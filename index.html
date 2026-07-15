@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TimerTrain｜複数タイマーを連続再生できる無料Webタイマー</title>
+<meta name="description" content="複数のタイマーを電車のように連結して、順番に自動再生。くり返し・色分け・名前設定に対応した無料のWebタイマー。インストール不要、ログイン不要、開いて3秒で使えます。">
+<link rel="canonical" href="https://timertrain.com/">
+<meta property="og:title" content="TimerTrain｜複数タイマーを連続再生">
+<meta property="og:description" content="複数のタイマーを連結して順番に自動再生。くり返し・色分け対応の無料Webタイマー。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/">
+<meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "TimerTrain",
+  "url": "https://timertrain.com/",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+  "description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・共有に対応。"
+}
+</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="app">
+  <header class="header">
+    <h1 class="logo">TimerTrain</h1>
+    <p class="tagline">連続・リピートタイマー</p>
+  </header>
+
+  <!-- 設定ビュー -->
+  <section id="setup" aria-label="タイマー設定">
+    <ul id="timer-list" class="timer-list"></ul>
+
+    <button id="add-btn" class="add-btn" type="button">＋ タイマーを追加</button>
+
+    <div class="repeat-row">
+      <span class="repeat-label">くり返し</span>
+      <div class="repeat-ctrl">
+        <button id="rep-minus" type="button" aria-label="くり返しを減らす">−</button>
+        <span id="rep-count">4回</span>
+        <button id="rep-plus" type="button" aria-label="くり返しを増やす">＋</button>
+        <button id="rep-inf" type="button" aria-label="無限にくり返す">∞</button>
+      </div>
+    </div>
+
+    <div class="total-row"><span id="total-label"></span></div>
+
+    <div class="action-row">
+      <button id="share-btn" class="share-btn" type="button">共有リンク</button>
+      <button id="start-btn" class="start-btn" type="button">▶ 開始</button>
+    </div>
+  </section>
+
+  <!-- 実行ビュー -->
+  <section id="run" class="run hidden" aria-label="タイマー実行中">
+    <button id="close-btn" class="close-btn" type="button" aria-label="閉じる">✕</button>
+    <p id="run-cycle" class="run-cycle"></p>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+      </svg>
+      <div class="ring-inner">
+        <p id="run-name" class="run-name"></p>
+        <p id="run-time" class="run-time">00:00</p>
+      </div>
+    </div>
+    <div id="stations" class="stations" aria-hidden="true"></div>
+    <div class="run-controls">
+      <button id="reset-btn" type="button" aria-label="リセット">⟲</button>
+      <button id="pause-btn" type="button" aria-label="一時停止">⏸</button>
+      <button id="skip-btn" type="button" aria-label="スキップ">⏭</button>
+    </div>
+    <p class="run-hint">Space: 開始/停止　S: スキップ　R: リセット　Esc: 閉じる</p>
+  </section>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <!-- SEO テキスト -->
+  <article class="about">
+    <h2>TimerTrainとは</h2>
+    <p>TimerTrainは、複数のタイマーを電車のように連結して、順番に自動再生できる無料のWebタイマーです。インストールもログインも不要。ページを開いて再生ボタンを押すだけで、連続タイマー・インターバルタイマーとしてすぐに使えます。</p>
+    <h2>使い方</h2>
+    <p>「＋タイマーを追加」で好きな数だけタイマーを並べ、時間をタップして変更、名前と色も自由に設定できます。くり返し回数を決めて再生すれば、作業と休憩、運動とインターバルのような繰り返しタイマーが自動で回り続けます。作ったタイマーはURLをコピーするだけで共有できます。</p>
+    <h2>こんな用途に</h2>
+    <p>ポモドーロ（25分作業＋5分休憩）、HIITやタバタ式トレーニング、勉強や授業の時間管理、料理の同時進行、プレゼンの練習など、「複数の時間を順番に測りたい」あらゆる場面で使えます。</p>
+  </article>
+
+  <footer class="footer">© 2026 TimerTrain</footer>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
