@@ -152,6 +152,11 @@ const listEl = $('timer-list'), setupEl = $('setup'), runEl = $('run');
 const runName = $('run-name'), runTime = $('run-time'), runCycle = $('run-cycle');
 const stationsEl = $('stations'), pauseBtn = $('pause-btn');
 const ringFg = $('ring-fg');
+const ICONS = {
+  play:  '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+  pause: '<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>',
+  replay: '<svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>',
+};
 const RING_C = 2 * Math.PI * 46;
 ringFg.style.strokeDasharray = RING_C;
 function setRing(frac, color) {
@@ -324,7 +329,7 @@ function startRun() {
   setupEl.classList.add('hidden');
   runEl.classList.remove('hidden');
   acquireWakeLock();
-  pauseBtn.textContent = '⏸';
+  pauseBtn.innerHTML = ICONS.pause;
   renderStations();
   tickId = setInterval(tick, 200);
   tick();
@@ -342,12 +347,12 @@ function pauseToggle() {
   if (run.paused) {
     run.endAt = Date.now() + run.remainMs;
     run.paused = false;
-    pauseBtn.textContent = '⏸';
+    pauseBtn.innerHTML = ICONS.pause;
     acquireWakeLock();
   } else {
     run.remainMs = Math.max(0, run.endAt - Date.now());
     run.paused = true;
-    pauseBtn.textContent = '▶';
+    pauseBtn.innerHTML = ICONS.play;
     releaseWakeLock();
   }
   updateRunView();
@@ -362,7 +367,7 @@ function resetRun() {
   run.paused = true;
   run.remainMs = state.timers[0].secs * 1000;
   run.lastSec = -1;
-  pauseBtn.textContent = '▶';
+  pauseBtn.innerHTML = ICONS.play;
   runTime.classList.remove('finished');
   renderStations();
   updateRunView();
@@ -392,7 +397,7 @@ function finish() {
   runTime.textContent = '完了 🎉';
   runName.textContent = '';
   runCycle.textContent = '';
-  pauseBtn.textContent = '⟲';
+  pauseBtn.innerHTML = ICONS.replay;
   setRing(1, '#34C759');
   document.title = '✅ 完了 — TimerTrain';
 }

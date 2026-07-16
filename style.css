@@ -111,7 +111,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   background: var(--card); box-shadow: var(--shadow);
   font-size: 15px; font-weight: 500;
 }
+.start-btn svg { width: 15px; height: 15px; fill: currentColor; margin-right: 7px; vertical-align: -2px; }
 .start-btn {
+  display: flex; align-items: center; justify-content: center;
   flex: 1; padding: 16px; border-radius: 999px;
   background: var(--accent); color: var(--accent-text);
   font-size: 17px; font-weight: 700; letter-spacing: .02em;
@@ -173,9 +175,11 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .run-controls button {
   width: 64px; height: 64px; border-radius: 50%;
   background: var(--card); box-shadow: var(--shadow);
-  font-size: 22px;
+  display: inline-flex; align-items: center; justify-content: center;
 }
-#pause-btn { width: 84px; height: 84px; font-size: 30px; background: var(--accent); color: var(--accent-text); }
+.run-controls button svg { width: 24px; height: 24px; fill: currentColor; }
+#pause-btn { width: 84px; height: 84px; background: var(--accent); color: var(--accent-text); }
+#pause-btn svg { width: 34px; height: 34px; }
 .run-hint { position: absolute; bottom: calc(20px + env(safe-area-inset-bottom)); font-size: 12px; color: var(--text2); width: 100%; left: 0; }
 @media (max-width: 600px) { .run-hint { display: none; } }
 
