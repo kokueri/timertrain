@@ -211,6 +211,16 @@ function renderList() {
     time.setAttribute('aria-label', '時間を変更');
     time.addEventListener('click', () => editTime(t, time));
 
+    const dup = document.createElement('button');
+    dup.className = 'dup-btn';
+    dup.textContent = '⧉';
+    dup.setAttribute('aria-label', '複製');
+    dup.addEventListener('click', () => {
+      const i = state.timers.findIndex(x => x.id === t.id);
+      state.timers.splice(i + 1, 0, { ...t, id: uid() });
+      persist(); renderList();
+    });
+
     const del = document.createElement('button');
     del.className = 'del-btn';
     del.textContent = '✕';
@@ -226,7 +236,7 @@ function renderList() {
     handle.textContent = '≡';
     enableDrag(handle, li);
 
-    li.append(dot, name, time, del, handle);
+    li.append(dot, name, time, dup, del, handle);
     listEl.appendChild(li);
   });
   updateTotal();

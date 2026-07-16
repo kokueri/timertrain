@@ -76,7 +76,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   border: none; border-bottom: 2px solid var(--text); background: none; color: var(--text);
   outline: none; padding: 8px 2px;
 }
-.del-btn { color: var(--text2); font-size: 15px; padding: 10px 6px; border-radius: 8px; }
+.dup-btn { color: var(--text2); font-size: 15px; padding: 10px 4px; border-radius: 8px; }
+.dup-btn:hover { color: var(--text); }
+.del-btn { color: var(--text2); font-size: 15px; padding: 10px 4px; border-radius: 8px; }
 .del-btn:hover { color: #FF6B6B; }
 .drag-handle { color: var(--text2); font-size: 16px; padding: 10px 2px 10px 6px; cursor: grab; touch-action: none; user-select: none; }
 .drag-handle:active { cursor: grabbing; }
