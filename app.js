@@ -22,14 +22,37 @@ const PALETTE = [
 const colorOf = id => (PALETTE.find(c => c.id === id) || PALETTE[5]).v;
 const nextColor = id => PALETTE[(PALETTE.findIndex(c => c.id === id) + 1) % PALETTE.length].id;
 const MAX_SECS = 99 * 3600;
+const LANG = document.documentElement.lang === 'en' ? 'en' : 'ja';
+const STR = {
+  ja: {
+    work: '作業', brk: '休憩', defName: 'タイマー', namePh: 'タイマー名',
+    lastDel: '最後の1つは削除できません', copied: 'リンクをコピーしました',
+    copyPrompt: 'このURLをコピーしてください', done: '完了 🎉', doneTitle: '✅ 完了 — TimerTrain',
+    reps: n => `${n}回`,
+    totalInf: one => `1周 ${one} × ∞`,
+    total: (t, one, n) => `合計 ${t}（${one} × ${n}周）`,
+    cycleInf: c => `${c}周目`,
+    cycle: (c, r) => `${c} / ${r}周`,
+  },
+  en: {
+    work: 'Work', brk: 'Break', defName: 'Timer', namePh: 'Timer name',
+    lastDel: "You can't delete the last timer", copied: 'Link copied',
+    copyPrompt: 'Copy this URL', done: 'Done 🎉', doneTitle: '✅ Done — TimerTrain',
+    reps: n => `×${n}`,
+    totalInf: one => `${one} per round × ∞`,
+    total: (t, one, n) => `Total ${t} (${one} × ${n} rounds)`,
+    cycleInf: c => `Round ${c}`,
+    cycle: (c, r) => `Round ${c} / ${r}`,
+  },
+}[LANG];
 const STORE_KEY = 'timertrain-v1';
 const BASE_TITLE = document.title;
 
 /* ---------- 状態 ---------- */
 let state = {
   timers: [
-    { id: uid(), name: '作業', secs: 1500, color: 'red' },
-    { id: uid(), name: '休憩', secs: 300,  color: 'blue' },
+    { id: uid(), name: STR.work, secs: 1500, color: 'red' },
+    { id: uid(), name: STR.brk, secs: 300,  color: 'blue' },
   ],
   repeat: 4, // Infinityで無限
 };
@@ -206,7 +229,7 @@ function renderList() {
     const name = document.createElement('input');
     name.className = 'name-input';
     name.value = t.name;
-    name.placeholder = 'タイマー名';
+    name.placeholder = STR.namePh;
     name.maxLength = 30;
     name.addEventListener('change', () => { t.name = name.value; persist(); });
 
@@ -231,7 +254,7 @@ function renderList() {
     del.textContent = '✕';
     del.setAttribute('aria-label', '削除');
     del.addEventListener('click', () => {
-      if (state.timers.length <= 1) { toast('最後の1つは削除できません'); return; }
+      if (state.timers.length <= 1) { toast(STR.lastDel); return; }
       state.timers = state.timers.filter(x => x.id !== t.id);
       persist(); renderList();
     });
@@ -314,10 +337,10 @@ function enableDrag(handle, li) {
 function updateTotal() {
   const one = state.timers.reduce((a, t) => a + t.secs, 0);
   const label = state.repeat === Infinity
-    ? `1周 ${fmt(one)} × ∞`
-    : `合計 ${fmt(one * state.repeat)}（${fmt(one)} × ${state.repeat}周）`;
+    ? STR.totalInf(fmt(one))
+    : STR.total(fmt(one * state.repeat), fmt(one), state.repeat);
   $('total-label').textContent = label;
-  $('rep-count').textContent = state.repeat === Infinity ? '∞' : `${state.repeat}回`;
+  $('rep-count').textContent = state.repeat === Infinity ? '∞' : STR.reps(state.repeat);
   $('rep-inf').classList.toggle('active', state.repeat === Infinity);
 }
 
@@ -394,12 +417,12 @@ function finish() {
   run.paused = true;
   releaseWakeLock();
   runTime.classList.add('finished');
-  runTime.textContent = '完了 🎉';
+  runTime.textContent = STR.done;
   runName.textContent = '';
   runCycle.textContent = '';
   pauseBtn.innerHTML = ICONS.replay;
   setRing(1, '#34C759');
-  document.title = '✅ 完了 — TimerTrain';
+  document.title = STR.doneTitle;
 }
 function tick() {
   if (!run.active || run.paused || run.finished) return;
@@ -418,10 +441,10 @@ function updateRunView() {
   const remainMs = run.paused ? run.remainMs : Math.max(0, run.endAt - Date.now());
   const disp = fmt(Math.ceil(remainMs / 1000));
   runTime.textContent = disp;
-  runName.textContent = t.name || 'タイマー';
+  runName.textContent = t.name || STR.defName;
   runCycle.textContent = state.repeat === Infinity
-    ? `${run.cycle}周目`
-    : `${run.cycle} / ${state.repeat}周`;
+    ? STR.cycleInf(run.cycle)
+    : STR.cycle(run.cycle, state.repeat);
   setRing(remainMs / (t.secs * 1000), colorOf(t.color));
   document.title = `${disp} ${t.name} — TimerTrain`;
 }
@@ -454,7 +477,7 @@ function toast(msg) {
 
 $('add-btn').addEventListener('click', () => {
   const last = state.timers[state.timers.length - 1];
-  state.timers.push({ id: uid(), name: 'タイマー', secs: 300, color: nextColor(last ? last.color : 'gray') });
+  state.timers.push({ id: uid(), name: STR.defName, secs: 300, color: nextColor(last ? last.color : 'gray') });
   persist(); renderList();
 });
 $('rep-minus').addEventListener('click', () => {
@@ -473,9 +496,9 @@ $('share-btn').addEventListener('click', async () => {
   const url = location.origin + location.pathname + serialize();
   try {
     await navigator.clipboard.writeText(url);
-    toast('リンクをコピーしました');
+    toast(STR.copied);
   } catch (e) {
-    prompt('このURLをコピーしてください', url);
+    prompt(STR.copyPrompt, url);
   }
 });
 $('start-btn').addEventListener('click', startRun);
