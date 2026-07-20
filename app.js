@@ -45,7 +45,7 @@ const STR = {
     cycle: (c, r) => `Round ${c} / ${r}`,
   },
 }[LANG];
-const STORE_KEY = 'timertrain-v1';
+const STORE_KEY = 'timertrain-v1:' + location.pathname;
 const BASE_TITLE = document.title;
 
 /* ---------- 状態 ---------- */
@@ -118,6 +118,7 @@ function parseConfig(qs) {
   } catch (e) { return null; }
 }
 function load() {
+  // 優先順: URL > このページの保存状態 > ページプリセット > 既定値
   const fromUrl = parseConfig(location.search);
   if (fromUrl) { state = fromUrl; return; }
   try {
@@ -126,9 +127,22 @@ function load() {
       const s = JSON.parse(raw);
       if (Array.isArray(s.timers) && s.timers.length) {
         state = { timers: s.timers, repeat: s.repeat === 'inf' ? Infinity : (s.repeat || 1) };
+        return;
       }
     }
   } catch (e) {}
+  const p = window.TT_PRESET;
+  if (p && Array.isArray(p.timers) && p.timers.length) {
+    state = {
+      timers: p.timers.map(t => ({
+        id: uid(),
+        name: String(t.name || STR.defName).slice(0, 30),
+        secs: Math.min(Math.max(1, t.secs | 0), MAX_SECS),
+        color: PALETTE.some(c => c.id === t.color) ? t.color : 'blue',
+      })),
+      repeat: p.repeat === 'inf' ? Infinity : Math.min(Math.max(1, p.repeat | 0), 99),
+    };
+  }
 }
 
 /* ---------- 音（iOS Safari 対応） ---------- */

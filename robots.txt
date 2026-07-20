@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://timertrain.com/sitemap.xml
