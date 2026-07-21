@@ -33,7 +33,7 @@
   "description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・共有に対応。"
 }
 </script>
-<link rel="stylesheet" href="/style.css?v=4">
+<link rel="stylesheet" href="/style.css?v=5">
 </head>
 <body>
 
@@ -43,7 +43,28 @@
     <h1 class="tagline page-title">HIITタイマー（40秒運動＋20秒休憩）</h1>
   </header>
 
-  <!-- 設定ビュー -->
+  <!-- タイマー（常時表示） -->
+  <section id="run" class="run-inline" aria-label="タイマー">
+    <p id="run-cycle" class="run-cycle"></p>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+      </svg>
+      <div class="ring-inner">
+        <p id="run-name" class="run-name"></p>
+        <p id="run-time" class="run-time">00:00</p>
+      </div>
+    </div>
+    <div id="stations" class="stations" aria-hidden="true"></div>
+    <div class="run-controls">
+      <button id="reset-btn" type="button" aria-label="リセット"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+      <button id="pause-btn" type="button" aria-label="開始・一時停止"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="skip-btn" type="button" aria-label="スキップ"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+    </div>
+  </section>
+
+  <!-- 設定（編成リスト） -->
   <section id="setup" aria-label="タイマー設定">
     <ul id="timer-list" class="timer-list"></ul>
 
@@ -62,32 +83,8 @@
     <div class="total-row"><span id="total-label"></span></div>
 
     <div class="action-row">
-      <button id="share-btn" class="share-btn" type="button">共有リンク</button>
-      <button id="start-btn" class="start-btn" type="button"><svg width="15" height="15" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>開始</button>
+      <button id="share-btn" class="share-btn wide" type="button">共有リンク</button>
     </div>
-  </section>
-
-  <!-- 実行ビュー -->
-  <section id="run" class="run hidden" aria-label="タイマー実行中">
-    <button id="close-btn" class="close-btn" type="button" aria-label="閉じる">✕</button>
-    <p id="run-cycle" class="run-cycle"></p>
-    <div class="ring-wrap">
-      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
-        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
-        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
-      </svg>
-      <div class="ring-inner">
-        <p id="run-name" class="run-name"></p>
-        <p id="run-time" class="run-time">00:00</p>
-      </div>
-    </div>
-    <div id="stations" class="stations" aria-hidden="true"></div>
-    <div class="run-controls">
-      <button id="reset-btn" type="button" aria-label="リセット"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
-      <button id="pause-btn" type="button" aria-label="一時停止"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button>
-      <button id="skip-btn" type="button" aria-label="スキップ"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
-    </div>
-    <p class="run-hint">Space: 開始/停止　S: スキップ　R: リセット　Esc: 閉じる</p>
   </section>
 
   <div id="toast" class="toast" role="status"></div>
@@ -108,6 +105,6 @@
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 40, "color": "red"}, {"name": "休憩", "secs": 20, "color": "blue"}], "repeat": 8};</script>
-<script src="/app.js?v=4"></script>
+<script src="/app.js?v=5"></script>
 </body>
 </html>

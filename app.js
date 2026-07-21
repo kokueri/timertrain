@@ -91,6 +91,7 @@ function serialize() {
 function persist() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify({ ...state, repeat: state.repeat === Infinity ? 'inf' : state.repeat })); } catch (e) {}
   history.replaceState(null, '', serialize());
+  configChanged();
 }
 function parseConfig(qs) {
   try {
@@ -218,6 +219,7 @@ function openColorPop(li, t, dot) {
       ev.stopPropagation();
       t.color = c.id;
       dot.style.background = c.v;
+      li.style.setProperty('--row-color', c.v);
       persist();
       closeColorPop();
     });
@@ -233,6 +235,7 @@ function renderList() {
     const li = document.createElement('li');
     li.className = 'timer-row';
     li.dataset.id = t.id;
+    li.style.setProperty('--row-color', colorOf(t.color));
 
     const dot = document.createElement('button');
     dot.className = 'color-dot';
@@ -282,6 +285,7 @@ function renderList() {
     listEl.appendChild(li);
   });
   updateTotal();
+  updateHighlight();
 }
 
 function editTime(t, btn) {
@@ -363,21 +367,43 @@ function startRun() {
   unlockAudio();
   run = { active: true, paused: false, finished: false, idx: 0, cycle: 1,
           endAt: Date.now() + state.timers[0].secs * 1000, remainMs: 0, lastSec: -1 };
-  setupEl.classList.add('hidden');
-  runEl.classList.remove('hidden');
   acquireWakeLock();
   pauseBtn.innerHTML = ICONS.pause;
+  runTime.classList.remove('finished');
   renderStations();
+  updateHighlight();
+  clearInterval(tickId);
   tickId = setInterval(tick, 200);
   tick();
 }
-function stopRun() {
+// 停止＝最初に戻る（待機状態: 1つ目のタイマーをリングにプレビュー）
+function resetToIdle() {
   clearInterval(tickId); tickId = null;
-  run.active = false;
+  run = { active: false, paused: true, finished: false, idx: 0, cycle: 1, endAt: 0, remainMs: 0, lastSec: -1 };
   releaseWakeLock();
   document.title = BASE_TITLE;
-  runEl.classList.add('hidden');
-  setupEl.classList.remove('hidden');
+  pauseBtn.innerHTML = ICONS.play;
+  runTime.classList.remove('finished');
+  renderStations();
+  updateHighlight();
+  updateIdleView();
+}
+function updateIdleView() {
+  const t = state.timers[0];
+  if (!t) return;
+  runName.textContent = t.name || STR.defName;
+  runTime.textContent = fmt(t.secs);
+  runCycle.textContent = '';
+  setRing(1, colorOf(t.color));
+}
+function updateHighlight() {
+  [...listEl.children].forEach((li, i) => {
+    li.classList.toggle('current', run.active && !run.finished && i === run.idx);
+  });
+}
+function configChanged() {
+  if (run.active) resetToIdle();
+  else updateIdleView();
 }
 function pauseToggle() {
   if (!run.active || run.finished) return;
@@ -398,17 +424,7 @@ function skip() {
   if (!run.active || run.finished) return;
   advance(false);
 }
-function resetRun() {
-  if (!run.active) return;
-  run.idx = 0; run.cycle = 1; run.finished = false;
-  run.paused = true;
-  run.remainMs = state.timers[0].secs * 1000;
-  run.lastSec = -1;
-  pauseBtn.innerHTML = ICONS.play;
-  runTime.classList.remove('finished');
-  renderStations();
-  updateRunView();
-}
+function resetRun() { resetToIdle(); }
 function advance(withSound) {
   const now = Date.now();
   if (run.idx + 1 < state.timers.length) {
@@ -423,6 +439,7 @@ function advance(withSound) {
   if (run.paused) run.remainMs = state.timers[run.idx].secs * 1000;
   else run.endAt = now + state.timers[run.idx].secs * 1000;
   renderStations();
+  updateHighlight();
   updateRunView();
 }
 function finish() {
@@ -473,7 +490,7 @@ function renderStations() {
       stationsEl.appendChild(rail);
     }
     const s = document.createElement('span');
-    s.className = 'station' + (i < run.idx ? ' done' : i === run.idx ? ' now' : '');
+    s.className = 'station' + (run.active ? (i < run.idx ? ' done' : i === run.idx ? ' now' : '') : '');
     s.style.background = colorOf(t.color);
     stationsEl.appendChild(s);
   });
@@ -515,12 +532,10 @@ $('share-btn').addEventListener('click', async () => {
     prompt(STR.copyPrompt, url);
   }
 });
-$('start-btn').addEventListener('click', startRun);
-$('pause-btn').addEventListener('click', () => { run.finished ? resetAndGo() : pauseToggle(); });
+$('pause-btn').addEventListener('click', () => { if (run.finished) resetAndGo(); else if (run.active) pauseToggle(); else startRun(); });
 $('skip-btn').addEventListener('click', skip);
 $('reset-btn').addEventListener('click', resetRun);
-$('close-btn').addEventListener('click', stopRun);
-function resetAndGo() { resetRun(); pauseToggle(); }
+function resetAndGo() { resetToIdle(); startRun(); }
 
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT') return;
@@ -533,10 +548,11 @@ document.addEventListener('keydown', e => {
   if (!run.active) return;
   if (e.key === 's' || e.key === 'S') skip();
   if (e.key === 'r' || e.key === 'R') resetRun();
-  if (e.key === 'Escape') stopRun();
+  if (e.key === 'Escape') resetToIdle();
 });
 
 /* ---------- 起動 ---------- */
 load();
 renderList();
-persist();
+pauseBtn.innerHTML = ICONS.play;
+persist(); // configChanged() 経由で待機ビュー（リングプレビュー）も描画される
