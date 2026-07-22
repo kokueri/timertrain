@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>インターバルタイマー｜運動＋休憩をくり返す無料タイマー - TimerTrain</title>
+<meta name="description" content="運動と休憩を自由な秒数でくり返せる無料のインターバルタイマー。ワンタップで開始、回数も時間も変更でき、インストール不要。筋トレ・HIIT・勉強のインターバルに。">
+<link rel="canonical" href="https://timertrain.com/interval-timer">
+<link rel="alternate" hreflang="ja" href="https://timertrain.com/interval-timer">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/en-interval-timer">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/interval-timer">
+<meta property="og:title" content="インターバルタイマー（運動＋休憩をくり返す） - TimerTrain">
+<meta property="og:description" content="運動と休憩を自由な秒数でくり返せる無料のインターバルタイマー。ワンタップ開始、インストール不要。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/interval-timer">
+<meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "TimerTrain",
+  "url": "https://timertrain.com/",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+  "description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・共有に対応。"
+}
+</script>
+<link rel="stylesheet" href="/style.css?v=5">
+</head>
+<body>
+
+<main class="app">
+  <header class="header">
+    <a class="logo" href="/">TimerTrain</a>
+    <h1 class="tagline page-title">インターバルタイマー（運動＋休憩をくり返す）</h1>
+  </header>
+
+  <!-- タイマー（常時表示） -->
+  <section id="run" class="run-inline" aria-label="タイマー">
+    <p id="run-cycle" class="run-cycle"></p>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+      </svg>
+      <div class="ring-inner">
+        <p id="run-name" class="run-name"></p>
+        <p id="run-time" class="run-time">00:00</p>
+      </div>
+    </div>
+    <div id="stations" class="stations" aria-hidden="true"></div>
+    <div class="run-controls">
+      <button id="reset-btn" type="button" aria-label="リセット"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+      <button id="pause-btn" type="button" aria-label="開始・一時停止"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="skip-btn" type="button" aria-label="スキップ"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+    </div>
+  </section>
+
+  <!-- 設定（編成リスト） -->
+  <section id="setup" aria-label="タイマー設定">
+    <ul id="timer-list" class="timer-list"></ul>
+
+    <button id="add-btn" class="add-btn" type="button">＋ タイマーを追加</button>
+
+    <div class="repeat-row">
+      <span class="repeat-label">くり返し</span>
+      <div class="repeat-ctrl">
+        <button id="rep-minus" type="button" aria-label="くり返しを減らす">−</button>
+        <span id="rep-count">4回</span>
+        <button id="rep-plus" type="button" aria-label="くり返しを増やす">＋</button>
+        <button id="rep-inf" type="button" aria-label="無限にくり返す">∞</button>
+      </div>
+    </div>
+
+    <div class="total-row"><span id="total-label"></span></div>
+
+    <div class="action-row">
+      <button id="share-btn" class="share-btn wide" type="button">共有リンク</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <!-- SEO テキスト -->
+  <article class="about">
+    <h2>インターバルタイマーとは</h2>
+    <p>インターバルタイマーは、「運動（または作業）」と「休憩」をあらかじめ決めた秒数でくり返し計るタイマーです。1種目だけを計るストップウォッチと違い、〈45秒動いて15秒休む〉を10セット、のように“動と静の切り替え”を自動でこなしてくれるのが特徴。筋トレのサーキット、HIIT、ランニングの疾走⇄流し、さらには勉強の集中⇄小休憩まで、リズムを作りたいあらゆる場面で使えます。</p>
+    <h2>このタイマーの使い方</h2>
+    <p>このページを開くと〈45秒の運動＋15秒の休憩〉が10セットぶんセットされています。「開始」を押すだけで、運動→休憩→運動…と自動で切り替わり、残りセット数も表示されます。秒数もセット数も自由に変更でき、「＋タイマーを追加」で3種目以上のメニュー（例: 運動→休憩→別の運動）も組めます。完成した構成はURLをコピーするだけで保存・共有できるので、お気に入りのメニューをブックマークしておけます。</p>
+    <h2>時間の決め方の目安</h2>
+    <p>迷ったら、運動と休憩の比率から考えると決めやすくなります。きつめに追い込むなら運動：休憩＝2:1（例: 40秒＋20秒）、初心者や有酸素寄りなら1:1（例: 30秒＋30秒）が扱いやすい配分です。セット数は合計時間から逆算しましょう。10分やりたいなら60秒サイクル×10セット、といった具合です。まずは無理のない設定で始め、慣れてきたら運動時間を延ばすか休憩を削ると、少しずつ負荷を上げられます。</p>
+    <h2>安全に続けるために</h2>
+    <p>高強度で行う場合は、必ず数分の軽い運動でウォームアップしてから始め、終わったらクールダウンを入れてください。痛みや強いめまいを感じたら中断すること。水分はセットの合間にこまめに取りましょう。持病がある方や運動を再開したばかりの方は、負荷の設定を軽めにし、必要に応じて専門家に相談してください。</p>
+    <h2>関連タイマー</h2>
+    <p><a href="/tabata">タバタ式タイマー（20秒＋10秒×8）</a> · <a href="/hiit">HIITタイマー</a> · <a href="/pomodoro">ポモドーロタイマー</a> · <a href="/">タイマーを自由に作る</a></p>
+  </article>
+
+  <footer class="footer">© 2026 TimerTrain · <a href="/en-interval-timer" class="lang-link">English</a></footer>
+</main>
+
+<script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 45, "color": "red"}, {"name": "休憩", "secs": 15, "color": "blue"}], "repeat": 10};</script>
+<script src="/app.js?v=5"></script>
+</body>
+</html>

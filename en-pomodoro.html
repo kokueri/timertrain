@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pomodoro Timer | Start 25-min Focus + 5-min Break in One Tap - TimerTrain</title>
+<meta name="description" content="A free online Pomodoro timer: 25 minutes of focused work plus a 5-minute break, started instantly in your browser. Adjust length and repeats, no install, and share your setup by URL.">
+<link rel="canonical" href="https://timertrain.com/en-pomodoro">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/en-pomodoro">
+<link rel="alternate" hreflang="ja" href="https://timertrain.com/pomodoro">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/pomodoro">
+<meta property="og:title" content="Pomodoro Timer (25-min focus + 5-min break) - TimerTrain">
+<meta property="og:description" content="Free browser Pomodoro timer. Adjust length and repeats, no install, share your setup by URL.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/en-pomodoro">
+<meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "TimerTrain",
+  "url": "https://timertrain.com/en",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free online sequential multi-timer. Chain timers, repeat them, and share your setup with a URL."
+}
+</script>
+<link rel="stylesheet" href="/style.css?v=5">
+</head>
+<body>
+
+<main class="app">
+  <header class="header">
+    <a class="logo" href="/en">TimerTrain</a>
+    <h1 class="tagline page-title">Pomodoro Timer (25-min focus + 5-min break)</h1>
+  </header>
+
+  <!-- Timer (always visible) -->
+  <section id="run" class="run-inline" aria-label="Timer">
+    <p id="run-cycle" class="run-cycle"></p>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+      </svg>
+      <div class="ring-inner">
+        <p id="run-name" class="run-name"></p>
+        <p id="run-time" class="run-time">00:00</p>
+      </div>
+    </div>
+    <div id="stations" class="stations" aria-hidden="true"></div>
+    <div class="run-controls">
+      <button id="reset-btn" type="button" aria-label="Reset"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+      <button id="pause-btn" type="button" aria-label="Start / pause"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="skip-btn" type="button" aria-label="Skip"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+    </div>
+  </section>
+
+  <!-- Setup view -->
+  <section id="setup" aria-label="Timer setup">
+    <ul id="timer-list" class="timer-list"></ul>
+
+    <button id="add-btn" class="add-btn" type="button">＋ Add timer</button>
+
+    <div class="repeat-row">
+      <span class="repeat-label">Repeat</span>
+      <div class="repeat-ctrl">
+        <button id="rep-minus" type="button" aria-label="Fewer repeats">−</button>
+        <span id="rep-count">×4</span>
+        <button id="rep-plus" type="button" aria-label="More repeats">＋</button>
+        <button id="rep-inf" type="button" aria-label="Repeat forever">∞</button>
+      </div>
+    </div>
+
+    <div class="total-row"><span id="total-label"></span></div>
+
+    <div class="action-row">
+      <button id="share-btn" class="share-btn wide" type="button">Share link</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <!-- SEO text -->
+  <article class="about">
+    <h2>What is the Pomodoro Technique?</h2>
+    <p>The Pomodoro Technique is a time-management method that alternates 25 minutes of focused work with a 5-minute break — one cycle is called a "pomodoro." It was created by Francesco Cirillo in the late 1980s and named after the tomato-shaped ("pomodoro" in Italian) kitchen timer he used as a student. The idea is to stack short, finite bursts of focus: a fixed 25-minute deadline makes concentration easier to summon, and after four pomodoros you take a longer 15–30 minute break.</p>
+    <h2>How to use this Pomodoro timer</h2>
+    <p>Opening this page loads a 25-minute work timer and a 5-minute break timer, set to repeat four times. Just press Start and the timer runs the work-break-work cycle automatically. You can change the durations and the number of repeats on the spot, and if you want a long break, use "Add timer" to append a 15-minute rest. Any setup you build can be saved and shared simply by copying the URL, so you can bookmark your own custom Pomodoro configuration.</p>
+    <h2>Why 25 and 5 minutes?</h2>
+    <p>Twenty-five minutes is long enough to make real progress but short enough that focus rarely fades — a practical sweet spot, not a strict rule. If you get into flow easily, try 50 minutes of work with a 10-minute break; if your tasks are small and frequent, 15 and 3 may fit better. What matters is not the exact number but deliberately separating work from rest. Start with the standard 25 + 5, and adjust if it doesn't feel right.</p>
+    <h2>Tips for staying focused</h2>
+    <p>Three habits do most of the work. First, assign just one task to each pomodoro — trying to juggle several dilutes your focus. Second, silence notifications while you work; even moving your phone to another room cuts the cost of getting back on track. Third, step away from the screen during breaks and move a little — standing up, drinking water, or looking out a window resets your brain. If a pomodoro gets interrupted, drop it and start a fresh one. Begin with four pomodoros a day.</p>
+    <h2>FAQ</h2>
+    <p><strong>Do I really need the breaks?</strong> Yes — breaks are recovery time, and skipping them makes your output drop sharply later on. <br /><strong>What if I finish before 25 minutes are up?</strong> Stopping at a natural point is fine; consistency matters more than perfect adherence. <br /><strong>Is there a sound?</strong> The timer notifies you when a phase ends. In quiet settings you can leave it muted — the on-screen switch still shows each transition.</p>
+    <h2>Related timers</h2>
+    <p><a href="/en-interval-timer">Interval timer</a> · <a href="/en">Build your own timer</a></p>
+  </article>
+
+  <footer class="footer">© 2026 TimerTrain · <a href="/pomodoro" class="lang-link">日本語</a></footer>
+</main>
+
+<script>window.TT_PRESET = {"timers": [{"name": "Focus", "secs": 1500, "color": "red"}, {"name": "Break", "secs": 300, "color": "blue"}], "repeat": 4};</script>
+<script src="/app.js?v=5"></script>
+</body>
+</html>
