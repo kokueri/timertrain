@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&display=swap');
 /* ===== TimerTrain — Apple-minimal design ===== */
 :root {
   --bg: #FFF9EE;
@@ -9,6 +10,7 @@
   --accent-text: #FFFFFF;
   --shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.04);
   --radius: 16px;
+  --font-round: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -130,14 +132,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .run-cycle { font-size: 14px; color: var(--text2); font-variant-numeric: tabular-nums; }
 .run-name { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 2px; }
 .run-time {
-  font-size: clamp(34px, 10vw, 48px); font-weight: 700;
+  font-size: clamp(46px, 13vw, 84px); font-weight: 700;
   font-variant-numeric: tabular-nums; letter-spacing: -.03em;
   line-height: 1.1;
 }
-.run-time.finished { font-size: clamp(20px, 6vw, 28px); }
+.run-time.finished { font-size: clamp(22px, 7vw, 34px); }
 
 /* ---- progress ring ---- */
-.ring-wrap { position: relative; width: min(58vw, 240px); aspect-ratio: 1; margin: 8px 0 14px; }
+.ring-wrap { position: relative; width: min(76vw, 340px); aspect-ratio: 1; margin: 10px 0 18px; }
 .ring { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
 .ring circle { fill: none; stroke-width: 4.5; }
 .ring-bg { stroke: var(--line); }
@@ -202,3 +204,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 a.logo { text-decoration: none; color: inherit; display: block; }
 .page-title { font-size: 15px; font-weight: 500; }
 .about a { color: inherit; }
+
+/* ---- rounded display font (numbers & brand) ---- */
+.logo, .tagline, .page-title, .run-cycle, .run-name, .run-time { font-family: var(--font-round); }
