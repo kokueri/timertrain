@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tabata Timer | 20s Work + 10s Rest x 8, Free Online - TimerTrain</title>
+<meta name="description" content="A free online Tabata timer: 20 seconds of all-out work and 10 seconds of rest, repeated 8 times. Audio cues for every set so you never watch the screen. No install.">
+<link rel="canonical" href="https://timertrain.com/en-tabata">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/en-tabata">
+<link rel="alternate" hreflang="ja" href="https://timertrain.com/tabata">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/tabata">
+<meta property="og:title" content="Tabata Timer (20s work + 10s rest x 8) - TimerTrain">
+<meta property="og:description" content="Free browser Tabata timer: 20s work + 10s rest x 8, with audio cues for every set. No install.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/en-tabata">
+<meta property="og:image" content="https://timertrain.com/ogp-en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://timertrain.com/ogp-en.png">
+<meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "TimerTrain",
+  "url": "https://timertrain.com/en",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free online sequential multi-timer. Chain timers, repeat them, and share your setup with a URL."
+}
+</script>
+<link rel="stylesheet" href="/style.css?v=7">
+</head>
+<body>
+
+<main class="app">
+  <header class="header">
+    <a class="logo" href="/en">TimerTrain</a>
+    <h1 class="tagline page-title">Tabata Timer (20s work + 10s rest x 8)</h1>
+  </header>
+
+  <section id="run" class="run-inline" aria-label="Timer">
+    <p id="run-cycle" class="run-cycle"></p>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+      </svg>
+      <div class="ring-inner">
+        <p id="run-name" class="run-name"></p>
+        <p id="run-time" class="run-time">00:00</p>
+      </div>
+    </div>
+    <div id="stations" class="stations" aria-hidden="true"></div>
+    <div class="run-controls">
+      <button id="reset-btn" type="button" aria-label="Reset"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+      <button id="pause-btn" type="button" aria-label="Start / pause"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="skip-btn" type="button" aria-label="Skip"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+    </div>
+  </section>
+
+  <section id="setup" aria-label="Timer setup">
+    <ul id="timer-list" class="timer-list"></ul>
+
+    <button id="add-btn" class="add-btn" type="button">＋ Add timer</button>
+
+    <div class="repeat-row">
+      <span class="repeat-label">Repeat</span>
+      <div class="repeat-ctrl">
+        <button id="rep-minus" type="button" aria-label="Fewer repeats">−</button>
+        <span id="rep-count">x8</span>
+        <button id="rep-plus" type="button" aria-label="More repeats">＋</button>
+        <button id="rep-inf" type="button" aria-label="Repeat forever">∞</button>
+      </div>
+    </div>
+
+    <div class="total-row"><span id="total-label"></span></div>
+
+    <div class="action-row">
+      <button id="share-btn" class="share-btn wide" type="button">Share link</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <article class="about">
+    <h2>What is Tabata training?</h2>
+    <p>Tabata is a form of high-intensity interval training: 20 seconds of all-out effort followed by 10 seconds of rest, repeated 8 times for a total of 4 minutes. It grew out of research by Dr. Izumi Tabata and colleagues at Ritsumeikan University, and is known worldwide simply as "TABATA" — a way to train both aerobic and anaerobic capacity in a very short session.</p>
+    <h2>How to use this Tabata timer</h2>
+    <p>This page is preset to 20 seconds of work and 10 seconds of rest for 8 sets. Press Start and a countdown beep sounds in the last 3 seconds of each phase, with an audio cue at every switch — so you never need to look at the screen while you move. To label an exercise, rename a timer; to add a warm-up, insert a timer at the top. Any setup you build can be saved and shared just by copying the URL.</p>
+    <h2>Train safely</h2>
+    <p>Tabata only delivers its benefits when you truly go all-out, which is also what makes it demanding. Always warm up first, and scale the number of sets to how you feel — there's no need to push through when your body says stop.</p>
+    <h2>Related timers</h2>
+    <p><a href="/en-hiit">HIIT timer</a> · <a href="/en-interval-timer">Interval timer</a> · <a href="/en">Build your own timer</a></p>
+  </article>
+
+  <footer class="footer">© 2026 TimerTrain · <a href="/tabata" class="lang-link">日本語</a></footer>
+</main>
+
+<script>window.TT_PRESET = {"timers": [{"name": "Work", "secs": 20, "color": "red"}, {"name": "Rest", "secs": 10, "color": "blue"}], "repeat": 8};</script>
+<script src="/app.js?v=5"></script>
+</body>
+</html>
