@@ -207,3 +207,13 @@ a.logo { text-decoration: none; color: inherit; display: block; }
 
 /* ---- rounded display font (numbers & brand) ---- */
 .logo, .tagline, .page-title, .run-cycle, .run-name, .run-time { font-family: var(--font-round); }
+
+/* ---- 時間編集（分／秒 2フィールド） ---- */
+.time-edit { display: inline-flex; align-items: center; }
+.time-field {
+  width: 42px; font-size: 22px; font-weight: 600; text-align: center;
+  font-variant-numeric: tabular-nums;
+  border: none; border-bottom: 2px solid var(--text); background: none; color: var(--text);
+  outline: none; padding: 8px 0;
+}
+.time-colon { font-size: 22px; font-weight: 600; padding: 8px 2px; color: var(--text); }
