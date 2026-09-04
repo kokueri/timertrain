@@ -289,21 +289,43 @@ function renderList() {
 }
 
 function editTime(t, btn) {
-  const input = document.createElement('input');
-  input.className = 'time-input';
-  input.value = fmt(t.secs);
-  input.inputMode = 'numeric';
-  btn.replaceWith(input);
-  input.focus(); input.select();
+  const wrap = document.createElement('span');
+  wrap.className = 'time-edit';
+  const mk = (val, aria, len) => {
+    const el = document.createElement('input');
+    el.className = 'time-field';
+    el.inputMode = 'numeric';
+    el.value = val;
+    el.maxLength = len;
+    el.setAttribute('aria-label', aria);
+    el.addEventListener('focus', () => el.select());
+    el.addEventListener('input', () => { el.value = el.value.replace(/[^0-9]/g, ''); });
+    return el;
+  };
+  const total = Math.max(0, Math.round(t.secs));
+  const mm = mk(String(Math.floor(total / 60)), LANG === 'en' ? 'minutes' : '分', 3);
+  const colon = document.createElement('span');
+  colon.className = 'time-colon';
+  colon.textContent = ':';
+  const ss = mk(String(total % 60).padStart(2, '0'), LANG === 'en' ? 'seconds' : '秒', 2);
+  wrap.append(mm, colon, ss);
+  btn.replaceWith(wrap);
+  mm.focus(); mm.select();
+  let done = false;
   const commit = () => {
-    const v = parseTime(input.value);
-    if (v) t.secs = v;
+    if (done) return; done = true;
+    const m = parseInt(mm.value || '0', 10) || 0;
+    const s = parseInt(ss.value || '0', 10) || 0;
+    t.secs = Math.min(Math.max(1, m * 60 + s), MAX_SECS);
     persist(); renderList();
   };
-  input.addEventListener('blur', commit);
-  input.addEventListener('keydown', e => {
-    if (e.key === 'Enter') input.blur();
-    if (e.key === 'Escape') { input.value = fmt(t.secs); input.blur(); }
+  const cancel = () => { if (done) return; done = true; renderList(); };
+  wrap.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); commit(); }
+    else if (e.key === 'Escape') { e.preventDefault(); cancel(); }
+  });
+  wrap.addEventListener('focusout', () => {
+    setTimeout(() => { if (!done && !wrap.contains(document.activeElement)) commit(); }, 0);
   });
 }
 
