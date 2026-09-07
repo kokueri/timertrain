@@ -267,7 +267,7 @@ a.logo { text-decoration: none; color: inherit; display: block; }
     align-items: start;
   }
   .header { grid-area: header; margin-bottom: 28px; }
-  #run    { grid-area: run; position: sticky; top: 32px; margin: 0; }
+  #run    { grid-area: run; margin: 0; }
   #setup  { grid-area: setup; padding-top: 4px; }
   .about  { grid-area: about; max-width: 760px; margin-top: 72px; }
   .footer { grid-area: footer; }
