@@ -47,7 +47,7 @@
   "description": "Free online sequential multi-timer. Chain timers, repeat them, and share your setup with a URL."
 }
 </script>
-<link rel="stylesheet" href="/style.css?v=8">
+<link rel="stylesheet" href="/style.css?v=9">
 </head>
 <body>
 
@@ -55,6 +55,14 @@
   <header class="header">
     <a class="logo" href="/en">TimerTrain</a>
     <h1 class="tagline page-title">HIIT Timer (40s work + 20s rest)</h1>
+    <nav class="nav" aria-label="Timer presets">
+      <a href="/en-pomodoro">Pomodoro</a>
+      <a href="/en-interval-timer">Interval</a>
+      <a href="/en-tabata">Tabata</a>
+      <a href="/en-hiit" aria-current="page">HIIT</a>
+      <a href="/en-study">Study</a>
+      <a href="/en-kitchen">Kitchen</a>
+    </nav>
   </header>
 
   <section id="run" class="run-inline" aria-label="Timer">
@@ -116,7 +124,7 @@
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "Work", "secs": 40, "color": "red"}, {"name": "Rest", "secs": 20, "color": "blue"}], "repeat": 8};</script>
-<script src="/app.js?v=5"></script>
+<script src="/app.js?v=6"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

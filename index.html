@@ -47,7 +47,7 @@
   "description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・共有に対応。"
 }
 </script>
-<link rel="stylesheet" href="/style.css?v=8">
+<link rel="stylesheet" href="/style.css?v=9">
 </head>
 <body>
 
@@ -55,6 +55,14 @@
   <header class="header">
     <h1 class="logo">TimerTrain</h1>
     <p class="tagline">タイマーを並べて自動で切り替え。リンクひとつで共有</p>
+    <nav class="nav" aria-label="用途別タイマー">
+      <a href="/pomodoro">ポモドーロ</a>
+      <a href="/interval-timer">インターバル</a>
+      <a href="/tabata">タバタ</a>
+      <a href="/hiit">HIIT</a>
+      <a href="/study">勉強</a>
+      <a href="/kitchen">キッチン</a>
+    </nav>
   </header>
 
   <!-- タイマー（常時表示） -->
@@ -120,7 +128,7 @@
   <footer class="footer">© 2026 TimerTrain · <a href="/en" class="lang-link">English</a></footer>
 </main>
 
-<script src="/app.js?v=5"></script>
+<script src="/app.js?v=6"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

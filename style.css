@@ -240,3 +240,79 @@ a.logo { text-decoration: none; color: inherit; display: block; }
 .run-controls button:focus-visible,
 .repeat-ctrl button:focus-visible,
 .share-btn:focus-visible { outline-offset: 3px; }
+
+/* ================= 用途別ナビ（PCのみ表示・スマホは非表示） ================= */
+.nav { display: none; }
+
+/* ================= キーボードのヒント（PCのみ） ================= */
+.kbd-hint { display: none; margin-top: 18px; font-size: 12px; color: var(--text2); text-align: center; }
+.kbd-hint kbd { font: inherit; background: var(--card); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; margin: 0 2px; }
+
+/* ================= 集中モードのボタン ================= */
+#focus-btn { display: none; }
+
+/* ================= PCレイアウト（900px以上・スマホには一切影響しない） ================= */
+@media (min-width: 900px) {
+  .app {
+    max-width: 1120px;
+    padding: 32px 32px 64px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    grid-template-areas:
+      "header header"
+      "run    setup"
+      "about  about"
+      "footer footer";
+    column-gap: 56px;
+    align-items: start;
+  }
+  .header { grid-area: header; margin-bottom: 28px; }
+  #run    { grid-area: run; position: sticky; top: 32px; margin: 0; }
+  #setup  { grid-area: setup; padding-top: 4px; }
+  .about  { grid-area: about; max-width: 760px; margin-top: 72px; }
+  .footer { grid-area: footer; }
+
+  .logo { font-size: 26px; }
+  .tagline { font-size: 14px; }
+
+  .nav {
+    display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 22px;
+    margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line);
+  }
+  .nav a { color: var(--text2); text-decoration: none; font-size: 14px; padding: 4px 2px; border-radius: 6px; }
+  .nav a:hover { color: var(--text); }
+  .nav a[aria-current="page"] { color: var(--text); font-weight: 700; }
+
+  .ring-wrap { width: min(34vw, 420px); margin: 6px 0 26px; }
+  .run-time { font-size: clamp(64px, 6vw, 108px); }
+  .run-time.finished { font-size: clamp(26px, 2.4vw, 40px); }
+  .run-controls { gap: 22px; }
+  .kbd-hint { display: block; margin-top: 14px; }
+
+  #focus-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    margin-top: 22px;
+    padding: 9px 15px; border-radius: 999px;
+    background: var(--card); box-shadow: var(--shadow);
+    border: 1.5px solid var(--line);
+    font-size: 13px; font-weight: 500; color: var(--text2);
+  }
+  #focus-btn svg { width: 15px; height: 15px; fill: currentColor; }
+  #focus-btn:hover { color: var(--text); }
+}
+
+/* ================= 集中モード（リングと時間だけの全画面） ================= */
+body.focus-mode { overflow: hidden; }
+body.focus-mode .header,
+body.focus-mode #setup,
+body.focus-mode .about,
+body.focus-mode .footer,
+body.focus-mode .kbd-hint { display: none; }
+body.focus-mode .app { display: block; max-width: none; padding: 0; }
+body.focus-mode #run { position: static; margin: 0; min-height: 100vh; justify-content: center; }
+body.focus-mode #focus-btn { position: fixed; top: 24px; right: 28px; }
+body.focus-mode .ring-wrap { width: min(66vh, 52vw); margin: 0 0 34px; }
+body.focus-mode .run-time { font-size: min(15vh, 11vw); }
+body.focus-mode .run-time.finished { font-size: min(5vh, 4vw); }
+body.focus-mode .run-name { font-size: clamp(15px, 2.2vh, 22px); }
+body.focus-mode .stations { margin-bottom: 26px; }

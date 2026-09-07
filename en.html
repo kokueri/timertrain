@@ -47,7 +47,7 @@
   "description": "Free online sequential multi-timer. Chain timers, repeat them, and share your setup with a URL."
 }
 </script>
-<link rel="stylesheet" href="/style.css?v=8">
+<link rel="stylesheet" href="/style.css?v=9">
 </head>
 <body>
 
@@ -55,6 +55,14 @@
   <header class="header">
     <h1 class="logo">TimerTrain</h1>
     <p class="tagline">Chain timers, auto-switch, and share by one link</p>
+    <nav class="nav" aria-label="Timer presets">
+      <a href="/en-pomodoro">Pomodoro</a>
+      <a href="/en-interval-timer">Interval</a>
+      <a href="/en-tabata">Tabata</a>
+      <a href="/en-hiit">HIIT</a>
+      <a href="/en-study">Study</a>
+      <a href="/en-kitchen">Kitchen</a>
+    </nav>
   </header>
 
   <!-- Timer (always visible) -->
@@ -120,7 +128,7 @@
   <footer class="footer">© 2026 TimerTrain · <a href="/" class="lang-link">日本語</a></footer>
 </main>
 
-<script src="/app.js?v=5"></script>
+<script src="/app.js?v=6"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
