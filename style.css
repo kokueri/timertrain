@@ -4,7 +4,7 @@
   --bg: #FFF9EE;
   --card: #FFFFFF;
   --text: #1C1C1E;
-  --text2: #8E8E93;
+  --text2: #6E6E73;
   --line: rgba(0,0,0,.06);
   --accent: #1C1C1E;
   --accent-text: #FFFFFF;
@@ -44,7 +44,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .timer-list { list-style: none; }
 .timer-row {
   position: relative;
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 8px;
   background: var(--card); border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 6px 12px 6px 14px; margin-bottom: 10px;
@@ -78,11 +78,16 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   border: none; border-bottom: 2px solid var(--text); background: none; color: var(--text);
   outline: none; padding: 8px 2px;
 }
-.dup-btn { color: var(--text2); font-size: 15px; padding: 10px 4px; border-radius: 8px; }
+.dup-btn, .del-btn, .drag-handle {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 44px; padding: 0; border-radius: 8px;
+  color: var(--text2); flex-shrink: 0;
+}
+.dup-btn { font-size: 15px; min-width: 34px; }
 .dup-btn:hover { color: var(--text); }
-.del-btn { color: var(--text2); font-size: 15px; padding: 10px 4px; border-radius: 8px; }
+.del-btn { font-size: 15px; min-width: 40px; }   /* 誤タップしやすいので広め */
 .del-btn:hover { color: #FF6B6B; }
-.drag-handle { color: var(--text2); font-size: 16px; padding: 10px 2px 10px 6px; cursor: grab; touch-action: none; user-select: none; }
+.drag-handle { font-size: 16px; min-width: 34px; cursor: grab; touch-action: none; user-select: none; }
 .drag-handle:active { cursor: grabbing; }
 
 .add-btn {
@@ -97,7 +102,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .repeat-label { font-size: 15px; color: var(--text2); }
 .repeat-ctrl { display: flex; align-items: center; gap: 4px; }
 .repeat-ctrl button {
-  width: 40px; height: 40px; border-radius: 12px;
+  width: 44px; height: 44px; border-radius: 12px;
   background: var(--card); box-shadow: var(--shadow);
   font-size: 18px; color: var(--text);
 }
@@ -217,3 +222,21 @@ a.logo { text-decoration: none; color: inherit; display: block; }
   outline: none; padding: 8px 0;
 }
 .time-colon { font-size: 22px; font-weight: 600; padding: 8px 2px; color: var(--text); }
+
+/* ---- フォーカスリング（:focus-visible = キーボード操作時のみ表示。マウス時は出ない） ---- */
+:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+.name-input:focus-visible,
+.time-input:focus-visible,
+.time-field:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+  border-radius: 6px;
+}
+.color-dot:focus-visible { outline-offset: 3px; }
+.run-controls button:focus-visible,
+.repeat-ctrl button:focus-visible,
+.share-btn:focus-visible { outline-offset: 3px; }
