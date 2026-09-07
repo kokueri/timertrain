@@ -29,6 +29,12 @@
 <meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest-en.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -108,12 +114,13 @@
     <h2>Cute and aesthetic</h2>
     <p>A warm, cream-colored design with rounded numerals — a free timer that actually looks good on your desk. Great for study-with-me and focus sessions. Dark mode included.</p>
     <h2>Ready-made timers</h2>
-    <p><a href="/en-pomodoro">Pomodoro timer</a> · <a href="/en-interval-timer">Interval timer</a> · <a href="/en-tabata">Tabata timer</a> · <a href="/en-hiit">HIIT timer</a> · <a href="/en-kitchen">Kitchen timer</a></p>
+    <p><a href="/en-pomodoro">Pomodoro timer</a> · <a href="/en-interval-timer">Interval timer</a> · <a href="/en-tabata">Tabata timer</a> · <a href="/en-hiit">HIIT timer</a> · <a href="/en-kitchen">Kitchen timer</a> · <a href="/en-study">Study timer</a></p>
   </article>
 
   <footer class="footer">© 2026 TimerTrain · <a href="/" class="lang-link">日本語</a></footer>
 </main>
 
 <script src="/app.js?v=5"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

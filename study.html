@@ -11,11 +11,14 @@
   gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>勉強タイマー｜50分勉強＋10分休憩で集中が続く - TimerTrain</title>
-<meta name="description" content="50分勉強＋10分休憩をくり返す勉強用タイマー。科目ごとに色分け・名前設定ができ、勉強計画をそのままタイマーにできます。無料・ログイン不要。">
+<title>勉強タイマー｜科目ごとに時間を並べて自動で切り替え - TimerTrain</title>
+<meta name="description" content="「英語30分→数学50分→休憩10分」のように科目ごとの時間を並べておくと、自動で切り替わる勉強用タイマー。色と名前で分けられるので、その日の勉強計画がそのままタイマーになります。無料・ログイン不要。">
 <link rel="canonical" href="https://timertrain.com/study">
-<meta property="og:title" content="勉強タイマー（50分勉強＋10分休憩） - TimerTrain">
-<meta property="og:description" content="50分勉強＋10分休憩をくり返す勉強用タイマー。科目ごとに色分け・名前設定ができ、勉強計画をそのままタイマーにできます。無料・ログイン不要。">
+<link rel="alternate" hreflang="ja" href="https://timertrain.com/study">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/en-study">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en-study">
+<meta property="og:title" content="勉強タイマー（科目ごとに並べて自動切り替え） - TimerTrain">
+<meta property="og:description" content="「英語30分→数学50分→休憩10分」のように科目ごとの時間を並べておくと、自動で切り替わる勉強用タイマー。色と名前で分けられるので、その日の勉強計画がそのままタイマーになります。無料・ログイン不要。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://timertrain.com/study">
 <meta property="og:image" content="https://timertrain.com/ogp.png">
@@ -26,6 +29,12 @@
 <meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -106,10 +115,11 @@
     <p><a href="/pomodoro">ポモドーロタイマー</a> · <a href="/kitchen">キッチンタイマー</a> · <a href="/">タイマーを自由に作る</a></p>
   </article>
 
-  <footer class="footer">© 2026 TimerTrain · <a href="/en" class="lang-link">English</a></footer>
+  <footer class="footer">© 2026 TimerTrain · <a href="/en-study" class="lang-link">English</a></footer>
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "勉強", "secs": 3000, "color": "green"}, {"name": "休憩", "secs": 600, "color": "blue"}], "repeat": 3};</script>
 <script src="/app.js?v=5"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

@@ -11,14 +11,14 @@
   gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>タバタ式タイマー｜20秒運動＋10秒休憩×8セット - TimerTrain</title>
-<meta name="description" content="20秒の全力運動と10秒の休憩を8セットくり返すタバタ式トレーニング用タイマー。音でセットを知らせ、画面を見なくても使えます。無料・インストール不要。">
+<title>タバタ式タイマー｜20秒＋10秒×8セットを音で自動進行 - TimerTrain</title>
+<meta name="description" content="20秒の全力運動と10秒の休憩を8セット、音の合図で自動進行するタバタ式タイマー。秒数もセット数も変更でき、画面を見なくても使えます。無料・インストール不要。">
 <link rel="canonical" href="https://timertrain.com/tabata">
 <link rel="alternate" hreflang="ja" href="https://timertrain.com/tabata">
 <link rel="alternate" hreflang="en" href="https://timertrain.com/en-tabata">
-<link rel="alternate" hreflang="x-default" href="https://timertrain.com/tabata">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en-tabata">
 <meta property="og:title" content="タバタ式タイマー（20秒＋10秒×8セット） - TimerTrain">
-<meta property="og:description" content="20秒の全力運動と10秒の休憩を8セットくり返すタバタ式トレーニング用タイマー。音でセットを知らせ、画面を見なくても使えます。無料・インストール不要。">
+<meta property="og:description" content="20秒の全力運動と10秒の休憩を8セット、音の合図で自動進行するタバタ式タイマー。秒数もセット数も変更でき、画面を見なくても使えます。無料・インストール不要。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://timertrain.com/tabata">
 <meta property="og:image" content="https://timertrain.com/ogp.png">
@@ -29,6 +29,12 @@
 <meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -114,5 +120,6 @@
 
 <script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 20, "color": "orange"}, {"name": "休憩", "secs": 10, "color": "teal"}], "repeat": 8};</script>
 <script src="/app.js?v=5"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

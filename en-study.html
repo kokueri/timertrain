@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Study Timer — Line Up Subjects and Switch Automatically | TimerTrain</title>
+<meta name="description" content="A free study timer that runs 50 minutes of study and a 10-minute break on repeat. Or line up one timer per subject — English 30, Maths 50, Break 10 — and let it switch automatically. Name and colour-code each block, then save the whole plan as a link. No signup, no install.">
+<link rel="canonical" href="https://timertrain.com/en-study">
+<link rel="alternate" hreflang="ja" href="https://timertrain.com/study">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/en-study">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en-study">
+<meta property="og:title" content="Study Timer — line up subjects, switch automatically - TimerTrain">
+<meta property="og:description" content="A free study timer that runs 50 minutes of study and a 10-minute break on repeat. Or line up one timer per subject — English 30, Maths 50, Break 10 — and let it switch automatically. Name and colour-code each block, then save the whole plan as a link. No signup, no install.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/en-study">
+<meta property="og:image" content="https://timertrain.com/ogp-en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://timertrain.com/ogp-en.png">
+<meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest-en.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "TimerTrain",
+  "url": "https://timertrain.com/en",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "description": "Free online sequential multi-timer. Chain timers, repeat them, and share your setup with a URL."
+}
+</script>
+<link rel="stylesheet" href="/style.css?v=7">
+</head>
+<body>
+
+<main class="app">
+  <header class="header">
+    <a class="logo" href="/en">TimerTrain</a>
+    <h1 class="tagline page-title">Study Timer (50-min study + 10-min break)</h1>
+  </header>
+
+  <!-- Timer (always visible) -->
+  <section id="run" class="run-inline" aria-label="Timer">
+    <p id="run-cycle" class="run-cycle"></p>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+      </svg>
+      <div class="ring-inner">
+        <p id="run-name" class="run-name"></p>
+        <p id="run-time" class="run-time">00:00</p>
+      </div>
+    </div>
+    <div id="stations" class="stations" aria-hidden="true"></div>
+    <div class="run-controls">
+      <button id="reset-btn" type="button" aria-label="Reset"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+      <button id="pause-btn" type="button" aria-label="Start / pause"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="skip-btn" type="button" aria-label="Skip"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+    </div>
+  </section>
+
+  <!-- Setup view -->
+  <section id="setup" aria-label="Timer setup">
+    <ul id="timer-list" class="timer-list"></ul>
+
+    <button id="add-btn" class="add-btn" type="button">＋ Add timer</button>
+
+    <div class="repeat-row">
+      <span class="repeat-label">Repeat</span>
+      <div class="repeat-ctrl">
+        <button id="rep-minus" type="button" aria-label="Fewer repeats">−</button>
+        <span id="rep-count">×4</span>
+        <button id="rep-plus" type="button" aria-label="More repeats">＋</button>
+        <button id="rep-inf" type="button" aria-label="Repeat forever">∞</button>
+      </div>
+    </div>
+
+    <div class="total-row"><span id="total-label"></span></div>
+
+    <div class="action-row">
+      <button id="share-btn" class="share-btn wide" type="button">Share link</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <!-- SEO text -->
+  <article class="about">
+    <h2>Why a timer makes studying easier</h2>
+    <p>A visible finish line changes how hard it is to start. Knowing that a block ends in fifty minutes turns "study history" into a task with edges, and a task with edges is one you can actually begin. The break matters just as much: recall improves when study is broken into spaced blocks rather than one long sitting, so the ten minutes off is part of the method, not a reward for surviving it.</p>
+    <h2>How to use this study timer</h2>
+    <p>Opening this page loads a 50-minute study block and a 10-minute break, set to repeat three times — press start and it runs the whole session for you. The more useful trick is one timer per subject. Use "Add timer" to build "English 30 — Maths 50 — Break 10 — Chemistry 40", give each block a name and a colour, and the timer becomes your plan for the evening instead of a single countdown. Whatever you build is stored in the URL, so you can bookmark tonight's plan and reopen it tomorrow in one tap.</p>
+    <h2>50 + 10, or 25 + 5?</h2>
+    <p>Fifty minutes suits reading, essays, problem sets and anything where stopping breaks your thread — it mirrors a school lesson, which is a rhythm most people are already trained on. Twenty-five minutes suits shorter, repetitive work like vocabulary, flashcards or revision drills, and it is easier to face when you are tired or avoiding the subject. Neither number is a rule. Start with the one that matches the work in front of you, and change the length the moment it starts fighting you. If you want the shorter cycle, the <a href="/en-pomodoro">Pomodoro timer</a> is preset for it.</p>
+    <h2>Making the sessions stick</h2>
+    <p>Decide what the block is for before you start it — "read chapter 4", not "do biology" — because a vague block quietly becomes a block of browsing. Keep the phone out of reach rather than face down; the cost of retrieving it is what protects the session. Spend the break away from a screen if you can, since the point is to let attention recover, not to move it somewhere else. And when a block falls apart, let it end and start a clean one instead of trying to rescue it.</p>
+    <h2>FAQ</h2>
+    <p><strong>Can I set a different length for each subject?</strong> Yes — every timer in the list has its own duration, name and colour, so a session can be as uneven as your workload is.<br /><strong>Does it keep running if I switch tabs?</strong> The countdown keeps time in the background and the tab title shows the remaining time, so you can check it without switching back.<br /><strong>Will my screen turn off mid-session?</strong> While a timer is running the page asks the device to keep the screen awake, so it stays visible on a phone propped up on the desk.<br /><strong>Do I need an account?</strong> No. Nothing is stored on a server — your setup lives in the URL, which is also how you share it.</p>
+    <h2>Related timers</h2>
+    <p><a href="/en-pomodoro">Pomodoro timer</a> · <a href="/en-interval-timer">Interval timer</a> · <a href="/en">Build your own timer</a></p>
+  </article>
+
+  <footer class="footer">© 2026 TimerTrain · <a href="/study" class="lang-link">日本語</a></footer>
+</main>
+
+<script>window.TT_PRESET = {"timers": [{"name": "Study", "secs": 3000, "color": "green"}, {"name": "Break", "secs": 600, "color": "blue"}], "repeat": 3};</script>
+<script src="/app.js?v=5"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</body>
+</html>

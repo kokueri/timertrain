@@ -1,0 +1,18 @@
+{
+  "name": "TimerTrain — 連続タイマー",
+  "short_name": "TimerTrain",
+  "description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・リンク共有に対応。",
+  "lang": "ja",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFF9EE",
+  "theme_color": "#FFF9EE",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -11,14 +11,14 @@
   gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Pomodoro Timer | Start 25-min Focus + 5-min Break in One Tap - TimerTrain</title>
-<meta name="description" content="A free online Pomodoro timer: 25 minutes of focused work plus a 5-minute break, started instantly in your browser. Adjust length and repeats, no install, and share your setup by URL.">
+<title>Pomodoro Timer — 25 + 5 on Auto-Repeat, Free Online | TimerTrain</title>
+<meta name="description" content="A free Pomodoro timer that switches between 25 minutes of focus and a 5-minute break automatically, for as many rounds as you want. Change any length and share your setup by link. No signup.">
 <link rel="canonical" href="https://timertrain.com/en-pomodoro">
-<link rel="alternate" hreflang="en" href="https://timertrain.com/en-pomodoro">
 <link rel="alternate" hreflang="ja" href="https://timertrain.com/pomodoro">
-<link rel="alternate" hreflang="x-default" href="https://timertrain.com/pomodoro">
-<meta property="og:title" content="Pomodoro Timer (25-min focus + 5-min break) - TimerTrain">
-<meta property="og:description" content="Free browser Pomodoro timer. Adjust length and repeats, no install, share your setup by URL.">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/en-pomodoro">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en-pomodoro">
+<meta property="og:title" content="Pomodoro Timer — 25 + 5 on auto-repeat - TimerTrain">
+<meta property="og:description" content="A free Pomodoro timer that switches between 25 minutes of focus and a 5-minute break automatically, for as many rounds as you want. Change any length and share your setup by link. No signup.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://timertrain.com/en-pomodoro">
 <meta property="og:image" content="https://timertrain.com/ogp-en.png">
@@ -29,6 +29,12 @@
 <meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest-en.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -110,7 +116,7 @@
     <h2>FAQ</h2>
     <p><strong>Do I really need the breaks?</strong> Yes — breaks are recovery time, and skipping them makes your output drop sharply later on. <br /><strong>What if I finish before 25 minutes are up?</strong> Stopping at a natural point is fine; consistency matters more than perfect adherence. <br /><strong>Is there a sound?</strong> The timer notifies you when a phase ends. In quiet settings you can leave it muted — the on-screen switch still shows each transition.</p>
     <h2>Related timers</h2>
-    <p><a href="/en-interval-timer">Interval timer</a> · <a href="/en">Build your own timer</a></p>
+    <p><a href="/en-study">Study timer</a> · <a href="/en-interval-timer">Interval timer</a> · <a href="/en">Build your own timer</a></p>
   </article>
 
   <footer class="footer">© 2026 TimerTrain · <a href="/pomodoro" class="lang-link">日本語</a></footer>
@@ -118,5 +124,6 @@
 
 <script>window.TT_PRESET = {"timers": [{"name": "Focus", "secs": 1500, "color": "red"}, {"name": "Break", "secs": 300, "color": "blue"}], "repeat": 4};</script>
 <script src="/app.js?v=5"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

@@ -16,7 +16,7 @@
 <link rel="canonical" href="https://timertrain.com/interval-timer">
 <link rel="alternate" hreflang="ja" href="https://timertrain.com/interval-timer">
 <link rel="alternate" hreflang="en" href="https://timertrain.com/en-interval-timer">
-<link rel="alternate" hreflang="x-default" href="https://timertrain.com/interval-timer">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en-interval-timer">
 <meta property="og:title" content="インターバルタイマー（運動＋休憩をくり返す） - TimerTrain">
 <meta property="og:description" content="運動と休憩を自由な秒数でくり返せる無料のインターバルタイマー。ワンタップ開始、インストール不要。">
 <meta property="og:type" content="website">
@@ -29,6 +29,12 @@
 <meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -116,5 +122,6 @@
 
 <script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 45, "color": "red"}, {"name": "休憩", "secs": 15, "color": "blue"}], "repeat": 10};</script>
 <script src="/app.js?v=5"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
