@@ -387,6 +387,7 @@ function updateTotal() {
 /* ---------- 実行 ---------- */
 function startRun() {
   unlockAudio();
+  if (window.gtag) gtag('event', 'timer_start');
   run = { active: true, paused: false, finished: false, idx: 0, cycle: 1,
           endAt: Date.now() + state.timers[0].secs * 1000, remainMs: 0, lastSec: -1 };
   acquireWakeLock();
@@ -546,6 +547,7 @@ $('rep-inf').addEventListener('click', () => {
   persist(); updateTotal();
 });
 $('share-btn').addEventListener('click', async () => {
+  if (window.gtag) gtag('event', 'share_click');
   const url = location.origin + location.pathname + serialize();
   try {
     await navigator.clipboard.writeText(url);
