@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Temporizador múltiple secuencial y repetible, para compartir por enlace - TimerTrain</title>
+<meta name="description" content="Encadena varios temporizadores y reprodúcelos en secuencia, luego comparte tu configuración con un solo enlace. Un temporizador online gratis y bonito: repeticiones, colores, sin instalar. Empieza en 3 segundos.">
+<link rel="canonical" href="https://timertrain.com/es">
+<link rel="alternate" hreflang="ja" href="https://timertrain.com/">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/en">
+<link rel="alternate" hreflang="es" href="https://timertrain.com/es">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en">
+<meta property="og:title" content="Temporizador múltiple secuencial para compartir por enlace - TimerTrain">
+<meta property="og:description" content="Encadena temporizadores, reprodúcelos en secuencia y comparte tu configuración con un enlace. Un temporizador online gratis y bonito.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/es">
+<meta property="og:image" content="https://timertrain.com/ogp-en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://timertrain.com/ogp-en.png">
+<meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest-es.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script type="application/ld+json">
+{
+"@context": "https://schema.org",
+"@type": "WebApplication",
+"name": "TimerTrain",
+"url": "https://timertrain.com/es",
+"applicationCategory": "UtilityApplication",
+"operatingSystem": "Any",
+"offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+"description": "Temporizador online gratis, secuencial y múltiple. Encadena temporizadores, repítelos y comparte tu configuración con una URL."
+}
+</script>
+<link rel="stylesheet" href="/style.css?v=10">
+</head>
+<body>
+
+<main class="app">
+<header class="header">
+<h1 class="logo">TimerTrain</h1>
+<p class="tagline">Encadena temporizadores, cambia automáticamente y comparte con un enlace</p>
+<nav class="nav" aria-label="Temporizadores por uso">
+<a href="/es?t=red.1500.Trabajo,blue.300.Descanso&r=4">Pomodoro</a>
+<a href="/es?t=green.60.Trabajo,gray.30.Descanso&r=8">Intervalos</a>
+<a href="/es?t=red.20.Trabajo,blue.10.Descanso&r=8">Tabata</a>
+<a href="/es?t=red.40.Trabajo,blue.20.Descanso&r=8">HIIT</a>
+<a href="/es?t=red.3000.Estudio,blue.600.Descanso&r=4">Estudio</a>
+<a href="/es?t=orange.300.Temporizador&r=1">Cocina</a>
+</nav>
+</header>
+
+<!-- Temporizador (siempre visible) -->
+<section id="run" class="run-inline" aria-label="Temporizador">
+<p id="run-cycle" class="run-cycle"></p>
+<div class="ring-wrap">
+<svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+<circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+<circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+</svg>
+<div class="ring-inner">
+<p id="run-name" class="run-name"></p>
+<p id="run-time" class="run-time">00:00</p>
+</div>
+</div>
+<div id="stations" class="stations" aria-hidden="true"></div>
+<div class="run-controls">
+<button id="reset-btn" type="button" aria-label="Reiniciar"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+<button id="pause-btn" type="button" aria-label="Iniciar / pausar"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+<button id="skip-btn" type="button" aria-label="Saltar"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+</div>
+</section>
+
+<!-- Configuración -->
+<section id="setup" aria-label="Configuración del temporizador">
+<ul id="timer-list" class="timer-list"></ul>
+
+<button id="add-btn" class="add-btn" type="button">＋ Añadir temporizador</button>
+
+<div class="repeat-row">
+<span class="repeat-label">Repetir</span>
+<div class="repeat-ctrl">
+<button id="rep-minus" type="button" aria-label="Menos repeticiones">−</button>
+<span id="rep-count">×4</span>
+<button id="rep-plus" type="button" aria-label="Más repeticiones">＋</button>
+<button id="rep-inf" type="button" aria-label="Repetir siempre">∞</button>
+</div>
+</div>
+
+<div class="total-row"><span id="total-label"></span></div>
+
+<div class="action-row">
+<button id="share-btn" class="share-btn wide" type="button">Compartir enlace</button>
+</div>
+</section>
+
+<div id="toast" class="toast" role="status"></div>
+
+<!-- Texto SEO -->
+<article class="about">
+<h2>¿Qué es TimerTrain?</h2>
+<p>TimerTrain es un temporizador online gratis que te permite encadenar varios temporizadores —como vagones de un tren— y reproducirlos en secuencia, una y otra vez. Sin instalación ni registro. Abre la página, pulsa play y úsalo al instante como temporizador secuencial, temporizador de intervalos o temporizador múltiple con repeticiones.</p>
+<h2>Cómo usarlo</h2>
+<p>Pulsa «Añadir temporizador» para colocar todos los que necesites, toca el tiempo para editarlo y ponle a cada uno un nombre y un color. Elige cuántas rondas quieres repetir y pulsa iniciar: tu ciclo de trabajo/descanso o ejercicio/pausa seguirá funcionando automáticamente. Comparte tu configuración exacta con quien quieras simplemente copiando la URL.</p>
+<h2>Perfecto para</h2>
+<p>Sesiones Pomodoro (25 min de trabajo + 5 min de descanso), entrenamientos HIIT y Tabata, estudiar y actividades de clase, cocinar varios platos a la vez, ensayar una presentación… cualquier situación en la que necesites varios temporizadores uno tras otro.</p>
+<h2>Bonito y con estilo</h2>
+<p>Un diseño cálido en color crema con números redondeados: un temporizador gratis que además se ve bien en tu escritorio. Ideal para sesiones de estudio y «study with me». Incluye modo oscuro.</p>
+<h2>Temporizadores listos para usar</h2>
+<p><a href="/es?t=red.1500.Trabajo,blue.300.Descanso&r=4">Temporizador Pomodoro</a> · <a href="/es?t=green.60.Trabajo,gray.30.Descanso&r=8">Temporizador de intervalos</a> · <a href="/es?t=red.20.Trabajo,blue.10.Descanso&r=8">Temporizador Tabata</a> · <a href="/es?t=red.40.Trabajo,blue.20.Descanso&r=8">Temporizador HIIT</a> · <a href="/es?t=orange.300.Temporizador&r=1">Temporizador de cocina</a> · <a href="/es?t=red.3000.Estudio,blue.600.Descanso&r=4">Temporizador de estudio</a></p>
+</article>
+
+<footer class="footer">© 2026 TimerTrain · <a href="/" class="lang-link">日本語</a> · <a href="/en" class="lang-link">English</a></footer>
+</main>
+
+<script src="/app.js?v=7"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</body>
+</html>

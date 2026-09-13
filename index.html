@@ -5,10 +5,10 @@
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-GSFVNEDCGN');
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>複数タイマーをWebで連続・くり返し再生｜共有できる無料タイマー - TimerTrain</title>
@@ -16,6 +16,7 @@
 <link rel="canonical" href="https://timertrain.com/">
 <link rel="alternate" hreflang="ja" href="https://timertrain.com/">
 <link rel="alternate" hreflang="en" href="https://timertrain.com/en">
+<link rel="alternate" hreflang="es" href="https://timertrain.com/es">
 <link rel="alternate" hreflang="x-default" href="https://timertrain.com/en">
 <meta property="og:title" content="複数タイマーを連続再生・共有 - TimerTrain">
 <meta property="og:description" content="複数のタイマーを連結して順番に自動再生。リンクひとつで共有できる、かわいい無料Webタイマー。">
@@ -37,14 +38,14 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <script type="application/ld+json">
 {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "TimerTrain",
-  "url": "https://timertrain.com/",
-  "applicationCategory": "UtilityApplication",
-  "operatingSystem": "Any",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
-  "description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・共有に対応。"
+"@context": "https://schema.org",
+"@type": "WebApplication",
+"name": "TimerTrain",
+"url": "https://timertrain.com/",
+"applicationCategory": "UtilityApplication",
+"operatingSystem": "Any",
+"offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+"description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・共有に対応。"
 }
 </script>
 <link rel="stylesheet" href="/style.css?v=10">
@@ -52,80 +53,80 @@
 <body>
 
 <main class="app">
-  <header class="header">
-    <h1 class="logo">TimerTrain</h1>
-    <p class="tagline">タイマーを並べて自動で切り替え。リンクひとつで共有</p>
-    <nav class="nav" aria-label="用途別タイマー">
-      <a href="/pomodoro">ポモドーロ</a>
-      <a href="/interval-timer">インターバル</a>
-      <a href="/tabata">タバタ</a>
-      <a href="/hiit">HIIT</a>
-      <a href="/study">勉強</a>
-      <a href="/kitchen">キッチン</a>
-    </nav>
-  </header>
+<header class="header">
+<h1 class="logo">TimerTrain</h1>
+<p class="tagline">タイマーを並べて自動で切り替え。リンクひとつで共有</p>
+<nav class="nav" aria-label="用途別タイマー">
+<a href="/pomodoro">ポモドーロ</a>
+<a href="/interval-timer">インターバル</a>
+<a href="/tabata">タバタ</a>
+<a href="/hiit">HIIT</a>
+<a href="/study">勉強</a>
+<a href="/kitchen">キッチン</a>
+</nav>
+</header>
 
-  <!-- タイマー（常時表示） -->
-  <section id="run" class="run-inline" aria-label="タイマー">
-    <p id="run-cycle" class="run-cycle"></p>
-    <div class="ring-wrap">
-      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
-        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
-        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
-      </svg>
-      <div class="ring-inner">
-        <p id="run-name" class="run-name"></p>
-        <p id="run-time" class="run-time">00:00</p>
-      </div>
-    </div>
-    <div id="stations" class="stations" aria-hidden="true"></div>
-    <div class="run-controls">
-      <button id="reset-btn" type="button" aria-label="リセット"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
-      <button id="pause-btn" type="button" aria-label="開始・一時停止"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-      <button id="skip-btn" type="button" aria-label="スキップ"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
-    </div>
-  </section>
+<!-- タイマー（常時表示） -->
+<section id="run" class="run-inline" aria-label="タイマー">
+<p id="run-cycle" class="run-cycle"></p>
+<div class="ring-wrap">
+<svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+<circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+<circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+</svg>
+<div class="ring-inner">
+<p id="run-name" class="run-name"></p>
+<p id="run-time" class="run-time">00:00</p>
+</div>
+</div>
+<div id="stations" class="stations" aria-hidden="true"></div>
+<div class="run-controls">
+<button id="reset-btn" type="button" aria-label="リセット"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+<button id="pause-btn" type="button" aria-label="開始・一時停止"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+<button id="skip-btn" type="button" aria-label="スキップ"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+</div>
+</section>
 
-  <!-- 設定（編成リスト） -->
-  <section id="setup" aria-label="タイマー設定">
-    <ul id="timer-list" class="timer-list"></ul>
+<!-- 設定（編成リスト） -->
+<section id="setup" aria-label="タイマー設定">
+<ul id="timer-list" class="timer-list"></ul>
 
-    <button id="add-btn" class="add-btn" type="button">＋ タイマーを追加</button>
+<button id="add-btn" class="add-btn" type="button">＋ タイマーを追加</button>
 
-    <div class="repeat-row">
-      <span class="repeat-label">くり返し</span>
-      <div class="repeat-ctrl">
-        <button id="rep-minus" type="button" aria-label="くり返しを減らす">−</button>
-        <span id="rep-count">4回</span>
-        <button id="rep-plus" type="button" aria-label="くり返しを増やす">＋</button>
-        <button id="rep-inf" type="button" aria-label="無限にくり返す">∞</button>
-      </div>
-    </div>
+<div class="repeat-row">
+<span class="repeat-label">くり返し</span>
+<div class="repeat-ctrl">
+<button id="rep-minus" type="button" aria-label="くり返しを減らす">−</button>
+<span id="rep-count">4回</span>
+<button id="rep-plus" type="button" aria-label="くり返しを増やす">＋</button>
+<button id="rep-inf" type="button" aria-label="無限にくり返す">∞</button>
+</div>
+</div>
 
-    <div class="total-row"><span id="total-label"></span></div>
+<div class="total-row"><span id="total-label"></span></div>
 
-    <div class="action-row">
-      <button id="share-btn" class="share-btn wide" type="button">共有リンク</button>
-    </div>
-  </section>
+<div class="action-row">
+<button id="share-btn" class="share-btn wide" type="button">共有リンク</button>
+</div>
+</section>
 
-  <div id="toast" class="toast" role="status"></div>
+<div id="toast" class="toast" role="status"></div>
 
-  <!-- SEO テキスト -->
-  <article class="about">
-    <h2>TimerTrainとは</h2>
-    <p>TimerTrainは、複数のタイマーを電車のように連結して、順番に自動再生できる無料のWebタイマーです。インストールもログインも不要。ページを開いて再生ボタンを押すだけで、連続タイマー・インターバルタイマーとしてすぐに使えます。</p>
-    <h2>使い方</h2>
-    <p>「＋タイマーを追加」で好きな数だけタイマーを並べ、時間をタップして変更、名前と色も自由に設定できます。くり返し回数を決めて再生すれば、作業と休憩、運動とインターバルのような繰り返しタイマーが自動で回り続けます。作ったタイマーはURLをコピーするだけで共有できます。</p>
-    <h2>こんな用途に</h2>
-    <p>ポモドーロ（25分作業＋5分休憩）、HIITやタバタ式トレーニング、勉強や授業の時間管理、料理の同時進行、プレゼンの練習など、「複数の時間を順番に測りたい」あらゆる場面で使えます。</p>
-    <h2>かわいくて、ちょっとおしゃれ</h2>
-    <p>クリーム色のやさしい配色とまるみのある文字で、見た目にもこだわった無料タイマー。勉強のお供や作業用（study with me）に、デスクへかわいく置いておけます。ダークモードにも対応。</p>
-    <h2>用途別タイマー</h2>
-    <p><a href="/pomodoro">ポモドーロタイマー</a> · <a href="/interval-timer">インターバルタイマー</a> · <a href="/tabata">タバタ式タイマー</a> · <a href="/hiit">HIITタイマー</a> · <a href="/study">勉強タイマー</a> · <a href="/kitchen">キッチンタイマー</a></p>
-  </article>
+<!-- SEO テキスト -->
+<article class="about">
+<h2>TimerTrainとは</h2>
+<p>TimerTrainは、複数のタイマーを電車のように連結して、順番に自動再生できる無料のWebタイマーです。インストールもログインも不要。ページを開いて再生ボタンを押すだけで、連続タイマー・インターバルタイマーとしてすぐに使えます。</p>
+<h2>使い方</h2>
+<p>「＋タイマーを追加」で好きな数だけタイマーを並べ、時間をタップして変更、名前と色も自由に設定できます。くり返し回数を決めて再生すれば、作業と休憩、運動とインターバルのような繰り返しタイマーが自動で回り続けます。作ったタイマーはURLをコピーするだけで共有できます。</p>
+<h2>こんな用途に</h2>
+<p>ポモドーロ（25分作業＋5分休憩）、HIITやタバタ式トレーニング、勉強や授業の時間管理、料理の同時進行、プレゼンの練習など、「複数の時間を順番に測りたい」あらゆる場面で使えます。</p>
+<h2>かわいくて、ちょっとおしゃれ</h2>
+<p>クリーム色のやさしい配色とまるみのある文字で、見た目にもこだわった無料タイマー。勉強のお供や作業用（study with me）に、デスクへかわいく置いておけます。ダークモードにも対応。</p>
+<h2>用途別タイマー</h2>
+<p><a href="/pomodoro">ポモドーロタイマー</a> · <a href="/interval-timer">インターバルタイマー</a> · <a href="/tabata">タバタ式タイマー</a> · <a href="/hiit">HIITタイマー</a> · <a href="/study">勉強タイマー</a> · <a href="/kitchen">キッチンタイマー</a></p>
+</article>
 
-  <footer class="footer">© 2026 TimerTrain · <a href="/en" class="lang-link">English</a></footer>
+<footer class="footer">© 2026 TimerTrain · <a href="/en" class="lang-link">English</a></footer>
 </main>
 
 <script src="/app.js?v=6"></script>

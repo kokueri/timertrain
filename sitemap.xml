@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://timertrain.com/</loc></url>
-  <url><loc>https://timertrain.com/en</loc></url>
-  <url><loc>https://timertrain.com/pomodoro</loc></url>
-  <url><loc>https://timertrain.com/tabata</loc></url>
-  <url><loc>https://timertrain.com/hiit</loc></url>
-  <url><loc>https://timertrain.com/study</loc></url>
-  <url><loc>https://timertrain.com/kitchen</loc></url>
-  <url><loc>https://timertrain.com/interval-timer</loc></url>
-  <url><loc>https://timertrain.com/en-pomodoro</loc></url>
-  <url><loc>https://timertrain.com/en-interval-timer</loc></url>
-  <url><loc>https://timertrain.com/en-tabata</loc></url>
-  <url><loc>https://timertrain.com/en-hiit</loc></url>
-  <url><loc>https://timertrain.com/en-kitchen</loc></url>
-  <url><loc>https://timertrain.com/en-study</loc></url>
+<url><loc>https://timertrain.com/</loc></url>
+<url><loc>https://timertrain.com/en</loc></url>
+<url><loc>https://timertrain.com/es</loc></url>
+<url><loc>https://timertrain.com/pomodoro</loc></url>
+<url><loc>https://timertrain.com/tabata</loc></url>
+<url><loc>https://timertrain.com/hiit</loc></url>
+<url><loc>https://timertrain.com/study</loc></url>
+<url><loc>https://timertrain.com/kitchen</loc></url>
+<url><loc>https://timertrain.com/interval-timer</loc></url>
+<url><loc>https://timertrain.com/en-pomodoro</loc></url>
+<url><loc>https://timertrain.com/en-interval-timer</loc></url>
+<url><loc>https://timertrain.com/en-tabata</loc></url>
+<url><loc>https://timertrain.com/en-hiit</loc></url>
+<url><loc>https://timertrain.com/en-kitchen</loc></url>
+<url><loc>https://timertrain.com/en-study</loc></url>
 </urlset>
