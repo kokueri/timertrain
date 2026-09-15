@@ -1,36 +1,36 @@
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&display=swap');
 /* ===== TimerTrain — Apple-minimal design ===== */
 :root {
-  --bg: #FFF9EE;
-  --card: #FFFFFF;
-  --text: #1C1C1E;
-  --text2: #6E6E73;
-  --line: rgba(0,0,0,.06);
-  --accent: #1C1C1E;
-  --accent-text: #FFFFFF;
-  --shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.04);
-  --radius: 16px;
-  --font-round: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
+--bg: #FFF9EE;
+--card: #FFFFFF;
+--text: #1C1C1E;
+--text2: #6E6E73;
+--line: rgba(0,0,0,.06);
+--accent: #1C1C1E;
+--accent-text: #FFFFFF;
+--shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.04);
+--radius: 16px;
+--font-round: 'M PLUS Rounded 1c', -apple-system, BlinkMacSystemFont, 'Hiragino Sans', sans-serif;
 }
 @media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #111113;
-    --card: #1C1C1E;
-    --text: #F2F2F7;
-    --text2: #8E8E93;
-    --line: rgba(255,255,255,.08);
-    --accent: #F2F2F7;
-    --accent-text: #111113;
-    --shadow: none;
-  }
+:root {
+--bg: #111113;
+--card: #1C1C1E;
+--text: #F2F2F7;
+--text2: #8E8E93;
+--line: rgba(255,255,255,.08);
+--accent: #F2F2F7;
+--accent-text: #111113;
+--shadow: none;
+}
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { height: 100%; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Segoe UI", sans-serif;
-  background: var(--bg); color: var(--text);
-  min-height: 100%;
-  line-height: 1.6;
+font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Segoe UI", sans-serif;
+background: var(--bg); color: var(--text);
+min-height: 100%;
+line-height: 1.6;
 }
 button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
 
@@ -43,57 +43,57 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 /* ---- timer list ---- */
 .timer-list { list-style: none; }
 .timer-row {
-  position: relative;
-  display: flex; align-items: center; gap: 8px;
-  background: var(--card); border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 6px 12px 6px 14px; margin-bottom: 10px;
-  touch-action: pan-y;
-  transition: transform .15s ease, opacity .15s ease;
+position: relative;
+display: flex; align-items: center; gap: 8px;
+background: var(--card); border-radius: var(--radius);
+box-shadow: var(--shadow);
+padding: 6px 12px 6px 14px; margin-bottom: 10px;
+touch-action: pan-y;
+transition: transform .15s ease, opacity .15s ease;
 }
 .timer-row.dragging { opacity: .85; transform: scale(1.02); position: relative; z-index: 5; transition: none; }
 .color-dot {
-  width: 22px; height: 22px; border-radius: 50%;
-  flex-shrink: 0; border: none;
-  transition: transform .1s ease;
+width: 22px; height: 22px; border-radius: 50%;
+flex-shrink: 0; border: none;
+transition: transform .1s ease;
 }
 .color-dot:active { transform: scale(1.2); }
 .name-input {
-  flex: 1; min-width: 0;
-  border: none; background: none; color: var(--text);
-  font-size: 16px; font-weight: 500; padding: 12px 0;
-  outline: none;
+flex: 1; min-width: 0;
+border: none; background: none; color: var(--text);
+font-size: 16px; font-weight: 500; padding: 12px 0;
+outline: none;
 }
 .name-input::placeholder { color: var(--text2); }
 .time-btn {
-  font-size: 22px; font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  padding: 8px 6px; border-radius: 10px;
-  letter-spacing: -.01em;
+font-size: 22px; font-weight: 600;
+font-variant-numeric: tabular-nums;
+padding: 8px 6px; border-radius: 10px;
+letter-spacing: -.01em;
 }
 .time-btn:hover { background: var(--line); }
 .time-input {
-  width: 92px; font-size: 22px; font-weight: 600; text-align: right;
-  font-variant-numeric: tabular-nums;
-  border: none; border-bottom: 2px solid var(--text); background: none; color: var(--text);
-  outline: none; padding: 8px 2px;
+width: 92px; font-size: 22px; font-weight: 600; text-align: right;
+font-variant-numeric: tabular-nums;
+border: none; border-bottom: 2px solid var(--text); background: none; color: var(--text);
+outline: none; padding: 8px 2px;
 }
 .dup-btn, .del-btn, .drag-handle {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-height: 44px; padding: 0; border-radius: 8px;
-  color: var(--text2); flex-shrink: 0;
+display: inline-flex; align-items: center; justify-content: center;
+min-height: 44px; padding: 0; border-radius: 8px;
+color: var(--text2); flex-shrink: 0;
 }
 .dup-btn { font-size: 15px; min-width: 34px; }
 .dup-btn:hover { color: var(--text); }
-.del-btn { font-size: 15px; min-width: 40px; }   /* 誤タップしやすいので広め */
+.del-btn { font-size: 15px; min-width: 40px; } /* 誤タップしやすいので広め */
 .del-btn:hover { color: #FF6B6B; }
 .drag-handle { font-size: 16px; min-width: 34px; cursor: grab; touch-action: none; user-select: none; }
 .drag-handle:active { cursor: grabbing; }
 
 .add-btn {
-  width: 100%; padding: 14px; margin: 4px 0 20px;
-  border: 1.5px dashed var(--text2); border-radius: var(--radius);
-  color: var(--text2); font-size: 15px; font-weight: 500;
+width: 100%; padding: 14px; margin: 4px 0 20px;
+border: 1.5px dashed var(--text2); border-radius: var(--radius);
+color: var(--text2); font-size: 15px; font-weight: 500;
 }
 .add-btn:hover { color: var(--text); border-color: var(--text); }
 
@@ -102,9 +102,9 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .repeat-label { font-size: 15px; color: var(--text2); }
 .repeat-ctrl { display: flex; align-items: center; gap: 4px; }
 .repeat-ctrl button {
-  width: 44px; height: 44px; border-radius: 12px;
-  background: var(--card); box-shadow: var(--shadow);
-  font-size: 18px; color: var(--text);
+width: 44px; height: 44px; border-radius: 12px;
+background: var(--card); box-shadow: var(--shadow);
+font-size: 18px; color: var(--text);
 }
 .repeat-ctrl button.active { background: var(--accent); color: var(--accent-text); }
 #rep-count { min-width: 56px; text-align: center; font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; }
@@ -114,32 +114,32 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 /* ---- actions ---- */
 .action-row { display: flex; gap: 10px; }
 .share-btn {
-  padding: 16px 18px; border-radius: 999px;
-  background: var(--card); box-shadow: var(--shadow);
-  font-size: 15px; font-weight: 500;
+padding: 16px 18px; border-radius: 999px;
+background: var(--card); box-shadow: var(--shadow);
+font-size: 15px; font-weight: 500;
 }
 .start-btn svg { width: 15px; height: 15px; fill: currentColor; margin-right: 7px; vertical-align: -2px; }
 .start-btn {
-  display: flex; align-items: center; justify-content: center;
-  flex: 1; padding: 16px; border-radius: 999px;
-  background: var(--accent); color: var(--accent-text);
-  font-size: 17px; font-weight: 700; letter-spacing: .02em;
-  transition: transform .1s ease;
+display: flex; align-items: center; justify-content: center;
+flex: 1; padding: 16px; border-radius: 999px;
+background: var(--accent); color: var(--accent-text);
+font-size: 17px; font-weight: 700; letter-spacing: .02em;
+transition: transform .1s ease;
 }
 .start-btn:active { transform: scale(.98); }
 
 /* ---- timer（常時表示・インライン） ---- */
 .run-inline {
-  display: flex; flex-direction: column; align-items: center;
-  text-align: center; margin: 2px 0 26px;
+display: flex; flex-direction: column; align-items: center;
+text-align: center; margin: 2px 0 26px;
 }
 .hidden { display: none; }
 .run-cycle { font-size: 14px; color: var(--text2); font-variant-numeric: tabular-nums; }
 .run-name { font-size: 15px; font-weight: 600; color: var(--text2); margin-bottom: 2px; }
 .run-time {
-  font-size: clamp(46px, 13vw, 84px); font-weight: 700;
-  font-variant-numeric: tabular-nums; letter-spacing: -.03em;
-  line-height: 1.1;
+font-size: clamp(46px, 13vw, 84px); font-weight: 700;
+font-variant-numeric: tabular-nums; letter-spacing: -.03em;
+line-height: 1.1;
 }
 .run-time.finished { font-size: clamp(22px, 7vw, 34px); }
 
@@ -150,17 +150,17 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .ring-bg { stroke: var(--line); }
 .ring-fg { stroke: var(--text2); stroke-linecap: round; transition: stroke-dashoffset .2s linear, stroke .3s ease; }
 .ring-inner {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 12%; text-align: center;
+position: absolute; inset: 0;
+display: flex; flex-direction: column; align-items: center; justify-content: center;
+padding: 12%; text-align: center;
 }
 
 /* ---- color picker ---- */
 .color-pop {
-  position: absolute; left: 10px; top: calc(100% - 4px); z-index: 20;
-  display: flex; flex-wrap: wrap; gap: 9px; max-width: 320px;
-  background: var(--card); padding: 12px 14px; border-radius: 20px;
-  box-shadow: 0 6px 28px rgba(0,0,0,.16);
+position: absolute; left: 10px; top: calc(100% - 4px); z-index: 20;
+display: flex; flex-wrap: wrap; gap: 9px; max-width: 320px;
+background: var(--card); padding: 12px 14px; border-radius: 20px;
+box-shadow: 0 6px 28px rgba(0,0,0,.16);
 }
 .color-pop button { width: 27px; height: 27px; border-radius: 50%; transition: transform .1s ease; }
 .color-pop button:hover { transform: scale(1.15); }
@@ -168,8 +168,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .stations { display: flex; align-items: center; gap: 0; margin-bottom: 16px; }
 .station {
-  width: 12px; height: 12px; border-radius: 50%;
-  background: var(--line); flex-shrink: 0;
+width: 12px; height: 12px; border-radius: 50%;
+background: var(--line); flex-shrink: 0;
 }
 .station.done { opacity: .45; }
 .station.now { transform: scale(1.5); box-shadow: 0 0 0 4px var(--line); }
@@ -177,14 +177,14 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .run-controls { display: flex; align-items: center; gap: 18px; }
 .run-controls button {
-  width: 54px; height: 54px; border-radius: 50%;
-  background: var(--card); box-shadow: var(--shadow);
-  display: inline-flex; align-items: center; justify-content: center;
+width: 54px; height: 54px; border-radius: 50%;
+background: var(--card); box-shadow: var(--shadow);
+display: inline-flex; align-items: center; justify-content: center;
 }
 .run-controls button svg { width: 20px; height: 20px; fill: currentColor; }
 .run-controls button { border: 1.5px solid var(--line); color: var(--text); }
 @media (prefers-color-scheme: dark) {
-  .run-controls button { background: #26262A; border-color: rgba(255,255,255,.14); }
+.run-controls button { background: #26262A; border-color: rgba(255,255,255,.14); }
 }
 #pause-btn { width: 72px; height: 72px; background: var(--accent); color: var(--accent-text); border: none; }
 #pause-btn svg { width: 28px; height: 28px; }
@@ -193,10 +193,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 /* ---- toast ---- */
 .toast {
-  position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px);
-  background: var(--accent); color: var(--accent-text);
-  padding: 10px 20px; border-radius: 999px; font-size: 14px; font-weight: 500;
-  opacity: 0; pointer-events: none; transition: all .25s ease; z-index: 100;
+position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%) translateY(20px);
+background: var(--accent); color: var(--accent-text);
+padding: 10px 20px; border-radius: 999px; font-size: 14px; font-weight: 500;
+opacity: 0; pointer-events: none; transition: all .25s ease; z-index: 100;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
@@ -216,25 +216,25 @@ a.logo { text-decoration: none; color: inherit; display: block; }
 /* ---- 時間編集（分／秒 2フィールド） ---- */
 .time-edit { display: inline-flex; align-items: center; }
 .time-field {
-  width: 42px; font-size: 22px; font-weight: 600; text-align: center;
-  font-variant-numeric: tabular-nums;
-  border: none; border-bottom: 2px solid var(--text); background: none; color: var(--text);
-  outline: none; padding: 8px 0;
+width: 42px; font-size: 22px; font-weight: 600; text-align: center;
+font-variant-numeric: tabular-nums;
+border: none; border-bottom: 2px solid var(--text); background: none; color: var(--text);
+outline: none; padding: 8px 0;
 }
 .time-colon { font-size: 22px; font-weight: 600; padding: 8px 2px; color: var(--text); }
 
 /* ---- フォーカスリング（:focus-visible = キーボード操作時のみ表示。マウス時は出ない） ---- */
 :focus-visible {
-  outline: 2px solid var(--text);
-  outline-offset: 2px;
-  border-radius: 8px;
+outline: 2px solid var(--text);
+outline-offset: 2px;
+border-radius: 8px;
 }
 .name-input:focus-visible,
 .time-input:focus-visible,
 .time-field:focus-visible {
-  outline: 2px solid var(--text);
-  outline-offset: 1px;
-  border-radius: 6px;
+outline: 2px solid var(--text);
+outline-offset: 1px;
+border-radius: 6px;
 }
 .color-dot:focus-visible { outline-offset: 3px; }
 .run-controls button:focus-visible,
@@ -253,52 +253,52 @@ a.logo { text-decoration: none; color: inherit; display: block; }
 
 /* ================= PCレイアウト（900px以上・スマホには一切影響しない） ================= */
 @media (min-width: 900px) {
-  .app {
-    max-width: 1120px;
-    padding: 32px 32px 64px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 380px;
-    grid-template-areas:
-      "header header"
-      "run    setup"
-      "about  about"
-      "footer footer";
-    column-gap: 56px;
-    align-items: start;
-  }
-  .header { grid-area: header; margin-bottom: 28px; }
-  #run    { grid-area: run; margin: 0; }
-  #setup  { grid-area: setup; padding-top: 4px; }
-  .about  { grid-area: about; max-width: 760px; margin-top: 72px; }
-  .footer { grid-area: footer; }
+.app {
+max-width: 1120px;
+padding: 32px 32px 64px;
+display: grid;
+grid-template-columns: minmax(0, 1fr) 380px;
+grid-template-areas:
+"header header"
+"run setup"
+"about about"
+"footer footer";
+column-gap: 56px;
+align-items: start;
+}
+.header { grid-area: header; margin-bottom: 28px; }
+#run { grid-area: run; margin: 0; }
+#setup { grid-area: setup; padding-top: 4px; }
+.about { grid-area: about; max-width: 760px; margin-top: 72px; }
+.footer { grid-area: footer; }
 
-  .logo { font-size: 26px; }
-  .tagline { font-size: 14px; }
+.logo { font-size: 26px; }
+.tagline { font-size: 14px; }
 
-  .nav {
-    display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 22px;
-    margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line);
-  }
-  .nav a { color: var(--text2); text-decoration: none; font-size: 14px; padding: 4px 2px; border-radius: 6px; }
-  .nav a:hover { color: var(--text); }
-  .nav a[aria-current="page"] { color: var(--text); font-weight: 700; }
+.nav {
+display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 22px;
+margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line);
+}
+.nav a { color: var(--text2); text-decoration: none; font-size: 14px; padding: 4px 2px; border-radius: 6px; }
+.nav a:hover { color: var(--text); }
+.nav a[aria-current="page"] { color: var(--text); font-weight: 700; }
 
-  .ring-wrap { width: min(34vw, 420px); margin: 6px 0 26px; }
-  .run-time { font-size: clamp(64px, 6vw, 108px); }
-  .run-time.finished { font-size: clamp(26px, 2.4vw, 40px); }
-  .run-controls { gap: 22px; }
-  .kbd-hint { display: block; margin-top: 14px; }
+.ring-wrap { width: min(34vw, 420px); margin: 6px 0 26px; }
+.run-time { font-size: clamp(64px, 6vw, 108px); }
+.run-time.finished { font-size: clamp(26px, 2.4vw, 40px); }
+.run-controls { gap: 22px; }
+.kbd-hint { display: block; margin-top: 14px; }
 
-  #focus-btn {
-    display: inline-flex; align-items: center; gap: 7px;
-    margin-top: 22px;
-    padding: 9px 15px; border-radius: 999px;
-    background: var(--card); box-shadow: var(--shadow);
-    border: 1.5px solid var(--line);
-    font-size: 13px; font-weight: 500; color: var(--text2);
-  }
-  #focus-btn svg { width: 15px; height: 15px; fill: currentColor; }
-  #focus-btn:hover { color: var(--text); }
+#focus-btn {
+display: inline-flex; align-items: center; gap: 7px;
+margin-top: 22px;
+padding: 9px 15px; border-radius: 999px;
+background: var(--card); box-shadow: var(--shadow);
+border: 1.5px solid var(--line);
+font-size: 13px; font-weight: 500; color: var(--text2);
+}
+#focus-btn svg { width: 15px; height: 15px; fill: currentColor; }
+#focus-btn:hover { color: var(--text); }
 }
 
 /* ================= 集中モード（リングと時間だけの全画面） ================= */
@@ -316,3 +316,44 @@ body.focus-mode .run-time { font-size: min(15vh, 11vw); }
 body.focus-mode .run-time.finished { font-size: min(5vh, 4vw); }
 body.focus-mode .run-name { font-size: clamp(15px, 2.2vh, 22px); }
 body.focus-mode .stations { margin-bottom: 26px; }
+
+/* ================= 手動テーマ切替（OS設定を上書き） ================= */
+:root[data-theme="light"] {
+--bg: #FFF9EE;
+--card: #FFFFFF;
+--text: #1C1C1E;
+--text2: #6E6E73;
+--line: rgba(0,0,0,.06);
+--accent: #1C1C1E;
+--accent-text: #FFFFFF;
+--shadow: 0 1px 3px rgba(0,0,0,.05), 0 4px 16px rgba(0,0,0,.04);
+}
+:root[data-theme="dark"] {
+--bg: #111113;
+--card: #1C1C1E;
+--text: #F2F2F7;
+--text2: #8E8E93;
+--line: rgba(255,255,255,.08);
+--accent: #F2F2F7;
+--accent-text: #111113;
+--shadow: none;
+}
+:root[data-theme="light"] .run-controls button { background: var(--card); border-color: var(--line); }
+:root[data-theme="dark"] .run-controls button { background: #26262A; border-color: rgba(255,255,255,.14); }
+
+/* テーマ切替ボタン（右上・全ページ共通。集中モードでは非表示） */
+#theme-btn {
+position: fixed; top: 10px; right: 12px; z-index: 60;
+display: inline-flex; align-items: center; gap: 6px;
+background: var(--card); color: var(--text2);
+border: 1.5px solid var(--line); border-radius: 999px;
+padding: 7px 12px; font-size: 13px; font-weight: 500; line-height: 1;
+box-shadow: var(--shadow); font-family: var(--font-round);
+}
+#theme-btn:hover { color: var(--text); }
+#theme-btn svg { width: 16px; height: 16px; fill: currentColor; }
+body.focus-mode #theme-btn { display: none; }
+@media (max-width: 480px) {
+#theme-btn span { display: none; }
+#theme-btn { padding: 9px; }
+}

@@ -653,3 +653,44 @@ setFocus(!isOn());
 }
 }, true);
 })();
+
+/* ---------- テーマ切替（ライト/ダーク手動トグル。未設定時はOS準拠） ---------- */
+(function () {
+var KEY = 'tt-theme';
+var root = document.documentElement;
+var saved = null;
+try { saved = localStorage.getItem(KEY); } catch (e) {}
+if (saved === 'dark' || saved === 'light') root.setAttribute('data-theme', saved);
+
+function osDark() { return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); }
+function effective() {
+var dt = root.getAttribute('data-theme');
+return dt ? dt : (osDark() ? 'dark' : 'light');
+}
+
+var lang = root.lang;
+var L = lang === 'en' ? { dark: 'Dark', light: 'Light' }
+: lang === 'es' ? { dark: 'Oscuro', light: 'Claro' }
+: { dark: 'ダーク', light: 'ライト' };
+var SUN = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zm0-6a1 1 0 011 1v1a1 1 0 11-2 0V2a1 1 0 011-1zm0 18a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM3.5 4.9a1 1 0 011.4 0l.7.7A1 1 0 114.2 7l-.7-.7a1 1 0 010-1.4zm14.2 14.2a1 1 0 011.4 0l.7.7a1 1 0 11-1.4 1.4l-.7-.7a1 1 0 010-1.4zM1 12a1 1 0 011-1h1a1 1 0 110 2H2a1 1 0 01-1-1zm19 0a1 1 0 011-1h1a1 1 0 110 2h-1a1 1 0 01-1-1zM4.9 20.5a1 1 0 010-1.4l.7-.7A1 1 0 117 19.8l-.7.7a1 1 0 01-1.4 0zM18.3 6.4a1 1 0 010-1.4l.7-.7a1 1 0 111.4 1.4l-.7.7a1 1 0 01-1.4 0z"/></svg>';
+var MOON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>';
+
+var btn = document.createElement('button');
+btn.id = 'theme-btn';
+btn.type = 'button';
+(document.querySelector('.header') || document.body).appendChild(btn);
+
+function paint() {
+var eff = effective();
+btn.innerHTML = (eff === 'dark' ? MOON : SUN) + '<span>' + (eff === 'dark' ? L.dark : L.light) + '</span>';
+btn.setAttribute('aria-label', eff === 'dark' ? L.dark : L.light);
+btn.setAttribute('aria-pressed', eff === 'dark' ? 'true' : 'false');
+}
+paint();
+btn.addEventListener('click', function () {
+var next = effective() === 'dark' ? 'light' : 'dark';
+root.setAttribute('data-theme', next);
+try { localStorage.setItem(KEY, next); } catch (e) {}
+paint();
+});
+})();
