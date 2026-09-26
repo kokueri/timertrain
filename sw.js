@@ -2,7 +2,7 @@
 - HTML: network-first （常に最新のページを配信し、オフライン時のみキャッシュ）
 - 静的アセット: cache-first（style.css / app.js は ?v= 付きなので更新は自動で反映）
 */
-const V = 'tt-v5';
+const V = 'tt-v6';
 const PRECACHE = ['/style.css?v=10', '/app.js?v=6', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', e => {

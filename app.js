@@ -398,6 +398,7 @@ $('rep-inf').classList.toggle('active', state.repeat === Infinity);
 function startRun() {
 unlockAudio();
 if (window.gtag) gtag('event', 'timer_start');
+if (window.__ttOnStart) { try { window.__ttOnStart(); } catch (e) {} }
 run = { active: true, paused: false, finished: false, idx: 0, cycle: 1,
 endAt: Date.now() + state.timers[0].secs * 1000, remainMs: 0, lastSec: -1 };
 acquireWakeLock();
@@ -487,6 +488,7 @@ runCycle.textContent = '';
 pauseBtn.innerHTML = ICONS.replay;
 setRing(1, '#34C759');
 document.title = STR.doneTitle;
+if (window.__ttOnFinish) { try { window.__ttOnFinish(); } catch (e) {} }
 }
 function tick() {
 if (!run.active || run.paused || run.finished) return;
@@ -693,4 +695,104 @@ root.setAttribute('data-theme', next);
 try { localStorage.setItem(KEY, next); } catch (e) {}
 paint();
 });
+})();
+
+/* ---------- リテンション: 最近の編成 / ホーム画面追加 / 再訪ヒント ---------- */
+(function () {
+var lang = document.documentElement.lang;
+var L = (lang === 'en') ? {
+recent: 'Recent', install: 'Add to home screen',
+comeback: 'Add TimerTrain to your home screen to reopen it in one tap.',
+bookmark: 'Bookmark this page (Ctrl/Cmd+D) so you can come back tomorrow.', dismiss: 'Close'
+} : (lang === 'es') ? {
+recent: 'Recientes', install: 'Añadir a la pantalla de inicio',
+comeback: 'Añade TimerTrain a tu pantalla de inicio para volver con un toque.',
+bookmark: 'Guarda esta página (Ctrl/Cmd+D) para volver mañana.', dismiss: 'Cerrar'
+} : {
+recent: '最近の編成', install: 'ホーム画面に追加',
+comeback: 'ホーム画面に追加すると、次回ワンタップで開けます。',
+bookmark: 'このページをブックマーク（Ctrl/Cmd+D）すると、また明日使えます。', dismiss: '閉じる'
+};
+var RECENTS_KEY = 'tt-recents';
+var app = document.querySelector('.app');
+var header = document.querySelector('.header');
+
+function readRecents() { try { return JSON.parse(localStorage.getItem(RECENTS_KEY) || '[]'); } catch (e) { return []; } }
+function writeRecents(a) { try { localStorage.setItem(RECENTS_KEY, JSON.stringify(a.slice(0, 6))); } catch (e) {} }
+function curQuery() { try { return serialize(); } catch (e) { return ''; } }
+function labelFor() {
+try {
+var names = state.timers.map(function (t) { return t.name || ''; }).filter(Boolean);
+var lbl = names.slice(0, 3).join(' · ');
+if (names.length > 3) lbl += '…';
+var r = (state.repeat === Infinity) ? '∞' : ('×' + state.repeat);
+return (lbl || 'Timer') + ' ' + r;
+} catch (e) { return 'Timer'; }
+}
+
+// 開始時に「最近の編成」として記録
+window.__ttOnStart = function () {
+try {
+var entry = { p: location.pathname, q: curQuery(), l: labelFor(), t: Date.now() };
+if (!entry.q) return;
+var list = readRecents().filter(function (e) { return !(e.p === entry.p && e.q === entry.q); });
+list.unshift(entry);
+writeRecents(list);
+} catch (e) {}
+};
+
+// 「最近の編成」チップを表示（今と同一構成は除外）
+function renderRecents() {
+if (!app || !header) return;
+var old = document.getElementById('tt-recents'); if (old) old.remove();
+var cq = curQuery();
+var list = readRecents().filter(function (e) { return !(e.p === location.pathname && e.q === cq); });
+if (!list.length) return;
+var wrap = document.createElement('div'); wrap.id = 'tt-recents'; wrap.className = 'tt-recents';
+var lab = document.createElement('span'); lab.className = 'tt-recents-label'; lab.textContent = L.recent; wrap.appendChild(lab);
+list.slice(0, 4).forEach(function (e) {
+var a = document.createElement('a'); a.className = 'tt-chip'; a.href = e.p + e.q; a.textContent = e.l; wrap.appendChild(a);
+});
+header.insertAdjacentElement('afterend', wrap);
+}
+
+// PWA: ホーム画面に追加
+var deferred = null;
+function isStandalone() { return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; }
+function showInstallBtn() {
+if (document.getElementById('tt-install') || isStandalone()) return;
+try { if (localStorage.getItem('tt-install-dismissed') === '1') return; } catch (e) {}
+var b = document.createElement('button'); b.id = 'tt-install'; b.type = 'button';
+b.innerHTML = '<span class="ic" aria-hidden="true">➕</span><span class="tt-install-t">' + L.install + '</span><span class="x" aria-hidden="true">✕</span>';
+document.body.appendChild(b);
+b.addEventListener('click', function (ev) {
+if (ev.target && ev.target.classList.contains('x')) { b.remove(); try { localStorage.setItem('tt-install-dismissed', '1'); } catch (e) {} return; }
+if (deferred) { deferred.prompt(); if (deferred.userChoice) deferred.userChoice.finally(function () { deferred = null; b.remove(); }); }
+});
+}
+window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; showInstallBtn(); });
+window.addEventListener('appinstalled', function () { var b = document.getElementById('tt-install'); if (b) b.remove(); });
+
+// 完了時の「また来てね」ヒント（1セッション1回・ダイアログは軽く）
+var shownComeback = false;
+window.__ttOnFinish = function () {
+if (shownComeback || isStandalone()) return;
+try { if (localStorage.getItem('tt-comeback-dismissed') === '1') return; } catch (e) {}
+shownComeback = true;
+var d = document.createElement('div'); d.id = 'tt-comeback'; d.className = 'tt-comeback';
+var msg = document.createElement('span'); msg.textContent = '★ ' + (deferred ? L.comeback : L.bookmark); d.appendChild(msg);
+var actions = document.createElement('div'); actions.className = 'tt-cb-actions';
+if (deferred) {
+var ib = document.createElement('button'); ib.type = 'button'; ib.className = 'tt-cb-install'; ib.textContent = L.install;
+ib.addEventListener('click', function () { deferred.prompt(); if (deferred.userChoice) deferred.userChoice.finally(function () { deferred = null; d.remove(); }); });
+actions.appendChild(ib);
+}
+var xb = document.createElement('button'); xb.type = 'button'; xb.className = 'tt-cb-x'; xb.textContent = L.dismiss;
+xb.addEventListener('click', function () { d.remove(); try { localStorage.setItem('tt-comeback-dismissed', '1'); } catch (e) {} });
+actions.appendChild(xb);
+d.appendChild(actions);
+document.body.appendChild(d);
+};
+
+renderRecents();
 })();
