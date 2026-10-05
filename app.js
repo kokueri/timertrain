@@ -798,3 +798,61 @@ document.body.appendChild(d);
 
 renderRecents();
 })();
+
+/* ---------- 需要テスト: 保存・同期（準備中）への関心を計測 ---------- */
+(function () {
+var row = document.querySelector('.action-row');
+if (!row) return;
+var lang = document.documentElement.lang;
+var L = (lang === 'en') ? {
+btn: 'Save & sync across devices (coming soon)',
+q: 'We are thinking about a free login so your saved timers follow you between phone and computer. Would you use it?',
+yes: 'I would use it', no: 'Not for me', thanks: 'Thanks! That helps us decide what to build.'
+} : (lang === 'es') ? {
+btn: 'Guardar y sincronizar entre dispositivos (próximamente)',
+q: 'Estamos pensando en un inicio de sesión gratuito para que tus temporizadores guardados te sigan entre el móvil y el ordenador. ¿Lo usarías?',
+yes: 'Lo usaría', no: 'No lo necesito', thanks: '¡Gracias! Nos ayuda a decidir qué construir.'
+} : {
+btn: '保存して別の端末でも使う（準備中）',
+q: 'ログインすると、保存したタイマーをスマホとPCで同じように使える機能を検討しています。あったら使いたいですか？',
+yes: '使いたい', no: 'いらない', thanks: 'ありがとうございます！開発の参考にします。'
+};
+var KEY = 'tt-sync-vote';
+var voted = false;
+try { voted = !!localStorage.getItem(KEY); } catch (e) {}
+if (voted) return;
+function ev(name, params) { try { if (window.gtag) gtag('event', name, params || {}); } catch (e) {} }
+
+var wrap = document.createElement('div'); wrap.id = 'tt-sync';
+wrap.style.cssText = 'margin-top:10px;text-align:center;';
+var b = document.createElement('button'); b.type = 'button'; b.id = 'tt-sync-btn'; b.textContent = L.btn;
+b.setAttribute('aria-expanded', 'false');
+b.style.cssText = 'min-height:44px;padding:8px 12px;font-size:13px;color:var(--text2);text-decoration:underline;text-underline-offset:3px;';
+var panel = document.createElement('div'); panel.id = 'tt-sync-panel'; panel.hidden = true;
+panel.style.cssText = 'margin-top:4px;padding:14px 16px;border-radius:16px;background:var(--card);box-shadow:var(--shadow);font-size:13px;line-height:1.7;text-align:left;';
+var p = document.createElement('p'); p.textContent = L.q; p.style.cssText = 'margin:0 0 12px;color:var(--text);';
+var acts = document.createElement('div'); acts.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;';
+function mk(label, primary) {
+var x = document.createElement('button'); x.type = 'button'; x.textContent = label;
+x.style.cssText = 'flex:1;min-width:120px;min-height:44px;padding:8px 14px;border-radius:999px;font-size:14px;font-weight:500;' +
+(primary ? 'background:var(--accent);color:var(--accent-text);' : 'border:1.5px solid var(--line);color:var(--text);');
+return x;
+}
+var y = mk(L.yes, true), n = mk(L.no, false);
+function vote(a) {
+ev('sync_interest_vote', { answer: a });
+try { localStorage.setItem(KEY, a); } catch (e) {}
+acts.remove(); p.textContent = L.thanks; b.disabled = true; b.style.textDecoration = 'none';
+}
+y.addEventListener('click', function () { vote('yes'); });
+n.addEventListener('click', function () { vote('no'); });
+acts.appendChild(y); acts.appendChild(n); panel.appendChild(p); panel.appendChild(acts);
+var opened = false;
+b.addEventListener('click', function () {
+panel.hidden = !panel.hidden;
+b.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
+if (!panel.hidden && !opened) { opened = true; ev('sync_interest_open'); }
+});
+wrap.appendChild(b); wrap.appendChild(panel);
+row.insertAdjacentElement('afterend', wrap);
+})();
