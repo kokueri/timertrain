@@ -1,0 +1,38 @@
+# TimerTrain
+
+> TimerTrain is a free web-based sequential timer. Users line up several timers and it plays them one after another, switching automatically and repeating for a set number of rounds or endlessly. A whole setup is stored in the page URL, so it can be saved as a bookmark or shared as a link. No account, no install. Available in English, Japanese and Spanish.
+
+Key facts:
+- Price: free. No sign-up, no app install; runs in any modern browser on phone, tablet and desktop, and can be added to the home screen (PWA).
+- Core feature: chain any number of timers (each with its own length, name and color), repeat the chain N times or infinitely.
+- Sharing: the URL holds the full setup, e.g. `https://timertrain.com/en?t=red.1500.Work,blue.300.Break&r=4` is 25 min Work + 5 min Break, 4 rounds. Format: `t=color.seconds.name,...` and `r=rounds` (`inf` for endless).
+- Colors: red, orange, yellow, green, teal, blue, purple, pink, gray.
+- Sound cues on every switch and at the finish, a 3-second countdown tick, screen kept awake while running, accurate in background tabs, dark mode, keyboard shortcuts and a full-screen focus mode on desktop.
+
+## Main pages
+
+- [TimerTrain (English)](https://timertrain.com/en): build a custom sequential / repeating multi-timer
+- [TimerTrain (日本語)](https://timertrain.com/): 複数タイマーを連続・くり返し再生
+- [TimerTrain (Español)](https://timertrain.com/es): temporizador secuencial
+
+## Ready-made timers (English)
+
+- [Pomodoro timer](https://timertrain.com/en-pomodoro): 25 min work + 5 min break
+- [Study timer](https://timertrain.com/en-study): 50 min study + 10 min break
+- [Interval timer](https://timertrain.com/en-interval-timer): custom work/rest intervals
+- [Tabata timer](https://timertrain.com/en-tabata): 20 s on + 10 s off x 8
+- [HIIT timer](https://timertrain.com/en-hiit): 40 s work + 20 s rest x 8
+- [Kitchen timer](https://timertrain.com/en-kitchen): several cooking timers in a row
+- [1 minute timer](https://timertrain.com/en-1-minute-timer)
+- [5 minute timer](https://timertrain.com/en-5-minute-timer)
+- [10 minute timer](https://timertrain.com/en-10-minute-timer)
+- [25 minute timer](https://timertrain.com/en-25-minute-timer)
+
+## 用途別タイマー（日本語）
+
+- [ポモドーロタイマー](https://timertrain.com/pomodoro)
+- [勉強タイマー](https://timertrain.com/study)
+- [インターバルタイマー](https://timertrain.com/interval-timer)
+- [タバタ式タイマー](https://timertrain.com/tabata)
+- [HIITタイマー](https://timertrain.com/hiit)
+- [キッチンタイマー](https://timertrain.com/kitchen)

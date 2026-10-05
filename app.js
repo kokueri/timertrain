@@ -100,7 +100,9 @@ return `?t=${t}&r=${r}`;
 }
 function persist() {
 try { localStorage.setItem(STORE_KEY, JSON.stringify({ ...state, repeat: state.repeat === Infinity ? 'inf' : state.repeat })); } catch (e) {}
-history.replaceState(null, '', serialize());
+// GA4の拡張計測は history.replaceState を包んで page_view を送るため、
+// 設定変更のたびに表示回数が水増しされる。プロトタイプのネイティブ実装を直接呼んで回避。
+History.prototype.replaceState.call(history, null, '', serialize());
 configChanged();
 }
 function parseConfig(qs) {

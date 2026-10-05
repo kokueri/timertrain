@@ -45,7 +45,59 @@ gtag('config', 'G-GSFVNEDCGN');
 "applicationCategory": "UtilityApplication",
 "operatingSystem": "Any",
 "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-"description": "Free online sequential multi-timer. Chain timers, repeat them, and share your setup with a URL."
+"description": "Free online sequential multi-timer. Chain timers, repeat them, and share your setup with a URL.",
+"inLanguage": "en",
+"browserRequirements": "Requires JavaScript",
+"isAccessibleForFree": true,
+"featureList": ["Sequential timers that switch automatically", "Repeat for a set number of rounds or endlessly", "Save and share a setup by URL", "Name and color for each timer", "Sound cues on every switch and at the finish", "Dark mode", "Add to home screen (PWA)"]
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "What is TimerTrain?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "TimerTrain is a free online sequential timer. You line up several timers and it runs them one after another, switching automatically, for as many rounds as you set (or endlessly)."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "How do I run multiple timers in a row?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Tap \"Add timer\" to line up as many timers as you need, set a time, name and color for each, then press play. A sound plays each time one ends and the next timer starts by itself."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Can I save or share my timer setup?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. Your whole setup lives in the URL. Use the share button to copy the link — bookmark it to save, or send it so someone else opens the exact same timers."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Is it free? Do I need an account or an app?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "It is free, with no sign-up and nothing to install. It runs in the browser on phone, tablet and desktop, and you can add it to your home screen to use it like an app."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Does it stay accurate in a background tab?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. Remaining time is calculated from the clock rather than counted tick by tick, so switching tabs does not make it drift. While it runs the screen is kept awake, and sounds mark every switch and the finish."
+   }
+  }
+ ]
 }
 </script>
 <link rel="stylesheet" href="/style.css?v=10">
@@ -122,6 +174,12 @@ gtag('config', 'G-GSFVNEDCGN');
 <p>Pomodoro sessions (25 min work + 5 min break), HIIT and Tabata workouts, studying and classroom activities, cooking multiple dishes, presentation practice — any situation where you need several timers to run one after another.</p>
 <h2>Cute and aesthetic</h2>
 <p>A warm, cream-colored design with rounded numerals — a free timer that actually looks good on your desk. Great for study-with-me and focus sessions. Dark mode included.</p>
+<h2>FAQ</h2>
+<p style="margin-top:10px"><strong>What is TimerTrain?</strong><br>TimerTrain is a free online sequential timer. You line up several timers and it runs them one after another, switching automatically, for as many rounds as you set (or endlessly).</p>
+<p style="margin-top:10px"><strong>How do I run multiple timers in a row?</strong><br>Tap "Add timer" to line up as many timers as you need, set a time, name and color for each, then press play. A sound plays each time one ends and the next timer starts by itself.</p>
+<p style="margin-top:10px"><strong>Can I save or share my timer setup?</strong><br>Yes. Your whole setup lives in the URL. Use the share button to copy the link — bookmark it to save, or send it so someone else opens the exact same timers.</p>
+<p style="margin-top:10px"><strong>Is it free? Do I need an account or an app?</strong><br>It is free, with no sign-up and nothing to install. It runs in the browser on phone, tablet and desktop, and you can add it to your home screen to use it like an app.</p>
+<p style="margin-top:10px"><strong>Does it stay accurate in a background tab?</strong><br>Yes. Remaining time is calculated from the clock rather than counted tick by tick, so switching tabs does not make it drift. While it runs the screen is kept awake, and sounds mark every switch and the finish.</p>
 <h2>Ready-made timers</h2>
 <p><a href="/en-1-minute-timer">1 minute timer</a> · <a href="/en-5-minute-timer">5 minute timer</a> · <a href="/en-10-minute-timer">10 minute timer</a> · <a href="/en-25-minute-timer">25 minute timer</a> · <a href="/en-pomodoro">Pomodoro timer</a> · <a href="/en-interval-timer">Interval timer</a> · <a href="/en-tabata">Tabata timer</a> · <a href="/en-hiit">HIIT timer</a> · <a href="/en-kitchen">Kitchen timer</a> · <a href="/en-study">Study timer</a></p>
 </article>
@@ -129,7 +187,7 @@ gtag('config', 'G-GSFVNEDCGN');
 <footer class="footer">© 2026 TimerTrain · <a href="/" class="lang-link">日本語</a> · <a href="/es" class="lang-link">Español</a></footer>
 </main>
 
-<script src="/app.js?v=6"></script>
+<script src="/app.js?v=8"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
