@@ -11,17 +11,13 @@
   gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>タバタ式タイマー｜20秒＋10秒×8セットを音で自動進行 - TimerTrain</title>
-<meta name="description" content="20秒の全力運動と10秒の休憩を8セット、音の合図で自動進行するタバタ式タイマー。秒数もセット数も変更でき、画面を見なくても使えます。無料・インストール不要。">
-<link rel="canonical" href="https://timertrain.com/tabata">
-<link rel="alternate" hreflang="ja" href="https://timertrain.com/tabata">
-<link rel="alternate" hreflang="en" href="https://timertrain.com/en-tabata">
-<link rel="alternate" hreflang="es" href="https://timertrain.com/es-tabata">
-<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en-tabata">
-<meta property="og:title" content="タバタ式タイマー（20秒＋10秒×8セット） - TimerTrain">
-<meta property="og:description" content="20秒の全力運動と10秒の休憩を8セット、音の合図で自動進行するタバタ式タイマー。秒数もセット数も変更でき、画面を見なくても使えます。無料・インストール不要。">
+<title>ポモドーロ50分＋10分休憩タイマー｜長めの集中を自動でくり返す - TimerTrain</title>
+<meta name="description" content="50分集中＋10分休憩を自動でくり返すポモドーロタイマー。25分だと短いと感じる勉強や作業向け。休憩に入る・戻るタイミングを音で知らせ、回数や時間も変更できます。無料・インストール不要。">
+<link rel="canonical" href="https://timertrain.com/pomodoro-50-10">
+<meta property="og:title" content="ポモドーロ50分＋10分休憩タイマー - TimerTrain">
+<meta property="og:description" content="50分集中＋10分休憩を自動でくり返す無料のポモドーロタイマー。">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://timertrain.com/tabata">
+<meta property="og:url" content="https://timertrain.com/pomodoro-50-10">
 <meta property="og:image" content="https://timertrain.com/ogp.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -48,6 +44,38 @@
   "description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・共有に対応。"
 }
 </script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "50分＋10分は何セットがおすすめですか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "3セット（約3時間）を目安にし、2〜3セットごとに20〜30分の長めの休憩を入れると疲れをためにくくなります。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "時間を変えられますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "時間をタップすると変更できます。45分＋15分や60分＋10分などにもできます。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "勉強記録は残りますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "今は記録機能はありません。設定はURLに入るので、ブックマークすれば次回も同じ設定で始められます。"
+   }
+  }
+ ]
+}
+</script>
 <link rel="stylesheet" href="/style.css?v=10">
 </head>
 <body>
@@ -55,11 +83,11 @@
 <main class="app">
   <header class="header">
     <a class="logo" href="/">TimerTrain</a>
-    <h1 class="tagline page-title">タバタ式タイマー（20秒＋10秒×8セット）</h1>
+    <h1 class="tagline page-title">ポモドーロタイマー（50分＋10分休憩）</h1>
     <nav class="nav" aria-label="用途別タイマー">
       <a href="/pomodoro">ポモドーロ</a>
       <a href="/interval-timer">インターバル</a>
-      <a href="/tabata" aria-current="page">タバタ</a>
+      <a href="/tabata">タバタ</a>
       <a href="/hiit">HIIT</a>
       <a href="/study">勉強</a>
       <a href="/kitchen">キッチン</a>
@@ -114,20 +142,26 @@
 
   <!-- SEO テキスト -->
   <article class="about">
-    <h2>タバタ式トレーニングとは</h2>
-    <p>タバタ式は、20秒の高強度運動と10秒の休息を8セット、計4分間くり返すインターバルトレーニングです。立命館大学の田畑泉教授らの研究に基づく方法で、短時間で有酸素性・無酸素性の両方の能力に働きかけられるとされ、世界中で「TABATA」として知られています。</p>
-    <h2>このタバタタイマーの使い方</h2>
-    <p>このページには20秒の運動と10秒の休憩が8セット分セットされています。開始を押せば残り3秒からカウント音が鳴り、セットの切り替わりも音で分かるので、運動中に画面を見る必要はありません。種目名を付けたい場合はタイマーの名前を編集し、ウォームアップを入れたい場合は先頭にタイマーを追加してください。</p>
-    <h2>安全に行うために</h2>
-    <p>タバタ式は「全力」で行ってこそ効果がある反面、負荷の高い運動です。事前のウォームアップを欠かさず、体調に合わせてセット数を減らすなど無理のない範囲で行ってください。</p>
+    <h2>50分＋10分のポモドーロとは</h2>
+    <p>ポモドーロ・テクニックの基本は「25分集中＋5分休憩」ですが、問題演習や資料づくりのように、25分では乗ってきたところで止まってしまう作業もあります。そこで使われるのが「50分集中＋10分休憩」の長めの区切りです。1時間を1サイクルとして数えやすく、学校の授業や会議の長さにも近いのが特徴です。</p>
+    <h2>このタイマーの使い方</h2>
+    <p>このページには「集中50分＋休憩10分」が3セット（合計3時間）入っています。開始を押すと、休憩に入るときと集中に戻るときに音が鳴ります。時間をタップすれば45分＋15分などにも変えられ、くり返し回数も自由です。</p>
+    <h2>25分と50分、どちらがいい？</h2>
+    <p>取りかかりが重い日や、細かいタスクを片付けたい日は<a href="/pomodoro">25分＋5分</a>が向いています。ひとつの課題にじっくり取り組みたい日や、慣れて集中が続くようになってきたら50分＋10分を試してみてください。</p>
+    <h2>休憩10分の過ごし方</h2>
+    <p>立ち上がって体を伸ばす、水を飲む、目を閉じるなど、画面から離れるのがおすすめです。休憩中にSNSや動画を見始めると戻りにくくなるので、休憩もタイマーに任せて「鳴ったら戻る」を決めておくと続けやすくなります。</p>
+    <h2>よくある質問</h2>
+    <p style="margin-top:10px"><strong>50分＋10分は何セットがおすすめですか？</strong><br>3セット（約3時間）を目安にし、2〜3セットごとに20〜30分の長めの休憩を入れると疲れをためにくくなります。</p>
+    <p style="margin-top:10px"><strong>時間を変えられますか？</strong><br>時間をタップすると変更できます。45分＋15分や60分＋10分などにもできます。</p>
+    <p style="margin-top:10px"><strong>勉強記録は残りますか？</strong><br>今は記録機能はありません。設定はURLに入るので、ブックマークすれば次回も同じ設定で始められます。</p>
     <h2>関連タイマー</h2>
-    <p><a href="/hiit">HIITタイマー</a> · <a href="/pomodoro">ポモドーロタイマー</a> · <a href="/">タイマーを自由に作る</a></p>
+    <p><a href="/pomodoro">ポモドーロタイマー（25分＋5分）</a> · <a href="/study">勉強タイマー</a> · <a href="/repeat-timer">繰り返しタイマー</a> · <a href="/">タイマーを自由に作る</a></p>
   </article>
 
-  <footer class="footer">© 2026 TimerTrain · <a href="/en-tabata" class="lang-link">English</a> · <a href="/es-tabata" class="lang-link">Español</a></footer>
+  <footer class="footer">© 2026 TimerTrain · <a href="/en" class="lang-link">English</a></footer>
 </main>
 
-<script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 20, "color": "orange"}, {"name": "休憩", "secs": 10, "color": "teal"}], "repeat": 8};</script>
+<script>window.TT_PRESET = {"timers": [{"name": "集中", "secs": 3000, "color": "red"}, {"name": "休憩", "secs": 600, "color": "blue"}], "repeat": 3};</script>
 <script src="/app.js?v=9"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>

@@ -11,17 +11,13 @@
   gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>タバタ式タイマー｜20秒＋10秒×8セットを音で自動進行 - TimerTrain</title>
-<meta name="description" content="20秒の全力運動と10秒の休憩を8セット、音の合図で自動進行するタバタ式タイマー。秒数もセット数も変更でき、画面を見なくても使えます。無料・インストール不要。">
-<link rel="canonical" href="https://timertrain.com/tabata">
-<link rel="alternate" hreflang="ja" href="https://timertrain.com/tabata">
-<link rel="alternate" hreflang="en" href="https://timertrain.com/en-tabata">
-<link rel="alternate" hreflang="es" href="https://timertrain.com/es-tabata">
-<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en-tabata">
-<meta property="og:title" content="タバタ式タイマー（20秒＋10秒×8セット） - TimerTrain">
-<meta property="og:description" content="20秒の全力運動と10秒の休憩を8セット、音の合図で自動進行するタバタ式タイマー。秒数もセット数も変更でき、画面を見なくても使えます。無料・インストール不要。">
+<title>繰り返しタイマー｜Webで同じ時間を何度でも自動でくり返す無料タイマー - TimerTrain</title>
+<meta name="description" content="同じ時間を何度でも自動でくり返す、Webの繰り返しタイマー。1分ごと・5分ごとの合図や、回数を決めたくり返しに。無限ループにも対応し、URLで設定を保存・共有できます。インストール不要・無料。">
+<link rel="canonical" href="https://timertrain.com/repeat-timer">
+<meta property="og:title" content="繰り返しタイマー（Webで自動くり返し） - TimerTrain">
+<meta property="og:description" content="同じ時間を何度でも自動でくり返す無料のWebタイマー。回数指定も無限くり返しもOK。">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://timertrain.com/tabata">
+<meta property="og:url" content="https://timertrain.com/repeat-timer">
 <meta property="og:image" content="https://timertrain.com/ogp.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -48,6 +44,38 @@
   "description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・共有に対応。"
 }
 </script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "何回でもくり返せますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "くり返しは1〜99回の指定か、∞（止めるまで続ける）を選べます。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "2つの時間を交互にくり返せますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "できます。「＋タイマーを追加」で2つ並べると、1つ目→2つ目→1つ目…と交互にくり返します。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "音を鳴らさずに使えますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "切り替わりと終了の合図は音で鳴ります。音を出せない場所では端末の音量を下げてください。画面の表示は変わらず進みます。"
+   }
+  }
+ ]
+}
+</script>
 <link rel="stylesheet" href="/style.css?v=10">
 </head>
 <body>
@@ -55,11 +83,11 @@
 <main class="app">
   <header class="header">
     <a class="logo" href="/">TimerTrain</a>
-    <h1 class="tagline page-title">タバタ式タイマー（20秒＋10秒×8セット）</h1>
+    <h1 class="tagline page-title">繰り返しタイマー（自動でくり返す）</h1>
     <nav class="nav" aria-label="用途別タイマー">
       <a href="/pomodoro">ポモドーロ</a>
       <a href="/interval-timer">インターバル</a>
-      <a href="/tabata" aria-current="page">タバタ</a>
+      <a href="/tabata">タバタ</a>
       <a href="/hiit">HIIT</a>
       <a href="/study">勉強</a>
       <a href="/kitchen">キッチン</a>
@@ -114,20 +142,26 @@
 
   <!-- SEO テキスト -->
   <article class="about">
-    <h2>タバタ式トレーニングとは</h2>
-    <p>タバタ式は、20秒の高強度運動と10秒の休息を8セット、計4分間くり返すインターバルトレーニングです。立命館大学の田畑泉教授らの研究に基づく方法で、短時間で有酸素性・無酸素性の両方の能力に働きかけられるとされ、世界中で「TABATA」として知られています。</p>
-    <h2>このタバタタイマーの使い方</h2>
-    <p>このページには20秒の運動と10秒の休憩が8セット分セットされています。開始を押せば残り3秒からカウント音が鳴り、セットの切り替わりも音で分かるので、運動中に画面を見る必要はありません。種目名を付けたい場合はタイマーの名前を編集し、ウォームアップを入れたい場合は先頭にタイマーを追加してください。</p>
-    <h2>安全に行うために</h2>
-    <p>タバタ式は「全力」で行ってこそ効果がある反面、負荷の高い運動です。事前のウォームアップを欠かさず、体調に合わせてセット数を減らすなど無理のない範囲で行ってください。</p>
+    <h2>同じ時間を、止めずにくり返す</h2>
+    <p>繰り返しタイマーは、決めた時間が終わるたびに音で知らせ、すぐに次の回を自動で始めるタイマーです。このページには「1分」が無限にくり返す設定で入っています。開始を押せば、止めるまで1分ごとに合図が鳴り続けます。</p>
+    <h2>使い方</h2>
+    <p>時間をタップして、くり返したい長さに変えます。「くり返し」の＋−で回数を決めるか、∞を押せば止めるまでずっと続きます。回数を決めた場合は、今が何回目かが画面に表示されます。作業と休憩のように2つ以上の時間を交互にくり返したいときは、「＋タイマーを追加」で並べてください。</p>
+    <h2>時間の決め方の例</h2>
+    <p>1分ごと: 縄跳びやプランクの区切り、スピーチ練習の目安に。5分ごと: 姿勢を直す・水を飲むなどのリマインダーに。25分ごと: ポモドーロのように集中の区切りに。2つの時間を交互にくり返したい場合は<a href="/interval-timer">インターバルタイマー</a>が便利です。</p>
+    <h2>画面を消しても大丈夫？</h2>
+    <p>残り時間は時刻の差分で計算しているため、別のタブを開いていてもずれません。再生中は画面が自動で消えないようにしています。スマホでは、ホーム画面に追加しておくと次回からワンタップで開けます。</p>
+    <h2>よくある質問</h2>
+    <p style="margin-top:10px"><strong>何回でもくり返せますか？</strong><br>くり返しは1〜99回の指定か、∞（止めるまで続ける）を選べます。</p>
+    <p style="margin-top:10px"><strong>2つの時間を交互にくり返せますか？</strong><br>できます。「＋タイマーを追加」で2つ並べると、1つ目→2つ目→1つ目…と交互にくり返します。</p>
+    <p style="margin-top:10px"><strong>音を鳴らさずに使えますか？</strong><br>切り替わりと終了の合図は音で鳴ります。音を出せない場所では端末の音量を下げてください。画面の表示は変わらず進みます。</p>
     <h2>関連タイマー</h2>
-    <p><a href="/hiit">HIITタイマー</a> · <a href="/pomodoro">ポモドーロタイマー</a> · <a href="/">タイマーを自由に作る</a></p>
+    <p><a href="/multi-timer">複数タイマー</a> · <a href="/interval-timer">インターバルタイマー</a> · <a href="/tabata">タバタ式タイマー</a> · <a href="/pomodoro">ポモドーロタイマー</a> · <a href="/">タイマーを自由に作る</a></p>
   </article>
 
-  <footer class="footer">© 2026 TimerTrain · <a href="/en-tabata" class="lang-link">English</a> · <a href="/es-tabata" class="lang-link">Español</a></footer>
+  <footer class="footer">© 2026 TimerTrain · <a href="/en" class="lang-link">English</a></footer>
 </main>
 
-<script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 20, "color": "orange"}, {"name": "休憩", "secs": 10, "color": "teal"}], "repeat": 8};</script>
+<script>window.TT_PRESET = {"timers": [{"name": "1分", "secs": 60, "color": "blue"}], "repeat": "inf"};</script>
 <script src="/app.js?v=9"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>

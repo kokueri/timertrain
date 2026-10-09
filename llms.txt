@@ -36,3 +36,12 @@ Key facts:
 - [タバタ式タイマー](https://timertrain.com/tabata)
 - [HIITタイマー](https://timertrain.com/hiit)
 - [キッチンタイマー](https://timertrain.com/kitchen)
+- [複数タイマー（マルチタイマー）](https://timertrain.com/multi-timer)
+- [繰り返しタイマー](https://timertrain.com/repeat-timer)
+- [ポモドーロ50分＋10分](https://timertrain.com/pomodoro-50-10)
+
+## Temporizadores (Español)
+
+- [Temporizador Pomodoro](https://timertrain.com/es-pomodoro): 25 min + 5 min
+- [Temporizador de intervalos](https://timertrain.com/es-intervalos): 1 min + 30 s
+- [Temporizador Tabata](https://timertrain.com/es-tabata): 20 s + 10 s x 8
