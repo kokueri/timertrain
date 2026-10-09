@@ -391,3 +391,34 @@ padding: 14px 18px; font-size: 13px; box-shadow: 0 6px 28px rgba(0,0,0,.18);
 .tt-cb-actions { display: flex; gap: 10px; justify-content: center; }
 .tt-cb-install { background: var(--accent); color: var(--accent-text); border: none; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font-round); }
 .tt-cb-x { background: none; border: none; color: var(--text2); font-size: 13px; cursor: pointer; text-decoration: underline; }
+
+/* ================= スマホでも集中モード（899px以下） ================= */
+@media (max-width: 899px) {
+#focus-btn {
+display: inline-flex; align-items: center; gap: 6px;
+margin-top: 14px; min-height: 40px;
+padding: 8px 14px; border-radius: 999px;
+background: var(--card); box-shadow: var(--shadow);
+border: 1.5px solid var(--line);
+font-size: 13px; font-weight: 500; color: var(--text2);
+}
+#focus-btn svg { width: 15px; height: 15px; fill: currentColor; }
+body.focus-mode #run { min-height: 100vh; min-height: 100dvh; padding: 0 16px env(safe-area-inset-bottom); }
+body.focus-mode #focus-btn { top: calc(12px + env(safe-area-inset-top)); right: 12px; margin: 0; }
+body.focus-mode .ring-wrap { width: min(88vw, 58vh); width: min(88vw, 58dvh); margin: 0 0 22px; }
+body.focus-mode .run-time { font-size: min(19vw, 11vh); }
+body.focus-mode .run-time.finished { font-size: min(8vw, 5vh); }
+body.focus-mode .run-name { font-size: clamp(15px, 2.4vh, 20px); }
+body.focus-mode .stations { margin-bottom: 20px; }
+body.focus-mode .run-controls { gap: 26px; }
+}
+/* 横向きのスマホ：高さが足りないのでリングを小さく */
+@media (max-width: 899px) and (orientation: landscape) {
+body.focus-mode .ring-wrap { width: min(62vh, 46vw); width: min(62dvh, 46vw); margin: 0 0 10px; }
+body.focus-mode .run-time { font-size: min(13vh, 9vw); }
+body.focus-mode .stations { display: none; }
+}
+/* 集中モード中は他の浮き要素も隠す（PC・スマホ共通） */
+body.focus-mode .tt-recents,
+body.focus-mode .tt-comeback,
+body.focus-mode .toast { display: none; }
