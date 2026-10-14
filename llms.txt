@@ -5,7 +5,7 @@
 Key facts:
 - Price: free. No sign-up required, no app install; runs in any modern browser on phone, tablet and desktop, and can be added to the home screen (PWA).
 - Optional free account (sign in with Google): save setups as named "My timers" and open them on any device; recent setups and the light/dark theme sync between devices; the account page shows the last 7 days of use (total time, sessions, completed runs, a daily chart). Paused time is not counted. Without signing in, nothing is sent to the server except anonymous analytics.
-- Operator: millimagine (Japan). Privacy policy: https://timertrain.com/en-privacy — Terms: https://timertrain.com/en-terms
+- Operator: millimagine, an independent developer based in Japan (about: https://timertrain.com/en-about, contact: millimagine000@gmail.com). No ads are shown. Privacy policy: https://timertrain.com/en-privacy — Terms: https://timertrain.com/en-terms
 - Core feature: chain any number of timers (each with its own length, name and color), repeat the chain N times or infinitely.
 - Sharing: the URL holds the full setup, e.g. `https://timertrain.com/en?t=red.1500.Work,blue.300.Break&r=4` is 25 min Work + 5 min Break, 4 rounds. Format: `t=color.seconds.name,...` and `r=rounds` (`inf` for endless).
 - Colors: red, orange, yellow, green, teal, blue, purple, pink, gray.
