@@ -392,7 +392,9 @@ const label = state.repeat === Infinity
 ? STR.totalInf(fmt(one))
 : STR.total(fmt(one * state.repeat), fmt(one), state.repeat);
 $('total-label').textContent = label;
-$('rep-count').textContent = state.repeat === Infinity ? '∞' : STR.reps(state.repeat);
+const repIn = document.getElementById('rep-input');
+if (repIn) { if (document.activeElement !== repIn) repIn.value = state.repeat === Infinity ? '∞' : String(state.repeat); }
+else $('rep-count').textContent = state.repeat === Infinity ? '∞' : STR.reps(state.repeat);
 $('rep-inf').classList.toggle('active', state.repeat === Infinity);
 }
 
@@ -548,6 +550,31 @@ const last = state.timers[state.timers.length - 1];
 state.timers.push({ id: uid(), name: STR.defName, secs: 300, color: nextColor(last ? last.color : 'gray') });
 persist(); renderList();
 });
+/* くり返し回数の直接入力（1〜99。全角数字も可。空・範囲外は元に戻す） */
+(function () {
+const box = $('rep-count');
+if (!box) return;
+const inp = document.createElement('input');
+inp.id = 'rep-input'; inp.type = 'text'; inp.inputMode = 'numeric'; inp.autocomplete = 'off';
+inp.maxLength = 2; inp.className = 'rep-input';
+inp.setAttribute('aria-label', LANG === 'en' ? 'Repeat count' : LANG === 'es' ? 'Número de repeticiones' : 'くり返し回数');
+const unit = document.createElement('span'); unit.className = 'rep-unit';
+box.textContent = '';
+if (LANG === 'ja') { unit.textContent = '回'; box.appendChild(inp); box.appendChild(unit); }
+else { unit.textContent = '×'; box.appendChild(unit); box.appendChild(inp); }
+function commit() {
+const v = inp.value.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).trim();
+const n = parseInt(v, 10);
+if (/^\d{1,2}$/.test(v) && n >= 1 && n <= 99 && n !== state.repeat) { state.repeat = n; persist(); }
+inp.value = state.repeat === Infinity ? '∞' : String(state.repeat);
+updateTotal();
+}
+inp.addEventListener('focus', () => { setTimeout(() => inp.select(), 0); });
+inp.addEventListener('change', commit);
+inp.addEventListener('blur', commit);
+inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); inp.blur(); } e.stopPropagation(); });
+updateTotal();
+})();
 $('rep-minus').addEventListener('click', () => {
 state.repeat = state.repeat === Infinity ? 99 : Math.max(1, state.repeat - 1);
 persist(); updateTotal();
