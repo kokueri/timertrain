@@ -699,6 +699,28 @@ paint();
 });
 })();
 
+/* ---------- アカウント入口（ログイン/マイページ）。ここでは認証ライブラリを読み込まない ---------- */
+(function () {
+var lang = document.documentElement.lang;
+var signed = false;
+try { signed = !!localStorage.getItem('sb-arsfocfjfwtlykfdkiea-auth-token'); } catch (e) {}
+var L = lang === 'en' ? { in: 'Sign in', me: 'Account' }
+: lang === 'es' ? { in: 'Iniciar sesión', me: 'Cuenta' }
+: { in: 'ログイン', me: 'マイページ' };
+var a = document.createElement('a');
+a.id = 'acct-link';
+a.href = '/account?l=' + (['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja');
+var ic = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+ic.setAttribute('viewBox', '0 0 24 24'); ic.setAttribute('aria-hidden', 'true');
+var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+path.setAttribute('d', 'M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1a2 2 0 002 2h12a2 2 0 002-2v-1c0-2.8-3.6-5-8-5z');
+ic.appendChild(path);
+var sp = document.createElement('span'); sp.textContent = signed ? L.me : L.in;
+a.appendChild(ic); a.appendChild(sp);
+a.setAttribute('aria-label', signed ? L.me : L.in);
+(document.querySelector('.header') || document.body).appendChild(a);
+})();
+
 /* ---------- リテンション: 最近の編成 / ホーム画面追加 / 再訪ヒント ---------- */
 (function () {
 var lang = document.documentElement.lang;

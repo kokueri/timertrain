@@ -422,3 +422,45 @@ body.focus-mode .stations { display: none; }
 body.focus-mode .tt-recents,
 body.focus-mode .tt-comeback,
 body.focus-mode .toast { display: none; }
+
+/* ================= アカウント（ログイン） ================= */
+#acct-link {
+position: fixed; top: 10px; left: 12px; z-index: 60;
+display: inline-flex; align-items: center; gap: 6px;
+background: var(--card); color: var(--text2);
+border: 1.5px solid var(--line); border-radius: 999px;
+padding: 7px 12px; font-size: 13px; font-weight: 500; line-height: 1;
+box-shadow: var(--shadow); font-family: var(--font-round); text-decoration: none;
+}
+#acct-link:hover { color: var(--text); }
+#acct-link svg { width: 16px; height: 16px; fill: currentColor; }
+body.focus-mode #acct-link { display: none; }
+@media (max-width: 480px) { #acct-link span { display: none; } #acct-link { padding: 9px; } }
+.acct-page { max-width: 520px; display: block; }
+.acct { display: flex; flex-direction: column; gap: 16px; margin-top: 8px; }
+.acct-lead { font-size: 15px; line-height: 1.7; color: var(--text2); }
+.acct-small { font-size: 13px; line-height: 1.7; color: var(--text2); }
+.acct-small a, .acct-back a { color: inherit; text-decoration: underline; }
+.acct-msg { font-size: 14px; color: var(--text2); }
+.acct-msg.err { color: #D93025; }
+.acct-btn {
+display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+min-height: 48px; padding: 0 20px; border-radius: 999px; cursor: pointer;
+background: var(--card); color: var(--text); border: 1.5px solid var(--line);
+font-size: 15px; font-weight: 600; font-family: inherit;
+}
+.acct-btn:disabled { opacity: .5; cursor: default; }
+.acct-google { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.acct-google .g { font-weight: 700; font-family: Arial, sans-serif; background: #fff; color: #4285F4; border-radius: 50%; width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; font-size: 15px; }
+.acct-card { background: var(--card); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+.acct-label { font-size: 12px; color: var(--text2); }
+.acct-name { font-size: 17px; font-weight: 600; margin-top: 4px; word-break: break-word; }
+.acct-email { font-size: 14px; color: var(--text2); word-break: break-all; }
+.acct-row { display: flex; flex-wrap: wrap; gap: 10px; }
+.acct-danger { margin-top: 32px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.acct-danger h2 { font-size: 15px; }
+.acct-btn-danger-outline { color: #D93025; border-color: #D93025; background: transparent; }
+.acct-btn-danger { background: #D93025; border-color: #D93025; color: #fff; }
+.acct-confirm { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.acct-input { min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font-size: 16px; font-family: inherit; max-width: 280px; }
+.acct-back { margin-top: 40px; text-align: center; font-size: 14px; color: var(--text2); }
