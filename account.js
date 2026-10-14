@@ -35,7 +35,7 @@
   var T = {
     ja: {
       title: 'アカウント', back: 'タイマーに戻る',
-      leadOut: 'ログインすると、タイマーの保存と端末間の同期、利用記録が使えるようになります（準備中の機能を順に追加していきます）。タイマーはこれまでどおりログインなしでも無料で使えます。',
+      leadOut: '無料でログインすると、名前を付けたマイタイマーの保存、スマホとPCの同期、直近7日間の利用記録が使えます。タイマーはこれまでどおりログインなしでも無料で使えます。',
       google: 'Google でログイン',
       agree1: 'ログインすると、', agreeP: 'プライバシーポリシー', agreeAnd: 'と', agreeT: '利用規約', agree2: 'に同意したものとみなします。',
       signedIn: 'ログイン中', logout: 'ログアウト',
@@ -53,7 +53,7 @@
     },
     en: {
       title: 'Account', back: 'Back to the timer',
-      leadOut: 'Sign in to save timers, sync them across devices and see your usage history (features are being added step by step). The timer stays free to use without an account.',
+      leadOut: 'Sign in for free to save named timers, sync them between your phone and computer, and see your last 7 days of usage. The timer stays free to use without an account.',
       google: 'Sign in with Google',
       agree1: 'By signing in, you agree to our ', agreeP: 'Privacy Policy', agreeAnd: ' and ', agreeT: 'Terms of Use', agree2: '.',
       signedIn: 'Signed in', logout: 'Sign out',
@@ -71,7 +71,7 @@
     },
     es: {
       title: 'Cuenta', back: 'Volver al temporizador',
-      leadOut: 'Inicia sesión para guardar temporizadores, sincronizarlos entre dispositivos y ver tu historial de uso (las funciones se irán añadiendo poco a poco). El temporizador sigue siendo gratis sin cuenta.',
+      leadOut: 'Inicia sesión gratis para guardar temporizadores con nombre, sincronizarlos entre el móvil y el ordenador y ver tu uso de los últimos 7 días. El temporizador sigue siendo gratis sin cuenta.',
       google: 'Iniciar sesión con Google',
       agree1: 'Al iniciar sesión, aceptas nuestra ', agreeP: 'Política de privacidad', agreeAnd: ' y los ', agreeT: 'Términos de uso', agree2: '.',
       signedIn: 'Sesión iniciada', logout: 'Cerrar sesión',

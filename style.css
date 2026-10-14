@@ -518,3 +518,8 @@ background: var(--card); border: 1.5px solid var(--line); border-radius: 10px; b
 .acct-bar-col.today .acct-bar { background: var(--accent); }
 .acct-bar-day { font-size: 11px; color: var(--text); }
 .acct-bar-date { font-size: 10px; color: var(--text2); font-variant-numeric: tabular-nums; }
+
+/* 未ログイン向けの保存・同期の入口 */
+.tt-sync { margin-top: 10px; text-align: center; }
+.tt-sync-link { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: 13px; color: var(--text2); text-decoration: underline; text-underline-offset: 3px; }
+.tt-sync-link:hover { color: var(--text); }
