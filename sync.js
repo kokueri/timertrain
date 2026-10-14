@@ -165,7 +165,8 @@
         L.busy = true;
         var r = await sb.from('usage_logs').insert({
           product: PRODUCT, started_at: L.startedAt, total_secs: secs, completed: !!done,
-          ended_at: done ? new Date().toISOString() : null, config: { q: L.q }, page: L.page
+          ended_at: done ? new Date().toISOString() : null, config: L.timerName ? { q: L.q, name: L.timerName } : { q: L.q }, page: L.page,
+          timer_id: L.timerId
         }).select('id').single();
         L.busy = false;
         if (!r.error && r.data) L.id = r.data.id;
@@ -186,7 +187,10 @@
   function startLog() {
     endLog(false);
     var q = ''; try { q = serialize(); } catch (e) {}
-    log = { startedAt: new Date().toISOString(), secs: 0, q: Q_RE.test(q) ? q : null, page: location.pathname.slice(0, 100), id: null, saved: 0 };
+    var hit = null;
+    for (var i = 0; i < items.length; i++) { if (items[i].config && items[i].config.q === q) { hit = items[i]; break; } }
+    log = { startedAt: new Date().toISOString(), secs: 0, q: Q_RE.test(q) ? q : null, page: location.pathname.slice(0, 100), id: null, saved: 0,
+      timerId: hit ? hit.id : null, timerName: hit ? String(hit.name).slice(0, 60) : null };
     last = Date.now();
     logTick = setInterval(step, 5000);
   }
@@ -197,6 +201,64 @@
     window.__ttOnStop = function () { if (prevStop) { try { prevStop(); } catch (e) {} } endLog(false); };
     window.addEventListener('pagehide', function () { if (log) { step(); persistLog(log, false); } });
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && log) { step(); persistLog(log, false); } });
+  }
+
+  /* ---------- 設定の同期（最近の編成・テーマ） ----------
+   * 最近の編成: 端末とアカウントの両方を合わせて新しい順に6件
+   * テーマ: 最後に切り替えた方（時刻で比較）を採用
+   */
+  var RECENTS_KEY = 'tt-recents';
+  var P_RE = /^\/[a-z0-9\-]{0,40}$/;
+  function cleanRecents(a) {
+    if (!Array.isArray(a)) return [];
+    return a.filter(function (e) {
+      return e && typeof e.p === 'string' && P_RE.test(e.p) && typeof e.q === 'string' && e.q.length <= 1500 && Q_RE.test(e.q)
+        && typeof e.l === 'string' && typeof e.t === 'number' && isFinite(e.t);
+    }).map(function (e) { return { p: e.p, q: e.q, l: e.l.slice(0, 80), t: e.t }; });
+  }
+  function mergeRecents(a, b) {
+    var map = {};
+    cleanRecents(a).concat(cleanRecents(b)).forEach(function (e) {
+      var k = e.p + e.q; if (!map[k] || map[k].t < e.t) map[k] = e;
+    });
+    return Object.keys(map).map(function (k) { return map[k]; }).sort(function (x, y) { return y.t - x.t; }).slice(0, 6);
+  }
+  function readLocal() {
+    var r = [], th = null, at = 0;
+    try { r = JSON.parse(localStorage.getItem(RECENTS_KEY) || '[]'); } catch (e) {}
+    try { th = localStorage.getItem('tt-theme'); at = Number(localStorage.getItem('tt-theme-at')) || 0; } catch (e) {}
+    return { recents: cleanRecents(r), theme: (th === 'dark' || th === 'light') ? th : null, themeAt: at };
+  }
+  var remoteData = null, pushTimer = null;
+  function pushSoon() { clearTimeout(pushTimer); pushTimer = setTimeout(pushSettings, 3000); }
+  async function pushSettings() {
+    var L = readLocal();
+    var data = { recents: mergeRecents(L.recents, remoteData && remoteData.recents), theme: L.theme, themeAt: L.themeAt };
+    if (remoteData && JSON.stringify(remoteData) === JSON.stringify(data)) return;
+    var r = await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
+    if (!r.error) remoteData = data;
+  }
+  async function syncSettings() {
+    var r = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
+    if (r.error) return;
+    var remote = (r.data && r.data.data) || {};
+    remoteData = { recents: cleanRecents(remote.recents), theme: (remote.theme === 'dark' || remote.theme === 'light') ? remote.theme : null, themeAt: Number(remote.themeAt) || 0 };
+    var L = readLocal();
+    if (remoteData.theme && remoteData.themeAt > L.themeAt && remoteData.theme !== L.theme && window.__ttApplyTheme) {
+      window.__ttApplyTheme(remoteData.theme, remoteData.themeAt);
+    }
+    var merged = mergeRecents(L.recents, remoteData.recents);
+    if (JSON.stringify(merged) !== JSON.stringify(L.recents)) {
+      try { localStorage.setItem(RECENTS_KEY, JSON.stringify(merged)); } catch (e) {}
+      if (window.__ttRenderRecents) { try { window.__ttRenderRecents(); } catch (e) {} }
+    }
+    pushSettings();
+  }
+  function hookSettings() {
+    var prevTheme = window.__ttOnTheme;
+    window.__ttOnTheme = function (t) { if (prevTheme) { try { prevTheme(t); } catch (e) {} } pushSoon(); };
+    var prevStart2 = window.__ttOnStart;
+    window.__ttOnStart = function () { if (prevStart2) { try { prevStart2(); } catch (e) {} } pushSoon(); };
   }
 
   (async function init() {
@@ -210,7 +272,9 @@
     }
     var test = document.getElementById('tt-sync'); if (test) test.remove(); // ログイン中は「準備中」の需要テストを出さない
     hookLogs();
+    hookSettings();
     await load();
-    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') load(); });
+    syncSettings().catch(function () {});
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { load(); syncSettings().catch(function () {}); } });
   })().catch(function () { setNote(T.err, true); });
 })();

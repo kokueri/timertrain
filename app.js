@@ -722,9 +722,17 @@ paint();
 btn.addEventListener('click', function () {
 var next = effective() === 'dark' ? 'light' : 'dark';
 root.setAttribute('data-theme', next);
-try { localStorage.setItem(KEY, next); } catch (e) {}
+try { localStorage.setItem(KEY, next); localStorage.setItem('tt-theme-at', String(Date.now())); } catch (e) {}
 paint();
+if (window.__ttOnTheme) { try { window.__ttOnTheme(next); } catch (e) {} }
 });
+// 同期（ログイン中のみ sync.js が使う）: 他の端末で選んだテーマを反映
+window.__ttApplyTheme = function (t, at) {
+if (t !== 'dark' && t !== 'light') return;
+root.setAttribute('data-theme', t);
+try { localStorage.setItem(KEY, t); localStorage.setItem('tt-theme-at', String(at || Date.now())); } catch (e) {}
+paint();
+};
 })();
 
 /* ---------- アカウント入口（ログイン/マイページ）。ここでは認証ライブラリを読み込まない ---------- */
@@ -750,7 +758,7 @@ a.setAttribute('aria-label', signed ? L.me : L.in);
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=2'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=3'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 })();
@@ -853,6 +861,7 @@ document.body.appendChild(d);
 };
 
 renderRecents();
+window.__ttRenderRecents = renderRecents;
 })();
 
 /* ---------- 需要テスト: 保存・同期（準備中）への関心を計測 ---------- */
