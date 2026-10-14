@@ -45,7 +45,11 @@
       deleted: 'アカウントを削除しました。ご利用ありがとうございました。',
       loading: '読み込み中…', errLogin: 'ログインできませんでした。時間をおいてもう一度お試しください。',
       errDelete: '削除できませんでした。時間をおいてもう一度お試しいただくか、お問い合わせください。',
-      errConfig: '設定の読み込みに失敗しました。'
+      errConfig: '設定の読み込みに失敗しました。',
+      usageTitle: 'この7日間', total: '合計時間', runs: '回数', done: '完了', days: '使った日',
+      usageNote: '直近7日間の記録です。タイマーを15秒以上動かすと記録されます。', usageEmpty: 'まだ記録がありません。ログインした状態でタイマーを使うと、ここに表示されます。',
+      chartLabel: '日ごとの利用時間（分）', min: '分', h: '時間', dayFmt: function (d) { return (d.getMonth() + 1) + '/' + d.getDate(); },
+      wd: ['日', '月', '火', '水', '木', '金', '土'], times: '回'
     },
     en: {
       title: 'Account', back: 'Back to the timer',
@@ -59,7 +63,11 @@
       deleted: 'Your account has been deleted. Thank you for using TimerTrain.',
       loading: 'Loading…', errLogin: 'Could not sign in. Please try again later.',
       errDelete: 'Could not delete your account. Please try again later or contact us.',
-      errConfig: 'Failed to load settings.'
+      errConfig: 'Failed to load settings.',
+      usageTitle: 'Last 7 days', total: 'Total time', runs: 'Sessions', done: 'Completed', days: 'Active days',
+      usageNote: 'Your history for the last 7 days. A session is recorded once a timer runs for 15 seconds.', usageEmpty: 'No history yet. Use the timer while signed in and it will appear here.',
+      chartLabel: 'Minutes per day', min: 'min', h: 'h', dayFmt: function (d) { return (d.getMonth() + 1) + '/' + d.getDate(); },
+      wd: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], times: ''
     },
     es: {
       title: 'Cuenta', back: 'Volver al temporizador',
@@ -73,7 +81,11 @@
       deleted: 'Tu cuenta se ha eliminado. Gracias por usar TimerTrain.',
       loading: 'Cargando…', errLogin: 'No se pudo iniciar sesión. Inténtalo más tarde.',
       errDelete: 'No se pudo eliminar la cuenta. Inténtalo más tarde o contáctanos.',
-      errConfig: 'No se pudo cargar la configuración.'
+      errConfig: 'No se pudo cargar la configuración.',
+      usageTitle: 'Últimos 7 días', total: 'Tiempo total', runs: 'Sesiones', done: 'Completadas', days: 'Días activos',
+      usageNote: 'Tu historial de los últimos 7 días. Se registra una sesión cuando el temporizador funciona 15 segundos.', usageEmpty: 'Aún no hay historial. Usa el temporizador con la sesión iniciada y aparecerá aquí.',
+      chartLabel: 'Minutos por día', min: 'min', h: 'h', dayFmt: function (d) { return d.getDate() + '/' + (d.getMonth() + 1); },
+      wd: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'], times: ''
     }
   }[lang];
 
@@ -184,7 +196,59 @@
       input.focus();
     });
 
-    show([who, el('div', { cls: 'acct-row' }, [out]), danger]);
+    var usage = el('section', { cls: 'acct-usage', 'aria-label': T.usageTitle }, [el('h2', { text: T.usageTitle }), msg(T.loading)]);
+    show([who, usage, el('div', { cls: 'acct-row' }, [out]), danger]);
+    loadUsage(usage);
+  }
+
+  /* ---------- 直近7日の利用記録 ---------- */
+  function fmtDur(sec) {
+    var m = Math.round(sec / 60);
+    if (m < 60) return m + T.min;
+    return Math.floor(m / 60) + T.h + (lang === 'ja' ? '' : ' ') + (m % 60) + T.min;
+  }
+  async function loadUsage(box) {
+    var start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - 6);
+    var r = await sb.from('usage_logs').select('started_at,total_secs,completed')
+      .eq('product', 'timertrain').gte('started_at', start.toISOString())
+      .order('started_at', { ascending: true }).limit(2100);
+    box.textContent = '';
+    box.appendChild(el('h2', { text: T.usageTitle }));
+    if (r.error) { box.appendChild(msg(T.errLogin, 'err')); return; }
+    var rows = r.data || [];
+    if (!rows.length) { box.appendChild(el('p', { cls: 'acct-small', text: T.usageEmpty })); return; }
+    var days = [];
+    for (var i = 0; i < 7; i++) { var d = new Date(start); d.setDate(start.getDate() + i); days.push({ d: d, secs: 0, n: 0 }); }
+    var total = 0, done = 0;
+    rows.forEach(function (x) {
+      var t = new Date(x.started_at); var idx = Math.floor((new Date(t.getFullYear(), t.getMonth(), t.getDate()) - start) / 86400000);
+      var s = Math.max(0, Number(x.total_secs) || 0);
+      if (idx >= 0 && idx < 7) { days[idx].secs += s; days[idx].n++; }
+      total += s; if (x.completed) done++;
+    });
+    var active = days.filter(function (d) { return d.n > 0; }).length;
+    function tile(label, value) { return el('div', { cls: 'acct-tile' }, [el('p', { cls: 'acct-tile-v', text: value }), el('p', { cls: 'acct-tile-l', text: label })]); }
+    box.appendChild(el('div', { cls: 'acct-tiles' }, [
+      tile(T.total, fmtDur(total)), tile(T.runs, String(rows.length)), tile(T.done, String(done)), tile(T.days, active + '/7')
+    ]));
+    var max = Math.max.apply(null, days.map(function (d) { return d.secs; })) || 1;
+    var chart = el('div', { cls: 'acct-chart', role: 'img', 'aria-label': T.chartLabel + ': ' + days.map(function (d) { return T.dayFmt(d.d) + ' ' + Math.round(d.secs / 60) + T.min; }).join(', ') });
+    days.forEach(function (d, i) {
+      var col = el('div', { cls: 'acct-bar-col' + (i === 6 ? ' today' : ''), title: T.dayFmt(d.d) + ' ' + fmtDur(d.secs) + (d.n ? ' · ' + d.n + (T.times || '×') : '') });
+      var val = el('span', { cls: 'acct-bar-val', text: d.secs && (i === 6 || d.secs === max) ? String(Math.round(d.secs / 60)) : '' });
+      var track = el('div', { cls: 'acct-bar-track' });
+      var bar = el('div', { cls: 'acct-bar' });
+      bar.style.height = (d.secs ? Math.max(3, Math.round(d.secs / max * 100)) : 0) + '%';
+      track.appendChild(bar);
+      col.appendChild(val); col.appendChild(track);
+      col.appendChild(el('span', { cls: 'acct-bar-day', text: T.wd[d.d.getDay()] }));
+      col.appendChild(el('span', { cls: 'acct-bar-date', text: T.dayFmt(d.d) }));
+      chart.appendChild(col);
+    });
+    box.appendChild(el('p', { cls: 'acct-chart-title', text: T.chartLabel }));
+    box.appendChild(chart);
+    box.appendChild(el('p', { cls: 'acct-small', text: T.usageNote }));
+    ev('usage_view', { sessions: rows.length });
   }
 
   (async function init() {

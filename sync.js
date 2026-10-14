@@ -143,6 +143,62 @@
     input.focus(); input.select();
   });
 
+  /* ---------- 利用記録 ----------
+   * 開始で記録を用意し、実際に動いた秒数（一時停止中は数えない）を数える。
+   * 15秒未満でやめたものは保存しない。保存は「15秒たったら作成 → 1分ごとに更新 → 完了/リセット/ページを閉じる時に確定」。
+   */
+  var log = null, logTick = null, last = 0;
+  function isRunning() { try { return run.active && !run.paused && !run.finished; } catch (e) { return false; } }
+  function step() {
+    if (!log) return;
+    var now = Date.now();
+    if (isRunning()) log.secs += (now - last) / 1000;
+    last = now;
+    if (!log.id && !log.busy && log.secs >= 15) persistLog(log, false);
+    else if (log.id && now - log.saved > 60000) persistLog(log, false);
+  }
+  function persistLog(L, done) {
+    L.chain = (L.chain || Promise.resolve()).then(async function () {
+      var secs = Math.min(356400, Math.round(L.secs));
+      if (!L.id) {
+        if (secs < 15) return;
+        L.busy = true;
+        var r = await sb.from('usage_logs').insert({
+          product: PRODUCT, started_at: L.startedAt, total_secs: secs, completed: !!done,
+          ended_at: done ? new Date().toISOString() : null, config: { q: L.q }, page: L.page
+        }).select('id').single();
+        L.busy = false;
+        if (!r.error && r.data) L.id = r.data.id;
+      } else {
+        await sb.from('usage_logs').update({ total_secs: secs, completed: !!done, ended_at: new Date().toISOString() }).eq('id', L.id);
+      }
+      L.saved = Date.now();
+    }).catch(function () {});
+    return L.chain;
+  }
+  function endLog(done) {
+    if (!log) return;
+    step();
+    clearInterval(logTick); logTick = null;
+    var L = log; log = null;
+    persistLog(L, done);
+  }
+  function startLog() {
+    endLog(false);
+    var q = ''; try { q = serialize(); } catch (e) {}
+    log = { startedAt: new Date().toISOString(), secs: 0, q: Q_RE.test(q) ? q : null, page: location.pathname.slice(0, 100), id: null, saved: 0 };
+    last = Date.now();
+    logTick = setInterval(step, 5000);
+  }
+  function hookLogs() {
+    var prevStart = window.__ttOnStart, prevFinish = window.__ttOnFinish, prevStop = window.__ttOnStop;
+    window.__ttOnStart = function () { if (prevStart) { try { prevStart(); } catch (e) {} } startLog(); };
+    window.__ttOnFinish = function () { if (prevFinish) { try { prevFinish(); } catch (e) {} } endLog(true); };
+    window.__ttOnStop = function () { if (prevStop) { try { prevStop(); } catch (e) {} } endLog(false); };
+    window.addEventListener('pagehide', function () { if (log) { step(); persistLog(log, false); } });
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && log) { step(); persistLog(log, false); } });
+  }
+
   (async function init() {
     var s = await sb.auth.getSession();
     if (!s.data || !s.data.session) {
@@ -153,6 +209,7 @@
       return;
     }
     var test = document.getElementById('tt-sync'); if (test) test.remove(); // ログイン中は「準備中」の需要テストを出さない
+    hookLogs();
     await load();
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') load(); });
   })().catch(function () { setNote(T.err, true); });

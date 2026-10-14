@@ -500,3 +500,21 @@ background: var(--card); border: 1.5px solid var(--line); border-radius: 10px; b
 }
 .rep-input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .rep-unit { font-size: 15px; font-weight: 600; }
+
+/* ================= 利用記録（アカウントページ） ================= */
+.acct-usage { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.acct-usage h2 { font-size: 15px; }
+.acct-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.acct-tile { background: var(--bg); border-radius: 12px; padding: 10px 8px; text-align: center; }
+.acct-tile-v { font-size: 17px; white-space: nowrap; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.acct-tile-l { font-size: 11px; color: var(--text2); margin-top: 2px; }
+@media (max-width: 400px) { .acct-tiles { grid-template-columns: repeat(2, 1fr); } }
+.acct-chart-title { font-size: 12px; color: var(--text2); }
+.acct-chart { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; align-items: end; }
+.acct-bar-col { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+.acct-bar-val { font-size: 11px; color: var(--text); font-weight: 600; min-height: 14px; font-variant-numeric: tabular-nums; }
+.acct-bar-track { width: 100%; max-width: 28px; height: 96px; display: flex; align-items: flex-end; border-bottom: 1px solid var(--line); }
+.acct-bar { width: 100%; background: var(--text2); border-radius: 4px 4px 0 0; }
+.acct-bar-col.today .acct-bar { background: var(--accent); }
+.acct-bar-day { font-size: 11px; color: var(--text); }
+.acct-bar-date { font-size: 10px; color: var(--text2); font-variant-numeric: tabular-nums; }

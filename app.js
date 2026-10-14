@@ -416,6 +416,7 @@ tick();
 }
 // 停止＝最初に戻る（待機状態: 1つ目のタイマーをリングにプレビュー）
 function resetToIdle() {
+if (window.__ttOnStop) { try { window.__ttOnStop(); } catch (e) {} }
 clearInterval(tickId); tickId = null;
 run = { active: false, paused: true, finished: false, idx: 0, cycle: 1, endAt: 0, remainMs: 0, lastSec: -1 };
 releaseWakeLock();
@@ -749,7 +750,7 @@ a.setAttribute('aria-label', signed ? L.me : L.in);
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=1'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=2'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 })();
