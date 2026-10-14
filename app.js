@@ -719,6 +719,12 @@ var sp = document.createElement('span'); sp.textContent = signed ? L.me : L.in;
 a.appendChild(ic); a.appendChild(sp);
 a.setAttribute('aria-label', signed ? L.me : L.in);
 (document.querySelector('.header') || document.body).appendChild(a);
+// ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
+if (signed && document.getElementById('setup')) {
+var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=1'; document.body.appendChild(s2); };
+document.body.appendChild(s1);
+}
 })();
 
 /* ---------- リテンション: 最近の編成 / ホーム画面追加 / 再訪ヒント ---------- */

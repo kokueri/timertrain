@@ -464,3 +464,29 @@ font-size: 15px; font-weight: 600; font-family: inherit;
 .acct-confirm { display: flex; flex-direction: column; gap: 10px; width: 100%; }
 .acct-input { min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font-size: 16px; font-family: inherit; max-width: 280px; }
 .acct-back { margin-top: 40px; text-align: center; font-size: 14px; color: var(--text2); }
+
+/* ================= マイタイマー（ログイン中） ================= */
+.tt-my { margin-top: 28px; padding: 16px 18px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); }
+.tt-my-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.tt-my-title { font-size: 15px; font-weight: 700; }
+.tt-my-save, .tt-my-ok, .tt-my-cancel, .tt-my-yes, .tt-my-no {
+font-family: inherit; font-size: 13px; font-weight: 600; border-radius: 999px; padding: 8px 14px; cursor: pointer;
+border: 1.5px solid var(--line); background: var(--bg); color: var(--text); min-height: 36px;
+}
+.tt-my-ok { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.tt-my-yes { color: #D93025; border-color: #D93025; background: transparent; }
+.tt-my-save:disabled, .tt-my-ok:disabled, .tt-my-yes:disabled { opacity: .5; cursor: default; }
+.tt-my-form { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.tt-my-form[hidden] { display: none; }
+.tt-my-input { flex: 1 1 180px; min-width: 0; min-height: 40px; padding: 0 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--bg); color: var(--text); font-size: 16px; font-family: inherit; }
+.tt-my-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tt-my-item { display: inline-flex; align-items: center; gap: 4px; }
+.tt-my-x { border: none; background: none; color: var(--text2); font-size: 18px; line-height: 1; cursor: pointer; padding: 6px 8px; min-width: 32px; min-height: 32px; }
+.tt-my-item.confirm .tt-my-x { display: none; }
+.tt-my-empty, .tt-my-note { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.tt-my-note:empty { display: none; }
+.tt-my-note { margin-top: 10px; }
+.tt-my-note.err { color: #D93025; }
+body.focus-mode .tt-my { display: none; }
+/* スクロールに合わせて上へ流す（固定だと本文のボタンに重なるため） */
+#theme-btn, #acct-link { position: absolute; }
