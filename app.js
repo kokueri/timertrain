@@ -392,7 +392,9 @@ const label = state.repeat === Infinity
 ? STR.totalInf(fmt(one))
 : STR.total(fmt(one * state.repeat), fmt(one), state.repeat);
 $('total-label').textContent = label;
-$('rep-count').textContent = state.repeat === Infinity ? '∞' : STR.reps(state.repeat);
+const repIn = document.getElementById('rep-input');
+if (repIn) { if (document.activeElement !== repIn) repIn.value = state.repeat === Infinity ? '∞' : String(state.repeat); }
+else $('rep-count').textContent = state.repeat === Infinity ? '∞' : STR.reps(state.repeat);
 $('rep-inf').classList.toggle('active', state.repeat === Infinity);
 }
 
@@ -414,6 +416,7 @@ tick();
 }
 // 停止＝最初に戻る（待機状態: 1つ目のタイマーをリングにプレビュー）
 function resetToIdle() {
+if (window.__ttOnStop) { try { window.__ttOnStop(); } catch (e) {} }
 clearInterval(tickId); tickId = null;
 run = { active: false, paused: true, finished: false, idx: 0, cycle: 1, endAt: 0, remainMs: 0, lastSec: -1 };
 releaseWakeLock();
@@ -548,6 +551,31 @@ const last = state.timers[state.timers.length - 1];
 state.timers.push({ id: uid(), name: STR.defName, secs: 300, color: nextColor(last ? last.color : 'gray') });
 persist(); renderList();
 });
+/* くり返し回数の直接入力（1〜99。全角数字も可。空・範囲外は元に戻す） */
+(function () {
+const box = $('rep-count');
+if (!box) return;
+const inp = document.createElement('input');
+inp.id = 'rep-input'; inp.type = 'text'; inp.inputMode = 'numeric'; inp.autocomplete = 'off';
+inp.maxLength = 2; inp.className = 'rep-input';
+inp.setAttribute('aria-label', LANG === 'en' ? 'Repeat count' : LANG === 'es' ? 'Número de repeticiones' : 'くり返し回数');
+const unit = document.createElement('span'); unit.className = 'rep-unit';
+box.textContent = '';
+if (LANG === 'ja') { unit.textContent = '回'; box.appendChild(inp); box.appendChild(unit); }
+else { unit.textContent = '×'; box.appendChild(unit); box.appendChild(inp); }
+function commit() {
+const v = inp.value.replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).trim();
+const n = parseInt(v, 10);
+if (/^\d{1,2}$/.test(v) && n >= 1 && n <= 99 && n !== state.repeat) { state.repeat = n; persist(); }
+inp.value = state.repeat === Infinity ? '∞' : String(state.repeat);
+updateTotal();
+}
+inp.addEventListener('focus', () => { setTimeout(() => inp.select(), 0); });
+inp.addEventListener('change', commit);
+inp.addEventListener('blur', commit);
+inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); inp.blur(); } e.stopPropagation(); });
+updateTotal();
+})();
 $('rep-minus').addEventListener('click', () => {
 state.repeat = state.repeat === Infinity ? 99 : Math.max(1, state.repeat - 1);
 persist(); updateTotal();
@@ -694,9 +722,45 @@ paint();
 btn.addEventListener('click', function () {
 var next = effective() === 'dark' ? 'light' : 'dark';
 root.setAttribute('data-theme', next);
-try { localStorage.setItem(KEY, next); } catch (e) {}
+try { localStorage.setItem(KEY, next); localStorage.setItem('tt-theme-at', String(Date.now())); } catch (e) {}
 paint();
+if (window.__ttOnTheme) { try { window.__ttOnTheme(next); } catch (e) {} }
 });
+// 同期（ログイン中のみ sync.js が使う）: 他の端末で選んだテーマを反映
+window.__ttApplyTheme = function (t, at) {
+if (t !== 'dark' && t !== 'light') return;
+root.setAttribute('data-theme', t);
+try { localStorage.setItem(KEY, t); localStorage.setItem('tt-theme-at', String(at || Date.now())); } catch (e) {}
+paint();
+};
+})();
+
+/* ---------- アカウント入口（ログイン/マイページ）。ここでは認証ライブラリを読み込まない ---------- */
+(function () {
+var lang = document.documentElement.lang;
+var signed = false;
+try { signed = !!localStorage.getItem('sb-arsfocfjfwtlykfdkiea-auth-token'); } catch (e) {}
+var L = lang === 'en' ? { in: 'Sign in', me: 'Account' }
+: lang === 'es' ? { in: 'Iniciar sesión', me: 'Cuenta' }
+: { in: 'ログイン', me: 'マイページ' };
+var a = document.createElement('a');
+a.id = 'acct-link';
+a.href = '/account?l=' + (['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja');
+var ic = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+ic.setAttribute('viewBox', '0 0 24 24'); ic.setAttribute('aria-hidden', 'true');
+var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+path.setAttribute('d', 'M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-4.4 0-8 2.2-8 5v1a2 2 0 002 2h12a2 2 0 002-2v-1c0-2.8-3.6-5-8-5z');
+ic.appendChild(path);
+var sp = document.createElement('span'); sp.textContent = signed ? L.me : L.in;
+a.appendChild(ic); a.appendChild(sp);
+a.setAttribute('aria-label', signed ? L.me : L.in);
+(document.querySelector('.header') || document.body).appendChild(a);
+// ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
+if (signed && document.getElementById('setup')) {
+var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=3'; document.body.appendChild(s2); };
+document.body.appendChild(s1);
+}
 })();
 
 /* ---------- リテンション: 最近の編成 / ホーム画面追加 / 再訪ヒント ---------- */
@@ -797,62 +861,22 @@ document.body.appendChild(d);
 };
 
 renderRecents();
+window.__ttRenderRecents = renderRecents;
 })();
 
-/* ---------- 需要テスト: 保存・同期（準備中）への関心を計測 ---------- */
+/* ---------- 未ログインの人向け: 保存・同期の入口（ログイン中は sync.js が消す） ---------- */
 (function () {
 var row = document.querySelector('.action-row');
 if (!row) return;
+try { if (localStorage.getItem('sb-arsfocfjfwtlykfdkiea-auth-token')) return; } catch (e) {}
 var lang = document.documentElement.lang;
-var L = (lang === 'en') ? {
-btn: 'Save & sync across devices (coming soon)',
-q: 'We are thinking about a free login so your saved timers follow you between phone and computer. Would you use it?',
-yes: 'I would use it', no: 'Not for me', thanks: 'Thanks! That helps us decide what to build.'
-} : (lang === 'es') ? {
-btn: 'Guardar y sincronizar entre dispositivos (próximamente)',
-q: 'Estamos pensando en un inicio de sesión gratuito para que tus temporizadores guardados te sigan entre el móvil y el ordenador. ¿Lo usarías?',
-yes: 'Lo usaría', no: 'No lo necesito', thanks: '¡Gracias! Nos ayuda a decidir qué construir.'
-} : {
-btn: '保存して別の端末でも使う（準備中）',
-q: 'ログインすると、保存したタイマーをスマホとPCで同じように使える機能を検討しています。あったら使いたいですか？',
-yes: '使いたい', no: 'いらない', thanks: 'ありがとうございます！開発の参考にします。'
-};
-var KEY = 'tt-sync-vote';
-var voted = false;
-try { voted = !!localStorage.getItem(KEY); } catch (e) {}
-if (voted) return;
-function ev(name, params) { try { if (window.gtag) gtag('event', name, params || {}); } catch (e) {} }
-
-var wrap = document.createElement('div'); wrap.id = 'tt-sync';
-wrap.style.cssText = 'margin-top:10px;text-align:center;';
-var b = document.createElement('button'); b.type = 'button'; b.id = 'tt-sync-btn'; b.textContent = L.btn;
-b.setAttribute('aria-expanded', 'false');
-b.style.cssText = 'min-height:44px;padding:8px 12px;font-size:13px;color:var(--text2);text-decoration:underline;text-underline-offset:3px;';
-var panel = document.createElement('div'); panel.id = 'tt-sync-panel'; panel.hidden = true;
-panel.style.cssText = 'margin-top:4px;padding:14px 16px;border-radius:16px;background:var(--card);box-shadow:var(--shadow);font-size:13px;line-height:1.7;text-align:left;';
-var p = document.createElement('p'); p.textContent = L.q; p.style.cssText = 'margin:0 0 12px;color:var(--text);';
-var acts = document.createElement('div'); acts.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;';
-function mk(label, primary) {
-var x = document.createElement('button'); x.type = 'button'; x.textContent = label;
-x.style.cssText = 'flex:1;min-width:120px;min-height:44px;padding:8px 14px;border-radius:999px;font-size:14px;font-weight:500;' +
-(primary ? 'background:var(--accent);color:var(--accent-text);' : 'border:1.5px solid var(--line);color:var(--text);');
-return x;
-}
-var y = mk(L.yes, true), n = mk(L.no, false);
-function vote(a) {
-ev('sync_interest_vote', { answer: a });
-try { localStorage.setItem(KEY, a); } catch (e) {}
-acts.remove(); p.textContent = L.thanks; b.disabled = true; b.style.textDecoration = 'none';
-}
-y.addEventListener('click', function () { vote('yes'); });
-n.addEventListener('click', function () { vote('no'); });
-acts.appendChild(y); acts.appendChild(n); panel.appendChild(p); panel.appendChild(acts);
-var opened = false;
-b.addEventListener('click', function () {
-panel.hidden = !panel.hidden;
-b.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
-if (!panel.hidden && !opened) { opened = true; ev('sync_interest_open'); }
-});
-wrap.appendChild(b); wrap.appendChild(panel);
+var l = ['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja';
+var txt = l === 'en' ? 'Save timers & sync across devices (free sign-in)'
+: l === 'es' ? 'Guarda y sincroniza entre dispositivos (inicio de sesión gratis)'
+: '保存して別の端末でも使う（無料ログイン）';
+var wrap = document.createElement('div'); wrap.id = 'tt-sync'; wrap.className = 'tt-sync';
+var a = document.createElement('a'); a.href = '/account?l=' + l; a.textContent = txt; a.className = 'tt-sync-link';
+a.addEventListener('click', function () { try { if (window.gtag) gtag('event', 'login_cta_click', { page: location.pathname }); } catch (e) {} });
+wrap.appendChild(a);
 row.insertAdjacentElement('afterend', wrap);
 })();
