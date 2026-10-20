@@ -49,7 +49,9 @@
       usageTitle: 'この7日間', total: '合計時間', runs: '回数', done: '完了', days: '使った日',
       usageNote: '直近7日間の記録です。タイマーを15秒以上動かすと記録されます。', usageEmpty: 'まだ記録がありません。ログインした状態でタイマーを使うと、ここに表示されます。',
       chartLabel: '日ごとの利用時間（分）', min: '分', h: '時間', dayFmt: function (d) { return (d.getMonth() + 1) + '/' + d.getDate(); },
-      wd: ['日', '月', '火', '水', '木', '金', '土'], times: '回'
+      wd: ['日', '月', '火', '水', '木', '金', '土'], times: '回',
+      streak: function (n) { return '🔥 ' + n + '日連続で使っています'; },
+      streakKeep: function (n) { return '🔥 ' + n + '日連続中。今日も使うと' + (n + 1) + '日になります'; }
     },
     en: {
       title: 'Account', back: 'Back to the timer',
@@ -67,7 +69,9 @@
       usageTitle: 'Last 7 days', total: 'Total time', runs: 'Sessions', done: 'Completed', days: 'Active days',
       usageNote: 'Your history for the last 7 days. A session is recorded once a timer runs for 15 seconds.', usageEmpty: 'No history yet. Use the timer while signed in and it will appear here.',
       chartLabel: 'Minutes per day', min: 'min', h: 'h', dayFmt: function (d) { return (d.getMonth() + 1) + '/' + d.getDate(); },
-      wd: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], times: ''
+      wd: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], times: '',
+      streak: function (n) { return '🔥 ' + n + '-day streak'; },
+      streakKeep: function (n) { return '🔥 ' + n + '-day streak. Use it today to make it ' + (n + 1); }
     },
     es: {
       title: 'Cuenta', back: 'Volver al temporizador',
@@ -85,7 +89,9 @@
       usageTitle: 'Últimos 7 días', total: 'Tiempo total', runs: 'Sesiones', done: 'Completadas', days: 'Días activos',
       usageNote: 'Tu historial de los últimos 7 días. Se registra una sesión cuando el temporizador funciona 15 segundos.', usageEmpty: 'Aún no hay historial. Usa el temporizador con la sesión iniciada y aparecerá aquí.',
       chartLabel: 'Minutos por día', min: 'min', h: 'h', dayFmt: function (d) { return d.getDate() + '/' + (d.getMonth() + 1); },
-      wd: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'], times: ''
+      wd: ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'], times: '',
+      streak: function (n) { return '🔥 Racha de ' + n + (n === 1 ? ' día' : ' días'); },
+      streakKeep: function (n) { return '🔥 Racha de ' + n + (n === 1 ? ' día' : ' días') + '. Úsalo hoy para llegar a ' + (n + 1); }
     }
   }[lang];
 
@@ -228,6 +234,9 @@
     });
     var active = days.filter(function (d) { return d.n > 0; }).length;
     function tile(label, value) { return el('div', { cls: 'acct-tile' }, [el('p', { cls: 'acct-tile-v', text: value }), el('p', { cls: 'acct-tile-l', text: label })]); }
+    var streakEl = el('p', { cls: 'acct-streak' });
+    box.appendChild(streakEl);
+    loadStreak(streakEl);
     box.appendChild(el('div', { cls: 'acct-tiles' }, [
       tile(T.total, fmtDur(total)), tile(T.runs, String(rows.length)), tile(T.done, String(done)), tile(T.days, active + '/7')
     ]));
@@ -249,6 +258,27 @@
     box.appendChild(chart);
     box.appendChild(el('p', { cls: 'acct-small', text: T.usageNote }));
     ev('usage_view', { sessions: rows.length });
+  }
+
+  /* ---------- 連続日数（今日か昨日までさかのぼって、続けて使った日数） ---------- */
+  function dayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  async function loadStreak(p) {
+    try {
+      var since = new Date(); since.setHours(0, 0, 0, 0); since.setDate(since.getDate() - 120);
+      var r = await sb.from('usage_logs').select('started_at')
+        .eq('product', 'timertrain').gte('started_at', since.toISOString())
+        .order('started_at', { ascending: false }).limit(5000);
+      if (r.error || !r.data) return;
+      var set = {};
+      r.data.forEach(function (x) { set[dayKey(new Date(x.started_at))] = 1; });
+      var d = new Date(); d.setHours(0, 0, 0, 0);
+      var today = !!set[dayKey(d)];
+      if (!today) d.setDate(d.getDate() - 1);
+      var n = 0;
+      while (set[dayKey(d)] && n < 121) { n++; d.setDate(d.getDate() - 1); }
+      if (n < 1) return;
+      p.textContent = today ? T.streak(n) : T.streakKeep(n);
+    } catch (e) {}
   }
 
   (async function init() {
