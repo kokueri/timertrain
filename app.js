@@ -33,6 +33,8 @@ totalInf: one => `1周 ${one} × ∞`,
 total: (t, one, n) => `合計 ${t}（${one} × ${n}周）`,
 cycleInf: c => `${c}周目`,
 cycle: (c, r) => `${c} / ${r}周`,
+etaRun: t => `${t} に終了予定`, etaIdle: t => `今始めると ${t} に終了`, etaRound: t => `この周は ${t} まで`,
+sound: '音', vol: '音量', snd: { chime: 'チャイム', bell: 'ベル', digital: 'デジタル', wood: '木の音', soft: 'やさしい音', none: '音なし' },
 },
 en: {
 work: 'Work', brk: 'Break', defName: 'Timer', namePh: 'Timer name',
@@ -43,6 +45,8 @@ totalInf: one => `${one} per round × ∞`,
 total: (t, one, n) => `Total ${t} (${one} × ${n} rounds)`,
 cycleInf: c => `Round ${c}`,
 cycle: (c, r) => `Round ${c} / ${r}`,
+etaRun: t => `Ends at ${t}`, etaIdle: t => `Start now and finish at ${t}`, etaRound: t => `This round ends at ${t}`,
+sound: 'Sound', vol: 'Volume', snd: { chime: 'Chime', bell: 'Bell', digital: 'Digital', wood: 'Wood', soft: 'Soft', none: 'Off' },
 },
 es: {
 work: 'Trabajo', brk: 'Descanso', defName: 'Temporizador', namePh: 'Nombre del temporizador',
@@ -53,6 +57,8 @@ totalInf: one => `${one} por ronda × ∞`,
 total: (t, one, n) => `Total ${t} (${one} × ${n} rondas)`,
 cycleInf: c => `Ronda ${c}`,
 cycle: (c, r) => `Ronda ${c} / ${r}`,
+etaRun: t => `Termina: ${t}`, etaIdle: t => `Si empiezas ahora, termina: ${t}`, etaRound: t => `Esta ronda termina: ${t}`,
+sound: 'Sonido', vol: 'Volumen', snd: { chime: 'Campanilla', bell: 'Campana', digital: 'Digital', wood: 'Madera', soft: 'Suave', none: 'Sin sonido' },
 },
 }[LANG];
 const STORE_KEY = 'timertrain-v1:' + location.pathname;
@@ -70,6 +76,7 @@ let run = { active: false, paused: false, finished: false, idx: 0, cycle: 1, end
 let tickId = null;
 let wakeLock = null;
 let audioCtx = null;
+let masterGain = null;
 
 function uid() { return Math.random().toString(36).slice(2, 9); }
 
@@ -170,22 +177,65 @@ if (audioCtx.state === 'suspended') audioCtx.resume();
 const buf = audioCtx.createBuffer(1, 1, 22050);
 const src = audioCtx.createBufferSource();
 src.buffer = buf; src.connect(audioCtx.destination); src.start(0);
+if (!masterGain) { masterGain = audioCtx.createGain(); masterGain.connect(audioCtx.destination); }
+masterGain.gain.value = sound.v / 70;
 }
-function beep(freq, dur, at, vol) {
-if (!audioCtx) return;
+function beep(freq, dur, at, vol, type) {
+if (!audioCtx || !masterGain) return;
 const t = audioCtx.currentTime + (at || 0);
 const osc = audioCtx.createOscillator();
 const g = audioCtx.createGain();
-osc.type = 'sine'; osc.frequency.value = freq;
+osc.type = type || 'sine'; osc.frequency.value = freq;
 g.gain.setValueAtTime(0.0001, t);
 g.gain.exponentialRampToValueAtTime(vol || 0.3, t + 0.01);
 g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-osc.connect(g); g.connect(audioCtx.destination);
+osc.connect(g); g.connect(masterGain);
 osc.start(t); osc.stop(t + dur + 0.05);
 }
-const soundSegment = () => { beep(880, 0.15, 0, 0.35); beep(1175, 0.2, 0.18, 0.35); };
-const soundFinish = () => { beep(880, 0.15, 0, 0.4); beep(1175, 0.15, 0.2, 0.4); beep(1568, 0.5, 0.4, 0.4); };
-const soundTick = () => beep(700, 0.06, 0, 0.15);
+/* 音の種類（すべて WebAudio で合成。音源ファイルは使わない） */
+function bellTone(f, dur, at, vol) { beep(f, dur, at, vol); beep(f * 2.76, dur * 0.5, at, vol * 0.25); beep(f * 5.4, dur * 0.25, at, vol * 0.12); }
+const SOUNDS = {
+chime: {
+seg() { beep(880, 0.15, 0, 0.35); beep(1175, 0.2, 0.18, 0.35); },
+fin() { beep(880, 0.15, 0, 0.4); beep(1175, 0.15, 0.2, 0.4); beep(1568, 0.5, 0.4, 0.4); },
+tick() { beep(700, 0.06, 0, 0.15); },
+},
+bell: {
+seg() { bellTone(1046, 1.2, 0, 0.3); },
+fin() { bellTone(1046, 1.3, 0, 0.3); bellTone(1318, 1.3, 0.35, 0.3); bellTone(1568, 1.8, 0.7, 0.3); },
+tick() { beep(1046, 0.05, 0, 0.1); },
+},
+digital: {
+seg() { beep(1200, 0.08, 0, 0.16, 'square'); beep(1200, 0.08, 0.15, 0.16, 'square'); },
+fin() { for (let i = 0; i < 3; i++) { beep(1200, 0.08, i * 0.5, 0.16, 'square'); beep(1200, 0.08, i * 0.5 + 0.15, 0.16, 'square'); } },
+tick() { beep(1200, 0.04, 0, 0.07, 'square'); },
+},
+wood: {
+seg() { beep(520, 0.08, 0, 0.5, 'triangle'); beep(780, 0.08, 0.13, 0.5, 'triangle'); },
+fin() { beep(520, 0.08, 0, 0.5, 'triangle'); beep(650, 0.08, 0.15, 0.5, 'triangle'); beep(780, 0.08, 0.3, 0.5, 'triangle'); beep(1040, 0.16, 0.5, 0.5, 'triangle'); },
+tick() { beep(650, 0.04, 0, 0.25, 'triangle'); },
+},
+soft: {
+seg() { beep(523, 0.6, 0, 0.22); beep(659, 0.8, 0.28, 0.22); },
+fin() { beep(523, 0.7, 0, 0.22); beep(659, 0.7, 0.3, 0.22); beep(784, 1.4, 0.6, 0.22); },
+tick() { beep(523, 0.08, 0, 0.07); },
+},
+none: { seg() {}, fin() {}, tick() {} },
+};
+const SOUND_KEY = 'tt-sound';
+let sound = { s: 'chime', v: 70 };
+try {
+const sv = JSON.parse(localStorage.getItem(SOUND_KEY) || 'null');
+if (sv && SOUNDS[sv.s]) sound.s = sv.s;
+if (sv && Number.isFinite(sv.v)) sound.v = Math.min(100, Math.max(0, Math.round(sv.v)));
+} catch (e) {}
+function saveSound() {
+try { localStorage.setItem(SOUND_KEY, JSON.stringify(sound)); } catch (e) {}
+if (masterGain) masterGain.gain.value = sound.v / 70;
+}
+const soundSegment = () => SOUNDS[sound.s].seg();
+const soundFinish = () => SOUNDS[sound.s].fin();
+const soundTick = () => SOUNDS[sound.s].tick();
 
 /* ---------- Wake Lock ---------- */
 async function acquireWakeLock() {
@@ -213,6 +263,35 @@ function setRing(frac, color) {
 ringFg.style.strokeDashoffset = RING_C * (1 - Math.min(1, Math.max(0, frac)));
 if (color) ringFg.style.stroke = color;
 }
+
+/* 終了予定時刻 */
+const etaEl = document.createElement('p');
+etaEl.id = 'run-eta'; etaEl.className = 'run-eta';
+stationsEl.insertAdjacentElement('afterend', etaEl);
+const LOCALE = LANG === 'ja' ? 'ja-JP' : LANG === 'es' ? 'es-ES' : ((navigator.language || '').startsWith('en') ? navigator.language : 'en-US');
+function clockStr(ms) {
+const d = new Date(Date.now() + ms), now = new Date();
+const opt = { hour: 'numeric', minute: '2-digit' };
+if (d.toDateString() !== now.toDateString()) opt.weekday = 'short';
+try { return d.toLocaleString(LOCALE, opt); } catch (e) { return d.toLocaleTimeString(); }
+}
+function updateEta() {
+if (run.finished || !state.timers.length) { etaEl.textContent = ''; return; }
+const one = state.timers.reduce((a, t) => a + t.secs, 0) * 1000;
+const inf = state.repeat === Infinity;
+let ms;
+if (!run.active) {
+ms = inf ? one : one * state.repeat;
+etaEl.textContent = inf ? STR.etaRound(clockStr(ms)) : STR.etaIdle(clockStr(ms));
+return;
+}
+const cur = run.paused ? run.remainMs : Math.max(0, run.endAt - Date.now());
+ms = cur;
+for (let i = run.idx + 1; i < state.timers.length; i++) ms += state.timers[i].secs * 1000;
+if (!inf) ms += (state.repeat - run.cycle) * one;
+etaEl.textContent = inf ? STR.etaRound(clockStr(ms)) : STR.etaRun(clockStr(ms));
+}
+setInterval(() => { if (!run.active || run.paused) updateEta(); }, 15000);
 
 function closeColorPop() { document.querySelectorAll('.color-pop').forEach(p => p.remove()); }
 function openColorPop(li, t, dot) {
@@ -434,6 +513,7 @@ runName.textContent = t.name || STR.defName;
 runTime.textContent = fmt(t.secs);
 runCycle.textContent = '';
 setRing(1, colorOf(t.color));
+updateEta();
 }
 function updateHighlight() {
 [...listEl.children].forEach((li, i) => {
@@ -458,6 +538,7 @@ pauseBtn.innerHTML = ICONS.play;
 releaseWakeLock();
 }
 updateRunView();
+updateEta();
 }
 function skip() {
 if (!run.active || run.finished) return;
@@ -493,6 +574,7 @@ runCycle.textContent = '';
 pauseBtn.innerHTML = ICONS.replay;
 setRing(1, '#34C759');
 document.title = STR.doneTitle;
+updateEta();
 if (window.__ttOnFinish) { try { window.__ttOnFinish(); } catch (e) {} }
 }
 function tick() {
@@ -510,7 +592,8 @@ function updateRunView() {
 if (run.finished) return;
 const t = state.timers[run.idx];
 const remainMs = run.paused ? run.remainMs : Math.max(0, run.endAt - Date.now());
-const disp = fmt(Math.ceil(remainMs / 1000));
+const sec = Math.ceil(remainMs / 1000);
+const disp = fmt(sec);
 runTime.textContent = disp;
 runName.textContent = t.name || STR.defName;
 runCycle.textContent = state.repeat === Infinity
@@ -518,6 +601,7 @@ runCycle.textContent = state.repeat === Infinity
 : STR.cycle(run.cycle, state.repeat);
 setRing(remainMs / (t.secs * 1000), colorOf(t.color));
 document.title = `${disp} ${t.name} — TimerTrain`;
+if (sec !== run.etaSec) { run.etaSec = sec; updateEta(); }
 }
 function renderStations() {
 stationsEl.innerHTML = '';
@@ -575,6 +659,27 @@ inp.addEventListener('change', commit);
 inp.addEventListener('blur', commit);
 inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); inp.blur(); } e.stopPropagation(); });
 updateTotal();
+})();
+/* 音の設定（種類・音量。端末に保存） */
+(function () {
+const rr = document.querySelector('.repeat-row');
+if (!rr) return;
+const row = document.createElement('div'); row.className = 'sound-row';
+const lab = document.createElement('label'); lab.className = 'repeat-label'; lab.htmlFor = 'snd-type'; lab.textContent = STR.sound;
+const ctrl = document.createElement('div'); ctrl.className = 'sound-ctrl';
+const sel = document.createElement('select'); sel.id = 'snd-type';
+Object.keys(SOUNDS).forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = STR.snd[k]; sel.appendChild(o); });
+sel.value = sound.s;
+const vol = document.createElement('input'); vol.type = 'range'; vol.id = 'snd-vol'; vol.min = '0'; vol.max = '100'; vol.step = '5';
+vol.value = String(sound.v); vol.setAttribute('aria-label', STR.vol);
+const paint = () => { vol.disabled = sound.s === 'none'; vol.style.setProperty('--p', sound.v + '%'); };
+const preview = () => { unlockAudio(); soundSegment(); };
+sel.addEventListener('change', () => { sound.s = SOUNDS[sel.value] ? sel.value : 'chime'; saveSound(); paint(); preview(); if (window.gtag) gtag('event', 'sound_change', { sound: sound.s }); });
+vol.addEventListener('input', () => { sound.v = Math.min(100, Math.max(0, parseInt(vol.value, 10) || 0)); saveSound(); paint(); });
+vol.addEventListener('change', preview);
+ctrl.append(sel, vol); row.append(lab, ctrl);
+rr.insertAdjacentElement('afterend', row);
+paint();
 })();
 $('rep-minus').addEventListener('click', () => {
 state.repeat = state.repeat === Infinity ? 99 : Math.max(1, state.repeat - 1);
