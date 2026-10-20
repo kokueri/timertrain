@@ -563,6 +563,7 @@ updateIdleView();
 function updateIdleView() {
 const t = state.timers[0];
 if (!t) return;
+if (DT) renderStations(); // DonutTimer は待機中もミニドーナツの並びを見せる
 runName.textContent = t.name || STR.defName;
 runTime.textContent = fmt(t.secs);
 runCycle.textContent = '';
@@ -977,11 +978,11 @@ document.body.appendChild(s1);
 var lang = document.documentElement.lang;
 var L = (lang === 'en') ? {
 recent: 'Recent', install: 'Add to home screen',
-comeback: 'Add TimerTrain to your home screen to reopen it in one tap.',
+comeback: 'Add ' + (window.DT ? 'DonutTimer' : 'TimerTrain') + ' to your home screen to reopen it in one tap.',
 bookmark: 'Bookmark this page (Ctrl/Cmd+D) so you can come back tomorrow.', dismiss: 'Close'
 } : (lang === 'es') ? {
 recent: 'Recientes', install: 'Añadir a la pantalla de inicio',
-comeback: 'Añade TimerTrain a tu pantalla de inicio para volver con un toque.',
+comeback: 'Añade ' + (window.DT ? 'DonutTimer' : 'TimerTrain') + ' a tu pantalla de inicio para volver con un toque.',
 bookmark: 'Guarda esta página (Ctrl/Cmd+D) para volver mañana.', dismiss: 'Cerrar'
 } : {
 recent: '最近の編成', install: 'ホーム画面に追加',

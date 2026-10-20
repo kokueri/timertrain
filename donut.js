@@ -17,7 +17,7 @@ var NAMES = {
   es: ['Fresa con leche', 'Chocolate', 'Menta con chocolate', 'Vainilla', 'Arándano', 'Té con leche']
 };
 // TimerTrain の色ID → フレーバー。共有URL・マイタイマーの色IDはそのまま使う。
-var BY_COLOR = { red: 0, pink: 0, gray: 1, green: 2, teal: 2, blue: 2, yellow: 3, purple: 4, orange: 5 };
+var BY_COLOR = { red: 0, pink: 0, gray: 1, green: 2, teal: 2, yellow: 3, blue: 4, purple: 4, orange: 5 };
 // フレーバーを選んだときに保存する色ID
 var CHOICE_COLOR = ['red', 'gray', 'green', 'yellow', 'purple', 'orange'];
 

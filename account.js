@@ -1,4 +1,5 @@
 'use strict';
+  var BRAND = window.DT ? window.DT.brand : 'TimerTrain'; // DonutTimer では donut.js が先に読み込まれる
 /* TimerTrain アカウントページ
  * - 認証は Supabase Auth（Google, PKCE）。パスワードは扱わない
  * - ブラウザに置くのは公開キーだけ。データは RLS で本人の行しか読めない
@@ -8,16 +9,18 @@
 (function () {
   var SB_URL = 'https://arsfocfjfwtlykfdkiea.supabase.co';
   var SB_KEY = 'sb_publishable_zw039kyiXe27oY4ITTcNnA_-B_FsG5H';
-  var GA_ID = 'G-GSFVNEDCGN';
+  var GA_ID = window.DT ? '' : 'G-GSFVNEDCGN'; // DonutTimer の計測は別プロパティを作ってから
 
   /* ---------- GA（インラインscriptを使わないためここで設定） ---------- */
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () { window.dataLayer.push(arguments); };
   gtag('js', new Date());
+  if (GA_ID) {
   gtag('config', GA_ID);
   var ga = document.createElement('script');
   ga.async = true; ga.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
   document.head.appendChild(ga);
+  }
   function ev(name, p) { try { gtag('event', name, p || {}); } catch (e) {} }
 
   /* ---------- 言語 ---------- */
@@ -62,7 +65,7 @@
       dangerTitle: 'Delete account', dangerLead: 'This deletes your account and all saved timers and history. It cannot be undone.',
       dangerOpen: 'Delete my account', dangerType: 'Type DELETE to confirm', dangerWord: 'DELETE',
       dangerGo: 'Delete permanently', cancel: 'Cancel',
-      deleted: 'Your account has been deleted. Thank you for using TimerTrain.',
+      deleted: 'Your account has been deleted. Thank you for using ' + BRAND + '.',
       loading: 'Loading…', errLogin: 'Could not sign in. Please try again later.',
       errDelete: 'Could not delete your account. Please try again later or contact us.',
       errConfig: 'Failed to load settings.',
@@ -82,7 +85,7 @@
       dangerTitle: 'Eliminar cuenta', dangerLead: 'Se eliminarán tu cuenta y todos tus temporizadores e historial. No se puede deshacer.',
       dangerOpen: 'Eliminar mi cuenta', dangerType: 'Escribe ELIMINAR para confirmar', dangerWord: 'ELIMINAR',
       dangerGo: 'Eliminar definitivamente', cancel: 'Cancelar',
-      deleted: 'Tu cuenta se ha eliminado. Gracias por usar TimerTrain.',
+      deleted: 'Tu cuenta se ha eliminado. Gracias por usar ' + BRAND + '.',
       loading: 'Cargando…', errLogin: 'No se pudo iniciar sesión. Inténtalo más tarde.',
       errDelete: 'No se pudo eliminar la cuenta. Inténtalo más tarde o contáctanos.',
       errConfig: 'No se pudo cargar la configuración.',
@@ -110,7 +113,7 @@
   function show(nodes) { root.textContent = ''; nodes.forEach(function (n) { root.appendChild(n); }); }
   function msg(text, cls) { return el('p', { cls: 'acct-msg ' + (cls || ''), role: 'status', text: text }); }
 
-  document.title = T.title + ' - TimerTrain';
+  document.title = T.title + ' - ' + BRAND;
   document.getElementById('acct-title').textContent = T.title;
   var logo = document.getElementById('acct-logo'); logo.href = HOME;
   var back = document.getElementById('acct-back'); back.href = HOME; back.textContent = T.back;
