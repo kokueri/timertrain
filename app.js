@@ -20,14 +20,18 @@ const PALETTE = [
 { id: 'gray', v: '#8E8E93' },
 ];
 const colorOf = id => (PALETTE.find(c => c.id === id) || PALETTE[5]).v;
-const nextColor = id => PALETTE[(PALETTE.findIndex(c => c.id === id) + 1) % PALETTE.length].id;
+// DonutTimer の見た目（donut.js）を読み込んだページでは window.DT がある
+const DT = window.DT || null;
+const BRAND = DT ? DT.brand : 'TimerTrain';
+const rowColor = id => DT ? DT.coat(id) : colorOf(id);
+const nextColor = id => DT ? DT.next(id) : PALETTE[(PALETTE.findIndex(c => c.id === id) + 1) % PALETTE.length].id;
 const MAX_SECS = 99 * 3600;
 const LANG = ['en', 'es', 'ja'].includes(document.documentElement.lang) ? document.documentElement.lang : 'ja';
 const STR = {
 ja: {
 work: '作業', brk: '休憩', defName: 'タイマー', namePh: 'タイマー名',
 lastDel: '最後の1つは削除できません', copied: 'リンクをコピーしました',
-copyPrompt: 'このURLをコピーしてください', done: '完了 🎉', doneTitle: '✅ 完了 — TimerTrain',
+copyPrompt: 'このURLをコピーしてください', done: '完了 🎉', doneTitle: '✅ 完了 — ' + (window.DT ? 'DonutTimer' : 'TimerTrain'),
 reps: n => `${n}回`,
 totalInf: one => `1周 ${one} × ∞`,
 total: (t, one, n) => `合計 ${t}（${one} × ${n}周）`,
@@ -37,7 +41,7 @@ cycle: (c, r) => `${c} / ${r}周`,
 en: {
 work: 'Work', brk: 'Break', defName: 'Timer', namePh: 'Timer name',
 lastDel: "You can't delete the last timer", copied: 'Link copied',
-copyPrompt: 'Copy this URL', done: 'Done 🎉', doneTitle: '✅ Done — TimerTrain',
+copyPrompt: 'Copy this URL', done: 'Done 🎉', doneTitle: '✅ Done — ' + (window.DT ? 'DonutTimer' : 'TimerTrain'),
 reps: n => `×${n}`,
 totalInf: one => `${one} per round × ∞`,
 total: (t, one, n) => `Total ${t} (${one} × ${n} rounds)`,
@@ -47,7 +51,7 @@ cycle: (c, r) => `Round ${c} / ${r}`,
 es: {
 work: 'Trabajo', brk: 'Descanso', defName: 'Temporizador', namePh: 'Nombre del temporizador',
 lastDel: 'No puedes eliminar el último temporizador', copied: 'Enlace copiado',
-copyPrompt: 'Copia esta URL', done: '¡Listo! 🎉', doneTitle: '✅ Listo — TimerTrain',
+copyPrompt: 'Copia esta URL', done: '¡Listo! 🎉', doneTitle: '✅ Listo — ' + (window.DT ? 'DonutTimer' : 'TimerTrain'),
 reps: n => `×${n}`,
 totalInf: one => `${one} por ronda × ∞`,
 total: (t, one, n) => `Total ${t} (${one} × ${n} rondas)`,
@@ -208,10 +212,26 @@ pause: '<svg width="34" height="34" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14
 replay: '<svg width="34" height="34" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>',
 };
 const RING_C = 2 * Math.PI * 46;
-ringFg.style.strokeDasharray = RING_C;
+if (ringFg && !DT) ringFg.style.strokeDasharray = RING_C;
 function setRing(frac, color) {
+if (DT) {
+const c = PALETTE.find(x => x.v === color);
+DT.set(frac, c ? c.id : 'blue');
+DT.fit(runTime);
+return;
+}
 ringFg.style.strokeDashoffset = RING_C * (1 - Math.min(1, Math.max(0, frac)));
 if (color) ringFg.style.stroke = color;
+}
+// 色の丸（DonutTimer ではミニドーナツ）を塗る
+function paintDot(dot, id) {
+if (DT) {
+dot.textContent = '';
+dot.appendChild(DT.mini(id));
+dot.setAttribute('aria-label', DT.name(id));
+} else {
+dot.style.background = colorOf(id);
+}
 }
 
 function closeColorPop() { document.querySelectorAll('.color-pop').forEach(p => p.remove()); }
@@ -221,17 +241,17 @@ closeColorPop();
 if (existed) return; // 同じ丸をもう一度押したら閉じるだけ
 const pop = document.createElement('div');
 pop.className = 'color-pop';
-PALETTE.forEach(c => {
+(DT ? DT.choices.map(id => ({ id })) : PALETTE).forEach(c => {
 const b = document.createElement('button');
 b.type = 'button';
-b.style.background = c.v;
-b.setAttribute('aria-label', c.id);
-if (c.id === t.color) b.classList.add('sel');
+paintDot(b, c.id);
+if (!DT) b.setAttribute('aria-label', c.id);
+if (DT ? DT.flavorOf(c.id) === DT.flavorOf(t.color) : c.id === t.color) b.classList.add('sel');
 b.addEventListener('click', ev => {
 ev.stopPropagation();
 t.color = c.id;
-dot.style.background = c.v;
-li.style.setProperty('--row-color', c.v);
+paintDot(dot, c.id);
+li.style.setProperty('--row-color', rowColor(c.id));
 persist();
 closeColorPop();
 });
@@ -247,12 +267,12 @@ state.timers.forEach((t, i) => {
 const li = document.createElement('li');
 li.className = 'timer-row';
 li.dataset.id = t.id;
-li.style.setProperty('--row-color', colorOf(t.color));
+li.style.setProperty('--row-color', rowColor(t.color));
 
 const dot = document.createElement('button');
 dot.className = 'color-dot';
-dot.style.background = colorOf(t.color);
-dot.setAttribute('aria-label', '色を変更');
+paintDot(dot, t.color);
+if (!DT) dot.setAttribute('aria-label', '色を変更');
 dot.addEventListener('click', e => { e.stopPropagation(); openColorPop(li, t, dot); });
 
 const name = document.createElement('input');
@@ -491,7 +511,7 @@ runTime.textContent = STR.done;
 runName.textContent = '';
 runCycle.textContent = '';
 pauseBtn.innerHTML = ICONS.replay;
-setRing(1, '#34C759');
+if (DT) { DT.done(); DT.fit(runTime); } else setRing(1, '#34C759');
 document.title = STR.doneTitle;
 if (window.__ttOnFinish) { try { window.__ttOnFinish(); } catch (e) {} }
 }
@@ -517,7 +537,7 @@ runCycle.textContent = state.repeat === Infinity
 ? STR.cycleInf(run.cycle)
 : STR.cycle(run.cycle, state.repeat);
 setRing(remainMs / (t.secs * 1000), colorOf(t.color));
-document.title = `${disp} ${t.name} — TimerTrain`;
+document.title = `${disp} ${t.name} — ${BRAND}`;
 }
 function renderStations() {
 stationsEl.innerHTML = '';
@@ -531,7 +551,7 @@ stationsEl.appendChild(rail);
 }
 const s = document.createElement('span');
 s.className = 'station' + (run.active ? (i < run.idx ? ' done' : i === run.idx ? ' now' : '') : '');
-s.style.background = colorOf(t.color);
+if (DT) s.appendChild(DT.mini(t.color)); else s.style.background = colorOf(t.color);
 stationsEl.appendChild(s);
 });
 }
