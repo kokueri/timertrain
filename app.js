@@ -20,14 +20,18 @@ const PALETTE = [
 { id: 'gray', v: '#8E8E93' },
 ];
 const colorOf = id => (PALETTE.find(c => c.id === id) || PALETTE[5]).v;
-const nextColor = id => PALETTE[(PALETTE.findIndex(c => c.id === id) + 1) % PALETTE.length].id;
+// DonutTimer の見た目（donut.js）を読み込んだページでは window.DT がある
+const DT = window.DT || null;
+const BRAND = DT ? DT.brand : 'TimerTrain';
+const rowColor = id => DT ? DT.coat(id) : colorOf(id);
+const nextColor = id => DT ? DT.next(id) : PALETTE[(PALETTE.findIndex(c => c.id === id) + 1) % PALETTE.length].id;
 const MAX_SECS = 99 * 3600;
 const LANG = ['en', 'es', 'ja'].includes(document.documentElement.lang) ? document.documentElement.lang : 'ja';
 const STR = {
 ja: {
 work: '作業', brk: '休憩', defName: 'タイマー', namePh: 'タイマー名',
 lastDel: '最後の1つは削除できません', copied: 'リンクをコピーしました',
-copyPrompt: 'このURLをコピーしてください', done: '完了 🎉', doneTitle: '✅ 完了 — TimerTrain',
+copyPrompt: 'このURLをコピーしてください', done: '完了 🎉', doneTitle: '✅ 完了 — ' + (window.DT ? 'DonutTimer' : 'TimerTrain'),
 reps: n => `${n}回`,
 totalInf: one => `1周 ${one} × ∞`,
 total: (t, one, n) => `合計 ${t}（${one} × ${n}周）`,
@@ -35,11 +39,14 @@ cycleInf: c => `${c}周目`,
 cycle: (c, r) => `${c} / ${r}周`,
 etaRun: t => `${t} に終了予定`, etaIdle: t => `今始めると ${t} に終了`, etaRound: t => `この周は ${t} まで`,
 sound: '音', vol: '音量', snd: { chime: 'チャイム', bell: 'ベル', digital: 'デジタル', wood: '木の音', soft: 'やさしい音', none: '音なし' },
+more: '詳しい設定', auto: '次のタイマーへ自動で進む', autoNote: 'オフにすると、1つ終わるごとに止まります', remind: '終わる前に知らせる', remindOff: 'しない', remindMin: n => `${n}分前`,
+notify: 'ブラウザ通知', notifyNote: '別のタブやアプリを見ていても、区切りでお知らせします', notifyBlocked: 'ブラウザの設定で通知がブロックされています', pausedNext: n => `次は「${n}」。▶で開始`,
+nNext: n => `次: ${n}`, nDone: 'すべて終わりました 🎉', nSoon: (n, m) => `${n} はあと${m}分です`,
 },
 en: {
 work: 'Work', brk: 'Break', defName: 'Timer', namePh: 'Timer name',
 lastDel: "You can't delete the last timer", copied: 'Link copied',
-copyPrompt: 'Copy this URL', done: 'Done 🎉', doneTitle: '✅ Done — TimerTrain',
+copyPrompt: 'Copy this URL', done: 'Done 🎉', doneTitle: '✅ Done — ' + (window.DT ? 'DonutTimer' : 'TimerTrain'),
 reps: n => `×${n}`,
 totalInf: one => `${one} per round × ∞`,
 total: (t, one, n) => `Total ${t} (${one} × ${n} rounds)`,
@@ -47,11 +54,14 @@ cycleInf: c => `Round ${c}`,
 cycle: (c, r) => `Round ${c} / ${r}`,
 etaRun: t => `Ends at ${t}`, etaIdle: t => `Start now and finish at ${t}`, etaRound: t => `This round ends at ${t}`,
 sound: 'Sound', vol: 'Volume', snd: { chime: 'Chime', bell: 'Bell', digital: 'Digital', wood: 'Wood', soft: 'Soft', none: 'Off' },
+more: 'More settings', auto: 'Go to the next timer automatically', autoNote: 'When off, it stops after each timer', remind: 'Remind me before the end', remindOff: 'Off', remindMin: n => `${n} min before`,
+notify: 'Browser notifications', notifyNote: 'Get notified at each switch, even in another tab or app', notifyBlocked: 'Notifications are blocked in your browser settings', pausedNext: n => `Next: ${n}. Press ▶ to start`,
+nNext: n => `Next: ${n}`, nDone: 'All done 🎉', nSoon: (n, m) => `${n}: ${m} min left`,
 },
 es: {
 work: 'Trabajo', brk: 'Descanso', defName: 'Temporizador', namePh: 'Nombre del temporizador',
 lastDel: 'No puedes eliminar el último temporizador', copied: 'Enlace copiado',
-copyPrompt: 'Copia esta URL', done: '¡Listo! 🎉', doneTitle: '✅ Listo — TimerTrain',
+copyPrompt: 'Copia esta URL', done: '¡Listo! 🎉', doneTitle: '✅ Listo — ' + (window.DT ? 'DonutTimer' : 'TimerTrain'),
 reps: n => `×${n}`,
 totalInf: one => `${one} por ronda × ∞`,
 total: (t, one, n) => `Total ${t} (${one} × ${n} rondas)`,
@@ -59,6 +69,9 @@ cycleInf: c => `Ronda ${c}`,
 cycle: (c, r) => `Ronda ${c} / ${r}`,
 etaRun: t => `Termina: ${t}`, etaIdle: t => `Si empiezas ahora, termina: ${t}`, etaRound: t => `Esta ronda termina: ${t}`,
 sound: 'Sonido', vol: 'Volumen', snd: { chime: 'Campanilla', bell: 'Campana', digital: 'Digital', wood: 'Madera', soft: 'Suave', none: 'Sin sonido' },
+more: 'Más ajustes', auto: 'Pasar al siguiente temporizador automáticamente', autoNote: 'Si lo desactivas, se detiene al terminar cada temporizador', remind: 'Avisar antes del final', remindOff: 'No', remindMin: n => `${n} min antes`,
+notify: 'Notificaciones del navegador', notifyNote: 'Te avisa en cada cambio, aunque estés en otra pestaña o app', notifyBlocked: 'Las notificaciones están bloqueadas en tu navegador', pausedNext: n => `Siguiente: ${n}. Pulsa ▶ para empezar`,
+nNext: n => `Siguiente: ${n}`, nDone: '¡Todo listo! 🎉', nSoon: (n, m) => `${n}: quedan ${m} min`,
 },
 }[LANG];
 const STORE_KEY = 'timertrain-v1:' + location.pathname;
@@ -237,6 +250,31 @@ const soundSegment = () => SOUNDS[sound.s].seg();
 const soundFinish = () => SOUNDS[sound.s].fin();
 const soundTick = () => SOUNDS[sound.s].tick();
 
+/* その他の設定（自動で次へ・終了前のお知らせ・ブラウザ通知。端末に保存） */
+const OPT_KEY = 'tt-opts';
+let opts = { auto: true, remind: 0, notify: false };
+try {
+const ov = JSON.parse(localStorage.getItem(OPT_KEY) || 'null');
+if (ov) {
+if (typeof ov.auto === 'boolean') opts.auto = ov.auto;
+if ([0, 1, 2, 5].includes(ov.remind)) opts.remind = ov.remind;
+if (typeof ov.notify === 'boolean') opts.notify = ov.notify;
+}
+} catch (e) {}
+function saveOpts() { try { localStorage.setItem(OPT_KEY, JSON.stringify(opts)); } catch (e) {} }
+const canNotify = () => 'Notification' in window;
+function notify(body) {
+if (!opts.notify || !canNotify() || Notification.permission !== 'granted') return;
+if (document.visibilityState === 'visible') return; // 画面を見ているときは音と表示だけ
+const title = typeof BRAND === 'string' ? BRAND : 'TimerTrain';
+const o = { body: String(body), tag: 'timertrain', renotify: true, icon: '/icon-192.png' };
+try {
+if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+navigator.serviceWorker.ready.then(r => r.showNotification(title, o)).catch(() => {});
+} else { new Notification(title, o); }
+} catch (e) {}
+}
+
 /* ---------- Wake Lock ---------- */
 async function acquireWakeLock() {
 try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
@@ -258,10 +296,26 @@ pause: '<svg width="34" height="34" viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14
 replay: '<svg width="34" height="34" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>',
 };
 const RING_C = 2 * Math.PI * 46;
-ringFg.style.strokeDasharray = RING_C;
+if (ringFg && !DT) ringFg.style.strokeDasharray = RING_C;
 function setRing(frac, color) {
+if (DT) {
+const c = PALETTE.find(x => x.v === color);
+DT.set(frac, c ? c.id : 'blue');
+DT.fit(runTime);
+return;
+}
 ringFg.style.strokeDashoffset = RING_C * (1 - Math.min(1, Math.max(0, frac)));
 if (color) ringFg.style.stroke = color;
+}
+// 色の丸（DonutTimer ではミニドーナツ）を塗る
+function paintDot(dot, id) {
+if (DT) {
+dot.textContent = '';
+dot.appendChild(DT.mini(id));
+dot.setAttribute('aria-label', DT.name(id));
+} else {
+dot.style.background = colorOf(id);
+}
 }
 
 /* 終了予定時刻 */
@@ -300,17 +354,17 @@ closeColorPop();
 if (existed) return; // 同じ丸をもう一度押したら閉じるだけ
 const pop = document.createElement('div');
 pop.className = 'color-pop';
-PALETTE.forEach(c => {
+(DT ? DT.choices.map(id => ({ id })) : PALETTE).forEach(c => {
 const b = document.createElement('button');
 b.type = 'button';
-b.style.background = c.v;
-b.setAttribute('aria-label', c.id);
-if (c.id === t.color) b.classList.add('sel');
+paintDot(b, c.id);
+if (!DT) b.setAttribute('aria-label', c.id);
+if (DT ? DT.flavorOf(c.id) === DT.flavorOf(t.color) : c.id === t.color) b.classList.add('sel');
 b.addEventListener('click', ev => {
 ev.stopPropagation();
 t.color = c.id;
-dot.style.background = c.v;
-li.style.setProperty('--row-color', c.v);
+paintDot(dot, c.id);
+li.style.setProperty('--row-color', rowColor(c.id));
 persist();
 closeColorPop();
 });
@@ -326,12 +380,12 @@ state.timers.forEach((t, i) => {
 const li = document.createElement('li');
 li.className = 'timer-row';
 li.dataset.id = t.id;
-li.style.setProperty('--row-color', colorOf(t.color));
+li.style.setProperty('--row-color', rowColor(t.color));
 
 const dot = document.createElement('button');
 dot.className = 'color-dot';
-dot.style.background = colorOf(t.color);
-dot.setAttribute('aria-label', '色を変更');
+paintDot(dot, t.color);
+if (!DT) dot.setAttribute('aria-label', '色を変更');
 dot.addEventListener('click', e => { e.stopPropagation(); openColorPop(li, t, dot); });
 
 const name = document.createElement('input');
@@ -554,8 +608,19 @@ run.cycle++; run.idx = 0;
 } else {
 finish(); return;
 }
-if (withSound) soundSegment();
+if (withSound) {
+soundSegment();
+const nx = state.timers[run.idx];
+notify(STR.nNext(nx.name || STR.defName));
+if (!opts.auto && !run.paused) {
+run.paused = true;
+pauseBtn.innerHTML = ICONS.play;
+releaseWakeLock();
+toast(STR.pausedNext(nx.name || STR.defName));
+}
+}
 run.lastSec = -1;
+run.reminded = false;
 if (run.paused) run.remainMs = state.timers[run.idx].secs * 1000;
 else run.endAt = now + state.timers[run.idx].secs * 1000;
 renderStations();
@@ -572,9 +637,10 @@ runTime.textContent = STR.done;
 runName.textContent = '';
 runCycle.textContent = '';
 pauseBtn.innerHTML = ICONS.replay;
-setRing(1, '#34C759');
+if (DT) { DT.done(); DT.fit(runTime); } else setRing(1, '#34C759');
 document.title = STR.doneTitle;
 updateEta();
+notify(STR.nDone);
 if (window.__ttOnFinish) { try { window.__ttOnFinish(); } catch (e) {} }
 }
 function tick() {
@@ -585,6 +651,12 @@ const sec = Math.ceil(remain / 1000);
 if (sec !== run.lastSec) {
 run.lastSec = sec;
 if (sec <= 3) soundTick();
+const t = state.timers[run.idx];
+if (opts.remind && !run.reminded && t.secs > opts.remind * 60 + 5 && sec <= opts.remind * 60 && sec > 3) {
+run.reminded = true;
+soundTick(); setTimeout(soundTick, 250);
+notify(STR.nSoon(t.name || STR.defName, opts.remind));
+}
 }
 updateRunView();
 }
@@ -600,7 +672,7 @@ runCycle.textContent = state.repeat === Infinity
 ? STR.cycleInf(run.cycle)
 : STR.cycle(run.cycle, state.repeat);
 setRing(remainMs / (t.secs * 1000), colorOf(t.color));
-document.title = `${disp} ${t.name} — TimerTrain`;
+document.title = `${disp} ${t.name} — ${BRAND}`;
 if (sec !== run.etaSec) { run.etaSec = sec; updateEta(); }
 }
 function renderStations() {
@@ -615,7 +687,7 @@ stationsEl.appendChild(rail);
 }
 const s = document.createElement('span');
 s.className = 'station' + (run.active ? (i < run.idx ? ' done' : i === run.idx ? ' now' : '') : '');
-s.style.background = colorOf(t.color);
+if (DT) s.appendChild(DT.mini(t.color)); else s.style.background = colorOf(t.color);
 stationsEl.appendChild(s);
 });
 }
@@ -680,6 +752,38 @@ vol.addEventListener('change', preview);
 ctrl.append(sel, vol); row.append(lab, ctrl);
 rr.insertAdjacentElement('afterend', row);
 paint();
+
+const det = document.createElement('details'); det.className = 'more-set';
+const sum = document.createElement('summary'); sum.textContent = STR.more; det.appendChild(sum);
+const mkRow = (labelText, note, control, id) => {
+const r = document.createElement('div'); r.className = 'opt-row';
+const tx = document.createElement('div'); tx.className = 'opt-text';
+const l = document.createElement('label'); l.htmlFor = id; l.textContent = labelText; tx.appendChild(l);
+if (note) { const n = document.createElement('p'); n.className = 'opt-note'; n.textContent = note; tx.appendChild(n); }
+r.append(tx, control); det.appendChild(r); return r;
+};
+const sw = (id, on) => { const c = document.createElement('input'); c.type = 'checkbox'; c.id = id; c.className = 'tt-switch'; c.checked = on; c.setAttribute('role', 'switch'); return c; };
+const autoSw = sw('opt-auto', opts.auto);
+autoSw.addEventListener('change', () => { opts.auto = autoSw.checked; saveOpts(); });
+mkRow(STR.auto, STR.autoNote, autoSw, 'opt-auto');
+const rem = document.createElement('select'); rem.id = 'opt-remind'; rem.className = 'tt-select';
+[0, 1, 2, 5].forEach(n => { const o = document.createElement('option'); o.value = String(n); o.textContent = n ? STR.remindMin(n) : STR.remindOff; rem.appendChild(o); });
+rem.value = String(opts.remind);
+rem.addEventListener('change', () => { opts.remind = parseInt(rem.value, 10) || 0; saveOpts(); });
+mkRow(STR.remind, '', rem, 'opt-remind');
+if (canNotify()) {
+const nSw = sw('opt-notify', opts.notify && Notification.permission === 'granted');
+nSw.addEventListener('change', async () => {
+if (!nSw.checked) { opts.notify = false; saveOpts(); return; }
+let p = Notification.permission;
+if (p === 'default') { try { p = await Notification.requestPermission(); } catch (e) { p = 'denied'; } }
+if (p !== 'granted') { nSw.checked = false; opts.notify = false; saveOpts(); if (p === 'denied') toast(STR.notifyBlocked); return; }
+opts.notify = true; saveOpts();
+if (window.gtag) gtag('event', 'notify_on');
+});
+mkRow(STR.notify, STR.notifyNote, nSw, 'opt-notify');
+}
+row.insertAdjacentElement('afterend', det);
 })();
 $('rep-minus').addEventListener('click', () => {
 state.repeat = state.repeat === Infinity ? 99 : Math.max(1, state.repeat - 1);
