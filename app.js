@@ -1173,3 +1173,52 @@ a.addEventListener('click', function () { try { if (window.gtag) gtag('event', '
 wrap.appendChild(a);
 row.insertAdjacentElement('afterend', wrap);
 })();
+
+/* ---------- 設定のたたみ（PC: 右に収納 / スマホ: 上下に開閉）。初期は閉じる。開閉は端末ごとに記憶 ---------- */
+(function () {
+var setup = document.getElementById('setup');
+if (!setup) return;
+var KEY = 'tt-setup-open';
+var L = LANG === 'en' ? { title: 'Timer settings', short: 'Settings', open: 'Open timer settings', close: 'Close timer settings', n: function (n, one) { return n + ' timers · ' + one + ' per round'; } }
+: LANG === 'es' ? { title: 'Ajustes del temporizador', short: 'Ajustes', open: 'Abrir ajustes', close: 'Cerrar ajustes', n: function (n, one) { return n + ' temporizadores · ' + one + ' por ronda'; } }
+: { title: 'タイマー設定', short: '設定', open: 'タイマー設定を開く', close: 'タイマー設定を閉じる', n: function (n, one) { return 'タイマー' + n + 'つ・1周 ' + one; } };
+var GEAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>';
+var CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>';
+
+var btn = document.createElement('button');
+btn.type = 'button'; btn.className = 'setup-toggle'; btn.id = 'setup-toggle';
+btn.setAttribute('aria-controls', 'setup');
+btn.innerHTML = '<span class="st-ic">' + GEAR + '</span><span class="st-txt"><span class="st-title"></span><span class="st-sum"></span><span class="st-short"></span></span><span class="st-chev">' + CHEV + '</span>';
+btn.querySelector('.st-title').textContent = L.title;
+btn.querySelector('.st-short').textContent = L.short;
+setup.insertBefore(btn, setup.firstChild);
+var sum = btn.querySelector('.st-sum');
+
+function summary() {
+var ts = state.timers, one = ts.reduce(function (a, t) { return a + t.secs; }, 0);
+var main = ts.length <= 3 ? ts.map(function (t) { return (t.name || STR.defName) + ' ' + fmt(t.secs); }).join(' → ') : L.n(ts.length, fmt(one));
+var rep = state.repeat === Infinity ? ' × ∞' : state.repeat > 1 ? ' × ' + state.repeat : '';
+sum.textContent = main + rep;
+btn.title = main + rep;
+}
+var open = false;
+try { open = localStorage.getItem(KEY) === '1'; } catch (e) {}
+function paint() {
+setup.classList.toggle('collapsed', !open);
+document.body.classList.toggle('setup-closed', !open);
+btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+btn.setAttribute('aria-label', (open ? L.close : L.open) + '（' + sum.textContent + '）');
+}
+btn.addEventListener('click', function () {
+open = !open;
+try { localStorage.setItem(KEY, open ? '1' : '0'); } catch (e) {}
+paint();
+try { if (window.gtag) gtag('event', 'setup_toggle', { open: open ? 1 : 0 }); } catch (e) {}
+if (open) { var first = document.querySelector('#timer-list .name-input, #timer-list button'); if (first && window.matchMedia('(min-width: 900px)').matches) first.focus({ preventScroll: true }); }
+});
+summary(); paint();
+/* 編集・並べ替え・くり返し変更のたびに要約を更新（どれも persist / updateTotal を通る） */
+var _ut = updateTotal, _ps = persist;
+updateTotal = function () { _ut(); summary(); paint(); };
+persist = function () { _ps(); summary(); paint(); };
+})();
