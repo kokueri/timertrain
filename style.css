@@ -571,3 +571,22 @@ flex-shrink: 0; height: 36px; padding: 0 28px 0 10px; border-radius: 10px; borde
 background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%238E8E93' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 6px center / 18px;
 box-shadow: var(--shadow); color: var(--text); font: inherit; font-size: 14px; -webkit-appearance: none; appearance: none;
 }
+
+/* ---- アカウント: できることのチェックリスト・マイタイマー一覧（2026-10-21） ---- */
+.acct-perks { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; }
+.acct-perks h2 { font-size: 15px; margin-bottom: 10px; }
+.acct-checklist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.acct-checklist li { display: flex; gap: 10px; align-items: flex-start; }
+.acct-check { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: #34C759; color: #fff; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
+.acct-perk-t { font-size: 15px; font-weight: 600; }
+.acct-perk-d { font-size: 13px; line-height: 1.6; color: var(--text2); margin-top: 2px; }
+.acct-mylist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+.acct-mylist li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.acct-mylist li:first-child { border-top: 0; padding-top: 0; }
+.acct-my-info { min-width: 0; flex: 1 1 160px; }
+.acct-my-name { font-size: 15px; font-weight: 600; word-break: break-word; }
+.acct-my-sum { font-size: 12px; color: var(--text2); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.acct-my-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.acct-btn-sm { min-height: 38px; padding: 0 14px; font-size: 14px; gap: 6px; text-decoration: none; }
+.acct-btn-primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.acct-soon { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 999px; background: var(--line); color: var(--text2); white-space: nowrap; }
