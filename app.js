@@ -90,6 +90,7 @@ let tickId = null;
 let wakeLock = null;
 let audioCtx = null;
 let masterGain = null;
+let schedOff = 0, schedNodes = [], wakeNode = null, bgSched = false; // 裏のタブ用の予約（下の「バックグラウンド」参照）
 
 function uid() { return Math.random().toString(36).slice(2, 9); }
 
@@ -195,8 +196,9 @@ masterGain.gain.value = sound.v / 70;
 }
 function beep(freq, dur, at, vol, type) {
 if (!audioCtx || !masterGain) return;
-const t = audioCtx.currentTime + (at || 0);
+const t = audioCtx.currentTime + (at || 0) + schedOff;
 const osc = audioCtx.createOscillator();
+if (schedOff > 0) schedNodes.push({ o: osc, t });
 const g = audioCtx.createGain();
 osc.type = type || 'sine'; osc.frequency.value = freq;
 g.gain.setValueAtTime(0.0001, t);
@@ -551,6 +553,7 @@ tick();
 function resetToIdle() {
 if (window.__ttOnStop) { try { window.__ttOnStop(); } catch (e) {} }
 clearInterval(tickId); tickId = null;
+cancelSched();
 run = { active: false, paused: true, finished: false, idx: 0, cycle: 1, endAt: 0, remainMs: 0, lastSec: -1 };
 releaseWakeLock();
 document.title = BASE_TITLE;
@@ -594,6 +597,7 @@ releaseWakeLock();
 }
 updateRunView();
 updateEta();
+scheduleAhead();
 }
 function skip() {
 if (!run.active || run.finished) return;
@@ -610,7 +614,7 @@ run.cycle++; run.idx = 0;
 finish(); return;
 }
 if (withSound) {
-soundSegment();
+if (!bgSched) soundSegment();
 const nx = state.timers[run.idx];
 notify(STR.nNext(nx.name || STR.defName));
 if (!opts.auto && !run.paused) {
@@ -629,7 +633,7 @@ updateHighlight();
 updateRunView();
 }
 function finish() {
-soundFinish();
+if (!bgSched) soundFinish();
 run.finished = true;
 run.paused = true;
 releaseWakeLock();
@@ -651,16 +655,95 @@ if (remain <= 0) { advance(true); return; }
 const sec = Math.ceil(remain / 1000);
 if (sec !== run.lastSec) {
 run.lastSec = sec;
-if (sec <= 3) soundTick();
+if (sec <= 3 && !bgSched) soundTick();
 const t = state.timers[run.idx];
 if (opts.remind && !run.reminded && t.secs > opts.remind * 60 + 5 && sec <= opts.remind * 60 && sec > 3) {
 run.reminded = true;
-soundTick(); setTimeout(soundTick, 250);
+if (!bgSched) { soundTick(); setTimeout(soundTick, 250); }
 notify(STR.nSoon(t.name || STR.defName, opts.remind));
 }
 }
 updateRunView();
 }
+/* ---------- バックグラウンド（別のタブ・アプリを見ている間）----------
+ * ブラウザは裏のタブの setInterval を間引く（5分以上で1分に1回程度まで）。
+ * WebAudio の時計は間引かれないので、裏に回ったら
+ *  1) 先の区切り・終了・カウントダウン・終了前のお知らせの音を、その時刻に鳴るよう予約しておく
+ *  2) 次の区切りの時刻に終わる無音の音を鳴らし、その終了の合図で切り替えと通知を行う
+ * 画面に戻ったら予約を取り消し、通常の動きに戻す。 */
+function atAudio(secFromNow, fn) {
+if (secFromNow < 0.05) return;
+schedOff = secFromNow;
+try { fn(); } finally { schedOff = 0; }
+}
+function cancelSched() {
+const now = audioCtx ? audioCtx.currentTime : 0;
+schedNodes.forEach(n => { if (n.t > now + 0.02) { try { n.o.stop(0); n.o.disconnect(); } catch (e) {} } });
+schedNodes = [];
+if (wakeNode) { try { wakeNode.onended = null; wakeNode.stop(0); wakeNode.disconnect(); } catch (e) {} wakeNode = null; }
+bgSched = false;
+}
+function remindAt(t, startMs, endMs, reminded) {
+if (!opts.remind || reminded || t.secs <= opts.remind * 60 + 5) return null;
+const at = endMs - opts.remind * 60000;
+return at > startMs && at > 3000 ? at : null;
+}
+function scheduleAhead() {
+cancelSched();
+if (!audioCtx || !masterGain || !run.active || run.paused || run.finished || document.visibilityState === 'visible') return;
+if (audioCtx.state === 'suspended') { try { audioCtx.resume(); } catch (e) {} }
+bgSched = true;
+const S = SOUNDS[sound.s];
+const extras = (t, startMs, endMs, reminded) => {
+[3, 2, 1].forEach(k => { const at = endMs - k * 1000; if (at > startMs) atAudio(at / 1000, () => S.tick()); });
+const r = remindAt(t, startMs, endMs, reminded);
+if (r !== null) { atAudio(r / 1000, () => S.tick()); atAudio(r / 1000 + 0.25, () => S.tick()); }
+};
+let endMs = Math.max(0, run.endAt - Date.now());
+let idx = run.idx, cycle = run.cycle;
+extras(state.timers[idx], 0, endMs, run.reminded);
+for (let n = 0; n < 60 && endMs < 6 * 3600e3; n++) {
+let ni = idx + 1, nc = cycle;
+if (ni >= state.timers.length) {
+if (state.repeat === Infinity || cycle < state.repeat) { ni = 0; nc = cycle + 1; }
+else { atAudio(endMs / 1000, () => S.fin()); break; }
+}
+atAudio(endMs / 1000, () => S.seg());
+if (!opts.auto) break; // 1つごとに止まる設定なら、次の区切りまで
+idx = ni; cycle = nc;
+const t = state.timers[idx], start = endMs;
+endMs += t.secs * 1000;
+extras(t, start, endMs, false);
+}
+scheduleWake();
+}
+// 次に処理が必要な時刻（区切り、または終了前のお知らせ）に終わる無音の音で、処理を起こす
+function scheduleWake() {
+if (wakeNode) { try { wakeNode.onended = null; wakeNode.stop(0); wakeNode.disconnect(); } catch (e) {} wakeNode = null; }
+if (!bgSched || !run.active || run.paused || run.finished) return;
+const remain = Math.max(0, run.endAt - Date.now());
+let next = remain;
+const r = remindAt(state.timers[run.idx], 0, remain, run.reminded);
+if (r !== null && r < next) next = r;
+try {
+const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+g.gain.value = 0;
+o.connect(g); g.connect(audioCtx.destination);
+o.onended = () => { if (wakeNode !== o) return; wakeNode = null; tick(); scheduleWake(); };
+o.start();
+o.stop(audioCtx.currentTime + next / 1000 + 0.03);
+wakeNode = o;
+} catch (e) {}
+}
+document.addEventListener('visibilitychange', () => {
+if (document.visibilityState === 'visible') {
+if (bgSched) tick(); // 遅れていた切り替えを、音を重ねずに追いつかせる
+cancelSched();
+if (run.active && !run.finished) { updateRunView(); updateEta(); }
+} else {
+scheduleAhead();
+}
+});
 function updateRunView() {
 if (run.finished) return;
 const t = state.timers[run.idx];
