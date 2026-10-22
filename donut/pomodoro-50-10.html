@@ -11,10 +11,61 @@ gtag('js', new Date());
 gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- ドーナツ版は準備中。公開するときに noindex を外し、canonical・sitemap を追加する -->
-<meta name="robots" content="noindex, nofollow">
-<title>ポモドーロ50分＋10分休憩タイマー｜長めの集中を自動でくり返す - DonutTimer</title>
-<meta name="description" content="50分集中＋10分休憩を自動でくり返すポモドーロタイマー。25分だと短いと感じる勉強や作業向け。休憩に入る・戻るタイミングを音で知らせ、回数や時間も変更できます。無料・インストール不要。">
+<title>かわいいポモドーロタイマー 50分＋10分｜長めの集中をドーナツで - ドーナツタイマー</title>
+<meta name="description" content="50分の集中と10分の休憩をくり返す、ドーナツ型のかわいいポモドーロタイマー。25分では短いと感じる人向けの、長めの集中にちょうどいい設定です。無料・登録不要。">
+<link rel="canonical" href="https://timertrain.com/donut/pomodoro-50-10">
+<meta property="og:title" content="かわいいポモドーロタイマー 50分＋10分｜長めの集中をドーナツで - ドーナツタイマー">
+<meta property="og:description" content="50分の集中と10分の休憩をくり返す、ドーナツ型のかわいいポモドーロタイマー。25分では短いと感じる人向けの、長めの集中にちょうどいい設定です。無料・登録不要。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/donut/pomodoro-50-10">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebApplication",
+ "name": "かわいいポモドーロタイマー50分＋10分（ドーナツタイマー）",
+ "url": "https://timertrain.com/donut/pomodoro-50-10",
+ "applicationCategory": "UtilityApplication",
+ "operatingSystem": "Any",
+ "inLanguage": "ja",
+ "offers": {
+  "@type": "Offer",
+  "price": "0",
+  "priceCurrency": "JPY"
+ },
+ "isAccessibleForFree": true,
+ "description": "50分の集中と10分の休憩をくり返す、ドーナツ型のかわいいポモドーロタイマー。25分では短いと感じる人向けの、長めの集中にちょうどいい設定です。無料・登録不要。",
+ "isPartOf": {
+  "@type": "WebSite",
+  "name": "TimerTrain",
+  "url": "https://timertrain.com/"
+ }
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "50分は長すぎませんか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "人によって合う長さは違います。長いと感じたら25分＋5分や、40分＋10分などに変えてみてください。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "休憩を長くできますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "できます。「タイマー設定」で休憩の時間を好きな長さに変えられます。"
+   }
+  }
+ ]
+}
+</script>
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
@@ -34,7 +85,7 @@ gtag('config', 'G-GSFVNEDCGN');
 <main class="app">
   <header class="header">
     <a class="logo" href="/donut/">DonutTimer</a>
-    <h1 class="tagline page-title">ポモドーロタイマー（50分＋10分休憩）</h1>
+    <h1 class="tagline page-title">かわいいポモドーロタイマー（50分集中＋10分休憩）</h1>
     <nav class="nav" aria-label="用途別タイマー">
       <a href="/donut/pomodoro">ポモドーロ</a>
       <a href="/donut/interval-timer">インターバル</a>
@@ -93,28 +144,27 @@ gtag('config', 'G-GSFVNEDCGN');
 
   <!-- SEO テキスト -->
   <article class="about">
-    <h2>50分＋10分のポモドーロとは</h2>
-    <p>ポモドーロ・テクニックの基本は「25分集中＋5分休憩」ですが、問題演習や資料づくりのように、25分では乗ってきたところで止まってしまう作業もあります。そこで使われるのが「50分集中＋10分休憩」の長めの区切りです。1時間を1サイクルとして数えやすく、学校の授業や会議の長さにも近いのが特徴です。</p>
-    <h2>このタイマーの使い方</h2>
-    <p>このページには「集中50分＋休憩10分」が3セット（合計3時間）入っています。開始を押すと、休憩に入るときと集中に戻るときに音が鳴ります。時間をタップすれば45分＋15分などにも変えられ、くり返し回数も自由です。</p>
-    <h2>25分と50分、どちらがいい？</h2>
-    <p>取りかかりが重い日や、細かいタスクを片付けたい日は<a href="/donut/pomodoro">25分＋5分</a>が向いています。ひとつの課題にじっくり取り組みたい日や、慣れて集中が続くようになってきたら50分＋10分を試してみてください。</p>
-    <h2>休憩10分の過ごし方</h2>
-    <p>立ち上がって体を伸ばす、水を飲む、目を閉じるなど、画面から離れるのがおすすめです。休憩中にSNSや動画を見始めると戻りにくくなるので、休憩もタイマーに任せて「鳴ったら戻る」を決めておくと続けやすくなります。</p>
-    <h2>よくある質問</h2>
-    <p style="margin-top:10px"><strong>50分＋10分は何セットがおすすめですか？</strong><br>3セット（約3時間）を目安にし、2〜3セットごとに20〜30分の長めの休憩を入れると疲れをためにくくなります。</p>
-    <p style="margin-top:10px"><strong>時間を変えられますか？</strong><br>時間をタップすると変更できます。45分＋15分や60分＋10分などにもできます。</p>
-    <p style="margin-top:10px"><strong>勉強記録は残りますか？</strong><br>今は記録機能はありません。設定はURLに入るので、ブックマークすれば次回も同じ設定で始められます。</p>
-    <h2>関連タイマー</h2>
-    <p><a href="/donut/pomodoro">ポモドーロタイマー（25分＋5分）</a> · <a href="/donut/study">勉強タイマー</a> · <a href="/donut/repeat-timer">繰り返しタイマー</a> · <a href="/donut/">タイマーを自由に作る</a></p>
-  </article>
+<h2>じっくり集中したい日の50分</h2>
+<p>25分で区切ると流れが途切れてしまう作業には、50分の集中＋10分の休憩がちょうどいいことがあります。集中はいちごミルク、休憩はブルーベリーのドーナツ。50分のあいだ、ドーナツが少しずつ減っていくので、ペース配分がつかみやすくなります。</p>
+<h2>使い方</h2>
+<p>「集中50分→休憩10分」が3回分、合計3時間でセットされています。再生ボタンを押せば休憩をはさみながら自動で進みます。10分の休憩では、席を立って体を伸ばすのがおすすめです。</p>
+<h2>25分版との使い分け</h2>
+<p>まだ集中が続きにくいときや、細かい作業が多い日は<a href="/donut/pomodoro">25分＋5分</a>、資料作りや勉強などまとまった作業の日は50分＋10分、のように使い分けてみてください。</p>
+<h2>ログインするとできること</h2>
+<p>無料のGoogleログインをすると、作ったタイマーに名前を付けて保存でき、使った時間が<a href="/account">マイページ</a>に記録されます。続けて使った日数は左上に🔥で表示されます。</p>
+<h2>よくある質問</h2>
+<p style="margin-top:10px"><strong>50分は長すぎませんか？</strong><br>人によって合う長さは違います。長いと感じたら25分＋5分や、40分＋10分などに変えてみてください。</p>
+<p style="margin-top:10px"><strong>休憩を長くできますか？</strong><br>できます。「タイマー設定」で休憩の時間を好きな長さに変えられます。</p>
+<h2>ほかのドーナツタイマー</h2>
+<p><a href="/donut/">ドーナツタイマー（自由に作る）</a> · <a href="/donut/pomodoro">ポモドーロ</a> · <a href="/donut/pomodoro-50-10">ポモドーロ50分＋10分</a> · <a href="/donut/study">勉強</a> · <a href="/donut/interval-timer">インターバル</a> · <a href="/donut/tabata">タバタ</a> · <a href="/donut/hiit">HIIT</a> · <a href="/donut/kitchen">キッチン</a> · <a href="/donut/multi-timer">複数タイマー</a> · <a href="/donut/repeat-timer">繰り返し</a></p>
+</article>
 
   <footer class="footer">© 2026 DonutTimer · <a href="/privacy">プライバシー</a> · <a href="/terms">利用規約</a> · <a href="/about">運営者情報</a></footer>
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "集中", "secs": 3000, "color": "red"}, {"name": "休憩", "secs": 600, "color": "blue"}], "repeat": 3};</script>
 <script src="/donut.js?v=3"></script>
-<script src="/app.js?v=20d"></script>
+<script src="/app.js?v=21d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

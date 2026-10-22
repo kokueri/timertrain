@@ -11,10 +11,61 @@ gtag('js', new Date());
 gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- ドーナツ版は準備中。公開するときに noindex を外し、canonical・sitemap を追加する -->
-<meta name="robots" content="noindex, nofollow">
-<title>繰り返しタイマー｜Webで同じ時間を何度でも自動でくり返す無料タイマー - DonutTimer</title>
-<meta name="description" content="同じ時間を何度でも自動でくり返す、Webの繰り返しタイマー。1分ごと・5分ごとの合図や、回数を決めたくり返しに。無限ループにも対応し、URLで設定を保存・共有できます。インストール不要・無料。">
+<title>かわいい繰り返しタイマー｜同じ時間を何度でも、ドーナツでくり返す - ドーナツタイマー</title>
+<meta name="description" content="1分などの決まった時間を、止めるまで何度でも自動でくり返す、ドーナツ型のかわいい繰り返しタイマー。回数を決めることもできます。無料・登録不要。">
+<link rel="canonical" href="https://timertrain.com/donut/repeat-timer">
+<meta property="og:title" content="かわいい繰り返しタイマー｜同じ時間を何度でも、ドーナツでくり返す - ドーナツタイマー">
+<meta property="og:description" content="1分などの決まった時間を、止めるまで何度でも自動でくり返す、ドーナツ型のかわいい繰り返しタイマー。回数を決めることもできます。無料・登録不要。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/donut/repeat-timer">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebApplication",
+ "name": "かわいい繰り返しタイマー（ドーナツタイマー）",
+ "url": "https://timertrain.com/donut/repeat-timer",
+ "applicationCategory": "UtilityApplication",
+ "operatingSystem": "Any",
+ "inLanguage": "ja",
+ "offers": {
+  "@type": "Offer",
+  "price": "0",
+  "priceCurrency": "JPY"
+ },
+ "isAccessibleForFree": true,
+ "description": "1分などの決まった時間を、止めるまで何度でも自動でくり返す、ドーナツ型のかわいい繰り返しタイマー。回数を決めることもできます。無料・登録不要。",
+ "isPartOf": {
+  "@type": "WebSite",
+  "name": "TimerTrain",
+  "url": "https://timertrain.com/"
+ }
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "くり返す回数を決められますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "決められます。「くり返し」の回数を選ぶか、数字を直接入力してください。∞を選ぶと止めるまで続きます。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "途中で止めたらどうなりますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "一時停止するとその場で止まり、もう一度押すと続きから再開します。リセットすると最初に戻ります。"
+   }
+  }
+ ]
+}
+</script>
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
@@ -34,7 +85,7 @@ gtag('config', 'G-GSFVNEDCGN');
 <main class="app">
   <header class="header">
     <a class="logo" href="/donut/">DonutTimer</a>
-    <h1 class="tagline page-title">繰り返しタイマー（自動でくり返す）</h1>
+    <h1 class="tagline page-title">かわいい繰り返しタイマー（自動でくり返す）</h1>
     <nav class="nav" aria-label="用途別タイマー">
       <a href="/donut/pomodoro">ポモドーロ</a>
       <a href="/donut/interval-timer">インターバル</a>
@@ -93,28 +144,27 @@ gtag('config', 'G-GSFVNEDCGN');
 
   <!-- SEO テキスト -->
   <article class="about">
-    <h2>同じ時間を、止めずにくり返す</h2>
-    <p>繰り返しタイマーは、決めた時間が終わるたびに音で知らせ、すぐに次の回を自動で始めるタイマーです。このページには「1分」が無限にくり返す設定で入っています。開始を押せば、止めるまで1分ごとに合図が鳴り続けます。</p>
-    <h2>使い方</h2>
-    <p>時間をタップして、くり返したい長さに変えます。「くり返し」の＋−で回数を決めるか、∞を押せば止めるまでずっと続きます。回数を決めた場合は、今が何回目かが画面に表示されます。作業と休憩のように2つ以上の時間を交互にくり返したいときは、「＋タイマーを追加」で並べてください。</p>
-    <h2>時間の決め方の例</h2>
-    <p>1分ごと: 縄跳びやプランクの区切り、スピーチ練習の目安に。5分ごと: 姿勢を直す・水を飲むなどのリマインダーに。25分ごと: ポモドーロのように集中の区切りに。2つの時間を交互にくり返したい場合は<a href="/donut/interval-timer">インターバルタイマー</a>が便利です。</p>
-    <h2>画面を消しても大丈夫？</h2>
-    <p>残り時間は時刻の差分で計算しているため、別のタブを開いていてもずれません。再生中は画面が自動で消えないようにしています。スマホでは、ホーム画面に追加しておくと次回からワンタップで開けます。</p>
-    <h2>よくある質問</h2>
-    <p style="margin-top:10px"><strong>何回でもくり返せますか？</strong><br>くり返しは1〜99回の指定か、∞（止めるまで続ける）を選べます。</p>
-    <p style="margin-top:10px"><strong>2つの時間を交互にくり返せますか？</strong><br>できます。「＋タイマーを追加」で2つ並べると、1つ目→2つ目→1つ目…と交互にくり返します。</p>
-    <p style="margin-top:10px"><strong>音を鳴らさずに使えますか？</strong><br>切り替わりと終了の合図は音で鳴ります。音を出せない場所では端末の音量を下げてください。画面の表示は変わらず進みます。</p>
-    <h2>関連タイマー</h2>
-    <p><a href="/donut/multi-timer">複数タイマー</a> · <a href="/donut/interval-timer">インターバルタイマー</a> · <a href="/donut/tabata">タバタ式タイマー</a> · <a href="/donut/pomodoro">ポモドーロタイマー</a> · <a href="/donut/">タイマーを自由に作る</a></p>
-  </article>
+<h2>止めるまで、くり返しドーナツ</h2>
+<p>同じ長さの時間を、自動で何度でもくり返すタイマーです。ドーナツを食べ終わると音が鳴り、また新しいドーナツから始まります。上には今が何周目かが表示されます。</p>
+<h2>使い方</h2>
+<p>開くと「1分」が無限にくり返す設定になっています。時間を変えるには「タイマー設定」で数字を押して書きかえます。回数を決めたいときは、∞を外して回数を選んでください。</p>
+<h2>こんなときに</h2>
+<p>1分ごとの区切りで行うトレーニング、一定時間ごとの休憩や水分補給の合図、スピーチの練習、子どもの「1回5分ずつ交代」など、決まった間隔で合図がほしいときに便利です。</p>
+<h2>ログインするとできること</h2>
+<p>無料のGoogleログインをすると、作ったタイマーに名前を付けて保存でき、使った時間が<a href="/account">マイページ</a>に記録されます。続けて使った日数は左上に🔥で表示されます。</p>
+<h2>よくある質問</h2>
+<p style="margin-top:10px"><strong>くり返す回数を決められますか？</strong><br>決められます。「くり返し」の回数を選ぶか、数字を直接入力してください。∞を選ぶと止めるまで続きます。</p>
+<p style="margin-top:10px"><strong>途中で止めたらどうなりますか？</strong><br>一時停止するとその場で止まり、もう一度押すと続きから再開します。リセットすると最初に戻ります。</p>
+<h2>ほかのドーナツタイマー</h2>
+<p><a href="/donut/">ドーナツタイマー（自由に作る）</a> · <a href="/donut/pomodoro">ポモドーロ</a> · <a href="/donut/pomodoro-50-10">ポモドーロ50分＋10分</a> · <a href="/donut/study">勉強</a> · <a href="/donut/interval-timer">インターバル</a> · <a href="/donut/tabata">タバタ</a> · <a href="/donut/hiit">HIIT</a> · <a href="/donut/kitchen">キッチン</a> · <a href="/donut/multi-timer">複数タイマー</a> · <a href="/donut/repeat-timer">繰り返し</a></p>
+</article>
 
   <footer class="footer">© 2026 DonutTimer · <a href="/privacy">プライバシー</a> · <a href="/terms">利用規約</a> · <a href="/about">運営者情報</a></footer>
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "1分", "secs": 60, "color": "blue"}], "repeat": "inf"};</script>
 <script src="/donut.js?v=3"></script>
-<script src="/app.js?v=20d"></script>
+<script src="/app.js?v=21d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

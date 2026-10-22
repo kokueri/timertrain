@@ -47,3 +47,18 @@ Key facts:
 - [Temporizador Pomodoro](https://timertrain.com/es-pomodoro): 25 min + 5 min
 - [Temporizador de intervalos](https://timertrain.com/es-intervalos): 1 min + 30 s
 - [Temporizador Tabata](https://timertrain.com/es-tabata): 20 s + 10 s x 8
+
+## DonutTimer / ドーナツタイマー（日本語）
+
+The same timer with a cute look: the remaining time is shown as a donut that gets eaten clockwise from 12 o'clock. Six flavors (strawberry milk, chocolate, mint chocolate, vanilla, blueberry, milk tea) can be chosen per timer. Same features, same free account and same share-link format as TimerTrain; a button at the top right switches between the two looks with the same setup.
+
+- [ドーナツタイマー](https://timertrain.com/donut/): 残り時間がドーナツで見える、かわいい無料Webタイマー
+- [かわいいポモドーロタイマー](https://timertrain.com/donut/pomodoro): 25分＋5分
+- [かわいい勉強タイマー](https://timertrain.com/donut/study): 50分＋10分
+- [かわいいインターバルタイマー](https://timertrain.com/donut/interval-timer): 45秒＋15秒
+- [かわいいタバタタイマー](https://timertrain.com/donut/tabata): 20秒＋10秒×8
+- [かわいいHIITタイマー](https://timertrain.com/donut/hiit): 40秒＋20秒
+- [かわいいキッチンタイマー](https://timertrain.com/donut/kitchen): 料理の工程を順番に
+- [かわいい複数タイマー](https://timertrain.com/donut/multi-timer)
+- [かわいい繰り返しタイマー](https://timertrain.com/donut/repeat-timer)
+- [かわいいポモドーロタイマー 50分＋10分](https://timertrain.com/donut/pomodoro-50-10)

@@ -1064,8 +1064,8 @@ if (!header) return;
 var isDT = !!window.DT;
 // ドーナツ版は同じサイトの /donut/ に置く
 var DONUT_PREFIX = '/donut';
-// ドーナツ版を公開するまで、TimerTrain 側には切り替えを出さない（公開するときに true）
-var SHOW_DONUT_ON_TT = false;
+// TimerTrain の日本語ページにもドーナツ版への切り替えを出す
+var SHOW_DONUT_ON_TT = true;
 // DonutTimer にある日本語ページ（TimerTrain からはこのページだけ同じ用途のページへ飛ぶ）
 var DT_PAGES = ['/', '/pomodoro', '/interval-timer', '/tabata', '/hiit', '/study', '/kitchen', '/multi-timer', '/repeat-timer', '/pomodoro-50-10'];
 var NS = 'http://www.w3.org/2000/svg';

@@ -11,10 +11,61 @@ gtag('js', new Date());
 gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- ドーナツ版は準備中。公開するときに noindex を外し、canonical・sitemap を追加する -->
-<meta name="robots" content="noindex, nofollow">
-<title>タバタ式タイマー｜20秒＋10秒×8セットを音で自動進行 - DonutTimer</title>
-<meta name="description" content="20秒の全力運動と10秒の休憩を8セット、音の合図で自動進行するタバタ式タイマー。秒数もセット数も変更でき、画面を見なくても使えます。無料・インストール不要。">
+<title>かわいいタバタタイマー｜20秒＋10秒×8をドーナツで - ドーナツタイマー</title>
+<meta name="description" content="20秒の運動と10秒の休憩を8回くり返すタバタ式トレーニング用の、ドーナツ型のかわいいタイマー。合計4分、切り替えは音とドーナツでお知らせ。無料・登録不要。">
+<link rel="canonical" href="https://timertrain.com/donut/tabata">
+<meta property="og:title" content="かわいいタバタタイマー｜20秒＋10秒×8をドーナツで - ドーナツタイマー">
+<meta property="og:description" content="20秒の運動と10秒の休憩を8回くり返すタバタ式トレーニング用の、ドーナツ型のかわいいタイマー。合計4分、切り替えは音とドーナツでお知らせ。無料・登録不要。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/donut/tabata">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebApplication",
+ "name": "かわいいタバタタイマー（ドーナツタイマー）",
+ "url": "https://timertrain.com/donut/tabata",
+ "applicationCategory": "UtilityApplication",
+ "operatingSystem": "Any",
+ "inLanguage": "ja",
+ "offers": {
+  "@type": "Offer",
+  "price": "0",
+  "priceCurrency": "JPY"
+ },
+ "isAccessibleForFree": true,
+ "description": "20秒の運動と10秒の休憩を8回くり返すタバタ式トレーニング用の、ドーナツ型のかわいいタイマー。合計4分、切り替えは音とドーナツでお知らせ。無料・登録不要。",
+ "isPartOf": {
+  "@type": "WebSite",
+  "name": "TimerTrain",
+  "url": "https://timertrain.com/"
+ }
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "全部で何分かかりますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "20秒＋10秒を8回なので、合計4分です。回数を変えると合計時間も変わり、設定の下に表示されます。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "2セット続けてやりたいときは？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "くり返す回数を16回にするか、休憩用のタイマーを足して並べると、続けて回せます。"
+   }
+  }
+ ]
+}
+</script>
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
@@ -34,7 +85,7 @@ gtag('config', 'G-GSFVNEDCGN');
 <main class="app">
   <header class="header">
     <a class="logo" href="/donut/">DonutTimer</a>
-    <h1 class="tagline page-title">タバタ式タイマー（20秒＋10秒×8セット）</h1>
+    <h1 class="tagline page-title">かわいいタバタタイマー（20秒＋10秒×8セット）</h1>
     <nav class="nav" aria-label="用途別タイマー">
       <a href="/donut/pomodoro">ポモドーロ</a>
       <a href="/donut/interval-timer">インターバル</a>
@@ -93,22 +144,27 @@ gtag('config', 'G-GSFVNEDCGN');
 
   <!-- SEO テキスト -->
   <article class="about">
-    <h2>タバタ式トレーニングとは</h2>
-    <p>タバタ式は、20秒の高強度運動と10秒の休息を8セット、計4分間くり返すインターバルトレーニングです。立命館大学の田畑泉教授らの研究に基づく方法で、短時間で有酸素性・無酸素性の両方の能力に働きかけられるとされ、世界中で「TABATA」として知られています。</p>
-    <h2>このタバタタイマーの使い方</h2>
-    <p>このページには20秒の運動と10秒の休憩が8セット分セットされています。開始を押せば残り3秒からカウント音が鳴り、セットの切り替わりも音で分かるので、運動中に画面を見る必要はありません。種目名を付けたい場合はタイマーの名前を編集し、ウォームアップを入れたい場合は先頭にタイマーを追加してください。</p>
-    <h2>安全に行うために</h2>
-    <p>タバタ式は「全力」で行ってこそ効果がある反面、負荷の高い運動です。事前のウォームアップを欠かさず、体調に合わせてセット数を減らすなど無理のない範囲で行ってください。</p>
-    <h2>関連タイマー</h2>
-    <p><a href="/donut/hiit">HIITタイマー</a> · <a href="/donut/pomodoro">ポモドーロタイマー</a> · <a href="/donut/">タイマーを自由に作る</a></p>
-  </article>
+<h2>4分間をドーナツで見守る</h2>
+<p>タバタ式は、20秒の運動と10秒の休憩を8回、合計4分でくり返すトレーニング方法です。このページでは、運動はミルクティー、休憩はチョコミントのドーナツ。短い切り替えが続いても、色と残りの量で今どちらなのかがすぐわかります。</p>
+<h2>使い方</h2>
+<p>開いた時点で「運動20秒→休憩10秒」が8回分セットされています。再生ボタンを押したら、あとは音の合図に合わせて動くだけ。終わる3秒前からカウントの音が鳴ります。</p>
+<h2>はじめるときは</h2>
+<p>短い時間でも負荷の高い運動です。体が慣れないうちは、回数を減らしたり休憩を長くしたりして、無理のない範囲で始めてください。設定はあとからいつでも変えられます。</p>
+<h2>ログインするとできること</h2>
+<p>無料のGoogleログインをすると、作ったタイマーに名前を付けて保存でき、使った時間が<a href="/account">マイページ</a>に記録されます。続けて使った日数は左上に🔥で表示されます。</p>
+<h2>よくある質問</h2>
+<p style="margin-top:10px"><strong>全部で何分かかりますか？</strong><br>20秒＋10秒を8回なので、合計4分です。回数を変えると合計時間も変わり、設定の下に表示されます。</p>
+<p style="margin-top:10px"><strong>2セット続けてやりたいときは？</strong><br>くり返す回数を16回にするか、休憩用のタイマーを足して並べると、続けて回せます。</p>
+<h2>ほかのドーナツタイマー</h2>
+<p><a href="/donut/">ドーナツタイマー（自由に作る）</a> · <a href="/donut/pomodoro">ポモドーロ</a> · <a href="/donut/pomodoro-50-10">ポモドーロ50分＋10分</a> · <a href="/donut/study">勉強</a> · <a href="/donut/interval-timer">インターバル</a> · <a href="/donut/tabata">タバタ</a> · <a href="/donut/hiit">HIIT</a> · <a href="/donut/kitchen">キッチン</a> · <a href="/donut/multi-timer">複数タイマー</a> · <a href="/donut/repeat-timer">繰り返し</a></p>
+</article>
 
   <footer class="footer">© 2026 DonutTimer · <a href="/privacy">プライバシー</a> · <a href="/terms">利用規約</a> · <a href="/about">運営者情報</a></footer>
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 20, "color": "orange"}, {"name": "休憩", "secs": 10, "color": "teal"}], "repeat": 8};</script>
 <script src="/donut.js?v=3"></script>
-<script src="/app.js?v=20d"></script>
+<script src="/app.js?v=21d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
