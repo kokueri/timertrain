@@ -11,8 +11,8 @@ gtag('js', new Date());
 gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- ドーナツ版は準備中。公開するときに noindex を外し、canonical・sitemap を追加する -->
-<meta name="robots" content="noindex, nofollow">
+<!-- 本文が TimerTrain の同名ページとほぼ同じなので、検索には出さない（リンクはたどってもらう） -->
+<meta name="robots" content="noindex, follow">
 <title>インターバルタイマー｜運動＋休憩をくり返す無料タイマー - DonutTimer</title>
 <meta name="description" content="運動と休憩を自由な秒数でくり返せる無料のインターバルタイマー。ワンタップで開始、回数も時間も変更でき、インストール不要。筋トレ・HIIT・勉強のインターバルに。">
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
@@ -112,7 +112,7 @@ gtag('config', 'G-GSFVNEDCGN');
 
 <script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 45, "color": "red"}, {"name": "休憩", "secs": 15, "color": "blue"}], "repeat": 10};</script>
 <script src="/donut.js?v=3"></script>
-<script src="/app.js?v=20d"></script>
+<script src="/app.js?v=21d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

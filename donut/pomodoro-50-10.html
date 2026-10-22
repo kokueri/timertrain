@@ -11,8 +11,8 @@ gtag('js', new Date());
 gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- ドーナツ版は準備中。公開するときに noindex を外し、canonical・sitemap を追加する -->
-<meta name="robots" content="noindex, nofollow">
+<!-- 本文が TimerTrain の同名ページとほぼ同じなので、検索には出さない（リンクはたどってもらう） -->
+<meta name="robots" content="noindex, follow">
 <title>ポモドーロ50分＋10分休憩タイマー｜長めの集中を自動でくり返す - DonutTimer</title>
 <meta name="description" content="50分集中＋10分休憩を自動でくり返すポモドーロタイマー。25分だと短いと感じる勉強や作業向け。休憩に入る・戻るタイミングを音で知らせ、回数や時間も変更できます。無料・インストール不要。">
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
@@ -114,7 +114,7 @@ gtag('config', 'G-GSFVNEDCGN');
 
 <script>window.TT_PRESET = {"timers": [{"name": "集中", "secs": 3000, "color": "red"}, {"name": "休憩", "secs": 600, "color": "blue"}], "repeat": 3};</script>
 <script src="/donut.js?v=3"></script>
-<script src="/app.js?v=20d"></script>
+<script src="/app.js?v=21d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

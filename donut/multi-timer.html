@@ -11,8 +11,8 @@ gtag('js', new Date());
 gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- ドーナツ版は準備中。公開するときに noindex を外し、canonical・sitemap を追加する -->
-<meta name="robots" content="noindex, nofollow">
+<!-- 本文が TimerTrain の同名ページとほぼ同じなので、検索には出さない（リンクはたどってもらう） -->
+<meta name="robots" content="noindex, follow">
 <title>複数タイマー（マルチタイマー）をWebで｜いくつでも並べて順番に自動再生 - DonutTimer</title>
 <meta name="description" content="複数のタイマーをWebでいくつでも並べ、終わったら次へ自動で切り替える無料のマルチタイマー。時間・名前・色をタイマーごとに設定でき、くり返しやURL共有にも対応。インストール不要。">
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
@@ -114,7 +114,7 @@ gtag('config', 'G-GSFVNEDCGN');
 
 <script>window.TT_PRESET = {"timers": [{"name": "準備", "secs": 300, "color": "yellow"}, {"name": "本番", "secs": 900, "color": "red"}, {"name": "片付け", "secs": 300, "color": "teal"}], "repeat": 1};</script>
 <script src="/donut.js?v=3"></script>
-<script src="/app.js?v=20d"></script>
+<script src="/app.js?v=21d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

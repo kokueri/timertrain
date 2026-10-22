@@ -11,8 +11,8 @@ gtag('js', new Date());
 gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- ドーナツ版は準備中。公開するときに noindex を外し、canonical・sitemap を追加する -->
-<meta name="robots" content="noindex, nofollow">
+<!-- 本文が TimerTrain の同名ページとほぼ同じなので、検索には出さない（リンクはたどってもらう） -->
+<meta name="robots" content="noindex, follow">
 <title>タバタ式タイマー｜20秒＋10秒×8セットを音で自動進行 - DonutTimer</title>
 <meta name="description" content="20秒の全力運動と10秒の休憩を8セット、音の合図で自動進行するタバタ式タイマー。秒数もセット数も変更でき、画面を見なくても使えます。無料・インストール不要。">
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
@@ -108,7 +108,7 @@ gtag('config', 'G-GSFVNEDCGN');
 
 <script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 20, "color": "orange"}, {"name": "休憩", "secs": 10, "color": "teal"}], "repeat": 8};</script>
 <script src="/donut.js?v=3"></script>
-<script src="/app.js?v=20d"></script>
+<script src="/app.js?v=21d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
