@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- ドーナツ版は準備中。公開するときに noindex を外し、canonical・sitemap を追加する -->
+<meta name="robots" content="noindex, nofollow">
+<title>DonutTimer｜ドーナツが減っていく、かわいい無料タイマー</title>
+<meta name="description" content="残り時間がドーナツで見える、かわいい無料Webタイマー。複数のタイマーを並べて自動で切り替え、くり返し再生・リンク共有にも対応。インストール不要。">
+<meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DonutTimer">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Titan+One&text=DonutTimer&display=swap">
+<link rel="stylesheet" href="/style.css?v=22">
+<link rel="stylesheet" href="/donut.css?v=3">
+</head>
+<body>
+
+<main class="app">
+<header class="header">
+<h1 class="logo">DonutTimer</h1>
+<p class="tagline">タイマーを並べて、自分のペースで。</p>
+<nav class="nav" aria-label="用途別タイマー">
+<a href="/donut/pomodoro">ポモドーロ</a>
+<a href="/donut/interval-timer">インターバル</a>
+<a href="/donut/tabata">タバタ</a>
+<a href="/donut/hiit">HIIT</a>
+<a href="/donut/study">勉強</a>
+<a href="/donut/kitchen">キッチン</a>
+</nav>
+</header>
+
+<!-- タイマー（常時表示） -->
+<section id="run" class="run-inline" aria-label="タイマー">
+<p id="run-cycle" class="run-cycle"></p>
+<div class="ring-wrap">
+<svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+<circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+<circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+</svg>
+<div class="ring-inner">
+<p id="run-name" class="run-name"></p>
+<p id="run-time" class="run-time">00:00</p>
+</div>
+</div>
+<div id="stations" class="stations" aria-hidden="true"></div>
+<div class="run-controls">
+<button id="reset-btn" type="button" aria-label="リセット"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+<button id="pause-btn" type="button" aria-label="開始・一時停止"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+<button id="skip-btn" type="button" aria-label="スキップ"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+</div>
+</section>
+
+<!-- 設定（編成リスト） -->
+<section id="setup" aria-label="タイマー設定">
+<ul id="timer-list" class="timer-list"></ul>
+
+<button id="add-btn" class="add-btn" type="button">＋ タイマーを追加</button>
+
+<div class="repeat-row">
+<span class="repeat-label">くり返し</span>
+<div class="repeat-ctrl">
+<button id="rep-minus" type="button" aria-label="くり返しを減らす">−</button>
+<span id="rep-count">4回</span>
+<button id="rep-plus" type="button" aria-label="くり返しを増やす">＋</button>
+<button id="rep-inf" type="button" aria-label="無限にくり返す">∞</button>
+</div>
+</div>
+
+<div class="total-row"><span id="total-label"></span></div>
+
+<div class="action-row">
+<button id="share-btn" class="share-btn wide" type="button">共有リンク</button>
+</div>
+</section>
+
+<div id="toast" class="toast" role="status"></div>
+
+<!-- SEO テキスト -->
+<article class="about">
+<h2>DonutTimerとは</h2>
+<p>残り時間がドーナツで見える、かわいい無料のWebタイマーです。時間がたつほど、ドーナツが12時の位置から時計回りに少しずつ減っていきます。インストールも登録も不要で、ページを開いて再生ボタンを押すだけで使えます。</p>
+<h2>使い方</h2>
+<p>「＋タイマーを追加」で好きな数だけタイマーを並べ、時間・名前・フレーバーを設定します。くり返し回数を決めて再生すると、作業と休憩のような流れが自動で切り替わります。作ったタイマーは「共有リンク」でURLを送るだけで共有できます。</p>
+<h2>フレーバー</h2>
+<p>いちごミルク・チョコ・チョコミント・バニラ・ブルーベリー・ミルクティーの6種類。左の丸を押すと、タイマーごとに選べます。</p>
+<h2>用途別タイマー</h2>
+<p><a href="/donut/pomodoro">ポモドーロタイマー</a> · <a href="/donut/interval-timer">インターバルタイマー</a> · <a href="/donut/tabata">タバタ式タイマー</a> · <a href="/donut/hiit">HIITタイマー</a> · <a href="/donut/study">勉強タイマー</a> · <a href="/donut/kitchen">キッチンタイマー</a> · <a href="/donut/multi-timer">複数タイマー</a> · <a href="/donut/repeat-timer">繰り返しタイマー</a> · <a href="/donut/pomodoro-50-10">ポモドーロ50分＋10分</a></p>
+</article>
+
+<footer class="footer">© 2026 DonutTimer · <a href="/privacy">プライバシー</a> · <a href="/terms">利用規約</a> · <a href="/about">運営者情報</a></footer>
+</main>
+
+<script src="/donut.js?v=3"></script>
+<script src="/app.js?v=20d"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</body>
+</html>

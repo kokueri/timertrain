@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- ドーナツ版は準備中。公開するときに noindex を外し、canonical・sitemap を追加する -->
+<meta name="robots" content="noindex, nofollow">
+<title>キッチンタイマー（複数・連続対応）｜料理の工程を順番に計る - DonutTimer</title>
+<meta name="description" content="下ゆで10分→煮込み20分→蒸らし5分のように、料理の工程を並べておくと順番に自動で計るキッチンタイマー。複数の時間をまとめて管理でき、音でお知らせ。無料・インストール不要。">
+<meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DonutTimer">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Titan+One&text=DonutTimer&display=swap">
+<link rel="stylesheet" href="/style.css?v=22">
+<link rel="stylesheet" href="/donut.css?v=3">
+</head>
+<body>
+
+<main class="app">
+  <header class="header">
+    <a class="logo" href="/donut/">DonutTimer</a>
+    <h1 class="tagline page-title">キッチンタイマー（複数・連続対応）</h1>
+    <nav class="nav" aria-label="用途別タイマー">
+      <a href="/donut/pomodoro">ポモドーロ</a>
+      <a href="/donut/interval-timer">インターバル</a>
+      <a href="/donut/tabata">タバタ</a>
+      <a href="/donut/hiit">HIIT</a>
+      <a href="/donut/study">勉強</a>
+      <a href="/donut/kitchen" aria-current="page">キッチン</a>
+    </nav>
+  </header>
+
+  <!-- タイマー（常時表示） -->
+  <section id="run" class="run-inline" aria-label="タイマー">
+    <p id="run-cycle" class="run-cycle"></p>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+      </svg>
+      <div class="ring-inner">
+        <p id="run-name" class="run-name"></p>
+        <p id="run-time" class="run-time">00:00</p>
+      </div>
+    </div>
+    <div id="stations" class="stations" aria-hidden="true"></div>
+    <div class="run-controls">
+      <button id="reset-btn" type="button" aria-label="リセット"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+      <button id="pause-btn" type="button" aria-label="開始・一時停止"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="skip-btn" type="button" aria-label="スキップ"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+    </div>
+  </section>
+
+  <!-- 設定（編成リスト） -->
+  <section id="setup" aria-label="タイマー設定">
+    <ul id="timer-list" class="timer-list"></ul>
+
+    <button id="add-btn" class="add-btn" type="button">＋ タイマーを追加</button>
+
+    <div class="repeat-row">
+      <span class="repeat-label">くり返し</span>
+      <div class="repeat-ctrl">
+        <button id="rep-minus" type="button" aria-label="くり返しを減らす">−</button>
+        <span id="rep-count">4回</span>
+        <button id="rep-plus" type="button" aria-label="くり返しを増やす">＋</button>
+        <button id="rep-inf" type="button" aria-label="無限にくり返す">∞</button>
+      </div>
+    </div>
+
+    <div class="total-row"><span id="total-label"></span></div>
+
+    <div class="action-row">
+      <button id="share-btn" class="share-btn wide" type="button">共有リンク</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <!-- SEO テキスト -->
+  <article class="about">
+    <h2>料理こそ「複数タイマー」</h2>
+    <p>複数の品を同時に作るとき、頭の中だけで時間を管理するのは大変です。DonutTimerなら「メイン15分→副菜10分→仕上げ5分」のように工程を並べて順番に計れるので、レシピの手順をそのままタイマーにできます。料理名と色を付ければ、鳴ったときにどの料理か一目で分かります。</p>
+    <h2>このキッチンタイマーの使い方</h2>
+    <p>メイン・副菜・仕上げの3つのタイマーがセットされています。時間をタップして自分のレシピに合わせて変更し、必要なら工程を追加してください。パスタ9分、ゆで卵7分（半熟）、蒸らし10分のような定番時間を登録してURLをブックマークしておくと、次からワンタップで呼び出せます。</p>
+    <h2>音で知らせるので画面を見なくてOK</h2>
+    <p>各タイマーの残り3秒からカウント音が鳴り、切り替わりも音で分かります。手が濡れていても、コンロの前にいても大丈夫。スマホでもパソコンでも、ブラウザを開くだけで使えます。</p>
+    <h2>関連タイマー</h2>
+    <p><a href="/donut/study">勉強タイマー</a> · <a href="/donut/pomodoro">ポモドーロタイマー</a> · <a href="/donut/">タイマーを自由に作る</a></p>
+  </article>
+
+  <footer class="footer">© 2026 DonutTimer · <a href="/privacy">プライバシー</a> · <a href="/terms">利用規約</a> · <a href="/about">運営者情報</a></footer>
+</main>
+
+<script>window.TT_PRESET = {"timers": [{"name": "メイン", "secs": 900, "color": "orange"}, {"name": "副菜", "secs": 600, "color": "green"}, {"name": "仕上げ", "secs": 300, "color": "yellow"}], "repeat": 1};</script>
+<script src="/donut.js?v=3"></script>
+<script src="/app.js?v=20d"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</body>
+</html>

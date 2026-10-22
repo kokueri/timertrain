@@ -647,3 +647,29 @@ body.setup-closed .app:has(#tt-my .tt-my-item) { grid-template-columns: minmax(0
 #setup.collapsed .tt-my-chip { flex: 1; min-width: 0; display: block; max-width: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .setup-toggle:hover { border-color: var(--text2); }
 }
+
+/* ================= 右上: 兄弟サイトへのリンク＋テーマ／左上: 連続日数 ================= */
+#tt-topright { position: absolute; top: 10px; right: 12px; z-index: 60; display: flex; align-items: center; gap: 6px; }
+#tt-topright #theme-btn { position: static; }
+#sib-link {
+display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+background: var(--card); color: var(--text2);
+border: 1.5px solid var(--line); border-radius: 999px;
+padding: 6px 12px 6px 8px; font-size: 13px; font-weight: 700; line-height: 1;
+box-shadow: var(--shadow); font-family: var(--font-round); min-height: 34px;
+}
+#sib-link:hover { color: var(--text); }
+#sib-link .sib-mark { width: 20px; height: 20px; flex-shrink: 0; }
+body.focus-mode #tt-topright { display: none; }
+@media (max-width: 480px) {
+#sib-link span { display: none; }
+#sib-link { padding: 6px; }
+}
+#acct-link .tt-streak { font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+#acct-link .tt-streak.keep { opacity: .55; }
+#acct-link:has(.tt-streak) svg { display: none; }
+@media (max-width: 480px) { #acct-link:has(.tt-streak) { padding: 9px 11px; } }
+@media (max-width: 360px) {
+#tt-topright { right: 10px; gap: 4px; }
+#tt-topright ~ .logo, .header:has(#tt-topright) .logo { font-size: 23px; }
+}
