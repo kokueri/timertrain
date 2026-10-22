@@ -2,30 +2,87 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GSFVNEDCGN');
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<!-- 試作中（donutブランチ）。公開前に検索エンジン向けの設定を見直す -->
-<meta name="robots" content="noindex, nofollow">
-<title>繰り返しタイマー｜Webで同じ時間を何度でも自動でくり返す無料タイマー - DonutTimer</title>
+<title>繰り返しタイマー｜Webで同じ時間を何度でも自動でくり返す無料タイマー - TimerTrain</title>
 <meta name="description" content="同じ時間を何度でも自動でくり返す、Webの繰り返しタイマー。1分ごと・5分ごとの合図や、回数を決めたくり返しに。無限ループにも対応し、URLで設定を保存・共有できます。インストール不要・無料。">
-<meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
+<link rel="canonical" href="https://timertrain.com/repeat-timer">
+<meta property="og:title" content="繰り返しタイマー（Webで自動くり返し） - TimerTrain">
+<meta property="og:description" content="同じ時間を何度でも自動でくり返す無料のWebタイマー。回数指定も無限くり返しもOK。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/repeat-timer">
+<meta property="og:image" content="https://timertrain.com/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://timertrain.com/ogp.png">
+<meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="DonutTimer">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Titan+One&text=DonutTimer&display=swap">
-<link rel="stylesheet" href="/style.css?v=21">
-<link rel="stylesheet" href="/donut.css?v=3">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "TimerTrain",
+  "url": "https://timertrain.com/",
+  "applicationCategory": "UtilityApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "JPY" },
+  "description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・共有に対応。"
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "何回でもくり返せますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "くり返しは1〜99回の指定か、∞（止めるまで続ける）を選べます。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "2つの時間を交互にくり返せますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "できます。「＋タイマーを追加」で2つ並べると、1つ目→2つ目→1つ目…と交互にくり返します。"
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "音を鳴らさずに使えますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "切り替わりと終了の合図は音で鳴ります。音を出せない場所では端末の音量を下げてください。画面の表示は変わらず進みます。"
+   }
+  }
+ ]
+}
+</script>
+<link rel="stylesheet" href="/style.css?v=18">
 </head>
 <body>
 
 <main class="app">
   <header class="header">
-    <a class="logo" href="/">DonutTimer</a>
+    <a class="logo" href="/">TimerTrain</a>
     <h1 class="tagline page-title">繰り返しタイマー（自動でくり返す）</h1>
     <nav class="nav" aria-label="用途別タイマー">
       <a href="/pomodoro">ポモドーロ</a>
@@ -101,12 +158,11 @@
     <p><a href="/multi-timer">複数タイマー</a> · <a href="/interval-timer">インターバルタイマー</a> · <a href="/tabata">タバタ式タイマー</a> · <a href="/pomodoro">ポモドーロタイマー</a> · <a href="/">タイマーを自由に作る</a></p>
   </article>
 
-  <footer class="footer">© 2026 DonutTimer · <a href="/privacy">プライバシー</a> · <a href="/terms">利用規約</a> · <a href="/about">運営者情報</a></footer>
+  <footer class="footer">© 2026 TimerTrain · <a href="/en" class="lang-link">English</a> · <a href="/privacy">プライバシー</a> · <a href="/terms">利用規約</a> · <a href="/about">運営者情報</a></footer>
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "1分", "secs": 60, "color": "blue"}], "repeat": "inf"};</script>
-<script src="/donut.js?v=3"></script>
-<script src="/app.js?v=19d"></script>
+<script src="/app.js?v=17"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

@@ -90,7 +90,6 @@ let tickId = null;
 let wakeLock = null;
 let audioCtx = null;
 let masterGain = null;
-let schedOff = 0, schedNodes = [], wakeNode = null, bgSched = false; // 裏のタブ用の予約（下の「バックグラウンド」参照）
 
 function uid() { return Math.random().toString(36).slice(2, 9); }
 
@@ -196,9 +195,8 @@ masterGain.gain.value = sound.v / 70;
 }
 function beep(freq, dur, at, vol, type) {
 if (!audioCtx || !masterGain) return;
-const t = audioCtx.currentTime + (at || 0) + schedOff;
+const t = audioCtx.currentTime + (at || 0);
 const osc = audioCtx.createOscillator();
-if (schedOff > 0) schedNodes.push({ o: osc, t });
 const g = audioCtx.createGain();
 osc.type = type || 'sine'; osc.frequency.value = freq;
 g.gain.setValueAtTime(0.0001, t);
@@ -553,7 +551,6 @@ tick();
 function resetToIdle() {
 if (window.__ttOnStop) { try { window.__ttOnStop(); } catch (e) {} }
 clearInterval(tickId); tickId = null;
-cancelSched();
 run = { active: false, paused: true, finished: false, idx: 0, cycle: 1, endAt: 0, remainMs: 0, lastSec: -1 };
 releaseWakeLock();
 document.title = BASE_TITLE;
@@ -566,7 +563,6 @@ updateIdleView();
 function updateIdleView() {
 const t = state.timers[0];
 if (!t) return;
-if (DT) renderStations(); // DonutTimer は待機中もミニドーナツの並びを見せる
 runName.textContent = t.name || STR.defName;
 runTime.textContent = fmt(t.secs);
 runCycle.textContent = '';
@@ -597,7 +593,6 @@ releaseWakeLock();
 }
 updateRunView();
 updateEta();
-scheduleAhead();
 }
 function skip() {
 if (!run.active || run.finished) return;
@@ -614,7 +609,7 @@ run.cycle++; run.idx = 0;
 finish(); return;
 }
 if (withSound) {
-if (!bgSched) soundSegment();
+soundSegment();
 const nx = state.timers[run.idx];
 notify(STR.nNext(nx.name || STR.defName));
 if (!opts.auto && !run.paused) {
@@ -633,7 +628,7 @@ updateHighlight();
 updateRunView();
 }
 function finish() {
-if (!bgSched) soundFinish();
+soundFinish();
 run.finished = true;
 run.paused = true;
 releaseWakeLock();
@@ -655,95 +650,16 @@ if (remain <= 0) { advance(true); return; }
 const sec = Math.ceil(remain / 1000);
 if (sec !== run.lastSec) {
 run.lastSec = sec;
-if (sec <= 3 && !bgSched) soundTick();
+if (sec <= 3) soundTick();
 const t = state.timers[run.idx];
 if (opts.remind && !run.reminded && t.secs > opts.remind * 60 + 5 && sec <= opts.remind * 60 && sec > 3) {
 run.reminded = true;
-if (!bgSched) { soundTick(); setTimeout(soundTick, 250); }
+soundTick(); setTimeout(soundTick, 250);
 notify(STR.nSoon(t.name || STR.defName, opts.remind));
 }
 }
 updateRunView();
 }
-/* ---------- バックグラウンド（別のタブ・アプリを見ている間）----------
- * ブラウザは裏のタブの setInterval を間引く（5分以上で1分に1回程度まで）。
- * WebAudio の時計は間引かれないので、裏に回ったら
- *  1) 先の区切り・終了・カウントダウン・終了前のお知らせの音を、その時刻に鳴るよう予約しておく
- *  2) 次の区切りの時刻に終わる無音の音を鳴らし、その終了の合図で切り替えと通知を行う
- * 画面に戻ったら予約を取り消し、通常の動きに戻す。 */
-function atAudio(secFromNow, fn) {
-if (secFromNow < 0.05) return;
-schedOff = secFromNow;
-try { fn(); } finally { schedOff = 0; }
-}
-function cancelSched() {
-const now = audioCtx ? audioCtx.currentTime : 0;
-schedNodes.forEach(n => { if (n.t > now + 0.02) { try { n.o.stop(0); n.o.disconnect(); } catch (e) {} } });
-schedNodes = [];
-if (wakeNode) { try { wakeNode.onended = null; wakeNode.stop(0); wakeNode.disconnect(); } catch (e) {} wakeNode = null; }
-bgSched = false;
-}
-function remindAt(t, startMs, endMs, reminded) {
-if (!opts.remind || reminded || t.secs <= opts.remind * 60 + 5) return null;
-const at = endMs - opts.remind * 60000;
-return at > startMs && at > 3000 ? at : null;
-}
-function scheduleAhead() {
-cancelSched();
-if (!audioCtx || !masterGain || !run.active || run.paused || run.finished || document.visibilityState === 'visible') return;
-if (audioCtx.state === 'suspended') { try { audioCtx.resume(); } catch (e) {} }
-bgSched = true;
-const S = SOUNDS[sound.s];
-const extras = (t, startMs, endMs, reminded) => {
-[3, 2, 1].forEach(k => { const at = endMs - k * 1000; if (at > startMs) atAudio(at / 1000, () => S.tick()); });
-const r = remindAt(t, startMs, endMs, reminded);
-if (r !== null) { atAudio(r / 1000, () => S.tick()); atAudio(r / 1000 + 0.25, () => S.tick()); }
-};
-let endMs = Math.max(0, run.endAt - Date.now());
-let idx = run.idx, cycle = run.cycle;
-extras(state.timers[idx], 0, endMs, run.reminded);
-for (let n = 0; n < 60 && endMs < 6 * 3600e3; n++) {
-let ni = idx + 1, nc = cycle;
-if (ni >= state.timers.length) {
-if (state.repeat === Infinity || cycle < state.repeat) { ni = 0; nc = cycle + 1; }
-else { atAudio(endMs / 1000, () => S.fin()); break; }
-}
-atAudio(endMs / 1000, () => S.seg());
-if (!opts.auto) break; // 1つごとに止まる設定なら、次の区切りまで
-idx = ni; cycle = nc;
-const t = state.timers[idx], start = endMs;
-endMs += t.secs * 1000;
-extras(t, start, endMs, false);
-}
-scheduleWake();
-}
-// 次に処理が必要な時刻（区切り、または終了前のお知らせ）に終わる無音の音で、処理を起こす
-function scheduleWake() {
-if (wakeNode) { try { wakeNode.onended = null; wakeNode.stop(0); wakeNode.disconnect(); } catch (e) {} wakeNode = null; }
-if (!bgSched || !run.active || run.paused || run.finished) return;
-const remain = Math.max(0, run.endAt - Date.now());
-let next = remain;
-const r = remindAt(state.timers[run.idx], 0, remain, run.reminded);
-if (r !== null && r < next) next = r;
-try {
-const o = audioCtx.createOscillator(), g = audioCtx.createGain();
-g.gain.value = 0;
-o.connect(g); g.connect(audioCtx.destination);
-o.onended = () => { if (wakeNode !== o) return; wakeNode = null; tick(); scheduleWake(); };
-o.start();
-o.stop(audioCtx.currentTime + next / 1000 + 0.03);
-wakeNode = o;
-} catch (e) {}
-}
-document.addEventListener('visibilitychange', () => {
-if (document.visibilityState === 'visible') {
-if (bgSched) tick(); // 遅れていた切り替えを、音を重ねずに追いつかせる
-cancelSched();
-if (run.active && !run.finished) { updateRunView(); updateEta(); }
-} else {
-scheduleAhead();
-}
-});
 function updateRunView() {
 if (run.finished) return;
 const t = state.timers[run.idx];
@@ -1061,11 +977,11 @@ document.body.appendChild(s1);
 var lang = document.documentElement.lang;
 var L = (lang === 'en') ? {
 recent: 'Recent', install: 'Add to home screen',
-comeback: 'Add ' + (window.DT ? 'DonutTimer' : 'TimerTrain') + ' to your home screen to reopen it in one tap.',
+comeback: 'Add TimerTrain to your home screen to reopen it in one tap.',
 bookmark: 'Bookmark this page (Ctrl/Cmd+D) so you can come back tomorrow.', dismiss: 'Close'
 } : (lang === 'es') ? {
 recent: 'Recientes', install: 'Añadir a la pantalla de inicio',
-comeback: 'Añade ' + (window.DT ? 'DonutTimer' : 'TimerTrain') + ' a tu pantalla de inicio para volver con un toque.',
+comeback: 'Añade TimerTrain a tu pantalla de inicio para volver con un toque.',
 bookmark: 'Guarda esta página (Ctrl/Cmd+D) para volver mañana.', dismiss: 'Cerrar'
 } : {
 recent: '最近の編成', install: 'ホーム画面に追加',
@@ -1172,53 +1088,4 @@ var a = document.createElement('a'); a.href = '/account?l=' + l; a.textContent =
 a.addEventListener('click', function () { try { if (window.gtag) gtag('event', 'login_cta_click', { page: location.pathname }); } catch (e) {} });
 wrap.appendChild(a);
 row.insertAdjacentElement('afterend', wrap);
-})();
-
-/* ---------- 設定のたたみ（PC: 右に収納 / スマホ: 上下に開閉）。初期は閉じる。開閉は端末ごとに記憶 ---------- */
-(function () {
-var setup = document.getElementById('setup');
-if (!setup) return;
-var KEY = 'tt-setup-open';
-var L = LANG === 'en' ? { title: 'Timer settings', short: 'Settings', open: 'Open timer settings', close: 'Close timer settings', n: function (n, one) { return n + ' timers · ' + one + ' per round'; } }
-: LANG === 'es' ? { title: 'Ajustes del temporizador', short: 'Ajustes', open: 'Abrir ajustes', close: 'Cerrar ajustes', n: function (n, one) { return n + ' temporizadores · ' + one + ' por ronda'; } }
-: { title: 'タイマー設定', short: '設定', open: 'タイマー設定を開く', close: 'タイマー設定を閉じる', n: function (n, one) { return 'タイマー' + n + 'つ・1周 ' + one; } };
-var GEAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>';
-var CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg>';
-
-var btn = document.createElement('button');
-btn.type = 'button'; btn.className = 'setup-toggle'; btn.id = 'setup-toggle';
-btn.setAttribute('aria-controls', 'setup');
-btn.innerHTML = '<span class="st-ic">' + GEAR + '</span><span class="st-txt"><span class="st-title"></span><span class="st-sum"></span><span class="st-short"></span></span><span class="st-chev">' + CHEV + '</span>';
-btn.querySelector('.st-title').textContent = L.title;
-btn.querySelector('.st-short').textContent = L.short;
-setup.insertBefore(btn, setup.firstChild);
-var sum = btn.querySelector('.st-sum');
-
-function summary() {
-var ts = state.timers, one = ts.reduce(function (a, t) { return a + t.secs; }, 0);
-var main = ts.length <= 3 ? ts.map(function (t) { return (t.name || STR.defName) + ' ' + fmt(t.secs); }).join(' → ') : L.n(ts.length, fmt(one));
-var rep = state.repeat === Infinity ? ' × ∞' : state.repeat > 1 ? ' × ' + state.repeat : '';
-sum.textContent = main + rep;
-btn.title = main + rep;
-}
-var open = false;
-try { open = localStorage.getItem(KEY) === '1'; } catch (e) {}
-function paint() {
-setup.classList.toggle('collapsed', !open);
-document.body.classList.toggle('setup-closed', !open);
-btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-btn.setAttribute('aria-label', (open ? L.close : L.open) + '（' + sum.textContent + '）');
-}
-btn.addEventListener('click', function () {
-open = !open;
-try { localStorage.setItem(KEY, open ? '1' : '0'); } catch (e) {}
-paint();
-try { if (window.gtag) gtag('event', 'setup_toggle', { open: open ? 1 : 0 }); } catch (e) {}
-if (open) { var first = document.querySelector('#timer-list .name-input, #timer-list button'); if (first && window.matchMedia('(min-width: 900px)').matches) first.focus({ preventScroll: true }); }
-});
-summary(); paint();
-/* 編集・並べ替え・くり返し変更のたびに要約を更新（どれも persist / updateTotal を通る） */
-var _ut = updateTotal, _ps = persist;
-updateTotal = function () { _ut(); summary(); paint(); };
-persist = function () { _ps(); summary(); paint(); };
 })();

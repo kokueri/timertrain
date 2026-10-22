@@ -1,5 +1,4 @@
 'use strict';
-  var BRAND = window.DT ? window.DT.brand : 'TimerTrain'; // DonutTimer では donut.js が先に読み込まれる
 /* TimerTrain アカウントページ
  * - 認証は Supabase Auth（Google, PKCE）。パスワードは扱わない
  * - ブラウザに置くのは公開キーだけ。データは RLS で本人の行しか読めない
@@ -9,18 +8,16 @@
 (function () {
   var SB_URL = 'https://arsfocfjfwtlykfdkiea.supabase.co';
   var SB_KEY = 'sb_publishable_zw039kyiXe27oY4ITTcNnA_-B_FsG5H';
-  var GA_ID = window.DT ? '' : 'G-GSFVNEDCGN'; // DonutTimer の計測は別プロパティを作ってから
+  var GA_ID = 'G-GSFVNEDCGN';
 
   /* ---------- GA（インラインscriptを使わないためここで設定） ---------- */
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () { window.dataLayer.push(arguments); };
   gtag('js', new Date());
-  if (GA_ID) {
   gtag('config', GA_ID);
   var ga = document.createElement('script');
   ga.async = true; ga.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
   document.head.appendChild(ga);
-  }
   function ev(name, p) { try { gtag('event', name, p || {}); } catch (e) {} }
 
   /* ---------- 言語 ---------- */
@@ -38,19 +35,7 @@
   var T = {
     ja: {
       title: 'アカウント', back: 'タイマーに戻る',
-      leadOut: 'タイマーはこれまでどおり、ログインしなくても無料で使えます。Googleで無料ログインすると、次のことができるようになります。',
-      perksTitle: '無料ログインでできること',
-      perks: [
-        ['マイタイマー', '「勉強」「HIIT」など、よく使う編成に名前を付けて保存。ワンタップで呼び出せます'],
-        ['スマホとPCで同じ設定', '同じGoogleアカウントでログインすれば、PCで保存したマイタイマーをスマホでもそのまま使えます。「最近の編成」とライト／ダークの設定も、どちらの端末にも反映されます'],
-        ['7日間の利用記録', 'タイマーを動かした時間を自動で記録。合計時間・回数・日ごとのグラフで振り返れます（一時停止中は数えません）'],
-        ['連続日数', '何日続けて使っているかが分かります'],
-        ['いつでも退会', 'アカウントと保存したデータは、このページからいつでも削除できます']
-      ],
-      myTitle: 'マイタイマー', myEmpty: 'まだ保存したタイマーはありません。タイマーの画面で「今の編成を保存」を押すと、ここに並びます。',
-      start: 'スタート', data: 'データ', soon: '近日公開',
-      myNote: '「データ」では、マイタイマーごとの利用時間を見られるようにする予定です（準備中）。',
-      sum: function (n, t, r) { return 'タイマー' + n + 'つ・1周 ' + t + (r === 'inf' ? '・くり返し∞' : '・' + r + '周'); },
+      leadOut: '無料でログインすると、名前を付けたマイタイマーの保存、スマホとPCの同期、直近7日間の利用記録が使えます。タイマーはこれまでどおりログインなしでも無料で使えます。',
       google: 'Google でログイン',
       agree1: 'ログインすると、', agreeP: 'プライバシーポリシー', agreeAnd: 'と', agreeT: '利用規約', agree2: 'に同意したものとみなします。',
       signedIn: 'ログイン中', logout: 'ログアウト',
@@ -70,26 +55,14 @@
     },
     en: {
       title: 'Account', back: 'Back to the timer',
-      leadOut: 'The timer stays free to use without an account. Sign in with Google for free and you also get:',
-      perksTitle: 'What a free account adds',
-      perks: [
-        ['My timers', 'Save setups you use often, like "Study" or "HIIT", under a name and open them in one tap'],
-        ['Same setups on phone and computer', 'Sign in with the same Google account and the timers you saved on your computer are ready on your phone too. Recent setups and the light/dark theme follow you as well'],
-        ['7-day history', 'The time your timer runs is logged automatically: total time, sessions and a daily chart (paused time is not counted)'],
-        ['Streaks', 'See how many days in a row you have used it'],
-        ['Leave any time', 'Delete your account and everything you saved from this page whenever you like']
-      ],
-      myTitle: 'My timers', myEmpty: 'No saved timers yet. On the timer screen, press "Save current setup" and they will appear here.',
-      start: 'Start', data: 'Data', soon: 'Coming soon',
-      myNote: '"Data" will show how much you used each saved timer (in preparation).',
-      sum: function (n, t, r) { return n + (n === 1 ? ' timer' : ' timers') + ' · ' + t + ' per round' + (r === 'inf' ? ' · repeats ∞' : ' · ' + r + (r === '1' ? ' round' : ' rounds')); },
+      leadOut: 'Sign in for free to save named timers, sync them between your phone and computer, and see your last 7 days of usage. The timer stays free to use without an account.',
       google: 'Sign in with Google',
       agree1: 'By signing in, you agree to our ', agreeP: 'Privacy Policy', agreeAnd: ' and ', agreeT: 'Terms of Use', agree2: '.',
       signedIn: 'Signed in', logout: 'Sign out',
       dangerTitle: 'Delete account', dangerLead: 'This deletes your account and all saved timers and history. It cannot be undone.',
       dangerOpen: 'Delete my account', dangerType: 'Type DELETE to confirm', dangerWord: 'DELETE',
       dangerGo: 'Delete permanently', cancel: 'Cancel',
-      deleted: 'Your account has been deleted. Thank you for using ' + BRAND + '.',
+      deleted: 'Your account has been deleted. Thank you for using TimerTrain.',
       loading: 'Loading…', errLogin: 'Could not sign in. Please try again later.',
       errDelete: 'Could not delete your account. Please try again later or contact us.',
       errConfig: 'Failed to load settings.',
@@ -102,26 +75,14 @@
     },
     es: {
       title: 'Cuenta', back: 'Volver al temporizador',
-      leadOut: 'El temporizador sigue siendo gratis sin cuenta. Si inicias sesión gratis con Google, además puedes:',
-      perksTitle: 'Lo que añade una cuenta gratis',
-      perks: [
-        ['Mis temporizadores', 'Guarda con nombre las configuraciones que más usas, como «Estudio» o «HIIT», y ábrelas con un toque'],
-        ['Lo mismo en el móvil y el ordenador', 'Con la misma cuenta de Google, los temporizadores que guardes en el ordenador estarán listos en el móvil. Las configuraciones recientes y el tema claro/oscuro también se sincronizan'],
-        ['Historial de 7 días', 'Se registra automáticamente el tiempo de uso: tiempo total, sesiones y un gráfico por día (las pausas no cuentan)'],
-        ['Rachas', 'Mira cuántos días seguidos lo has usado'],
-        ['Baja cuando quieras', 'Puedes eliminar tu cuenta y todo lo guardado desde esta página en cualquier momento']
-      ],
-      myTitle: 'Mis temporizadores', myEmpty: 'Aún no hay temporizadores guardados. En la pantalla del temporizador, pulsa «Guardar configuración actual» y aparecerán aquí.',
-      start: 'Empezar', data: 'Datos', soon: 'Próximamente',
-      myNote: 'En «Datos» podrás ver cuánto has usado cada temporizador guardado (en preparación).',
-      sum: function (n, t, r) { return n + (n === 1 ? ' temporizador' : ' temporizadores') + ' · ' + t + ' por ronda' + (r === 'inf' ? ' · repetir ∞' : ' · ' + r + (r === '1' ? ' ronda' : ' rondas')); },
+      leadOut: 'Inicia sesión gratis para guardar temporizadores con nombre, sincronizarlos entre el móvil y el ordenador y ver tu uso de los últimos 7 días. El temporizador sigue siendo gratis sin cuenta.',
       google: 'Iniciar sesión con Google',
       agree1: 'Al iniciar sesión, aceptas nuestra ', agreeP: 'Política de privacidad', agreeAnd: ' y los ', agreeT: 'Términos de uso', agree2: '.',
       signedIn: 'Sesión iniciada', logout: 'Cerrar sesión',
       dangerTitle: 'Eliminar cuenta', dangerLead: 'Se eliminarán tu cuenta y todos tus temporizadores e historial. No se puede deshacer.',
       dangerOpen: 'Eliminar mi cuenta', dangerType: 'Escribe ELIMINAR para confirmar', dangerWord: 'ELIMINAR',
       dangerGo: 'Eliminar definitivamente', cancel: 'Cancelar',
-      deleted: 'Tu cuenta se ha eliminado. Gracias por usar ' + BRAND + '.',
+      deleted: 'Tu cuenta se ha eliminado. Gracias por usar TimerTrain.',
       loading: 'Cargando…', errLogin: 'No se pudo iniciar sesión. Inténtalo más tarde.',
       errDelete: 'No se pudo eliminar la cuenta. Inténtalo más tarde o contáctanos.',
       errConfig: 'No se pudo cargar la configuración.',
@@ -149,7 +110,7 @@
   function show(nodes) { root.textContent = ''; nodes.forEach(function (n) { root.appendChild(n); }); }
   function msg(text, cls) { return el('p', { cls: 'acct-msg ' + (cls || ''), role: 'status', text: text }); }
 
-  document.title = T.title + ' - ' + BRAND;
+  document.title = T.title + ' - TimerTrain';
   document.getElementById('acct-title').textContent = T.title;
   var logo = document.getElementById('acct-logo'); logo.href = HOME;
   var back = document.getElementById('acct-back'); back.href = HOME; back.textContent = T.back;
@@ -184,13 +145,6 @@
   function signedOutNodes(btn) {
     return [
       el('p', { cls: 'acct-lead', text: T.leadOut }),
-      el('section', { cls: 'acct-perks', 'aria-label': T.perksTitle }, [
-        el('h2', { text: T.perksTitle }),
-        el('ul', { cls: 'acct-checklist' }, T.perks.map(function (p) {
-          return el('li', null, [el('span', { cls: 'acct-check', 'aria-hidden': 'true', text: '✓' }),
-            el('div', null, [el('p', { cls: 'acct-perk-t', text: p[0] }), el('p', { cls: 'acct-perk-d', text: p[1] })])]);
-        }))
-      ]),
       btn,
       el('p', { cls: 'acct-small' }, [
         T.agree1, el('a', { href: PRIV, text: T.agreeP }), T.agreeAnd,
@@ -249,51 +203,8 @@
     });
 
     var usage = el('section', { cls: 'acct-usage', 'aria-label': T.usageTitle }, [el('h2', { text: T.usageTitle }), msg(T.loading)]);
-    var mine = el('section', { cls: 'acct-usage acct-my', 'aria-label': T.myTitle }, [el('h2', { text: T.myTitle }), msg(T.loading)]);
-    show([who, mine, usage, el('div', { cls: 'acct-row' }, [out]), danger]);
-    loadMine(mine);
+    show([who, usage, el('div', { cls: 'acct-row' }, [out]), danger]);
     loadUsage(usage);
-  }
-
-  /* ---------- マイタイマーの一覧（スタート＝そのページで開く、データ＝準備中） ---------- */
-  var Q_RE = /^\?t=[A-Za-z0-9.,%_\-~!*'()]{1,7000}&r=(?:inf|\d{1,2})$/;
-  var PAGE_RE = /^\/[a-z0-9-]{0,40}$/;
-  function fmtClock(sec) {
-    var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60, p = function (n) { return (n < 10 ? '0' : '') + n; };
-    return h ? h + ':' + p(m) + ':' + p(s) : p(m) + ':' + p(s);
-  }
-  function summary(q) {
-    var mt = q.match(/^\?t=([^&]*)&r=(inf|\d{1,2})$/);
-    if (!mt) return '';
-    var items = mt[1].split(','), secs = 0;
-    items.forEach(function (it) { var a = it.split('.'); secs += Math.max(0, parseInt(a[1], 10) || 0); });
-    return T.sum(items.length, fmtClock(secs), mt[2]);
-  }
-  async function loadMine(box) {
-    var r = await sb.from('timers').select('id,name,config,updated_at').eq('product', 'timertrain')
-      .order('updated_at', { ascending: false }).limit(100);
-    box.textContent = '';
-    box.appendChild(el('h2', { text: T.myTitle }));
-    if (r.error) { box.appendChild(msg(T.errLogin, 'err')); return; }
-    var rows = (r.data || []).filter(function (x) { return x.config && typeof x.config.q === 'string' && Q_RE.test(x.config.q); });
-    if (!rows.length) { box.appendChild(el('p', { cls: 'acct-small', text: T.myEmpty })); }
-    else {
-      var ul = el('ul', { cls: 'acct-mylist' });
-      rows.forEach(function (x) {
-        var page = (typeof x.config.page === 'string' && PAGE_RE.test(x.config.page)) ? x.config.page : HOME;
-        var go = el('a', { cls: 'acct-btn acct-btn-sm acct-btn-primary', href: page + x.config.q, text: T.start });
-        go.addEventListener('click', function () { ev('mytimer_start_from_account'); });
-        var data = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm', disabled: 'disabled', title: T.soon }, [
-          T.data, el('span', { cls: 'acct-soon', text: T.soon })
-        ]);
-        ul.appendChild(el('li', null, [
-          el('div', { cls: 'acct-my-info' }, [el('p', { cls: 'acct-my-name', text: x.name || '' }), el('p', { cls: 'acct-my-sum', text: summary(x.config.q) })]),
-          el('div', { cls: 'acct-my-actions' }, [go, data])
-        ]));
-      });
-      box.appendChild(ul);
-    }
-    box.appendChild(el('p', { cls: 'acct-small', text: T.myNote }));
   }
 
   /* ---------- 直近7日の利用記録 ---------- */
