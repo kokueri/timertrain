@@ -571,3 +571,79 @@ flex-shrink: 0; height: 36px; padding: 0 28px 0 10px; border-radius: 10px; borde
 background: var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%238E8E93' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 6px center / 18px;
 box-shadow: var(--shadow); color: var(--text); font: inherit; font-size: 14px; -webkit-appearance: none; appearance: none;
 }
+
+/* ---- アカウント: できることのチェックリスト・マイタイマー一覧（2026-10-21） ---- */
+.acct-perks { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px 18px; }
+.acct-perks h2 { font-size: 15px; margin-bottom: 10px; }
+.acct-checklist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.acct-checklist li { display: flex; gap: 10px; align-items: flex-start; }
+.acct-check { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: #34C759; color: #fff; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; margin-top: 1px; }
+.acct-perk-t { font-size: 15px; font-weight: 600; }
+.acct-perk-d { font-size: 13px; line-height: 1.6; color: var(--text2); margin-top: 2px; }
+.acct-mylist { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+.acct-mylist li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); flex-wrap: wrap; }
+.acct-mylist li:first-child { border-top: 0; padding-top: 0; }
+.acct-my-info { min-width: 0; flex: 1 1 160px; }
+.acct-my-name { font-size: 15px; font-weight: 600; word-break: break-word; }
+.acct-my-sum { font-size: 12px; color: var(--text2); margin-top: 2px; font-variant-numeric: tabular-nums; }
+.acct-my-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.acct-btn-sm { min-height: 38px; padding: 0 14px; font-size: 14px; gap: 6px; text-decoration: none; }
+.acct-btn-primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.acct-soon { font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 999px; background: var(--line); color: var(--text2); white-space: nowrap; }
+
+/* ---- 設定のたたみ（初期は閉じる。PC: 右に収納 / スマホ: 上下に開閉） ---- */
+.setup-toggle {
+display: flex; align-items: center; gap: 12px; width: 100%;
+margin: 0 0 14px; padding: 12px 14px; border-radius: 16px;
+background: var(--card); box-shadow: var(--shadow); border: 1.5px solid var(--line);
+color: var(--text); text-align: left; font: inherit; cursor: pointer;
+}
+.setup-toggle .st-ic svg { width: 20px; height: 20px; fill: var(--text2); display: block; }
+.setup-toggle .st-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.setup-toggle .st-title { font-size: 14px; font-weight: 600; }
+.setup-toggle .st-sum { font-size: 12.5px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
+.setup-toggle .st-short { display: none; }
+.setup-toggle .st-chev svg { width: 22px; height: 22px; fill: var(--text2); display: block; transition: transform .2s; }
+.setup-toggle[aria-expanded="true"] .st-chev svg { transform: rotate(180deg); }
+.setup-toggle[aria-expanded="true"] .st-sum { display: none; }
+#setup.collapsed > :not(.setup-toggle):not(.tt-my) { display: none; }
+/* 閉じている時もマイタイマーだけは出す（呼び出し専用の1行。保存・削除は開いた時） */
+#setup.collapsed > .tt-my { display: flex; align-items: center; gap: 12px; margin-top: 0; padding: 10px 14px; }
+#setup.collapsed > .tt-my:not(:has(.tt-my-item)) { display: none; }
+#setup.collapsed .tt-my-head { flex: none; }
+#setup.collapsed .tt-my-title { font-size: 13px; color: var(--text2); font-weight: 600; }
+#setup.collapsed .tt-my-save, #setup.collapsed .tt-my-form, #setup.collapsed .tt-my-x,
+#setup.collapsed .tt-my-yes, #setup.collapsed .tt-my-no, #setup.collapsed .tt-my-note { display: none; }
+#setup.collapsed .tt-my-list { flex: 1; min-width: 0; margin-top: 0; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }
+#setup.collapsed .tt-my-list::-webkit-scrollbar { display: none; }
+#setup.collapsed .tt-my-item { flex: none; }
+body.focus-mode .setup-toggle { display: none; }
+
+@media (min-width: 900px) {
+.app { transition: grid-template-columns .25s ease, column-gap .25s ease; }
+body.setup-closed .app { grid-template-columns: minmax(0, 1fr) 64px; column-gap: 24px; }
+/* 開いている時: 見出しの帯（右向きの矢印＝右へしまう） */
+.setup-toggle { padding: 10px 14px; }
+.setup-toggle[aria-expanded="true"] .st-chev svg { transform: rotate(-90deg); }
+/* 閉じている時: 右端の縦長タブ */
+#setup.collapsed { padding-top: 4px; }
+#setup.collapsed .setup-toggle {
+flex-direction: column; gap: 10px; width: 64px; padding: 16px 0 14px;
+align-items: center; text-align: center;
+}
+#setup.collapsed .st-txt { flex: none; }
+#setup.collapsed .st-title { display: none; }
+#setup.collapsed .st-short { display: block; font-size: 12px; font-weight: 600; }
+#setup.collapsed .st-sum { display: none; }
+#setup.collapsed .st-chev svg { transform: rotate(90deg); }
+/* マイタイマーがある時は、閉じても 200px の細い列（設定の帯＋マイタイマーを縦に） */
+body.setup-closed .app:has(#tt-my .tt-my-item) { grid-template-columns: minmax(0, 1fr) 210px; column-gap: 40px; }
+#setup.collapsed:has(.tt-my-item) .setup-toggle { flex-direction: row; width: 100%; padding: 10px 12px; gap: 10px; }
+#setup.collapsed:has(.tt-my-item) .st-txt { flex: 1; }
+#setup.collapsed:has(.tt-my-item) .st-short { display: block; font-size: 14px; text-align: left; }
+#setup.collapsed > .tt-my { flex-direction: column; align-items: stretch; gap: 8px; padding: 14px; }
+#setup.collapsed .tt-my-list { flex-direction: column; overflow: visible; gap: 6px; }
+#setup.collapsed .tt-my-item { display: flex; }
+#setup.collapsed .tt-my-chip { flex: 1; min-width: 0; display: block; max-width: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.setup-toggle:hover { border-color: var(--text2); }
+}
