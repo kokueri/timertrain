@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Temporizador Pomodoro online gratis｜25 min de trabajo + 5 de descanso - TimerTrain</title>
+<meta name="description" content="Temporizador Pomodoro gratis: 25 minutos de concentración y 5 de descanso que se repiten solos, con aviso sonoro en cada cambio. Cambia los tiempos y las rondas, y guarda tu configuración con un enlace. Sin instalar.">
+<link rel="canonical" href="https://timertrain.com/es-pomodoro">
+<link rel="alternate" hreflang="ja" href="https://timertrain.com/pomodoro">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/en-pomodoro">
+<link rel="alternate" hreflang="es" href="https://timertrain.com/es-pomodoro">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en-pomodoro">
+<meta property="og:title" content="Temporizador Pomodoro (25 + 5) - TimerTrain">
+<meta property="og:description" content="25 minutos de trabajo y 5 de descanso que se repiten solos. Gratis y sin instalar.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/es-pomodoro">
+<meta property="og:image" content="https://timertrain.com/ogp-en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://timertrain.com/ogp-en.png">
+<meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest-es.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script type="application/ld+json">
+{
+"@context": "https://schema.org",
+"@type": "WebApplication",
+"name": "TimerTrain",
+"url": "https://timertrain.com/es",
+"applicationCategory": "UtilityApplication",
+"operatingSystem": "Any",
+"offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+"description": "Temporizador online gratis, secuencial y múltiple. Encadena temporizadores, repítelos y comparte tu configuración con una URL."
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "¿Puedo cambiar los 25 minutos?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Sí. Toca el tiempo para editarlo; por ejemplo, 50 minutos de trabajo y 10 de descanso."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "¿Funciona si cambio de pestaña?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Sí. El tiempo restante se calcula con el reloj, así que no se atrasa en segundo plano, y suena un aviso en cada cambio."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "¿Necesito registrarme?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "No. Es gratis, sin registro ni instalación. También puedes añadirlo a la pantalla de inicio. Si quieres, puedes iniciar sesión gratis con Google para guardar temporizadores con nombre, sincronizarlos entre dispositivos y ver tu tiempo de los últimos 7 días."
+   }
+  }
+ ]
+}
+</script>
+<link rel="stylesheet" href="/style.css?v=21">
+</head>
+<body>
+
+<main class="app">
+<header class="header">
+<a class="logo" href="/es">TimerTrain</a>
+<h1 class="tagline page-title">Temporizador Pomodoro (25 min + 5 min)</h1>
+<nav class="nav" aria-label="Temporizadores por uso">
+<a href="/es-pomodoro" aria-current="page">Pomodoro</a>
+<a href="/es-intervalos">Intervalos</a>
+<a href="/es-tabata">Tabata</a>
+<a href="/es?t=red.40.Trabajo,blue.20.Descanso&r=8">HIIT</a>
+<a href="/es?t=red.3000.Estudio,blue.600.Descanso&r=4">Estudio</a>
+<a href="/es?t=orange.300.Temporizador&r=1">Cocina</a>
+</nav>
+</header>
+
+<!-- Temporizador (siempre visible) -->
+<section id="run" class="run-inline" aria-label="Temporizador">
+<p id="run-cycle" class="run-cycle"></p>
+<div class="ring-wrap">
+<svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+<circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+<circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+</svg>
+<div class="ring-inner">
+<p id="run-name" class="run-name"></p>
+<p id="run-time" class="run-time">00:00</p>
+</div>
+</div>
+<div id="stations" class="stations" aria-hidden="true"></div>
+<div class="run-controls">
+<button id="reset-btn" type="button" aria-label="Reiniciar"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+<button id="pause-btn" type="button" aria-label="Iniciar / pausar"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+<button id="skip-btn" type="button" aria-label="Saltar"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+</div>
+</section>
+
+<!-- Configuración -->
+<section id="setup" aria-label="Configuración del temporizador">
+<ul id="timer-list" class="timer-list"></ul>
+
+<button id="add-btn" class="add-btn" type="button">＋ Añadir temporizador</button>
+
+<div class="repeat-row">
+<span class="repeat-label">Repetir</span>
+<div class="repeat-ctrl">
+<button id="rep-minus" type="button" aria-label="Menos repeticiones">−</button>
+<span id="rep-count">×4</span>
+<button id="rep-plus" type="button" aria-label="Más repeticiones">＋</button>
+<button id="rep-inf" type="button" aria-label="Repetir siempre">∞</button>
+</div>
+</div>
+
+<div class="total-row"><span id="total-label"></span></div>
+
+<div class="action-row">
+<button id="share-btn" class="share-btn wide" type="button">Compartir enlace</button>
+</div>
+</section>
+
+<div id="toast" class="toast" role="status"></div>
+
+<!-- Texto SEO -->
+<article class="about">
+<h2>¿Qué es la técnica Pomodoro?</h2>
+<p>La técnica Pomodoro divide el trabajo en bloques de 25 minutos de concentración seguidos de 5 minutos de descanso. Tras cuatro bloques se hace una pausa más larga. Trabajar con un final a la vista ayuda a empezar las tareas que da pereza abrir y a no agotarse en sesiones largas.</p>
+<h2>Cómo usar este temporizador</h2>
+<p>Esta página ya trae 25 minutos de trabajo y 5 de descanso, repetidos 4 veces. Pulsa iniciar y TimerTrain pasará solo del trabajo al descanso y de vuelta, con un sonido en cada cambio. Toca un tiempo para cambiarlo y usa ＋/− para elegir las rondas.</p>
+<h2>Variantes populares</h2>
+<p>Si 25 minutos se te quedan cortos, prueba 50 minutos de trabajo y 10 de descanso. Para tareas pequeñas o días de poca energía, 15 + 3 también funciona. Puedes añadir un tercer temporizador al final de la serie para la pausa larga.</p>
+<h2>Guarda y comparte tu configuración</h2>
+<p>Toda la configuración queda en la URL. Copia el enlace con el botón de compartir y guárdalo en favoritos, o envíalo a tus compañeros de estudio para que usen exactamente los mismos tiempos.</p>
+<h2>Registra tu tiempo de concentración</h2>
+<p>Si inicias sesión gratis con Google, el tiempo que funciona el temporizador se registra automáticamente. En tu <a href="/account?l=es">página de cuenta</a> verás los últimos 7 días: tiempo total, sesiones y sesiones completadas, con un gráfico por día. Las pausas no cuentan, así que ves cuánto te concentraste de verdad. También puedes guardar tu configuración como temporizador con nombre y usarla en el móvil y en el ordenador. Iniciar sesión es opcional; el temporizador sigue siendo gratis sin cuenta.</p>
+<h2>Preguntas frecuentes</h2>
+<p style="margin-top:10px"><strong>¿Puedo cambiar los 25 minutos?</strong><br>Sí. Toca el tiempo para editarlo; por ejemplo, 50 minutos de trabajo y 10 de descanso.</p>
+<p style="margin-top:10px"><strong>¿Funciona si cambio de pestaña?</strong><br>Sí. El tiempo restante se calcula con el reloj, así que no se atrasa en segundo plano, y suena un aviso en cada cambio.</p>
+<p style="margin-top:10px"><strong>¿Necesito registrarme?</strong><br>No. Es gratis, sin registro ni instalación. También puedes añadirlo a la pantalla de inicio. Si quieres, puedes iniciar sesión gratis con Google para guardar temporizadores con nombre, sincronizarlos entre dispositivos y ver tu tiempo de los últimos 7 días.</p>
+<h2>Otros temporizadores</h2>
+<p><a href="/es-intervalos">Temporizador de intervalos</a> · <a href="/es-tabata">Temporizador Tabata</a> · <a href="/es?t=red.40.Trabajo,blue.20.Descanso&r=8">Temporizador HIIT</a> · <a href="/es?t=red.3000.Estudio,blue.600.Descanso&r=4">Temporizador de estudio</a> · <a href="/es?t=orange.300.Temporizador&r=1">Temporizador de cocina</a> · <a href="/es">Crea tu propio temporizador</a></p>
+</article>
+
+<footer class="footer">© 2026 TimerTrain · <a href="/pomodoro" class="lang-link">日本語</a> · <a href="/en-pomodoro" class="lang-link">English</a> · <a href="/es-privacy">Privacidad</a> · <a href="/es-terms">Términos</a> · <a href="/es-about">Acerca de</a></footer>
+</main>
+
+<script>window.TT_PRESET = {"timers": [{"name": "Trabajo", "secs": 1500, "color": "red"}, {"name": "Descanso", "secs": 300, "color": "blue"}], "repeat": 4};</script>
+<script src="/app.js?v=19"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</body>
+</html>

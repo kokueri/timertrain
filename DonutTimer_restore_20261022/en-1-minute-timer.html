@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>1 Minute Timer — Free Online Countdown with Alarm | TimerTrain</title>
+<meta name="description" content="A free 1-minute timer online. Press start for a big countdown and an alarm at zero. Perfect for planks, quick drills, brushing teeth and fast focus bursts. No install, no signup.">
+<link rel="canonical" href="https://timertrain.com/en-1-minute-timer">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/en-1-minute-timer">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en-1-minute-timer">
+<meta property="og:title" content="1 Minute Timer — free online countdown with alarm - TimerTrain">
+<meta property="og:description" content="A free 1-minute timer online. Big countdown, alarm at zero. Great for planks, quick drills and fast focus bursts.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/en-1-minute-timer">
+<meta property="og:image" content="https://timertrain.com/ogp-en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://timertrain.com/ogp-en.png">
+<meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest-en.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script type="application/ld+json">
+{
+"@context": "https://schema.org",
+"@type": "WebApplication",
+"name": "TimerTrain",
+"url": "https://timertrain.com/en-1-minute-timer",
+"applicationCategory": "UtilityApplication",
+"operatingSystem": "Any",
+"offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+"description": "A free online 1-minute timer with a full-screen countdown and an alarm. Chain more timers and share your setup with a URL."
+}
+</script>
+<script type="application/ld+json">
+{
+"@context": "https://schema.org",
+"@type": "FAQPage",
+"mainEntity": [
+{ "@type": "Question", "name": "Does the 1 minute timer have an alarm?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. It beeps in the final seconds and plays an alarm at zero, with a finish screen. You can keep it muted and still see the on-screen alert." } },
+{ "@type": "Question", "name": "Do I need to install anything?", "acceptedAnswer": { "@type": "Answer", "text": "No. It runs in your browser on phone, tablet and desktop with no install and no signup." } },
+{ "@type": "Question", "name": "Can I change one minute to another length?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Tap the time to edit it, or add more timers to build a sequence, then copy the URL to save or share it." } }
+]
+}
+</script>
+<link rel="stylesheet" href="/style.css?v=21">
+</head>
+<body>
+
+<main class="app">
+<header class="header">
+<a class="logo" href="/en">TimerTrain</a>
+<h1 class="tagline page-title">1 Minute Timer</h1>
+<nav class="nav" aria-label="Timer presets">
+<a href="/en-pomodoro">Pomodoro</a>
+<a href="/en-interval-timer">Interval</a>
+<a href="/en-tabata">Tabata</a>
+<a href="/en-hiit">HIIT</a>
+<a href="/en-study">Study</a>
+<a href="/en-kitchen">Kitchen</a>
+</nav>
+</header>
+
+<section id="run" class="run-inline" aria-label="Timer">
+<p id="run-cycle" class="run-cycle"></p>
+<div class="ring-wrap">
+<svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+<circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+<circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+</svg>
+<div class="ring-inner">
+<p id="run-name" class="run-name"></p>
+<p id="run-time" class="run-time">00:00</p>
+</div>
+</div>
+<div id="stations" class="stations" aria-hidden="true"></div>
+<div class="run-controls">
+<button id="reset-btn" type="button" aria-label="Reset"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+<button id="pause-btn" type="button" aria-label="Start / pause"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+<button id="skip-btn" type="button" aria-label="Skip"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+</div>
+</section>
+
+<section id="setup" aria-label="Timer setup">
+<ul id="timer-list" class="timer-list"></ul>
+
+<button id="add-btn" class="add-btn" type="button">＋ Add timer</button>
+
+<div class="repeat-row">
+<span class="repeat-label">Repeat</span>
+<div class="repeat-ctrl">
+<button id="rep-minus" type="button" aria-label="Fewer repeats">−</button>
+<span id="rep-count">×1</span>
+<button id="rep-plus" type="button" aria-label="More repeats">＋</button>
+<button id="rep-inf" type="button" aria-label="Repeat forever">∞</button>
+</div>
+</div>
+
+<div class="total-row"><span id="total-label"></span></div>
+
+<div class="action-row">
+<button id="share-btn" class="share-btn wide" type="button">Share link</button>
+</div>
+</section>
+
+<div id="toast" class="toast" role="status"></div>
+
+<article class="about">
+<h2>A quick 1 minute timer</h2>
+<p>This is a free 1-minute timer that runs right in your browser. Press Start and a big countdown fills the screen, with an alarm the moment the minute is up. Nothing to install, no sign-up — it works the same on your phone, tablet or computer.</p>
+<h2>What a 1 minute timer is good for</h2>
+<p>One minute is the perfect length for anything you want to do intensely and then stop: holding a plank, a set of push-ups or a wall-sit, brushing your teeth properly, a minute of slow breathing, a quick tidy of one surface, a kid's turn at a game, or rehearsing an elevator pitch. It is also a great anti-procrastination trick — promise yourself just one minute on a task, and starting becomes easy.</p>
+<h2>How to use it</h2>
+<p>Press play to start the 60-second countdown; press again to pause, or reset to start over. Want a different length or a repeating round? Tap the time to type any minutes and seconds, or press "Add timer" to line up several — say 1 minute on, 30 seconds off — and set them to repeat. Copy the URL to save or share your setup.</p>
+<h2>Timers by length</h2>
+<p><a href="/en-1-minute-timer">1 minute</a> · <a href="/en-5-minute-timer">5 minutes</a> · <a href="/en-10-minute-timer">10 minutes</a> · <a href="/en-25-minute-timer">25 minutes</a> · <a href="/en-pomodoro">Pomodoro (25+5)</a> · <a href="/en-study">Study (50+10)</a></p>
+<h2>Need a different timer?</h2>
+<p>Chain the 1-minute timer into a repeating interval, or build a longer sequence — TimerTrain is made for running multiple timers in a row. Try the <a href="/en-interval-timer">interval timer</a>, the <a href="/en-tabata">Tabata timer</a>, or <a href="/en">build your own timer</a>.</p>
+</article>
+
+<footer class="footer">© 2026 TimerTrain · <a href="/" class="lang-link">日本語</a> · <a href="/es" class="lang-link">Español</a> · <a href="/en-privacy">Privacy</a> · <a href="/en-terms">Terms</a> · <a href="/en-about">About</a></footer>
+</main>
+
+<script>window.TT_PRESET = {"timers": [{"name": "1 minute", "secs": 60, "color": "red"}], "repeat": 1};</script>
+<script src="/app.js?v=19"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- 試作中（donutブランチ）。公開前に検索エンジン向けの設定を見直す -->
+<meta name="robots" content="noindex, nofollow">
+<title>ポモドーロ50分＋10分休憩タイマー｜長めの集中を自動でくり返す - DonutTimer</title>
+<meta name="description" content="50分集中＋10分休憩を自動でくり返すポモドーロタイマー。25分だと短いと感じる勉強や作業向け。休憩に入る・戻るタイミングを音で知らせ、回数や時間も変更できます。無料・インストール不要。">
+<meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DonutTimer">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Titan+One&text=DonutTimer&display=swap">
+<link rel="stylesheet" href="/style.css?v=21">
+<link rel="stylesheet" href="/donut.css?v=3">
+</head>
+<body>
+
+<main class="app">
+  <header class="header">
+    <a class="logo" href="/">DonutTimer</a>
+    <h1 class="tagline page-title">ポモドーロタイマー（50分＋10分休憩）</h1>
+    <nav class="nav" aria-label="用途別タイマー">
+      <a href="/pomodoro">ポモドーロ</a>
+      <a href="/interval-timer">インターバル</a>
+      <a href="/tabata">タバタ</a>
+      <a href="/hiit">HIIT</a>
+      <a href="/study">勉強</a>
+      <a href="/kitchen">キッチン</a>
+    </nav>
+  </header>
+
+  <!-- タイマー（常時表示） -->
+  <section id="run" class="run-inline" aria-label="タイマー">
+    <p id="run-cycle" class="run-cycle"></p>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+      </svg>
+      <div class="ring-inner">
+        <p id="run-name" class="run-name"></p>
+        <p id="run-time" class="run-time">00:00</p>
+      </div>
+    </div>
+    <div id="stations" class="stations" aria-hidden="true"></div>
+    <div class="run-controls">
+      <button id="reset-btn" type="button" aria-label="リセット"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+      <button id="pause-btn" type="button" aria-label="開始・一時停止"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="skip-btn" type="button" aria-label="スキップ"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+    </div>
+  </section>
+
+  <!-- 設定（編成リスト） -->
+  <section id="setup" aria-label="タイマー設定">
+    <ul id="timer-list" class="timer-list"></ul>
+
+    <button id="add-btn" class="add-btn" type="button">＋ タイマーを追加</button>
+
+    <div class="repeat-row">
+      <span class="repeat-label">くり返し</span>
+      <div class="repeat-ctrl">
+        <button id="rep-minus" type="button" aria-label="くり返しを減らす">−</button>
+        <span id="rep-count">4回</span>
+        <button id="rep-plus" type="button" aria-label="くり返しを増やす">＋</button>
+        <button id="rep-inf" type="button" aria-label="無限にくり返す">∞</button>
+      </div>
+    </div>
+
+    <div class="total-row"><span id="total-label"></span></div>
+
+    <div class="action-row">
+      <button id="share-btn" class="share-btn wide" type="button">共有リンク</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <!-- SEO テキスト -->
+  <article class="about">
+    <h2>50分＋10分のポモドーロとは</h2>
+    <p>ポモドーロ・テクニックの基本は「25分集中＋5分休憩」ですが、問題演習や資料づくりのように、25分では乗ってきたところで止まってしまう作業もあります。そこで使われるのが「50分集中＋10分休憩」の長めの区切りです。1時間を1サイクルとして数えやすく、学校の授業や会議の長さにも近いのが特徴です。</p>
+    <h2>このタイマーの使い方</h2>
+    <p>このページには「集中50分＋休憩10分」が3セット（合計3時間）入っています。開始を押すと、休憩に入るときと集中に戻るときに音が鳴ります。時間をタップすれば45分＋15分などにも変えられ、くり返し回数も自由です。</p>
+    <h2>25分と50分、どちらがいい？</h2>
+    <p>取りかかりが重い日や、細かいタスクを片付けたい日は<a href="/pomodoro">25分＋5分</a>が向いています。ひとつの課題にじっくり取り組みたい日や、慣れて集中が続くようになってきたら50分＋10分を試してみてください。</p>
+    <h2>休憩10分の過ごし方</h2>
+    <p>立ち上がって体を伸ばす、水を飲む、目を閉じるなど、画面から離れるのがおすすめです。休憩中にSNSや動画を見始めると戻りにくくなるので、休憩もタイマーに任せて「鳴ったら戻る」を決めておくと続けやすくなります。</p>
+    <h2>よくある質問</h2>
+    <p style="margin-top:10px"><strong>50分＋10分は何セットがおすすめですか？</strong><br>3セット（約3時間）を目安にし、2〜3セットごとに20〜30分の長めの休憩を入れると疲れをためにくくなります。</p>
+    <p style="margin-top:10px"><strong>時間を変えられますか？</strong><br>時間をタップすると変更できます。45分＋15分や60分＋10分などにもできます。</p>
+    <p style="margin-top:10px"><strong>勉強記録は残りますか？</strong><br>今は記録機能はありません。設定はURLに入るので、ブックマークすれば次回も同じ設定で始められます。</p>
+    <h2>関連タイマー</h2>
+    <p><a href="/pomodoro">ポモドーロタイマー（25分＋5分）</a> · <a href="/study">勉強タイマー</a> · <a href="/repeat-timer">繰り返しタイマー</a> · <a href="/">タイマーを自由に作る</a></p>
+  </article>
+
+  <footer class="footer">© 2026 DonutTimer · <a href="/privacy">プライバシー</a> · <a href="/terms">利用規約</a> · <a href="/about">運営者情報</a></footer>
+</main>
+
+<script>window.TT_PRESET = {"timers": [{"name": "集中", "secs": 3000, "color": "red"}, {"name": "休憩", "secs": 600, "color": "blue"}], "repeat": 3};</script>
+<script src="/donut.js?v=3"></script>
+<script src="/app.js?v=19d"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</body>
+</html>

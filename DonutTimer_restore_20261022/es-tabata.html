@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Temporizador Tabata online gratis｜20 s de trabajo + 10 s de descanso × 8 - TimerTrain</title>
+<meta name="description" content="Temporizador Tabata gratis: 20 segundos a tope y 10 de descanso durante 8 rondas, con aviso sonoro para no mirar la pantalla. Cambia los segundos y las rondas, y comparte tu entrenamiento con un enlace. Sin instalar.">
+<link rel="canonical" href="https://timertrain.com/es-tabata">
+<link rel="alternate" hreflang="ja" href="https://timertrain.com/tabata">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/en-tabata">
+<link rel="alternate" hreflang="es" href="https://timertrain.com/es-tabata">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/en-tabata">
+<meta property="og:title" content="Temporizador Tabata (20 s + 10 s × 8) - TimerTrain">
+<meta property="og:description" content="20 segundos de trabajo y 10 de descanso × 8, con aviso sonoro. Gratis y sin instalar.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/es-tabata">
+<meta property="og:image" content="https://timertrain.com/ogp-en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://timertrain.com/ogp-en.png">
+<meta name="theme-color" content="#FFF9EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111113" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%9A%82%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest-es.webmanifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="TimerTrain">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<script type="application/ld+json">
+{
+"@context": "https://schema.org",
+"@type": "WebApplication",
+"name": "TimerTrain",
+"url": "https://timertrain.com/es",
+"applicationCategory": "UtilityApplication",
+"operatingSystem": "Any",
+"offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+"description": "Temporizador online gratis, secuencial y múltiple. Encadena temporizadores, repítelos y comparte tu configuración con una URL."
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "¿Puedo hacer más de 8 rondas?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Sí. Usa ＋ junto a «Repetir» para cambiar el número de rondas."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "¿Puedo cambiar 20 y 10 segundos?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Sí. Toca cada tiempo para editarlo, por ejemplo 30 s + 15 s."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "¿Es gratis?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Sí, es gratis, sin registro ni instalación."
+   }
+  }
+ ]
+}
+</script>
+<link rel="stylesheet" href="/style.css?v=21">
+</head>
+<body>
+
+<main class="app">
+<header class="header">
+<a class="logo" href="/es">TimerTrain</a>
+<h1 class="tagline page-title">Temporizador Tabata (20 s + 10 s × 8)</h1>
+<nav class="nav" aria-label="Temporizadores por uso">
+<a href="/es-pomodoro">Pomodoro</a>
+<a href="/es-intervalos">Intervalos</a>
+<a href="/es-tabata" aria-current="page">Tabata</a>
+<a href="/es?t=red.40.Trabajo,blue.20.Descanso&r=8">HIIT</a>
+<a href="/es?t=red.3000.Estudio,blue.600.Descanso&r=4">Estudio</a>
+<a href="/es?t=orange.300.Temporizador&r=1">Cocina</a>
+</nav>
+</header>
+
+<!-- Temporizador (siempre visible) -->
+<section id="run" class="run-inline" aria-label="Temporizador">
+<p id="run-cycle" class="run-cycle"></p>
+<div class="ring-wrap">
+<svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+<circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+<circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+</svg>
+<div class="ring-inner">
+<p id="run-name" class="run-name"></p>
+<p id="run-time" class="run-time">00:00</p>
+</div>
+</div>
+<div id="stations" class="stations" aria-hidden="true"></div>
+<div class="run-controls">
+<button id="reset-btn" type="button" aria-label="Reiniciar"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+<button id="pause-btn" type="button" aria-label="Iniciar / pausar"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+<button id="skip-btn" type="button" aria-label="Saltar"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+</div>
+</section>
+
+<!-- Configuración -->
+<section id="setup" aria-label="Configuración del temporizador">
+<ul id="timer-list" class="timer-list"></ul>
+
+<button id="add-btn" class="add-btn" type="button">＋ Añadir temporizador</button>
+
+<div class="repeat-row">
+<span class="repeat-label">Repetir</span>
+<div class="repeat-ctrl">
+<button id="rep-minus" type="button" aria-label="Menos repeticiones">−</button>
+<span id="rep-count">×4</span>
+<button id="rep-plus" type="button" aria-label="Más repeticiones">＋</button>
+<button id="rep-inf" type="button" aria-label="Repetir siempre">∞</button>
+</div>
+</div>
+
+<div class="total-row"><span id="total-label"></span></div>
+
+<div class="action-row">
+<button id="share-btn" class="share-btn wide" type="button">Compartir enlace</button>
+</div>
+</section>
+
+<div id="toast" class="toast" role="status"></div>
+
+<!-- Texto SEO -->
+<article class="about">
+<h2>¿Qué es el entrenamiento Tabata?</h2>
+<p>Tabata es un entrenamiento por intervalos de 4 minutos: 20 segundos de esfuerzo máximo y 10 de descanso, repetidos 8 veces. Proviene de las investigaciones del profesor Izumi Tabata en Japón y hoy se usa en todo el mundo por lo corto e intenso que es.</p>
+<h2>Cómo usar este temporizador</h2>
+<p>La página ya trae 20 segundos de trabajo y 10 de descanso × 8. Pulsa iniciar: suena una cuenta atrás en los últimos 3 segundos y un aviso en cada cambio, así que puedes entrenar sin mirar la pantalla. Añade un temporizador al principio si quieres incluir el calentamiento.</p>
+<h2>Ideas para tu Tabata</h2>
+<p>Elige uno o dos ejercicios y alterna: sentadillas, burpees, escaladores, saltos de tijera o flexiones. Si encadenas varios bloques Tabata, deja 1 minuto de descanso entre ellos.</p>
+<h2>Precauciones</h2>
+<p>Tabata se hace a máxima intensidad, así que calienta bien antes y escucha a tu cuerpo. Si estás empezando, reduce las rondas o el esfuerzo y ve aumentando con el tiempo.</p>
+<h2>Preguntas frecuentes</h2>
+<p style="margin-top:10px"><strong>¿Puedo hacer más de 8 rondas?</strong><br>Sí. Usa ＋ junto a «Repetir» para cambiar el número de rondas.</p>
+<p style="margin-top:10px"><strong>¿Puedo cambiar 20 y 10 segundos?</strong><br>Sí. Toca cada tiempo para editarlo, por ejemplo 30 s + 15 s.</p>
+<p style="margin-top:10px"><strong>¿Es gratis?</strong><br>Sí, es gratis, sin registro ni instalación.</p>
+<h2>Otros temporizadores</h2>
+<p><a href="/es-pomodoro">Temporizador Pomodoro</a> · <a href="/es-intervalos">Temporizador de intervalos</a> · <a href="/es?t=red.40.Trabajo,blue.20.Descanso&r=8">Temporizador HIIT</a> · <a href="/es?t=red.3000.Estudio,blue.600.Descanso&r=4">Temporizador de estudio</a> · <a href="/es?t=orange.300.Temporizador&r=1">Temporizador de cocina</a> · <a href="/es">Crea tu propio temporizador</a></p>
+</article>
+
+<footer class="footer">© 2026 TimerTrain · <a href="/tabata" class="lang-link">日本語</a> · <a href="/en-tabata" class="lang-link">English</a> · <a href="/es-privacy">Privacidad</a> · <a href="/es-terms">Términos</a> · <a href="/es-about">Acerca de</a></footer>
+</main>
+
+<script>window.TT_PRESET = {"timers": [{"name": "Trabajo", "secs": 20, "color": "orange"}, {"name": "Descanso", "secs": 10, "color": "teal"}], "repeat": 8};</script>
+<script src="/app.js?v=19"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</body>
+</html>
