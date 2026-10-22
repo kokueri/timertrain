@@ -35,7 +35,7 @@
   var HOME = { ja: '/', en: '/en', es: '/es' }[lang];
   // ドーナツ版から来た人は戻り先をドーナツ版に（Googleログインで行って戻っても同じタブなら覚えている）
   try { if (params.get('from') === 'donut') sessionStorage.setItem('tt-from', 'donut'); } catch (e) {}
-  try { if (lang === 'ja' && sessionStorage.getItem('tt-from') === 'donut') HOME = '/donut/'; } catch (e) {}
+  try { if (sessionStorage.getItem('tt-from') === 'donut') HOME = { ja: '/donut/', en: '/donut/en', es: '/donut/es' }[lang] || HOME; } catch (e) {}
   var PRIV = { ja: '/privacy', en: '/en-privacy', es: '/es-privacy' }[lang];
   var TERMS = { ja: '/terms', en: '/en-terms', es: '/es-terms' }[lang];
   var T = {
