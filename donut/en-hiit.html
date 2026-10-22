@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-GSFVNEDCGN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-GSFVNEDCGN');
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cute HIIT Timer — 40 s Work + 20 s Rest, Donut Style | DonutTimer</title>
+<meta name="description" content="A cute HIIT timer that repeats 40 seconds of work and 20 seconds of rest for 8 rounds, with the time left shown as a donut. Free and adjustable.">
+<link rel="canonical" href="https://timertrain.com/donut/en-hiit">
+<link rel="alternate" hreflang="ja" href="https://timertrain.com/donut/hiit">
+<link rel="alternate" hreflang="en" href="https://timertrain.com/donut/en-hiit">
+<link rel="alternate" hreflang="x-default" href="https://timertrain.com/donut/en-hiit">
+<meta property="og:title" content="Cute HIIT Timer — 40 s Work + 20 s Rest, Donut Style | DonutTimer">
+<meta property="og:description" content="A cute HIIT timer that repeats 40 seconds of work and 20 seconds of rest for 8 rounds, with the time left shown as a donut. Free and adjustable.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://timertrain.com/donut/en-hiit">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "WebApplication",
+ "name": "Cute HIIT timer (DonutTimer)",
+ "url": "https://timertrain.com/donut/en-hiit",
+ "applicationCategory": "UtilityApplication",
+ "operatingSystem": "Any",
+ "inLanguage": "en",
+ "offers": {
+  "@type": "Offer",
+  "price": "0",
+  "priceCurrency": "USD"
+ },
+ "isAccessibleForFree": true,
+ "description": "A cute HIIT timer that repeats 40 seconds of work and 20 seconds of rest for 8 rounds, with the time left shown as a donut. Free and adjustable.",
+ "isPartOf": {
+  "@type": "WebSite",
+  "name": "TimerTrain",
+  "url": "https://timertrain.com/"
+ }
+}
+</script>
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@type": "FAQPage",
+ "mainEntity": [
+  {
+   "@type": "Question",
+   "name": "Can I set different exercises?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. Add a timer for each exercise and name it — \"Squats\", \"Push-ups\", \"Rest\" — and they play in order."
+   }
+  },
+  {
+   "@type": "Question",
+   "name": "Will the screen turn off?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "While the timer is running, the page asks your device to keep the screen on where the browser supports it."
+   }
+  }
+ ]
+}
+</script>
+<meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DonutTimer">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Titan+One&text=DonutTimer&display=swap">
+<link rel="stylesheet" href="/style.css?v=22">
+<link rel="stylesheet" href="/donut.css?v=3">
+</head>
+<body>
+
+<main class="app">
+  <header class="header">
+    <a class="logo" href="/donut/en">DonutTimer</a>
+    <h1 class="tagline page-title">Cute HIIT Timer (40 s work + 20 s rest)</h1>
+    <nav class="nav" aria-label="Timer presets">
+      <a href="/donut/en-pomodoro">Pomodoro</a>
+      <a href="/donut/en-interval-timer">Interval</a>
+      <a href="/donut/en-tabata">Tabata</a>
+      <a href="/donut/en-hiit" aria-current="page">HIIT</a>
+      <a href="/donut/en-study">Study</a>
+      <a href="/donut/en-kitchen">Kitchen</a>
+    </nav>
+  </header>
+
+  <section id="run" class="run-inline" aria-label="Timer">
+    <p id="run-cycle" class="run-cycle"></p>
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="ring-bg" cx="50" cy="50" r="46"></circle>
+        <circle id="ring-fg" class="ring-fg" cx="50" cy="50" r="46"></circle>
+      </svg>
+      <div class="ring-inner">
+        <p id="run-name" class="run-name"></p>
+        <p id="run-time" class="run-time">00:00</p>
+      </div>
+    </div>
+    <div id="stations" class="stations" aria-hidden="true"></div>
+    <div class="run-controls">
+      <button id="reset-btn" type="button" aria-label="Reset"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
+      <button id="pause-btn" type="button" aria-label="Start / pause"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="skip-btn" type="button" aria-label="Skip"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+    </div>
+  </section>
+
+  <section id="setup" aria-label="Timer setup">
+    <ul id="timer-list" class="timer-list"></ul>
+
+    <button id="add-btn" class="add-btn" type="button">＋ Add timer</button>
+
+    <div class="repeat-row">
+      <span class="repeat-label">Repeat</span>
+      <div class="repeat-ctrl">
+        <button id="rep-minus" type="button" aria-label="Fewer repeats">−</button>
+        <span id="rep-count">x8</span>
+        <button id="rep-plus" type="button" aria-label="More repeats">＋</button>
+        <button id="rep-inf" type="button" aria-label="Repeat forever">∞</button>
+      </div>
+    </div>
+
+    <div class="total-row"><span id="total-label"></span></div>
+
+    <div class="action-row">
+      <button id="share-btn" class="share-btn wide" type="button">Share link</button>
+    </div>
+  </section>
+
+  <div id="toast" class="toast" role="status"></div>
+
+  <article class="about">
+<h2>HIIT you can follow from the floor</h2>
+<p>This page starts with 40 seconds of work and 20 seconds of rest for 8 rounds. Work is strawberry milk, rest is blueberry, and the donut shrinks as each phase runs out — big enough to read from a yoga mat or across a room.</p>
+<h2>How to use it</h2>
+<p>Press play and the workout runs to the end on its own, with a sound at every switch. Change the times or rounds in the timer settings, or add timers for a warm-up and cool-down. Focus mode shows only the donut, full screen.</p>
+<h2>Keep a record (optional)</h2>
+<p>Sign in free with Google to save your setups with a name, open them on your phone or computer, and see the time you spent on your <a href="/account?l=en&amp;from=donut">account page</a>. The days you keep going show up as a 🔥 streak at the top left. Everything else works without an account.</p>
+<h2>FAQ</h2>
+<p style="margin-top:10px"><strong>Can I set different exercises?</strong><br>Yes. Add a timer for each exercise and name it — "Squats", "Push-ups", "Rest" — and they play in order.</p>
+<p style="margin-top:10px"><strong>Will the screen turn off?</strong><br>While the timer is running, the page asks your device to keep the screen on where the browser supports it.</p>
+<h2>More donut timers</h2>
+<p><a href="/donut/en">DonutTimer (build your own)</a> · <a href="/donut/en-pomodoro">Pomodoro</a> · <a href="/donut/en-study">Study</a> · <a href="/donut/en-interval-timer">Interval</a> · <a href="/donut/en-tabata">Tabata</a> · <a href="/donut/en-hiit">HIIT</a> · <a href="/donut/en-kitchen">Kitchen</a> · <a href="/donut/en-1-minute-timer">1 minute</a> · <a href="/donut/en-5-minute-timer">5 minutes</a> · <a href="/donut/en-10-minute-timer">10 minutes</a> · <a href="/donut/en-25-minute-timer">25 minutes</a></p>
+</article>
+
+  <footer class="footer">© 2026 DonutTimer · <a href="/donut/hiit" class="lang-link">日本語</a> · <a href="/donut/es" class="lang-link">Español</a> · <a href="/en-privacy">Privacy</a> · <a href="/en-terms">Terms</a> · <a href="/en-about">About</a></footer>
+</main>
+
+<script>window.TT_PRESET = {"timers": [{"name": "Work", "secs": 40, "color": "red"}, {"name": "Rest", "secs": 20, "color": "blue"}], "repeat": 8};</script>
+<script src="/donut.js?v=3"></script>
+<script src="/app.js?v=22d"></script>
+<script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
+</body>
+</html>

@@ -62,3 +62,24 @@ The same timer with a cute look: the remaining time is shown as a donut that get
 - [かわいい複数タイマー](https://timertrain.com/donut/multi-timer)
 - [かわいい繰り返しタイマー](https://timertrain.com/donut/repeat-timer)
 - [かわいいポモドーロタイマー 50分＋10分](https://timertrain.com/donut/pomodoro-50-10)
+
+## DonutTimer (English)
+
+- [DonutTimer](https://timertrain.com/donut/en): A cute, free online timer that shows the time left as a donut being eaten bite by bite
+- [Cute Pomodoro Timer (25-min focus + 5-min break)](https://timertrain.com/donut/en-pomodoro): A cute Pomodoro timer that runs 25 minutes of focus and 5 minutes of break on repeat, with the time left shown as a donut
+- [Cute Interval Timer (repeating work + rest)](https://timertrain.com/donut/en-interval-timer): A cute interval timer that repeats work and rest automatically, showing each phase as a different donut flavor
+- [Cute Tabata Timer (20 s work + 10 s rest x 8)](https://timertrain.com/donut/en-tabata): A cute Tabata timer: 20 seconds of work and 10 seconds of rest, 8 rounds, with each phase shown as a shrinking donut
+- [Cute HIIT Timer (40 s work + 20 s rest)](https://timertrain.com/donut/en-hiit): A cute HIIT timer that repeats 40 seconds of work and 20 seconds of rest for 8 rounds, with the time left shown as a donut
+- [Cute Kitchen Timer (multiple & sequential)](https://timertrain.com/donut/en-kitchen): A cute kitchen timer that runs your cooking steps one after another — main, side, finish — each as its own donut flavor
+- [Cute Study Timer (50-min study + 10-min break)](https://timertrain.com/donut/en-study): A cute study timer: 50 minutes of study and 10 minutes of break, repeated, with the time left shown as a donut
+- [Cute 1 Minute Timer](https://timertrain.com/donut/en-1-minute-timer): A free 1 minute timer where the time left is a strawberry milk donut that gets eaten bite by bite
+- [Cute 5 Minute Timer](https://timertrain.com/donut/en-5-minute-timer): A free 5 minute timer where the time left is a blueberry donut that gets eaten bite by bite
+- [Cute 10 Minute Timer](https://timertrain.com/donut/en-10-minute-timer): A free 10 minute timer where the time left is a mint chocolate donut that gets eaten bite by bite
+- [Cute 25 Minute Timer](https://timertrain.com/donut/en-25-minute-timer): A free 25 minute timer where the time left is a strawberry milk donut that gets eaten bite by bite
+
+## DonutTimer (Español)
+
+- [DonutTimer](https://timertrain.com/donut/es): Un temporizador online bonito y gratis que muestra el tiempo restante como una dona que se va comiendo bocado a bocado
+- [Temporizador Pomodoro bonito (25 min + 5 min)](https://timertrain.com/donut/es-pomodoro): Un temporizador Pomodoro bonito y gratis: 25 minutos de trabajo y 5 de descanso que se repiten solos, con el tiempo restante en forma de dona
+- [Temporizador de intervalos bonito (trabajo + descanso)](https://timertrain.com/donut/es-intervalos): Un temporizador de intervalos bonito y gratis que repite trabajo y descanso automáticamente, con cada fase como una dona de otro sabor
+- [Temporizador Tabata bonito (20 s + 10 s × 8)](https://timertrain.com/donut/es-tabata): Un temporizador Tabata bonito y gratis: 20 segundos de trabajo y 10 de descanso, 8 rondas, con cada fase como una dona que se acaba

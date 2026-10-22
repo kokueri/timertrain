@@ -1064,10 +1064,13 @@ if (!header) return;
 var isDT = !!window.DT;
 // ドーナツ版は同じサイトの /donut/ に置く
 var DONUT_PREFIX = '/donut';
-// TimerTrain の日本語ページにもドーナツ版への切り替えを出す
+// TimerTrain の各ページにもドーナツ版への切り替えを出す
 var SHOW_DONUT_ON_TT = true;
-// DonutTimer にある日本語ページ（TimerTrain からはこのページだけ同じ用途のページへ飛ぶ）
-var DT_PAGES = ['/', '/pomodoro', '/interval-timer', '/tabata', '/hiit', '/study', '/kitchen', '/multi-timer', '/repeat-timer', '/pomodoro-50-10'];
+// DonutTimer にあるページ（TimerTrain からはこのページだけ同じ用途のページへ飛ぶ。無ければその言語のトップへ）
+var DT_PAGES = ['/', '/pomodoro', '/interval-timer', '/tabata', '/hiit', '/study', '/kitchen', '/multi-timer', '/repeat-timer', '/pomodoro-50-10',
+'/en', '/en-pomodoro', '/en-interval-timer', '/en-tabata', '/en-hiit', '/en-kitchen', '/en-study', '/en-1-minute-timer', '/en-5-minute-timer', '/en-10-minute-timer', '/en-25-minute-timer',
+'/es', '/es-pomodoro', '/es-intervalos', '/es-tabata'];
+var DT_HOME = { ja: '/', en: '/en', es: '/es' };
 var NS = 'http://www.w3.org/2000/svg';
 function svg(view, parts) {
 var e = document.createElementNS(NS, 'svg'); e.setAttribute('viewBox', view); e.setAttribute('aria-hidden', 'true'); e.setAttribute('class', 'sib-mark');
@@ -1090,7 +1093,7 @@ function dtMark() { return svg('0 0 24 24', [
 
 // 右上: 兄弟サイト ＋ テーマ切替をまとめる
 var theme = document.getElementById('theme-btn');
-var showSib = isDT || (SHOW_DONUT_ON_TT && lang === 'ja');
+var showSib = isDT || SHOW_DONUT_ON_TT;
 if (theme && showSib) {
 var box = document.createElement('div'); box.id = 'tt-topright';
 header.appendChild(box);
@@ -1106,7 +1109,7 @@ var path = location.pathname.replace(/\.html$/, '').replace(/\/index$/, '/') || 
 if (isDT) {
 path = path.replace(/^\/donut(?=\/|$)/, '') || '/';
 } else {
-if (DT_PAGES.indexOf(path) < 0) path = '/';
+if (DT_PAGES.indexOf(path) < 0) path = DT_HOME[lang] || '/';
 path = DONUT_PREFIX + (path === '/' ? '/' : path);
 }
 var q = ''; try { q = typeof serialize === 'function' ? serialize() : location.search; } catch (e) {}
