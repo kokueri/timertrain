@@ -55,3 +55,10 @@ The same timer with a cute look: the remaining time is shown as a donut that get
 - [ドーナツタイマー](https://timertrain.com/donut/): 残り時間がドーナツで見える、かわいい無料Webタイマー
 - [かわいいポモドーロタイマー](https://timertrain.com/donut/pomodoro): 25分＋5分
 - [かわいい勉強タイマー](https://timertrain.com/donut/study): 50分＋10分
+- [かわいいインターバルタイマー](https://timertrain.com/donut/interval-timer): 45秒＋15秒
+- [かわいいタバタタイマー](https://timertrain.com/donut/tabata): 20秒＋10秒×8
+- [かわいいHIITタイマー](https://timertrain.com/donut/hiit): 40秒＋20秒
+- [かわいいキッチンタイマー](https://timertrain.com/donut/kitchen): 料理の工程を順番に
+- [かわいい複数タイマー](https://timertrain.com/donut/multi-timer)
+- [かわいい繰り返しタイマー](https://timertrain.com/donut/repeat-timer)
+- [かわいいポモドーロタイマー 50分＋10分](https://timertrain.com/donut/pomodoro-50-10)
