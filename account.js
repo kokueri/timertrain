@@ -33,6 +33,9 @@
   try { localStorage.setItem('tt-lang', lang); } catch (e) {}
   document.documentElement.lang = lang;
   var HOME = { ja: '/', en: '/en', es: '/es' }[lang];
+  // ドーナツ版から来た人は戻り先をドーナツ版に（Googleログインで行って戻っても同じタブなら覚えている）
+  try { if (params.get('from') === 'donut') sessionStorage.setItem('tt-from', 'donut'); } catch (e) {}
+  try { if (lang === 'ja' && sessionStorage.getItem('tt-from') === 'donut') HOME = '/donut/'; } catch (e) {}
   var PRIV = { ja: '/privacy', en: '/en-privacy', es: '/es-privacy' }[lang];
   var TERMS = { ja: '/terms', en: '/en-terms', es: '/es-terms' }[lang];
   var T = {
@@ -257,7 +260,7 @@
 
   /* ---------- マイタイマーの一覧（スタート＝そのページで開く、データ＝準備中） ---------- */
   var Q_RE = /^\?t=[A-Za-z0-9.,%_\-~!*'()]{1,7000}&r=(?:inf|\d{1,2})$/;
-  var PAGE_RE = /^\/[a-z0-9-]{0,40}$/;
+  var PAGE_RE = /^\/(?:donut\/)?[a-z0-9-]{0,40}$/;
   function fmtClock(sec) {
     var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60, p = function (n) { return (n < 10 ? '0' : '') + n; };
     return h ? h + ':' + p(m) + ':' + p(s) : p(m) + ':' + p(s);

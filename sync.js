@@ -157,6 +157,33 @@
     if (!log.id && !log.busy && log.secs >= 15) persistLog(log, false);
     else if (log.id && now - log.saved > 60000) persistLog(log, false);
   }
+  /* ---------- 連続日数（マイページと同じ数え方: タイマーを15秒以上動かした日が続いた数） ---------- */
+  var STREAK_KEY = 'tt-streak';
+  var streakToday = false;
+  function dayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
+  function showStreak(n, today) { streakToday = !!today; if (window.__ttSetStreak) { try { window.__ttSetStreak(n, today); } catch (e) {} } }
+  async function loadStreak(force) {
+    try {
+      var c = JSON.parse(sessionStorage.getItem(STREAK_KEY) || 'null');
+      if (!force && c && c.day === dayKey(new Date()) && Date.now() - c.at < 600000) { showStreak(c.n, c.today); return; }
+    } catch (e) {}
+    try {
+      var since = new Date(); since.setHours(0, 0, 0, 0); since.setDate(since.getDate() - 120);
+      var r = await sb.from('usage_logs').select('started_at')
+        .eq('product', PRODUCT).gte('started_at', since.toISOString())
+        .order('started_at', { ascending: false }).limit(5000);
+      if (r.error || !r.data) return;
+      var set = {};
+      r.data.forEach(function (x) { set[dayKey(new Date(x.started_at))] = 1; });
+      var d = new Date(); d.setHours(0, 0, 0, 0);
+      var today = !!set[dayKey(d)];
+      if (!today) d.setDate(d.getDate() - 1);
+      var n = 0;
+      while (set[dayKey(d)] && n < 121) { n++; d.setDate(d.getDate() - 1); }
+      try { sessionStorage.setItem(STREAK_KEY, JSON.stringify({ n: n, today: today, day: dayKey(new Date()), at: Date.now() })); } catch (e) {}
+      showStreak(n, today);
+    } catch (e) {}
+  }
   function persistLog(L, done) {
     L.chain = (L.chain || Promise.resolve()).then(async function () {
       var secs = Math.min(356400, Math.round(L.secs));
@@ -169,7 +196,7 @@
           timer_id: L.timerId
         }).select('id').single();
         L.busy = false;
-        if (!r.error && r.data) L.id = r.data.id;
+        if (!r.error && r.data) { L.id = r.data.id; if (!streakToday) loadStreak(true); } // 今日の1回目で🔥を更新
       } else {
         await sb.from('usage_logs').update({ total_secs: secs, completed: !!done, ended_at: new Date().toISOString() }).eq('id', L.id);
       }
@@ -266,6 +293,7 @@
     if (!s.data || !s.data.session) {
       // セッション切れ: 入口の表示を「ログイン」に戻し、欄はログインの案内だけにする
       var link = document.querySelector('#acct-link span'); if (link) link.textContent = T.signin;
+      try { sessionStorage.removeItem('tt-streak'); } catch (e) {}
       head.removeChild(saveBtn);
       list.appendChild(el('a', { cls: 'tt-chip', href: acctHref, text: T.signin }));
       return;
@@ -273,8 +301,9 @@
     var test = document.getElementById('tt-sync'); if (test) test.remove(); // ログイン中は「準備中」の需要テストを出さない
     hookLogs();
     hookSettings();
+    loadStreak(false);
     await load();
     syncSettings().catch(function () {});
-    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { load(); syncSettings().catch(function () {}); } });
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { load(); loadStreak(false); syncSettings().catch(function () {}); } });
   })().catch(function () { setNote(T.err, true); });
 })();

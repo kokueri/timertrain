@@ -1038,7 +1038,7 @@ var L = lang === 'en' ? { in: 'Sign in', me: 'Account' }
 : { in: 'ログイン', me: 'マイページ' };
 var a = document.createElement('a');
 a.id = 'acct-link';
-a.href = '/account?l=' + (['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja');
+a.href = '/account?l=' + (['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja') + (window.DT ? '&from=donut' : '');
 var ic = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 ic.setAttribute('viewBox', '0 0 24 24'); ic.setAttribute('aria-hidden', 'true');
 var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -1051,9 +1051,91 @@ a.setAttribute('aria-label', signed ? L.me : L.in);
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=3'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=4'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
+})();
+
+/* ---------- 兄弟サイトへのリンク（右上）／連続日数🔥（左上のマイページ） ---------- */
+(function () {
+var lang = document.documentElement.lang;
+var header = document.querySelector('.header');
+if (!header) return;
+var isDT = !!window.DT;
+// ドーナツ版は同じサイトの /donut/ に置く
+var DONUT_PREFIX = '/donut';
+// ドーナツ版を公開するまで、TimerTrain 側には切り替えを出さない（公開するときに true）
+var SHOW_DONUT_ON_TT = false;
+// DonutTimer にある日本語ページ（TimerTrain からはこのページだけ同じ用途のページへ飛ぶ）
+var DT_PAGES = ['/', '/pomodoro', '/interval-timer', '/tabata', '/hiit', '/study', '/kitchen', '/multi-timer', '/repeat-timer', '/pomodoro-50-10'];
+var NS = 'http://www.w3.org/2000/svg';
+function svg(view, parts) {
+var e = document.createElementNS(NS, 'svg'); e.setAttribute('viewBox', view); e.setAttribute('aria-hidden', 'true'); e.setAttribute('class', 'sib-mark');
+parts.forEach(function (p) { var n = document.createElementNS(NS, p[0]); for (var k in p[1]) n.setAttribute(k, p[1][k]); e.appendChild(n); });
+return e;
+}
+// TimerTrain のアイコン（リング）と、DonutTimer のドーナツ
+function ttMark() { return svg('0 0 24 24', [
+['circle', { cx: 12, cy: 12, r: 8, fill: 'none', stroke: '#E8E1D8', 'stroke-width': 3.2 }],
+['path', { d: 'M12 4a8 8 0 1 1-7.6 5.5', fill: 'none', stroke: '#FF6B6B', 'stroke-width': 3.2, 'stroke-linecap': 'round' }],
+['circle', { cx: 12, cy: 4, r: 1.9, fill: '#FF6B6B' }], ['circle', { cx: 4.4, cy: 9.5, r: 1.9, fill: '#FF6B6B' }]]); }
+function dtMark() { return svg('0 0 24 24', [
+['circle', { cx: 12, cy: 12, r: 10, fill: '#DCA04E' }],
+['path', { d: 'M12 3.2c1.6 0 2.4 1 3.7 1.4 1.4.4 2.9.3 3.6 1.6.8 1.3.1 2.6.4 4 .3 1.3 1.4 2.4.9 3.8-.5 1.3-2 1.6-2.8 2.7-.9 1.1-1.1 2.6-2.5 3.1-1.3.4-2.4-.6-3.3-.6s-2 1-3.3.6c-1.4-.5-1.6-2-2.5-3.1-.8-1.1-2.3-1.4-2.8-2.7-.5-1.4.6-2.5.9-3.8.3-1.4-.4-2.7.4-4 .7-1.3 2.2-1.2 3.6-1.6C9.6 4.2 10.4 3.2 12 3.2z', fill: '#F19DBA' }],
+['circle', { cx: 12, cy: 12, r: 3.6, fill: 'var(--bg, #FFF9EF)' }],
+['rect', { x: 7, y: 6.5, width: 3.2, height: 1.3, rx: .65, fill: '#F8DE7E', transform: 'rotate(-35 8.6 7.2)' }],
+['rect', { x: 14.5, y: 7.4, width: 3.2, height: 1.3, rx: .65, fill: '#A5DDEB', transform: 'rotate(30 16.1 8)' }],
+['rect', { x: 13.4, y: 16.2, width: 3.2, height: 1.3, rx: .65, fill: '#FFFDF5', transform: 'rotate(-20 15 16.8)' }],
+['rect', { x: 6.2, y: 14.6, width: 3.2, height: 1.3, rx: .65, fill: '#C6B0E8', transform: 'rotate(50 7.8 15.2)' }]]); }
+
+// 右上: 兄弟サイト ＋ テーマ切替をまとめる
+var theme = document.getElementById('theme-btn');
+var showSib = isDT || (SHOW_DONUT_ON_TT && lang === 'ja');
+if (theme && showSib) {
+var box = document.createElement('div'); box.id = 'tt-topright';
+header.appendChild(box);
+var a = document.createElement('a'); a.id = 'sib-link';
+var name = isDT ? 'TimerTrain' : 'DonutTimer';
+var L = lang === 'en' ? 'Open this timer in ' : lang === 'es' ? 'Abrir este temporizador en ' : '';
+a.setAttribute('aria-label', lang === 'ja' ? (isDT ? 'TimerTrainの見た目で同じタイマーを開く' : 'ドーナツの見た目で同じタイマーを開く') : L + name);
+a.title = a.getAttribute('aria-label');
+a.appendChild(isDT ? ttMark() : dtMark());
+var sp = document.createElement('span'); sp.textContent = name; a.appendChild(sp);
+function target() {
+var path = location.pathname.replace(/\.html$/, '').replace(/\/index$/, '/') || '/';
+if (isDT) {
+path = path.replace(/^\/donut(?=\/|$)/, '') || '/';
+} else {
+if (DT_PAGES.indexOf(path) < 0) path = '/';
+path = DONUT_PREFIX + (path === '/' ? '/' : path);
+}
+var q = ''; try { q = typeof serialize === 'function' ? serialize() : location.search; } catch (e) {}
+return path + q;
+}
+a.href = target();
+// 押した時点の編成を持っていく
+a.addEventListener('pointerdown', function () { a.href = target(); });
+a.addEventListener('focus', function () { a.href = target(); });
+box.appendChild(a);
+box.appendChild(theme);
+}
+
+// 左上: 連続日数（sync.js がログイン中に呼ぶ）
+window.__ttSetStreak = function (n, today) {
+var link = document.getElementById('acct-link');
+if (!link) return;
+var b = link.querySelector('.tt-streak');
+if (!(n >= 1)) { if (b) b.remove(); return; }
+if (!b) { b = document.createElement('b'); b.className = 'tt-streak'; link.insertBefore(b, link.firstChild); }
+b.textContent = '🔥' + n;
+b.classList.toggle('keep', !today);
+var msg = lang === 'en' ? (today ? n + '-day streak' : n + '-day streak. Use it today to make it ' + (n + 1))
+: lang === 'es' ? (today ? 'Racha de ' + n + (n === 1 ? ' día' : ' días') : 'Racha de ' + n + (n === 1 ? ' día' : ' días') + '. Úsalo hoy para llegar a ' + (n + 1))
+: (today ? n + '日連続で使っています' : n + '日連続中。今日も使うと' + (n + 1) + '日になります');
+link.title = msg;
+var label = link.querySelector('span');
+link.setAttribute('aria-label', (label ? label.textContent + '・' : '') + msg);
+};
 })();
 
 /* ---------- リテンション: 最近の編成 / ホーム画面追加 / 再訪ヒント ---------- */
