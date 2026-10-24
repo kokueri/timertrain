@@ -1,0 +1,37 @@
+{
+  "id": "/donut/en",
+  "name": "DonutTimer — cute visual timer",
+  "short_name": "DonutTimer",
+  "description": "A cute, free online timer that shows the time left as a donut.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/donut/en",
+  "scope": "/donut/",
+  "display": "standalone",
+  "background_color": "#FFF9EF",
+  "theme_color": "#FFF9EF",
+  "categories": [
+    "productivity",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/donut/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/donut/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/donut/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -673,3 +673,25 @@ body.focus-mode #tt-topright { display: none; }
 #tt-topright { right: 10px; gap: 4px; }
 #tt-topright ~ .logo, .header:has(#tt-topright) .logo { font-size: 23px; }
 }
+
+/* ================= マイタイマー: 使用中・上書き保存（2026-10-24） ================= */
+.tt-my-badge { font-size: 12px; font-weight: 600; color: var(--text2); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; margin: 0 0 6px; max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-my-badge[hidden] { display: none; }
+.tt-my-badge.dirty { border-style: dashed; }
+body.focus-mode .tt-my-badge { display: none; }
+.tt-my-cur { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; margin-top: 12px; padding: 10px 12px; border-radius: 12px; background: var(--bg); font-size: 13px; }
+.tt-my-cur[hidden] { display: none; }
+.tt-my-cur-label { color: var(--text2); font-size: 12px; }
+.tt-my-cur-name { font-weight: 700; overflow-wrap: anywhere; }
+.tt-my-dirty { font-size: 11px; font-weight: 700; color: #B35C00; border: 1px solid currentColor; border-radius: 999px; padding: 1px 8px; }
+.tt-my-cur-acts { display: inline-flex; gap: 6px; margin-left: auto; flex-wrap: wrap; }
+.tt-my-item.current .tt-my-chip { border: 2px solid var(--text); font-weight: 700; padding: 5px 11px; }
+#setup.collapsed .tt-my-cur { display: none; }
+
+/* 通知をオンにする案内 */
+.tt-ask { margin: 10px auto 0; max-width: 420px; padding: 12px 14px; border-radius: 14px; background: var(--card); box-shadow: var(--shadow); border: 1px solid var(--line); text-align: left; }
+.tt-ask p { font-size: 13px; line-height: 1.6; color: var(--text); margin: 0 0 8px; }
+.tt-ask-btns { display: flex; gap: 8px; justify-content: flex-end; }
+.tt-ask-yes, .tt-ask-no { font-family: inherit; font-size: 13px; font-weight: 600; border-radius: 999px; padding: 7px 14px; cursor: pointer; border: 1.5px solid var(--line); background: var(--bg); color: var(--text); min-height: 36px; }
+.tt-ask-yes { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+body.focus-mode .tt-ask { display: none; }
