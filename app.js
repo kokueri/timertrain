@@ -44,6 +44,8 @@ notify: 'ブラウザ通知', notifyNote: '別のタブやアプリを見てい�
 nNext: n => `次: ${n}`, nDone: 'すべて終わりました 🎉', nSoon: (n, m) => `${n} はあと${m}分です`,
 askNotify: '別のタブを見ているときや最小化中も、ポップアップでお知らせしますか？', askYes: 'オンにする', askNo: '今はしない',
 restored: 'タイマーを続きから再開しました', tapSound: '音を鳴らすには画面をタップしてください',
+silent: 'マナーモードでも鳴らす', silentNote: 'iPhone・iPad はマナーモード中だと音が出ません。オンにすると鳴りますが、音楽アプリの再生が止まることがあります',
+askSilent: 'iPhone はマナーモード中だと音が鳴りません。マナーモードでも鳴らしますか？（音楽アプリは止まることがあります）',
 },
 en: {
 work: 'Work', brk: 'Break', defName: 'Timer', namePh: 'Timer name',
@@ -61,6 +63,8 @@ notify: 'Browser notifications', notifyNote: 'Get notified at each switch, even 
 nNext: n => `Next: ${n}`, nDone: 'All done 🎉', nSoon: (n, m) => `${n}: ${m} min left`,
 askNotify: 'Get a pop-up notification at each switch, even in another tab or when minimized?', askYes: 'Turn on', askNo: 'Not now',
 restored: 'Timer resumed where it left off', tapSound: 'Tap the screen to turn the sound back on',
+silent: 'Play sound in silent mode', silentNote: 'iPhone and iPad stay quiet when the silent switch is on. Turn this on to hear the timer anyway (music apps may pause)',
+askSilent: 'Your iPhone stays quiet in silent mode. Play the timer sound even in silent mode? (Music apps may pause)',
 },
 es: {
 work: 'Trabajo', brk: 'Descanso', defName: 'Temporizador', namePh: 'Nombre del temporizador',
@@ -78,6 +82,8 @@ notify: 'Notificaciones del navegador', notifyNote: 'Te avisa en cada cambio, au
 nNext: n => `Siguiente: ${n}`, nDone: '¡Todo listo! 🎉', nSoon: (n, m) => `${n}: quedan ${m} min`,
 askNotify: '¿Quieres un aviso emergente en cada cambio, aunque estés en otra pestaña o la ventana esté minimizada?', askYes: 'Activar', askNo: 'Ahora no',
 restored: 'El temporizador continúa donde se quedó', tapSound: 'Toca la pantalla para volver a activar el sonido',
+silent: 'Sonar en modo silencio', silentNote: 'El iPhone y el iPad no suenan en modo silencio. Actívalo para oír el temporizador (la música puede pausarse)',
+askSilent: 'Tu iPhone no suena en modo silencio. ¿Quieres que el temporizador suene igualmente? (la música puede pausarse)',
 },
 }[LANG];
 const STORE_KEY = 'timertrain-v1:' + location.pathname;
@@ -194,6 +200,24 @@ repeat: p.repeat === 'inf' ? Infinity : Math.min(Math.max(1, p.repeat | 0), 99),
 }
 }
 
+/* ---------- iPhone/iPad のマナーモード ----------
+ * iOS の WebAudio は消音スイッチに従う（ambient）。メディア再生として扱わせると鳴るが、
+ * 他のアプリの音楽は止まる。そのため設定でオンにした人だけ:
+ *  1) Audio Session API があれば type='playback'
+ *  2) なければ無音の <audio> を流しっぱなしにしてメディア扱いにする（実行中だけ） */
+const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const SILENT_SRC = 'data:audio/wav;base64,UklGRvQHAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YdAHAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+let silentEl = null;
+function applySilentMode(playing) {
+if (!IS_IOS) return;
+const want = !!opts.silent;
+try { if (navigator.audioSession) navigator.audioSession.type = want && playing ? 'playback' : 'auto'; } catch (e) {}
+if (want && playing) {
+if (!silentEl) { silentEl = new Audio(SILENT_SRC); silentEl.loop = true; silentEl.setAttribute('playsinline', ''); silentEl.volume = 0.01; }
+try { const pr = silentEl.play(); if (pr && pr.catch) pr.catch(() => {}); } catch (e) {}
+} else if (silentEl) { try { silentEl.pause(); } catch (e) {} }
+}
+
 /* ---------- 音（iOS Safari 対応） ---------- */
 function unlockAudio() {
 if (!audioCtx) {
@@ -275,13 +299,14 @@ const soundTick = () => SOUNDS[sound.s].tick();
 
 /* その他の設定（自動で次へ・終了前のお知らせ・ブラウザ通知。端末に保存） */
 const OPT_KEY = 'tt-opts';
-let opts = { auto: true, remind: 0, notify: false };
+let opts = { auto: true, remind: 0, notify: false, silent: false };
 try {
 const ov = JSON.parse(localStorage.getItem(OPT_KEY) || 'null');
 if (ov) {
 if (typeof ov.auto === 'boolean') opts.auto = ov.auto;
 if ([0, 1, 2, 5].includes(ov.remind)) opts.remind = ov.remind;
 if (typeof ov.notify === 'boolean') opts.notify = ov.notify;
+if (typeof ov.silent === 'boolean') opts.silent = ov.silent;
 }
 } catch (e) {}
 function saveOpts() { try { localStorage.setItem(OPT_KEY, JSON.stringify(opts)); } catch (e) {} }
@@ -311,7 +336,29 @@ opts.notify = true; saveOpts(); if (sw) sw.checked = true;
 if (window.gtag) gtag('event', 'notify_on');
 return true;
 }
+function askSilentOnce() {
+const K = 'tt-silent-ask';
+try { if (!IS_IOS || opts.silent || localStorage.getItem(K)) return; } catch (e) { return; }
+if (document.getElementById('tt-ask')) return;
+const box = document.createElement('div'); box.id = 'tt-ask'; box.className = 'tt-ask'; box.setAttribute('role', 'status');
+const tx = document.createElement('p'); tx.textContent = STR.askSilent;
+const yes = document.createElement('button'); yes.type = 'button'; yes.className = 'tt-ask-yes'; yes.textContent = STR.askYes;
+const no = document.createElement('button'); no.type = 'button'; no.className = 'tt-ask-no'; no.textContent = STR.askNo;
+const close = v => { try { localStorage.setItem(K, v); } catch (e) {} box.remove(); };
+yes.addEventListener('click', () => {
+close('yes'); opts.silent = true; saveOpts();
+const sw = document.getElementById('opt-silent'); if (sw) sw.checked = true;
+applySilentMode(run.active && !run.paused && !run.finished); unlockAudio();
+if (window.gtag) gtag('event', 'silent_on');
+});
+no.addEventListener('click', () => close('no'));
+const btns = document.createElement('div'); btns.className = 'tt-ask-btns'; btns.append(yes, no);
+box.append(tx, btns);
+const ctr = document.querySelector('.run-controls');
+if (ctr) ctr.insertAdjacentElement('afterend', box);
+}
 function askNotifyOnce() {
+if (IS_IOS) { askSilentOnce(); if (document.getElementById('tt-ask')) return; }
 try {
 if (!canNotify() || opts.notify || Notification.permission !== 'default' || localStorage.getItem(ASK_KEY)) return;
 } catch (e) { return; }
@@ -587,6 +634,7 @@ $('rep-inf').classList.toggle('active', state.repeat === Infinity);
 
 /* ---------- 実行 ---------- */
 function startRun() {
+applySilentMode(true);
 unlockAudio();
 if (window.gtag) gtag('event', 'timer_start');
 if (window.__ttOnStart) { try { window.__ttOnStart(); } catch (e) {} }
@@ -611,6 +659,7 @@ clearInterval(tickId); tickId = null;
 cancelSched();
 run = { active: false, paused: true, finished: false, idx: 0, cycle: 1, endAt: 0, remainMs: 0, lastSec: -1 };
 saveRun();
+applySilentMode(false);
 releaseWakeLock();
 document.title = BASE_TITLE;
 pauseBtn.innerHTML = ICONS.play;
@@ -641,6 +690,8 @@ else updateIdleView();
 function pauseToggle() {
 if (!run.active || run.finished) return;
 if (run.paused) {
+applySilentMode(true);
+unlockAudio();
 run.endAt = Date.now() + run.remainMs;
 run.paused = false;
 pauseBtn.innerHTML = ICONS.pause;
@@ -711,6 +762,7 @@ document.title = STR.doneTitle;
 updateEta();
 saveRun();
 notify(STR.nDone, true);
+setTimeout(() => { if (run.finished) applySilentMode(false); }, 4000);
 if (window.__ttOnFinish) { try { window.__ttOnFinish(); } catch (e) {} }
 }
 function tick() {
@@ -830,8 +882,26 @@ document.addEventListener('freeze', saveRun);
 document.addEventListener('resume', () => { tick(); if (run.active && !run.paused && !run.finished) scheduleAhead(1.5); });
 window.addEventListener('pageshow', e => { if (e.persisted) { tick(); if (run.active && !run.paused && !run.finished) scheduleAhead(1.5); } });
 window.addEventListener('pagehide', saveRun);
+/* なめらかな表示: 画面を見ている間は毎フレーム、リング／ドーナツを残り時間どおりに描く（短いタイマーでもカクカクしない） */
+let rafId = 0;
+function frame() {
+rafId = 0;
+if (!run.active || run.paused || run.finished || document.visibilityState !== 'visible') { if (ringFg) ringFg.style.transition = ''; return; }
+// 毎フレーム描くので、リングの遅れ（CSS の transition）はなくす
+if (ringFg && !DT) ringFg.style.transition = 'stroke .3s ease';
+const remain = run.endAt - Date.now();
+if (remain <= 0) tick(); // 区切りはすぐに切り替える（200ms 待たない）
+if (run.active && !run.paused && !run.finished) {
+const t = state.timers[run.idx];
+setRing(Math.max(0, run.endAt - Date.now()) / (t.secs * 1000), colorOf(t.color));
+}
+rafId = requestAnimationFrame(frame);
+}
+function startFrames() { if (!rafId && typeof requestAnimationFrame === 'function') rafId = requestAnimationFrame(frame); }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') startFrames(); });
 function updateRunView() {
 if (run.finished) return;
+if (!run.paused) startFrames();
 const t = state.timers[run.idx];
 const remainMs = run.paused ? run.remainMs : Math.max(0, run.endAt - Date.now());
 const sec = Math.ceil(remainMs / 1000);
@@ -941,6 +1011,16 @@ const rem = document.createElement('select'); rem.id = 'opt-remind'; rem.classNa
 rem.value = String(opts.remind);
 rem.addEventListener('change', () => { opts.remind = parseInt(rem.value, 10) || 0; saveOpts(); if (run.active) scheduleAhead(); });
 mkRow(STR.remind, '', rem, 'opt-remind');
+if (IS_IOS) {
+const sSw = sw('opt-silent', opts.silent);
+sSw.addEventListener('change', () => {
+opts.silent = sSw.checked; saveOpts();
+try { localStorage.setItem('tt-silent-ask', 'set'); } catch (e) {}
+applySilentMode(run.active && !run.paused && !run.finished); unlockAudio();
+if (sSw.checked) { soundSegment(); if (window.gtag) gtag('event', 'silent_on'); }
+});
+mkRow(STR.silent, STR.silentNote, sSw, 'opt-silent');
+}
 if (canNotify()) {
 const nSw = sw('opt-notify', opts.notify && Notification.permission === 'granted');
 nSw.addEventListener('change', async () => {
@@ -1020,7 +1100,7 @@ if (!run.paused) acquireWakeLock();
 toast(STR.restored);
 // 音はブラウザの決まりで、画面を一度さわるまで鳴らせないことがある
 unlockAudio();
-const wake = () => { unlockAudio(); if (run.active && !run.paused && !run.finished) scheduleAhead(); };
+const wake = () => { if (run.active && !run.paused && !run.finished) applySilentMode(true); unlockAudio(); if (run.active && !run.paused && !run.finished) scheduleAhead(); };
 document.addEventListener('pointerdown', wake, { once: true });
 document.addEventListener('keydown', wake, { once: true });
 if (audioCtx && audioCtx.state !== 'running') setTimeout(() => { if (audioCtx && audioCtx.state !== 'running') toast(STR.tapSound); }, 2000);
