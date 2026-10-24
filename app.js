@@ -42,6 +42,8 @@ sound: '音', vol: '音量', snd: { chime: 'チャイム', bell: 'ベル', digit
 more: '詳しい設定', auto: '次のタイマーへ自動で進む', autoNote: 'オフにすると、1つ終わるごとに止まります', remind: '終わる前に知らせる', remindOff: 'しない', remindMin: n => `${n}分前`,
 notify: 'ブラウザ通知', notifyNote: '別のタブやアプリを見ていても、区切りでお知らせします', notifyBlocked: 'ブラウザの設定で通知がブロックされています', pausedNext: n => `次は「${n}」。▶で開始`,
 nNext: n => `次: ${n}`, nDone: 'すべて終わりました 🎉', nSoon: (n, m) => `${n} はあと${m}分です`,
+askNotify: '別のタブを見ているときや最小化中も、ポップアップでお知らせしますか？', askYes: 'オンにする', askNo: '今はしない',
+restored: 'タイマーを続きから再開しました', tapSound: '音を鳴らすには画面をタップしてください',
 },
 en: {
 work: 'Work', brk: 'Break', defName: 'Timer', namePh: 'Timer name',
@@ -57,6 +59,8 @@ sound: 'Sound', vol: 'Volume', snd: { chime: 'Chime', bell: 'Bell', digital: 'Di
 more: 'More settings', auto: 'Go to the next timer automatically', autoNote: 'When off, it stops after each timer', remind: 'Remind me before the end', remindOff: 'Off', remindMin: n => `${n} min before`,
 notify: 'Browser notifications', notifyNote: 'Get notified at each switch, even in another tab or app', notifyBlocked: 'Notifications are blocked in your browser settings', pausedNext: n => `Next: ${n}. Press ▶ to start`,
 nNext: n => `Next: ${n}`, nDone: 'All done 🎉', nSoon: (n, m) => `${n}: ${m} min left`,
+askNotify: 'Get a pop-up notification at each switch, even in another tab or when minimized?', askYes: 'Turn on', askNo: 'Not now',
+restored: 'Timer resumed where it left off', tapSound: 'Tap the screen to turn the sound back on',
 },
 es: {
 work: 'Trabajo', brk: 'Descanso', defName: 'Temporizador', namePh: 'Nombre del temporizador',
@@ -72,6 +76,8 @@ sound: 'Sonido', vol: 'Volumen', snd: { chime: 'Campanilla', bell: 'Campana', di
 more: 'Más ajustes', auto: 'Pasar al siguiente temporizador automáticamente', autoNote: 'Si lo desactivas, se detiene al terminar cada temporizador', remind: 'Avisar antes del final', remindOff: 'No', remindMin: n => `${n} min antes`,
 notify: 'Notificaciones del navegador', notifyNote: 'Te avisa en cada cambio, aunque estés en otra pestaña o app', notifyBlocked: 'Las notificaciones están bloqueadas en tu navegador', pausedNext: n => `Siguiente: ${n}. Pulsa ▶ para empezar`,
 nNext: n => `Siguiente: ${n}`, nDone: '¡Todo listo! 🎉', nSoon: (n, m) => `${n}: quedan ${m} min`,
+askNotify: '¿Quieres un aviso emergente en cada cambio, aunque estés en otra pestaña o la ventana esté minimizada?', askYes: 'Activar', askNo: 'Ahora no',
+restored: 'El temporizador continúa donde se quedó', tapSound: 'Toca la pantalla para volver a activar el sonido',
 },
 }[LANG];
 const STORE_KEY = 'timertrain-v1:' + location.pathname;
@@ -93,6 +99,14 @@ let masterGain = null;
 let schedOff = 0, schedNodes = [], wakeNode = null, bgSched = false; // 裏のタブ用の予約（下の「バックグラウンド」参照）
 
 function uid() { return Math.random().toString(36).slice(2, 9); }
+const RUN_KEY = 'tt-run:' + location.pathname;
+function saveRun() {
+try {
+if (!run.active || run.finished) { sessionStorage.removeItem(RUN_KEY); return; }
+sessionStorage.setItem(RUN_KEY, JSON.stringify({ q: serialize(), paused: run.paused, idx: run.idx, cycle: run.cycle,
+endAt: run.endAt, remainMs: run.remainMs, reminded: !!run.reminded, at: Date.now() }));
+} catch (e) {}
+}
 
 /* ---------- 時間表記 ---------- */
 function fmt(secs) {
@@ -125,6 +139,7 @@ try { localStorage.setItem(STORE_KEY, JSON.stringify({ ...state, repeat: state.r
 // 設定変更のたびに表示回数が水増しされる。プロトタイプのネイティブ実装を直接呼んで回避。
 History.prototype.replaceState.call(history, null, '', serialize());
 configChanged();
+if (window.__ttOnConfig) { try { window.__ttOnConfig(); } catch (e) {} }
 }
 function parseConfig(qs) {
 try {
@@ -185,6 +200,11 @@ if (!audioCtx) {
 const AC = window.AudioContext || window.webkitAudioContext;
 if (!AC) return;
 audioCtx = new AC();
+// 他のアプリ（音楽など）に音を取られて止まった後、戻ったら予約をし直す
+audioCtx.onstatechange = () => {
+if (audioCtx.state === 'running') { if (run.active && !run.paused && !run.finished) scheduleAhead(); }
+else if (run.active && !run.paused) { bgSched = false; try { audioCtx.resume(); } catch (e) {} }
+};
 }
 if (audioCtx.state === 'suspended') audioCtx.resume();
 // 無音バッファを鳴らしてアンロック
@@ -196,9 +216,10 @@ masterGain.gain.value = sound.v / 70;
 }
 function beep(freq, dur, at, vol, type) {
 if (!audioCtx || !masterGain) return;
+if (audioCtx.state !== 'running') { try { audioCtx.resume(); } catch (e) {} }
 const t = audioCtx.currentTime + (at || 0) + schedOff;
 const osc = audioCtx.createOscillator();
-if (schedOff > 0) schedNodes.push({ o: osc, t });
+if (schedOff > 0) schedNodes.push({ o: osc, t, ev: audioCtx.currentTime + schedOff });
 const g = audioCtx.createGain();
 osc.type = type || 'sine'; osc.frequency.value = freq;
 g.gain.setValueAtTime(0.0001, t);
@@ -265,16 +286,47 @@ if (typeof ov.notify === 'boolean') opts.notify = ov.notify;
 } catch (e) {}
 function saveOpts() { try { localStorage.setItem(OPT_KEY, JSON.stringify(opts)); } catch (e) {} }
 const canNotify = () => 'Notification' in window;
-function notify(body) {
+function notify(body, sticky) {
 if (!opts.notify || !canNotify() || Notification.permission !== 'granted') return;
-if (document.visibilityState === 'visible') return; // 画面を見ているときは音と表示だけ
+// 画面を見ているとき（表示中かつ操作中のウィンドウ）は音と表示だけ。裏の別ウィンドウ・最小化・別タブでは通知
+if (document.visibilityState === 'visible' && document.hasFocus()) return;
 const title = typeof BRAND === 'string' ? BRAND : 'TimerTrain';
-const o = { body: String(body), tag: 'timertrain', renotify: true, icon: '/icon-192.png' };
+const o = { body: String(body), tag: 'timertrain', renotify: true, icon: DT ? '/donut/icon-192.png' : '/icon-192.png',
+requireInteraction: !!sticky, data: { url: location.pathname + location.search } };
 try {
 if (navigator.serviceWorker && navigator.serviceWorker.controller) {
 navigator.serviceWorker.ready.then(r => r.showNotification(title, o)).catch(() => {});
 } else { new Notification(title, o); }
 } catch (e) {}
+}
+
+/* 通知の案内: 許可をまだ聞いていない人に、初めて開始したとき1回だけ */
+const ASK_KEY = 'tt-notify-ask';
+async function enableNotify() {
+let p = Notification.permission;
+if (p === 'default') { try { p = await Notification.requestPermission(); } catch (e) { p = 'denied'; } }
+const sw = document.getElementById('opt-notify');
+if (p !== 'granted') { opts.notify = false; saveOpts(); if (sw) sw.checked = false; if (p === 'denied') toast(STR.notifyBlocked); return false; }
+opts.notify = true; saveOpts(); if (sw) sw.checked = true;
+if (window.gtag) gtag('event', 'notify_on');
+return true;
+}
+function askNotifyOnce() {
+try {
+if (!canNotify() || opts.notify || Notification.permission !== 'default' || localStorage.getItem(ASK_KEY)) return;
+} catch (e) { return; }
+if (document.getElementById('tt-ask')) return;
+const box = document.createElement('div'); box.id = 'tt-ask'; box.className = 'tt-ask'; box.setAttribute('role', 'status');
+const tx = document.createElement('p'); tx.textContent = STR.askNotify;
+const yes = document.createElement('button'); yes.type = 'button'; yes.className = 'tt-ask-yes'; yes.textContent = STR.askYes;
+const no = document.createElement('button'); no.type = 'button'; no.className = 'tt-ask-no'; no.textContent = STR.askNo;
+const close = v => { try { localStorage.setItem(ASK_KEY, v); } catch (e) {} box.remove(); };
+yes.addEventListener('click', async () => { close('yes'); await enableNotify(); });
+no.addEventListener('click', () => { close('no'); if (window.gtag) gtag('event', 'notify_ask_no'); });
+const btns = document.createElement('div'); btns.className = 'tt-ask-btns'; btns.append(yes, no);
+box.append(tx, btns);
+const ctr = document.querySelector('.run-controls');
+if (ctr) ctr.insertAdjacentElement('afterend', box);
 }
 
 /* ---------- Wake Lock ---------- */
@@ -548,6 +600,9 @@ updateHighlight();
 clearInterval(tickId);
 tickId = setInterval(tick, 200);
 tick();
+scheduleAhead();
+saveRun();
+askNotifyOnce();
 }
 // 停止＝最初に戻る（待機状態: 1つ目のタイマーをリングにプレビュー）
 function resetToIdle() {
@@ -555,6 +610,7 @@ if (window.__ttOnStop) { try { window.__ttOnStop(); } catch (e) {} }
 clearInterval(tickId); tickId = null;
 cancelSched();
 run = { active: false, paused: true, finished: false, idx: 0, cycle: 1, endAt: 0, remainMs: 0, lastSec: -1 };
+saveRun();
 releaseWakeLock();
 document.title = BASE_TITLE;
 pauseBtn.innerHTML = ICONS.play;
@@ -598,14 +654,19 @@ releaseWakeLock();
 updateRunView();
 updateEta();
 scheduleAhead();
+saveRun();
 }
 function skip() {
 if (!run.active || run.finished) return;
 advance(false);
+scheduleAhead();
+saveRun();
 }
 function resetRun() { resetToIdle(); }
 function advance(withSound) {
 const now = Date.now();
+// 時間切れで進むときは本来の区切り時刻から数える（裏のタブで処理が遅れても後ろにずれない）
+const base = withSound && !run.paused && run.endAt > 0 ? Math.min(run.endAt, now) : now;
 if (run.idx + 1 < state.timers.length) {
 run.idx++;
 } else if (state.repeat === Infinity || run.cycle < state.repeat) {
@@ -627,10 +688,13 @@ toast(STR.pausedNext(nx.name || STR.defName));
 run.lastSec = -1;
 run.reminded = false;
 if (run.paused) run.remainMs = state.timers[run.idx].secs * 1000;
-else run.endAt = now + state.timers[run.idx].secs * 1000;
+else run.endAt = base + state.timers[run.idx].secs * 1000;
 renderStations();
 updateHighlight();
 updateRunView();
+// 音の予約を今の時刻に合わせ直す（鳴り始めた音は残す）
+if (withSound && !run.paused) scheduleAhead(1.5);
+saveRun();
 }
 function finish() {
 if (!bgSched) soundFinish();
@@ -645,13 +709,18 @@ pauseBtn.innerHTML = ICONS.replay;
 if (DT) { DT.done(); DT.fit(runTime); } else setRing(1, '#34C759');
 document.title = STR.doneTitle;
 updateEta();
-notify(STR.nDone);
+saveRun();
+notify(STR.nDone, true);
 if (window.__ttOnFinish) { try { window.__ttOnFinish(); } catch (e) {} }
 }
 function tick() {
 if (!run.active || run.paused || run.finished) return;
 const remain = run.endAt - Date.now();
-if (remain <= 0) { advance(true); return; }
+if (remain <= 0) {
+let guard = 0;
+do { advance(true); } while (run.active && !run.paused && !run.finished && run.endAt - Date.now() <= 0 && ++guard < 500);
+return;
+}
 const sec = Math.ceil(remain / 1000);
 if (sec !== run.lastSec) {
 run.lastSec = sec;
@@ -672,14 +741,20 @@ updateRunView();
  *  2) 次の区切りの時刻に終わる無音の音を鳴らし、その終了の合図で切り替えと通知を行う
  * 画面に戻ったら予約を取り消し、通常の動きに戻す。 */
 function atAudio(secFromNow, fn) {
-if (secFromNow < 0.05) return;
+if (secFromNow < 0.05 || secFromNow <= schedKeep) return;
 schedOff = secFromNow;
 try { fn(); } finally { schedOff = 0; }
 }
-function cancelSched() {
+function cancelSched(keep) {
 const now = audioCtx ? audioCtx.currentTime : 0;
-schedNodes.forEach(n => { if (n.t > now + 0.02) { try { n.o.stop(0); n.o.disconnect(); } catch (e) {} } });
-schedNodes = [];
+const lim = now + (keep || 0.02);
+// keep 秒以内に鳴り始める音（鳴っている途中の音を含む）は残す
+const left = [];
+schedNodes.forEach(n => {
+if (n.ev > lim) { try { n.o.stop(0); n.o.disconnect(); } catch (e) {} }
+else if (n.t > now - 2) left.push(n);
+});
+schedNodes = left;
 if (wakeNode) { try { wakeNode.onended = null; wakeNode.stop(0); wakeNode.disconnect(); } catch (e) {} wakeNode = null; }
 bgSched = false;
 }
@@ -688,11 +763,15 @@ if (!opts.remind || reminded || t.secs <= opts.remind * 60 + 5) return null;
 const at = endMs - opts.remind * 60000;
 return at > startMs && at > 3000 ? at : null;
 }
-function scheduleAhead() {
-cancelSched();
-if (!audioCtx || !masterGain || !run.active || run.paused || run.finished || document.visibilityState === 'visible') return;
-if (audioCtx.state === 'suspended') { try { audioCtx.resume(); } catch (e) {} }
+let schedKeep = 0;
+function scheduleAhead(keep) {
+keep = keep || 0;
+cancelSched(keep);
+if (!audioCtx || !masterGain || !run.active || run.paused || run.finished) return;
+// 音が止まっている（ブラウザの制限・他のアプリに取られた）間は予約できないので、画面側で鳴らす
+if (audioCtx.state !== 'running') { try { audioCtx.resume(); } catch (e) {} return; }
 bgSched = true;
+schedKeep = keep;
 const S = SOUNDS[sound.s];
 const extras = (t, startMs, endMs, reminded) => {
 [3, 2, 1].forEach(k => { const at = endMs - k * 1000; if (at > startMs) atAudio(at / 1000, () => S.tick()); });
@@ -715,6 +794,7 @@ const t = state.timers[idx], start = endMs;
 endMs += t.secs * 1000;
 extras(t, start, endMs, false);
 }
+schedKeep = 0;
 scheduleWake();
 }
 // 次に処理が必要な時刻（区切り、または終了前のお知らせ）に終わる無音の音で、処理を起こす
@@ -737,13 +817,19 @@ wakeNode = o;
 }
 document.addEventListener('visibilitychange', () => {
 if (document.visibilityState === 'visible') {
-if (bgSched) tick(); // 遅れていた切り替えを、音を重ねずに追いつかせる
-cancelSched();
+tick(); // 遅れていた切り替えを追いつかせる（音は予約済みなので重ねない）
 if (run.active && !run.finished) { updateRunView(); updateEta(); }
+if (run.active && !run.paused && !run.finished && !bgSched) scheduleAhead();
 } else {
-scheduleAhead();
+if (run.active && !run.paused && !run.finished && !bgSched) scheduleAhead();
+saveRun();
 }
 });
+// ブラウザがタブを一時停止（freeze）→再開したとき、bfcache から戻ったとき
+document.addEventListener('freeze', saveRun);
+document.addEventListener('resume', () => { tick(); if (run.active && !run.paused && !run.finished) scheduleAhead(1.5); });
+window.addEventListener('pageshow', e => { if (e.persisted) { tick(); if (run.active && !run.paused && !run.finished) scheduleAhead(1.5); } });
+window.addEventListener('pagehide', saveRun);
 function updateRunView() {
 if (run.finished) return;
 const t = state.timers[run.idx];
@@ -830,7 +916,7 @@ const vol = document.createElement('input'); vol.type = 'range'; vol.id = 'snd-v
 vol.value = String(sound.v); vol.setAttribute('aria-label', STR.vol);
 const paint = () => { vol.disabled = sound.s === 'none'; vol.style.setProperty('--p', sound.v + '%'); };
 const preview = () => { unlockAudio(); soundSegment(); };
-sel.addEventListener('change', () => { sound.s = SOUNDS[sel.value] ? sel.value : 'chime'; saveSound(); paint(); preview(); if (window.gtag) gtag('event', 'sound_change', { sound: sound.s }); });
+sel.addEventListener('change', () => { sound.s = SOUNDS[sel.value] ? sel.value : 'chime'; saveSound(); paint(); preview(); if (run.active) scheduleAhead(); if (window.gtag) gtag('event', 'sound_change', { sound: sound.s }); });
 vol.addEventListener('input', () => { sound.v = Math.min(100, Math.max(0, parseInt(vol.value, 10) || 0)); saveSound(); paint(); });
 vol.addEventListener('change', preview);
 ctrl.append(sel, vol); row.append(lab, ctrl);
@@ -848,22 +934,20 @@ r.append(tx, control); det.appendChild(r); return r;
 };
 const sw = (id, on) => { const c = document.createElement('input'); c.type = 'checkbox'; c.id = id; c.className = 'tt-switch'; c.checked = on; c.setAttribute('role', 'switch'); return c; };
 const autoSw = sw('opt-auto', opts.auto);
-autoSw.addEventListener('change', () => { opts.auto = autoSw.checked; saveOpts(); });
+autoSw.addEventListener('change', () => { opts.auto = autoSw.checked; saveOpts(); if (run.active) scheduleAhead(); });
 mkRow(STR.auto, STR.autoNote, autoSw, 'opt-auto');
 const rem = document.createElement('select'); rem.id = 'opt-remind'; rem.className = 'tt-select';
 [0, 1, 2, 5].forEach(n => { const o = document.createElement('option'); o.value = String(n); o.textContent = n ? STR.remindMin(n) : STR.remindOff; rem.appendChild(o); });
 rem.value = String(opts.remind);
-rem.addEventListener('change', () => { opts.remind = parseInt(rem.value, 10) || 0; saveOpts(); });
+rem.addEventListener('change', () => { opts.remind = parseInt(rem.value, 10) || 0; saveOpts(); if (run.active) scheduleAhead(); });
 mkRow(STR.remind, '', rem, 'opt-remind');
 if (canNotify()) {
 const nSw = sw('opt-notify', opts.notify && Notification.permission === 'granted');
 nSw.addEventListener('change', async () => {
 if (!nSw.checked) { opts.notify = false; saveOpts(); return; }
-let p = Notification.permission;
-if (p === 'default') { try { p = await Notification.requestPermission(); } catch (e) { p = 'denied'; } }
-if (p !== 'granted') { nSw.checked = false; opts.notify = false; saveOpts(); if (p === 'denied') toast(STR.notifyBlocked); return; }
-opts.notify = true; saveOpts();
-if (window.gtag) gtag('event', 'notify_on');
+try { localStorage.setItem(ASK_KEY, 'set'); } catch (e) {}
+const a = document.getElementById('tt-ask'); if (a) a.remove();
+await enableNotify();
 });
 mkRow(STR.notify, STR.notifyNote, nSw, 'opt-notify');
 }
@@ -915,6 +999,33 @@ load();
 renderList();
 pauseBtn.innerHTML = ICONS.play;
 persist(); // configChanged() 経由で待機ビュー（リングプレビュー）も描画される
+restoreRun();
+function restoreRun() {
+let s = null;
+try { s = JSON.parse(sessionStorage.getItem(RUN_KEY) || 'null'); } catch (e) {}
+if (!s || s.q !== serialize()) return;
+const n = state.timers.length;
+if (!(s.idx >= 0 && s.idx < n) || !(s.cycle >= 1) || Date.now() - s.at > 12 * 3600e3) { try { sessionStorage.removeItem(RUN_KEY); } catch (e) {} return; }
+run = { active: true, paused: !!s.paused, finished: false, idx: s.idx, cycle: s.cycle,
+endAt: s.paused ? 0 : s.endAt, remainMs: s.paused ? Math.max(0, s.remainMs) : 0, lastSec: -1, reminded: !!s.reminded };
+pauseBtn.innerHTML = run.paused ? ICONS.play : ICONS.pause;
+renderStations(); updateHighlight();
+// 閉じていた間に過ぎた区切りは音を鳴らさずに進める
+let guard = 0;
+while (!run.paused && !run.finished && run.endAt - Date.now() <= 0 && ++guard < 2000) advance(true);
+if (run.finished) return;
+updateRunView(); updateEta();
+clearInterval(tickId); tickId = setInterval(tick, 200);
+if (!run.paused) acquireWakeLock();
+toast(STR.restored);
+// 音はブラウザの決まりで、画面を一度さわるまで鳴らせないことがある
+unlockAudio();
+const wake = () => { unlockAudio(); if (run.active && !run.paused && !run.finished) scheduleAhead(); };
+document.addEventListener('pointerdown', wake, { once: true });
+document.addEventListener('keydown', wake, { once: true });
+if (audioCtx && audioCtx.state !== 'running') setTimeout(() => { if (audioCtx && audioCtx.state !== 'running') toast(STR.tapSound); }, 2000);
+else scheduleAhead();
+}
 
 /* ---------- 集中モード（PCのみ表示。リングと時間だけの全画面） ---------- */
 (function () {
@@ -1051,7 +1162,7 @@ a.setAttribute('aria-label', signed ? L.me : L.in);
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=4'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=5'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 })();

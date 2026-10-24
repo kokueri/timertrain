@@ -2,8 +2,8 @@
 - HTML: network-first （常に最新のページを配信し、オフライン時のみキャッシュ）
 - 静的アセット: cache-first（style.css / app.js は ?v= 付きなので更新は自動で反映）
 */
-const V = 'tt-v24';
-const PRECACHE = ['/style.css?v=22', '/app.js?v=22', '/icon-192.png', '/icon-512.png'];
+const V = 'tt-v25';
+const PRECACHE = ['/style.css?v=23', '/app.js?v=23', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', e => {
 e.waitUntil(caches.open(V).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting()).catch(() => self.skipWaiting()));
@@ -51,8 +51,13 @@ self.addEventListener('notificationclick', e => {
 e.notification.close();
 e.waitUntil(
 self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+const want = (e.notification.data && typeof e.notification.data.url === 'string' && e.notification.data.url.startsWith('/')) ? e.notification.data.url : '/';
+const path = want.split('?')[0];
+// 通知を出したタイマーのタブ（同じページ）を優先して前に出す
+const same = list.find(c => { try { return new URL(c.url).pathname === path && 'focus' in c; } catch (x) { return false; } });
+if (same) return same.focus();
 for (const c of list) { if (c.url.startsWith(self.location.origin) && 'focus' in c) return c.focus(); }
-return self.clients.openWindow ? self.clients.openWindow('/') : null;
+return self.clients.openWindow ? self.clients.openWindow(want) : null;
 })
 );
 });

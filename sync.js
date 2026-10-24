@@ -19,17 +19,23 @@
     title: 'My timers', save: 'Save current setup', namePh: 'Name', ok: 'Save', cancel: 'Cancel',
     empty: 'No saved timers yet. Save the current setup to use it on any device.',
     del: 'Delete', delQ: 'Delete?', saved: 'Saved', err: 'Could not connect. Please try again later.',
-    limit: 'You have reached the limit of saved timers.', signin: 'Sign in again'
+    limit: 'You have reached the limit of saved timers.', signin: 'Sign in again',
+    cur: 'In use', changed: 'edited', over: 'Save changes', asNew: 'Save as new', rename: 'Rename', renameQ: 'New name',
+    overDone: 'Changes saved', renamed: 'Renamed', badge: 'My timer'
   } : lang === 'es' ? {
     title: 'Mis temporizadores', save: 'Guardar configuración actual', namePh: 'Nombre', ok: 'Guardar', cancel: 'Cancelar',
     empty: 'Aún no hay temporizadores guardados. Guarda la configuración actual para usarla en cualquier dispositivo.',
     del: 'Eliminar', delQ: '¿Eliminar?', saved: 'Guardado', err: 'No se pudo conectar. Inténtalo más tarde.',
-    limit: 'Has alcanzado el límite de temporizadores guardados.', signin: 'Vuelve a iniciar sesión'
+    limit: 'Has alcanzado el límite de temporizadores guardados.', signin: 'Vuelve a iniciar sesión',
+    cur: 'En uso', changed: 'con cambios', over: 'Guardar cambios', asNew: 'Guardar como nuevo', rename: 'Renombrar', renameQ: 'Nuevo nombre',
+    overDone: 'Cambios guardados', renamed: 'Nombre cambiado', badge: 'Mi temporizador'
   } : {
     title: 'マイタイマー', save: '今の編成を保存', namePh: '名前', ok: '保存', cancel: 'やめる',
     empty: 'まだ保存したタイマーはありません。今の編成を保存すると、どの端末からでも呼び出せます。',
     del: '削除', delQ: '削除する？', saved: '保存しました', err: 'つながりませんでした。時間をおいてもう一度お試しください。',
-    limit: '保存できる数の上限に達しました。', signin: 'もう一度ログイン'
+    limit: '保存できる数の上限に達しました。', signin: 'もう一度ログイン',
+    cur: '使用中', changed: '変更あり', over: '上書き保存', asNew: '別に保存', rename: '名前を変更', renameQ: '新しい名前',
+    overDone: '上書き保存しました', renamed: '名前を変更しました', badge: 'マイタイマー'
   };
   var acctHref = '/account?l=' + (['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja');
   function ev(name, p) { try { if (window.gtag) gtag('event', name, p || {}); } catch (e) {} }
@@ -57,10 +63,110 @@
   var form = el('div', { cls: 'tt-my-form', hidden: '' });
   var list = el('div', { cls: 'tt-my-list' });
   var note = el('p', { cls: 'tt-my-note', role: 'status' });
-  box.appendChild(head); box.appendChild(form); box.appendChild(list); box.appendChild(note);
+  var curRow = el('div', { cls: 'tt-my-cur', hidden: '' });
+  box.appendChild(head); box.appendChild(curRow); box.appendChild(form); box.appendChild(list); box.appendChild(note);
   setup.appendChild(box);
+  // タイマーの上に「マイタイマー：名前」
+  var badge = el('p', { cls: 'tt-my-badge', hidden: '' });
+  var runSec = document.getElementById('run');
+  if (runSec) runSec.insertBefore(badge, runSec.firstChild);
 
   var items = [];
+  /* ---------- 使用中のマイタイマー ----------
+   * 呼び出したマイタイマーを、このタブで覚えておく（sessionStorage）。
+   * 編成を変えたら「変更あり」→ 上書き保存できる。別の編成に切り替えたら使用中ではなくなる。 */
+  var CUR_KEY = 'tt-my-cur';
+  var curId = null;
+  function curQ() { try { return serialize(); } catch (e) { return ''; } }
+  function readCur() { try { return JSON.parse(sessionStorage.getItem(CUR_KEY) || 'null'); } catch (e) { return null; } }
+  function writeCur() {
+    try {
+      if (curId) sessionStorage.setItem(CUR_KEY, JSON.stringify({ id: curId, path: location.pathname, q: curQ() }));
+      else sessionStorage.removeItem(CUR_KEY);
+    } catch (e) {}
+  }
+  function findItem(id) { for (var i = 0; i < items.length; i++) if (items[i].id === id) return items[i]; return null; }
+  function itemQ(it) { return it && it.config && typeof it.config.q === 'string' ? it.config.q : ''; }
+  function pickCur() {
+    var q = curQ(), c = readCur();
+    if (c && c.path === location.pathname && c.q === q && findItem(c.id)) { curId = c.id; return; }
+    // 保存したものとまったく同じ編成なら、それを使用中とみなす
+    curId = null;
+    for (var i = 0; i < items.length; i++) if (itemQ(items[i]) === q) { curId = items[i].id; break; }
+    writeCur();
+  }
+  function isDirty() { var it = findItem(curId); return !!it && itemQ(it) !== curQ(); }
+  function renderCur() {
+    var it = findItem(curId);
+    curRow.textContent = '';
+    saveBtn.textContent = '＋ ' + T.save;
+    if (!it) { curRow.hidden = true; badge.hidden = true; return; }
+    var dirty = isDirty();
+    curRow.hidden = false;
+    curRow.appendChild(el('span', { cls: 'tt-my-cur-label', text: T.cur }));
+    curRow.appendChild(el('strong', { cls: 'tt-my-cur-name', text: it.name }));
+    if (dirty) curRow.appendChild(el('span', { cls: 'tt-my-dirty', text: T.changed }));
+    var acts = el('span', { cls: 'tt-my-cur-acts' });
+    if (dirty) {
+      var ov = el('button', { type: 'button', cls: 'tt-my-ok', text: T.over });
+      ov.addEventListener('click', function () { overwrite(it, ov); });
+      acts.appendChild(ov);
+    }
+    var rn = el('button', { type: 'button', cls: 'tt-my-save', text: T.rename });
+    rn.addEventListener('click', function () { openRename(it); });
+    acts.appendChild(rn);
+    curRow.appendChild(acts);
+    badge.hidden = false;
+    badge.textContent = T.badge + '：' + it.name + (dirty ? '（' + T.changed + '）' : '');
+    badge.classList.toggle('dirty', dirty);
+    saveBtn.textContent = '＋ ' + (dirty ? T.asNew : T.save);
+  }
+  async function overwrite(it, btn) {
+    var q = curQ();
+    if (!Q_RE.test(q)) return;
+    if (btn) btn.disabled = true;
+    var r = await sb.from('timers').update({ config: { q: q, page: location.pathname } }).eq('id', it.id)
+      .select('id,name,config,updated_at').single();
+    if (btn) btn.disabled = false;
+    if (r.error || !r.data) { setNote(T.err, true); return; }
+    ev('timer_overwrite');
+    items = [r.data].concat(items.filter(function (z) { return z.id !== it.id; }));
+    writeCur(); render(); flash(T.overDone);
+  }
+  function openRename(it) {
+    if (!form.hidden) return;
+    form.textContent = '';
+    var input = el('input', { type: 'text', cls: 'tt-my-input', maxlength: '60', placeholder: T.renameQ, 'aria-label': T.renameQ });
+    input.value = it.name;
+    var ok = el('button', { type: 'button', cls: 'tt-my-ok', text: T.ok });
+    var cancel = el('button', { type: 'button', cls: 'tt-my-cancel', text: T.cancel });
+    function close() { form.hidden = true; form.textContent = ''; saveBtn.disabled = false; }
+    cancel.addEventListener('click', close);
+    async function doRename() {
+      var name = input.value.trim().slice(0, 60);
+      if (!name) { input.focus(); return; }
+      if (name === it.name) { close(); return; }
+      ok.disabled = true;
+      var r = await sb.from('timers').update({ name: name }).eq('id', it.id).select('id,name,config,updated_at').single();
+      if (r.error || !r.data) { ok.disabled = false; setNote(T.err, true); return; }
+      ev('timer_rename');
+      items = items.map(function (z) { return z.id === it.id ? r.data : z; });
+      close(); render(); flash(T.renamed);
+    }
+    ok.addEventListener('click', doRename);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); doRename(); } });
+    form.appendChild(input); form.appendChild(ok); form.appendChild(cancel);
+    form.hidden = false; saveBtn.disabled = true;
+    input.focus(); input.select();
+  }
+  function flash(t) { setNote(t); setTimeout(function () { if (note.textContent === t) setNote(''); }, 2500); }
+  // 編成を変えたとき（app.js の persist から）
+  var prevCfg = window.__ttOnConfig;
+  window.__ttOnConfig = function () {
+    if (prevCfg) { try { prevCfg(); } catch (e) {} }
+    if (curId) writeCur();
+    renderCur();
+  };
   function setNote(t, isErr) { note.textContent = t || ''; note.classList.toggle('err', !!isErr); }
 
   function defaultName() {
@@ -73,13 +179,18 @@
 
   function render() {
     list.textContent = '';
+    renderCur();
     if (!items.length) { list.appendChild(el('p', { cls: 'tt-my-empty', text: T.empty })); return; }
     items.forEach(function (it) {
       var q = it.config && it.config.q;
       if (typeof q !== 'string' || !Q_RE.test(q)) return;
-      var row = el('div', { cls: 'tt-my-item' });
+      var row = el('div', { cls: 'tt-my-item' + (it.id === curId ? ' current' : '') });
       var a = el('a', { cls: 'tt-chip tt-my-chip', href: location.pathname + q, text: it.name });
-      a.addEventListener('click', function () { ev('timer_load'); });
+      if (it.id === curId) a.setAttribute('aria-current', 'true');
+      a.addEventListener('click', function () {
+        ev('timer_load');
+        try { sessionStorage.setItem(CUR_KEY, JSON.stringify({ id: it.id, path: location.pathname, q: q })); } catch (e) {}
+      });
       var x = el('button', { type: 'button', cls: 'tt-my-x', 'aria-label': T.del + ': ' + it.name, text: '×' });
       x.addEventListener('click', function () {
         if (row.classList.contains('confirm')) return;
@@ -93,6 +204,7 @@
           if (r.error) { setNote(T.err, true); yes.disabled = false; return; }
           ev('timer_delete');
           items = items.filter(function (z) { return z.id !== it.id; });
+          if (curId === it.id) { curId = null; writeCur(); }
           render();
         });
         row.appendChild(yes); row.appendChild(no);
@@ -107,6 +219,7 @@
       .eq('product', PRODUCT).order('updated_at', { ascending: false }).limit(100);
     if (r.error) { setNote(T.err, true); return; }
     items = r.data || [];
+    pickCur();
     render();
   }
 
@@ -133,6 +246,7 @@
       }
       ev('timer_save', { count: items.length + 1 });
       items.unshift(r.data);
+      curId = r.data.id; writeCur();
       render(); close(); setNote(T.saved);
       setTimeout(function () { if (note.textContent === T.saved) setNote(''); }, 2500);
     }
@@ -214,8 +328,8 @@
   function startLog() {
     endLog(false);
     var q = ''; try { q = serialize(); } catch (e) {}
-    var hit = null;
-    for (var i = 0; i < items.length; i++) { if (items[i].config && items[i].config.q === q) { hit = items[i]; break; } }
+    var hit = findItem(curId);
+    if (!hit) for (var i = 0; i < items.length; i++) { if (items[i].config && items[i].config.q === q) { hit = items[i]; break; } }
     log = { startedAt: new Date().toISOString(), secs: 0, q: Q_RE.test(q) ? q : null, page: location.pathname.slice(0, 100), id: null, saved: 0,
       timerId: hit ? hit.id : null, timerName: hit ? String(hit.name).slice(0, 60) : null };
     last = Date.now();
