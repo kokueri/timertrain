@@ -263,10 +263,19 @@
    */
   var log = null, logTick = null, last = 0;
   function isRunning() { try { return run.active && !run.paused && !run.finished; } catch (e) { return false; } }
+  /* 区切りごとの記録: 今動いている区切り（タイマー名＝ラベル）に、動いた秒数を足していく */
+  function curSeg(L) {
+    var s = L.segs[L.segs.length - 1];
+    if (s && !s.closed) return s;
+    var t = null; try { t = state.timers[run.idx]; } catch (e) {}
+    s = { seq: L.segs.length, label: String((t && t.name) || '').slice(0, 30), secs: 0, startedAt: new Date().toISOString(), sent: -1, closed: false };
+    if (L.segs.length < 2000) L.segs.push(s);
+    return s;
+  }
   function step() {
     if (!log) return;
     var now = Date.now();
-    if (isRunning()) log.secs += (now - last) / 1000;
+    if (isRunning()) { var d = (now - last) / 1000; log.secs += d; curSeg(log).secs += d; }
     last = now;
     if (!log.id && !log.busy && log.secs >= 15) persistLog(log, false);
     else if (log.id && now - log.saved > 60000) persistLog(log, false);
@@ -315,6 +324,18 @@
         await sb.from('usage_logs').update({ total_secs: secs, completed: !!done, ended_at: new Date().toISOString() }).eq('id', L.id);
       }
       L.saved = Date.now();
+      if (L.id && !L.noSegs) {
+        var rows = [];
+        L.segs.forEach(function (g) {
+          var v = Math.min(86400, Math.round(g.secs));
+          if (v >= 1 && v !== g.sent) rows.push({ g: g, row: { log_id: L.id, product: PRODUCT, seq: g.seq, label: g.label, secs: v, started_at: g.startedAt } });
+        });
+        if (rows.length) {
+          var r2 = await sb.from('usage_segments').upsert(rows.map(function (x) { return x.row; }), { onConflict: 'log_id,seq' });
+          if (!r2.error) rows.forEach(function (x) { x.g.sent = x.row.secs; });
+          else if (/usage_segments|does not exist|schema cache/.test(r2.error.message || '')) L.noSegs = true; // 表がまだ無いときは送らない
+        }
+      }
     }).catch(function () {});
     return L.chain;
   }
@@ -331,7 +352,7 @@
     var hit = findItem(curId);
     if (!hit) for (var i = 0; i < items.length; i++) { if (items[i].config && items[i].config.q === q) { hit = items[i]; break; } }
     log = { startedAt: new Date().toISOString(), secs: 0, q: Q_RE.test(q) ? q : null, page: location.pathname.slice(0, 100), id: null, saved: 0,
-      timerId: hit ? hit.id : null, timerName: hit ? String(hit.name).slice(0, 60) : null };
+      timerId: hit ? hit.id : null, timerName: hit ? String(hit.name).slice(0, 60) : null, segs: [] };
     last = Date.now();
     logTick = setInterval(step, 5000);
   }
@@ -340,6 +361,16 @@
     window.__ttOnStart = function () { if (prevStart) { try { prevStart(); } catch (e) {} } startLog(); };
     window.__ttOnFinish = function () { if (prevFinish) { try { prevFinish(); } catch (e) {} } endLog(true); };
     window.__ttOnStop = function () { if (prevStop) { try { prevStop(); } catch (e) {} } endLog(false); };
+    var prevPause = window.__ttOnPause;
+    window.__ttOnPause = function () { if (prevPause) { try { prevPause(); } catch (e) {} } step(); };
+    var prevSeg = window.__ttOnSeg;
+    window.__ttOnSeg = function () {
+      if (prevSeg) { try { prevSeg(); } catch (e) {} }
+      if (!log) return;
+      step();
+      var s = log.segs[log.segs.length - 1];
+      if (s && !s.closed) s.closed = true;
+    };
     window.addEventListener('pagehide', function () { if (log) { step(); persistLog(log, false); } });
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden' && log) { step(); persistLog(log, false); } });
   }
@@ -417,6 +448,7 @@
     hookSettings();
     loadStreak(false);
     await load();
+    if (window.__ttRestored && isRunning() && !log) startLog();
     syncSettings().catch(function () {});
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { load(); loadStreak(false); syncSettings().catch(function () {}); } });
   })().catch(function () { setNote(T.err, true); });
