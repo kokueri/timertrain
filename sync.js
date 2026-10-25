@@ -8,6 +8,7 @@
   var SB_URL = 'https://arsfocfjfwtlykfdkiea.supabase.co';
   var SB_KEY = 'sb_publishable_zw039kyiXe27oY4ITTcNnA_-B_FsG5H';
   var PRODUCT = 'timertrain';
+  var PJ_FREE = 1; // 無料プランのプロジェクト数
   var FREE_MAX = 2; // 無料プランで保存できるマイタイマーの数（サーバー側の制限は決済と一緒に入れる）
   var Q_RE = /^\?t=[A-Za-z0-9.,%_\-~!*'()]{1,7000}&r=(?:inf|\d{1,2})$/;
 
@@ -23,6 +24,7 @@
     limit: 'You have reached the limit of saved timers.', signin: 'Sign in again',
     cur: 'In use', changed: 'edited', over: 'Save changes', asNew: 'Save as new', rename: 'Rename', renameQ: 'New name',
     overDone: 'Changes saved', renamed: 'Renamed', badge: 'My timer',
+    proj: 'Project', projNone: 'No project', projNew: '+ New project…', projNamePh: 'Project name',
     full: 'The free plan saves up to 2 timers. Save changes over one you have, or delete one first. Unlimited with Premium (coming soon).', plans: 'See plans'
   } : lang === 'es' ? {
     title: 'Mis temporizadores', save: 'Guardar configuración actual', namePh: 'Nombre', ok: 'Guardar', cancel: 'Cancelar',
@@ -31,6 +33,7 @@
     limit: 'Has alcanzado el límite de temporizadores guardados.', signin: 'Vuelve a iniciar sesión',
     cur: 'En uso', changed: 'con cambios', over: 'Guardar cambios', asNew: 'Guardar como nuevo', rename: 'Renombrar', renameQ: 'Nuevo nombre',
     overDone: 'Cambios guardados', renamed: 'Nombre cambiado', badge: 'Mi temporizador',
+    proj: 'Proyecto', projNone: 'Sin proyecto', projNew: '+ Nuevo proyecto…', projNamePh: 'Nombre del proyecto',
     full: 'El plan gratis guarda hasta 2 temporizadores. Guarda los cambios sobre uno que ya tengas o elimina uno primero. Ilimitados con Premium (próximamente).', plans: 'Ver planes'
   } : {
     title: 'マイタイマー', save: '今の編成を保存', namePh: '名前', ok: '保存', cancel: 'やめる',
@@ -39,6 +42,7 @@
     limit: '保存できる数の上限に達しました。', signin: 'もう一度ログイン',
     cur: '使用中', changed: '変更あり', over: '上書き保存', asNew: '別に保存', rename: '名前を変更', renameQ: '新しい名前',
     overDone: '上書き保存しました', renamed: '名前を変更しました', badge: 'マイタイマー',
+    proj: 'プロジェクト', projNone: 'プロジェクトなし', projNew: '＋ 新しいプロジェクト…', projNamePh: 'プロジェクト名',
     full: '無料プランで保存できるマイタイマーは2つまでです。今あるものに上書き保存するか、1つ削除してから保存してください。プレミアム（準備中）では無制限になります。', plans: 'プランを見る'
   };
   var acctHref = '/account?l=' + (['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja');
@@ -76,6 +80,38 @@
   if (runSec) runSec.insertBefore(badge, runSec.firstChild);
 
   var items = [];
+  var projects = [];
+  function projName(id) { for (var i = 0; i < projects.length; i++) if (projects[i].id === id) return projects[i].name; return ''; }
+  // プロジェクトの選択（なし／既存／＋新しく作る）。選んだら onPick(id or null)
+  function projPicker(cur, onPick) {
+    var s = el('select', { cls: 'tt-my-proj', 'aria-label': T.proj });
+    s.appendChild(el('option', { value: '', text: T.projNone }));
+    projects.forEach(function (p) { var o = el('option', { value: p.id, text: p.name }); if (p.id === cur) o.selected = true; s.appendChild(o); });
+    if (projects.length < PJ_FREE) s.appendChild(el('option', { value: '__new', text: T.projNew }));
+    s.addEventListener('change', async function () {
+      if (s.value !== '__new') { onPick(s.value || null); return; }
+      var name = '';
+      var box = el('span', { cls: 'tt-my-projnew' });
+      var inp = el('input', { type: 'text', cls: 'tt-my-input', maxlength: '40', placeholder: T.projNamePh, 'aria-label': T.projNamePh });
+      var ok = el('button', { type: 'button', cls: 'tt-my-ok', text: T.ok });
+      box.appendChild(inp); box.appendChild(ok);
+      s.hidden = true; s.parentNode.insertBefore(box, s.nextSibling); inp.focus();
+      async function go() {
+        name = inp.value.trim().slice(0, 40);
+        if (!name) { box.remove(); s.hidden = false; s.value = cur || ''; return; }
+        ok.disabled = true;
+        var r = await sb.from('projects').insert({ product: PRODUCT, name: name, sort: projects.length }).select('id,name').single();
+        if (r.error || !r.data) { ok.disabled = false; setNote(T.err, true); return; }
+        projects.push(r.data); ev('project_create', { count: projects.length, from: 'timer' });
+        var o = el('option', { value: r.data.id, text: r.data.name }); s.insertBefore(o, s.lastChild); s.value = r.data.id;
+        if (projects.length >= PJ_FREE && s.lastChild.value === '__new') s.removeChild(s.lastChild);
+        box.remove(); s.hidden = false; onPick(r.data.id);
+      }
+      ok.addEventListener('click', go);
+      inp.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); go(); } if (e.key === 'Escape') { box.remove(); s.hidden = false; s.value = cur || ''; } });
+    });
+    return s;
+  }
   /* ---------- 使用中のマイタイマー ----------
    * 呼び出したマイタイマーを、このタブで覚えておく（sessionStorage）。
    * 編成を変えたら「変更あり」→ 上書き保存できる。別の編成に切り替えたら使用中ではなくなる。 */
@@ -120,6 +156,15 @@
     rn.addEventListener('click', function () { openRename(it); });
     acts.appendChild(rn);
     curRow.appendChild(acts);
+    var pl = el('label', { cls: 'tt-my-projrow' }, [el('span', { cls: 'tt-my-cur-label', text: T.proj })]);
+    pl.appendChild(projPicker(it.project_id || '', async function (pid) {
+      var r = await sb.from('timers').update({ project_id: pid }).eq('id', it.id).select('id,name,config,updated_at,project_id').single();
+      if (r.error || !r.data) { setNote(T.err, true); return; }
+      ev('project_assign', { from: 'timer' });
+      items = items.map(function (z) { return z.id === it.id ? r.data : z; });
+      render();
+    }));
+    curRow.appendChild(pl);
     badge.hidden = false;
     badge.textContent = T.badge + '：' + it.name + (dirty ? '（' + T.changed + '）' : '');
     badge.classList.toggle('dirty', dirty);
@@ -130,7 +175,7 @@
     if (!Q_RE.test(q)) return;
     if (btn) btn.disabled = true;
     var r = await sb.from('timers').update({ config: { q: q, page: location.pathname } }).eq('id', it.id)
-      .select('id,name,config,updated_at').single();
+      .select('id,name,config,updated_at,project_id').single();
     if (btn) btn.disabled = false;
     if (r.error || !r.data) { setNote(T.err, true); return; }
     ev('timer_overwrite');
@@ -151,7 +196,7 @@
       if (!name) { input.focus(); return; }
       if (name === it.name) { close(); return; }
       ok.disabled = true;
-      var r = await sb.from('timers').update({ name: name }).eq('id', it.id).select('id,name,config,updated_at').single();
+      var r = await sb.from('timers').update({ name: name }).eq('id', it.id).select('id,name,config,updated_at,project_id').single();
       if (r.error || !r.data) { ok.disabled = false; setNote(T.err, true); return; }
       ev('timer_rename');
       items = items.map(function (z) { return z.id === it.id ? r.data : z; });
@@ -220,10 +265,12 @@
   }
 
   async function load() {
-    var r = await sb.from('timers').select('id,name,config,updated_at')
+    var r = await sb.from('timers').select('id,name,config,updated_at,project_id')
       .eq('product', PRODUCT).order('updated_at', { ascending: false }).limit(100);
     if (r.error) { setNote(T.err, true); return; }
     items = r.data || [];
+    var rp = await sb.from('projects').select('id,name').eq('product', PRODUCT).order('sort').order('created_at').limit(100);
+    projects = rp.error ? [] : (rp.data || []);
     pickCur();
     render();
   }
@@ -244,13 +291,17 @@
     var cancel = el('button', { type: 'button', cls: 'tt-my-cancel', text: T.cancel });
     function close() { form.hidden = true; form.textContent = ''; saveBtn.disabled = false; }
     cancel.addEventListener('click', close);
+    var curIt = findItem(curId), newProj = curIt ? (curIt.project_id || null) : null;
+    var pick = projPicker(newProj || '', function (pid) { newProj = pid; });
     async function doSave() {
       var name = input.value.trim().slice(0, 60);
       var q = serialize();
       if (!name || !Q_RE.test(q)) { input.focus(); return; }
       ok.disabled = true;
-      var r = await sb.from('timers').insert({ product: PRODUCT, name: name, config: { q: q, page: location.pathname } })
-        .select('id,name,config,updated_at').single();
+      var row = { product: PRODUCT, name: name, config: { q: q, page: location.pathname } };
+      if (newProj) row.project_id = newProj;
+      var r = await sb.from('timers').insert(row)
+        .select('id,name,config,updated_at,project_id').single();
       if (r.error) {
         ok.disabled = false;
         setNote(/limit/.test(r.error.message || '') ? T.limit : T.err, true);
@@ -264,7 +315,7 @@
     }
     ok.addEventListener('click', doSave);
     input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); doSave(); } });
-    form.appendChild(input); form.appendChild(ok); form.appendChild(cancel);
+    form.appendChild(input); form.appendChild(pick); form.appendChild(ok); form.appendChild(cancel);
     form.hidden = false; saveBtn.disabled = true;
     input.focus(); input.select();
   });
@@ -419,7 +470,12 @@
     var L = readLocal();
     var data = { recents: mergeRecents(L.recents, remoteData && remoteData.recents), theme: L.theme, themeAt: L.themeAt };
     if (remoteData && JSON.stringify(remoteData) === JSON.stringify(data)) return;
-    var r = await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
+    // ほかの画面（マイページ）が保存した項目（休憩の切り替えなど）は残す
+    var cur = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
+    if (cur.error) return;
+    var base = (cur.data && cur.data.data && typeof cur.data.data === 'object') ? cur.data.data : {};
+    var full = Object.assign({}, base, data);
+    var r = await sb.from('settings').upsert({ product: PRODUCT, data: full }, { onConflict: 'user_id,product' });
     if (!r.error) remoteData = data;
   }
   async function syncSettings() {

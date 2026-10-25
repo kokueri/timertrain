@@ -719,3 +719,29 @@ body.focus-mode .tt-ask { display: none; }
 #acct-link[aria-label="ログイン"] span, #acct-link[aria-label="Sign in"] span { display: inline; }
 #acct-link[aria-label="ログイン"], #acct-link[aria-label="Sign in"] { padding: 9px 12px; }
 }
+/* プロジェクト（マイページの集計・タイマー画面の選択） */
+.acct-select, .tt-my-proj { min-height: 40px; max-width: 220px; padding: 0 10px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font-size: 14px; font-family: inherit; }
+.acct-my-actions { flex-wrap: wrap; }
+.acct-pj-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; width: 100%; }
+.acct-pj-list { display: flex; flex-direction: column; gap: 14px; }
+.acct-pj { display: flex; flex-direction: column; gap: 6px; padding-top: 12px; border-top: 1px solid var(--line); }
+.acct-pj-list .acct-pj:first-child { border-top: 0; padding-top: 0; }
+.acct-pj-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.acct-pj-name { font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
+.acct-pj-total { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.acct-pj-bar { height: 8px; border-radius: 4px; background: var(--bg); overflow: hidden; }
+.acct-pj-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+.acct-pj-rows { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; }
+.acct-pj-row { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 3px 0; }
+.acct-pj-row.brk { color: var(--text2); }
+.acct-pj-lab { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.acct-pj-sec { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.acct-pj-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.acct-pj-tog { min-height: 32px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line); background: transparent; color: var(--text2); font-size: 12px; font-family: inherit; cursor: pointer; white-space: nowrap; }
+.acct-pj-tog:disabled { opacity: .5; cursor: default; }
+.acct-pj-yes { border-color: #c0392b; color: #c0392b; }
+.acct-pj-acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.tt-my-projrow { display: flex; align-items: center; gap: 8px; width: 100%; }
+.tt-my-proj[hidden] { display: none; }
+.tt-my-projnew { display: inline-flex; gap: 6px; flex: 1 1 200px; }
+.tt-my-form .tt-my-proj { flex: 0 1 180px; }

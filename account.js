@@ -50,6 +50,13 @@
         ['連続日数', '何日続けて使っているかが分かります'],
         ['いつでも退会', 'アカウントと保存したデータは、このページからいつでも削除できます']
       ],
+      pjTitle: 'プロジェクト（この7日間）', pjNew: '＋ プロジェクトを作る', pjNamePh: 'プロジェクト名（例: 勉強）', pjOk: '作る', pjNone: 'プロジェクトなし',
+      pjEmpty: 'マイタイマーをプロジェクトにまとめると、ここにプロジェクトごと・区切り（ラベル）ごとの時間が出ます。下の「マイタイマー」で、それぞれのプロジェクトを選んでください。',
+      pjOther: 'マイタイマー以外', pjNoSeg: '（区切りの記録なし）', pjNoLabel: '（名前なし）', pjBreak: '休憩（合計に入れない）',
+      pjToBreak: '休憩にする', pjToWork: '合計に入れる', pjRename: '名前を変更', pjDel: '削除', pjDelQ: '削除する？（マイタイマーは残ります）', pjSave: '保存',
+      pjSel: 'プロジェクト', pjNewOpt: '＋ 新しいプロジェクト…', pjTotal: '合計', pjNote: '「休憩」「Break」などの名前は自動で休憩として合計から外します。違うときは「合計に入れる」を押してください。区切りごとの記録は 2026/10/25 から始まりました。',
+      pjErr: '保存できませんでした。時間をおいてもう一度お試しください。',
+      pjFull: '無料プランで作れるプロジェクトは1つまでです。名前を変えて使うか、削除してから作り直せます。プレミアム（準備中）では無制限になります。',
       myTitle: 'マイタイマー', myEmpty: 'まだ保存したタイマーはありません。タイマーの画面で「今の編成を保存」を押すと、ここに並びます。',
       start: 'スタート', data: 'データ', soon: '近日公開',
       myNote: '「データ」では、マイタイマーごとの利用時間を見られるようにする予定です（準備中）。',
@@ -82,6 +89,13 @@
         ['Streaks', 'See how many days in a row you have used it'],
         ['Leave any time', 'Delete your account and everything you saved from this page whenever you like']
       ],
+      pjTitle: 'Projects (last 7 days)', pjNew: '+ New project', pjNamePh: 'Project name (e.g. Study)', pjOk: 'Create', pjNone: 'No project',
+      pjEmpty: 'Group your saved timers into projects to see time per project and per segment (label) here. Pick a project for each timer under "My timers" below.',
+      pjOther: 'Not a saved timer', pjNoSeg: '(no segment data)', pjNoLabel: '(no name)', pjBreak: 'Breaks (not counted)',
+      pjToBreak: 'Mark as break', pjToWork: 'Count it', pjRename: 'Rename', pjDel: 'Delete', pjDelQ: 'Delete? (Timers are kept)', pjSave: 'Save',
+      pjSel: 'Project', pjNewOpt: '+ New project…', pjTotal: 'Total', pjNote: 'Names like "Break" or "Rest" are treated as breaks and left out of the totals. If that is wrong, press "Count it". Segment data started on 2026-10-25.',
+      pjErr: 'Could not save. Please try again later.',
+      pjFull: 'The free plan has 1 project. Rename it, or delete it and make a new one. Unlimited with Premium (coming soon).',
       myTitle: 'My timers', myEmpty: 'No saved timers yet. On the timer screen, press "Save current setup" and they will appear here.',
       start: 'Start', data: 'Data', soon: 'Coming soon',
       myNote: '"Data" will show how much you used each saved timer (in preparation).',
@@ -114,6 +128,13 @@
         ['Rachas', 'Mira cuántos días seguidos lo has usado'],
         ['Baja cuando quieras', 'Puedes eliminar tu cuenta y todo lo guardado desde esta página en cualquier momento']
       ],
+      pjTitle: 'Proyectos (últimos 7 días)', pjNew: '+ Nuevo proyecto', pjNamePh: 'Nombre del proyecto (p. ej. Estudio)', pjOk: 'Crear', pjNone: 'Sin proyecto',
+      pjEmpty: 'Agrupa tus temporizadores en proyectos para ver aquí el tiempo por proyecto y por etapa (etiqueta). Elige un proyecto para cada temporizador en «Mis temporizadores».',
+      pjOther: 'No es un temporizador guardado', pjNoSeg: '(sin datos por etapa)', pjNoLabel: '(sin nombre)', pjBreak: 'Descansos (no cuentan)',
+      pjToBreak: 'Marcar como descanso', pjToWork: 'Contarlo', pjRename: 'Renombrar', pjDel: 'Eliminar', pjDelQ: '¿Eliminar? (los temporizadores se conservan)', pjSave: 'Guardar',
+      pjSel: 'Proyecto', pjNewOpt: '+ Nuevo proyecto…', pjTotal: 'Total', pjNote: 'Los nombres como «Descanso» o «Break» se toman como descansos y no cuentan en el total. Si no es así, pulsa «Contarlo». Los datos por etapa empezaron el 25/10/2026.',
+      pjErr: 'No se pudo guardar. Inténtalo más tarde.',
+      pjFull: 'El plan gratis tiene 1 proyecto. Cámbiale el nombre o elimínalo y crea otro. Ilimitados con Premium (próximamente).',
       myTitle: 'Mis temporizadores', myEmpty: 'Aún no hay temporizadores guardados. En la pantalla del temporizador, pulsa «Guardar configuración actual» y aparecerán aquí.',
       start: 'Empezar', data: 'Datos', soon: 'Próximamente',
       myNote: 'En «Datos» podrás ver cuánto has usado cada temporizador guardado (en preparación).',
@@ -149,7 +170,7 @@
         ['スマホとPCで同じ設定', false, true, true],
         ['利用記録', false, '7日間', '全期間・月／年のグラフ'],
         ['連続日数', false, true, true],
-        ['マイプロジェクト（勉強・仕事などに分けて集計）', false, '1つ', '無制限', 1],
+        ['マイプロジェクト（勉強・仕事などに分けて集計）', false, '1つ', '無制限'],
         ['記録のCSVダウンロード', false, false, true],
         ['ミニプレーヤー（小窓で表示）', false, false, true]
       ],
@@ -165,7 +186,7 @@
         ['Same setups on phone and computer', false, true, true],
         ['History', false, '7 days', 'All time + charts'],
         ['Streaks', false, true, true],
-        ['Projects (track study, work, etc. separately)', false, '1', 'No limit', 1],
+        ['Projects (track study, work, etc. separately)', false, '1', 'No limit'],
         ['Download history as CSV', false, false, true],
         ['Mini player (small floating window)', false, false, true]
       ],
@@ -181,7 +202,7 @@
         ['Lo mismo en el móvil y el ordenador', false, true, true],
         ['Historial', false, '7 días', 'Todo + gráficos'],
         ['Rachas', false, true, true],
-        ['Proyectos (estudio, trabajo, etc. por separado)', false, '1', 'Sin límite', 1],
+        ['Proyectos (estudio, trabajo, etc. por separado)', false, '1', 'Sin límite'],
         ['Descargar el historial en CSV', false, false, true],
         ['Minirreproductor (ventana flotante)', false, false, true]
       ],
@@ -328,8 +349,9 @@
 
     var usage = el('section', { cls: 'acct-usage', 'aria-label': T.usageTitle }, [el('h2', { text: T.usageTitle }), msg(T.loading)]);
     var mine = el('section', { cls: 'acct-usage acct-my', 'aria-label': T.myTitle }, [el('h2', { text: T.myTitle }), msg(T.loading)]);
-    show([who, mine, usage, planTable(1), el('div', { cls: 'acct-row' }, [out]), danger]);
-    loadMine(mine);
+    var pj = el('section', { cls: 'acct-usage acct-pj', 'aria-label': T.pjTitle }, [el('h2', { text: T.pjTitle }), msg(T.loading)]);
+    show([who, pj, mine, usage, planTable(1), el('div', { cls: 'acct-row' }, [out]), danger]);
+    loadAll(pj, mine);
     loadUsage(usage);
   }
 
@@ -347,13 +369,75 @@
     items.forEach(function (it) { var a = it.split('.'); secs += Math.max(0, parseInt(a[1], 10) || 0); });
     return T.sum(items.length, fmtClock(secs), mt[2]);
   }
-  async function loadMine(box) {
-    var r = await sb.from('timers').select('id,name,config,updated_at').eq('product', 'timertrain')
+  /* ---------- プロジェクト ----------
+   * timers.project_id でマイタイマーをまとめ、usage_segments（区切りごとの秒数）をラベル＝区切りの名前ごとに合計する。
+   * 「休憩」などの名前は自動で合計から外す。切り替えは settings.data.breaks（{ラベル: 1=休憩 / 0=合計に入れる}）に保存 */
+  var DATA = { timers: [], projects: [], breaks: {} };
+  var BREAK_RE = /休憩|きゅうけい|やすみ|break|rest|descanso|pausa|recreo/i;
+  function isBreak(label) {
+    if (Object.prototype.hasOwnProperty.call(DATA.breaks, label)) return DATA.breaks[label] === 1;
+    return BREAK_RE.test(label);
+  }
+  async function saveBreak(label, v) {
+    var r = await sb.from('settings').select('data').eq('product', 'timertrain').maybeSingle();
+    if (r.error) return false;
+    var data = (r.data && r.data.data && typeof r.data.data === 'object') ? r.data.data : {};
+    var b = (data.breaks && typeof data.breaks === 'object') ? data.breaks : {};
+    b[label] = v;
+    var keys = Object.keys(b); if (keys.length > 200) delete b[keys[0]];
+    data.breaks = b;
+    var w = await sb.from('settings').upsert({ product: 'timertrain', data: data }, { onConflict: 'user_id,product' });
+    if (w.error) return false;
+    DATA.breaks = b; return true;
+  }
+  async function loadAll(pjBox, mineBox) {
+    var r1 = await sb.from('timers').select('id,name,config,updated_at,project_id').eq('product', 'timertrain')
       .order('updated_at', { ascending: false }).limit(100);
+    var r2 = await sb.from('projects').select('id,name,sort,created_at').eq('product', 'timertrain').order('sort').order('created_at').limit(100);
+    var r3 = await sb.from('settings').select('data').eq('product', 'timertrain').maybeSingle();
+    DATA.timers = r1.error ? [] : (r1.data || []);
+    DATA.projects = r2.error ? [] : (r2.data || []);
+    var sd = (!r3.error && r3.data && r3.data.data) || {};
+    DATA.breaks = (sd.breaks && typeof sd.breaks === 'object') ? sd.breaks : {};
+    renderMine(mineBox, r1.error);
+    loadProjects(pjBox, mineBox, r2.error);
+  }
+  function projectSelect(cur, onPick) {
+    var s = el('select', { cls: 'acct-select', 'aria-label': T.pjSel });
+    s.appendChild(el('option', { value: '', text: T.pjNone }));
+    DATA.projects.forEach(function (p) { var o = el('option', { value: p.id, text: p.name }); if (p.id === cur) o.selected = true; s.appendChild(o); });
+    if (DATA.projects.length < PJ_FREE) s.appendChild(el('option', { value: '__new', text: T.pjNewOpt }));
+    s.addEventListener('change', function () { onPick(s.value, s); });
+    return s;
+  }
+  var PJ_FREE = 1; // 無料プランのプロジェクト数（サーバー側の制限は決済と一緒に入れる）
+  async function createProject(name) {
+    name = String(name || '').trim().slice(0, 40);
+    if (!name) return null;
+    if (DATA.projects.length >= PJ_FREE) { ev('project_limit'); return null; }
+    var r = await sb.from('projects').insert({ product: 'timertrain', name: name, sort: DATA.projects.length }).select('id,name,sort,created_at').single();
+    if (r.error || !r.data) return null;
+    DATA.projects.push(r.data); ev('project_create', { count: DATA.projects.length });
+    return r.data;
+  }
+  function nameForm(box, ph, init, okText, onOk) {
+    var input = el('input', { type: 'text', cls: 'acct-input', maxlength: '40', placeholder: ph, 'aria-label': ph });
+    input.value = init || '';
+    var ok = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm acct-btn-primary', text: okText });
+    var no = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm', text: T.cancel });
+    var f = el('div', { cls: 'acct-pj-form' }, [input, ok, no]);
+    no.addEventListener('click', function () { f.remove(); });
+    async function go() { var v = input.value.trim(); if (!v) { input.focus(); return; } ok.disabled = true; var done = await onOk(v); if (done === false) { ok.disabled = false; box.appendChild(msg(T.pjErr, 'err')); } else f.remove(); }
+    ok.addEventListener('click', go);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); go(); } });
+    box.appendChild(f); input.focus();
+    return f;
+  }
+  function renderMine(box, err) {
     box.textContent = '';
     box.appendChild(el('h2', { text: T.myTitle }));
-    if (r.error) { box.appendChild(msg(T.errLogin, 'err')); return; }
-    var rows = (r.data || []).filter(function (x) { return x.config && typeof x.config.q === 'string' && Q_RE.test(x.config.q); });
+    if (err) { box.appendChild(msg(T.errLogin, 'err')); return; }
+    var rows = DATA.timers.filter(function (x) { return x.config && typeof x.config.q === 'string' && Q_RE.test(x.config.q); });
     if (!rows.length) { box.appendChild(el('p', { cls: 'acct-small', text: T.myEmpty })); }
     else {
       var ul = el('ul', { cls: 'acct-mylist' });
@@ -361,18 +445,129 @@
         var page = (typeof x.config.page === 'string' && PAGE_RE.test(x.config.page)) ? x.config.page : HOME;
         var go = el('a', { cls: 'acct-btn acct-btn-sm acct-btn-primary', href: page + x.config.q, text: T.start });
         go.addEventListener('click', function () { ev('mytimer_start_from_account'); });
-        var data = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm', disabled: 'disabled', title: T.soon }, [
-          T.data, el('span', { cls: 'acct-soon', text: T.soon })
-        ]);
-        ul.appendChild(el('li', null, [
-          el('div', { cls: 'acct-my-info' }, [el('p', { cls: 'acct-my-name', text: x.name || '' }), el('p', { cls: 'acct-my-sum', text: summary(x.config.q) })]),
-          el('div', { cls: 'acct-my-actions' }, [go, data])
-        ]));
+        var li = el('li');
+        var sel = projectSelect(x.project_id || '', async function (v, s) {
+          if (v === '__new') {
+            s.value = x.project_id || '';
+            nameForm(li, T.pjNamePh, '', T.pjOk, async function (name) {
+              var p = await createProject(name); if (!p) return false;
+              return await assign(p.id);
+            });
+            return;
+          }
+          await assign(v || null);
+        });
+        async function assign(pid) {
+          var r = await sb.from('timers').update({ project_id: pid }).eq('id', x.id).select('id').single();
+          if (r.error) { li.appendChild(msg(T.pjErr, 'err')); return false; }
+          x.project_id = pid; ev('project_assign');
+          refresh(); return true;
+        }
+        li.appendChild(el('div', { cls: 'acct-my-info' }, [el('p', { cls: 'acct-my-name', text: x.name || '' }), el('p', { cls: 'acct-my-sum', text: summary(x.config.q) })]));
+        li.appendChild(el('div', { cls: 'acct-my-actions' }, [sel, go]));
+        ul.appendChild(li);
       });
       box.appendChild(ul);
     }
     box.appendChild(el('p', { cls: 'acct-small acct-quota', text: P.quota(rows.length) }));
-    box.appendChild(el('p', { cls: 'acct-small', text: T.myNote }));
+  }
+  var refresh = function () {};
+  async function loadProjects(box, mineBox, err) {
+    refresh = function () { renderMine(mineBox, false); loadProjects(box, mineBox, false); };
+    var start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - 6);
+    var rl = await sb.from('usage_logs').select('id,started_at,total_secs,timer_id').eq('product', 'timertrain')
+      .gte('started_at', start.toISOString()).limit(2100);
+    var rs = await sb.from('usage_segments').select('log_id,label,secs').eq('product', 'timertrain')
+      .gte('started_at', new Date(start.getTime() - 86400000).toISOString()).limit(10000);
+    box.textContent = '';
+    box.appendChild(el('h2', { text: T.pjTitle }));
+    if (err || rl.error) { box.appendChild(msg(T.errLogin, 'err')); return; }
+    var segsByLog = {};
+    (rs.error ? [] : rs.data || []).forEach(function (s) { (segsByLog[s.log_id] = segsByLog[s.log_id] || []).push(s); });
+    var tmap = {}; DATA.timers.forEach(function (t) { tmap[t.id] = t; });
+    // プロジェクトごと → ラベルごとの秒数
+    var buckets = {};
+    function bucket(key) { return buckets[key] = buckets[key] || { labels: {}, total: 0, brk: 0 }; }
+    (rl.data || []).forEach(function (l) {
+      var t = l.timer_id && tmap[l.timer_id];
+      var key = t ? (t.project_id || '__none') : '__other';
+      var b = bucket(key);
+      var segs = segsByLog[l.id];
+      var list = segs && segs.length ? segs.map(function (s) { return { label: s.label || '', secs: s.secs, seg: true }; })
+        : [{ label: '\u0000', secs: Math.max(0, Number(l.total_secs) || 0), seg: false }];
+      list.forEach(function (s) {
+        b.labels[s.label] = (b.labels[s.label] || 0) + s.secs;
+        if (s.label !== '\u0000' && isBreak(s.label)) b.brk += s.secs; else b.total += s.secs;
+      });
+    });
+    var order = DATA.projects.map(function (p) { return { key: p.id, name: p.name, p: p }; });
+    order.push({ key: '__none', name: T.pjNone }, { key: '__other', name: T.pjOther });
+    var max = 1; order.forEach(function (o) { if (buckets[o.key]) max = Math.max(max, buckets[o.key].total); });
+    var anyProject = DATA.projects.length > 0;
+    if (!anyProject) box.appendChild(el('p', { cls: 'acct-small', text: T.pjEmpty }));
+    var list = el('div', { cls: 'acct-pj-list' });
+    order.forEach(function (o) {
+      var b = buckets[o.key];
+      if (!o.p && !b) return; // 使っていない「なし」「以外」は出さない
+      if (!anyProject && o.key !== '__none' && o.key !== '__other') return;
+      b = b || { labels: {}, total: 0, brk: 0 };
+      var card = el('div', { cls: 'acct-pj' });
+      var head = el('div', { cls: 'acct-pj-head' }, [el('p', { cls: 'acct-pj-name', text: o.name }), el('p', { cls: 'acct-pj-total', text: fmtDur(b.total) })]);
+      card.appendChild(head);
+      var bar = el('div', { cls: 'acct-pj-bar' }); var fill = el('div', { cls: 'acct-pj-fill' }); fill.style.width = Math.round(b.total / max * 100) + '%'; bar.appendChild(fill); card.appendChild(bar);
+      var labels = Object.keys(b.labels).sort(function (a, c) { return b.labels[c] - b.labels[a]; });
+      var work = labels.filter(function (l) { return l === '\u0000' || !isBreak(l); }), brk = labels.filter(function (l) { return l !== '\u0000' && isBreak(l); });
+      function row(l, isB) {
+        var name = l === '\u0000' ? T.pjNoSeg : (l || T.pjNoLabel);
+        var r = el('li', { cls: 'acct-pj-row' + (isB ? ' brk' : '') }, [el('span', { cls: 'acct-pj-lab', text: name }), el('span', { cls: 'acct-pj-sec', text: fmtDur(b.labels[l]) })]);
+        if (l !== '\u0000') {
+          var t = el('button', { type: 'button', cls: 'acct-pj-tog', text: isB ? T.pjToWork : T.pjToBreak });
+          t.addEventListener('click', async function () { t.disabled = true; var ok = await saveBreak(l, isB ? 0 : 1); if (!ok) { t.disabled = false; card.appendChild(msg(T.pjErr, 'err')); return; } ev('label_break_toggle'); refresh(); });
+          r.appendChild(t);
+        }
+        return r;
+      }
+      if (work.length) card.appendChild(el('ul', { cls: 'acct-pj-rows' }, work.map(function (l) { return row(l, false); })));
+      if (brk.length) {
+        card.appendChild(el('p', { cls: 'acct-pj-sub', text: T.pjBreak + ' ' + fmtDur(b.brk) }));
+        card.appendChild(el('ul', { cls: 'acct-pj-rows' }, brk.map(function (l) { return row(l, true); })));
+      }
+      if (o.p) {
+        var acts = el('div', { cls: 'acct-pj-acts' });
+        var rn = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjRename });
+        rn.addEventListener('click', function () {
+          nameForm(card, T.pjNamePh, o.p.name, T.pjSave, async function (name) {
+            var r = await sb.from('projects').update({ name: name.slice(0, 40) }).eq('id', o.p.id).select('id').single();
+            if (r.error) return false; o.p.name = name.slice(0, 40); refresh(); return true;
+          });
+        });
+        var del = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjDel });
+        del.addEventListener('click', function () {
+          if (acts.querySelector('.acct-pj-yes')) return;
+          var yes = el('button', { type: 'button', cls: 'acct-pj-tog acct-pj-yes', text: T.pjDelQ });
+          yes.addEventListener('click', async function () {
+            yes.disabled = true;
+            var r = await sb.from('projects').delete().eq('id', o.p.id);
+            if (r.error) { yes.disabled = false; card.appendChild(msg(T.pjErr, 'err')); return; }
+            DATA.projects = DATA.projects.filter(function (p) { return p.id !== o.p.id; });
+            DATA.timers.forEach(function (t) { if (t.project_id === o.p.id) t.project_id = null; });
+            ev('project_delete'); refresh();
+          });
+          acts.appendChild(yes);
+        });
+        acts.appendChild(rn); acts.appendChild(del);
+        card.appendChild(acts);
+      }
+      list.appendChild(card);
+    });
+    box.appendChild(list);
+    if (DATA.projects.length >= PJ_FREE) { box.appendChild(el('p', { cls: 'acct-small acct-quota', text: T.pjFull })); box.appendChild(el('p', { cls: 'acct-small', text: T.pjNote })); return; }
+    var add = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm', text: T.pjNew });
+    add.addEventListener('click', function () {
+      nameForm(box, T.pjNamePh, '', T.pjOk, async function (name) { var p = await createProject(name); if (!p) return false; refresh(); return true; });
+    });
+    box.appendChild(add);
+    box.appendChild(el('p', { cls: 'acct-small', text: T.pjNote }));
   }
 
   /* ---------- 直近7日の利用記録 ---------- */
