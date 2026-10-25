@@ -8,6 +8,7 @@
   var SB_URL = 'https://arsfocfjfwtlykfdkiea.supabase.co';
   var SB_KEY = 'sb_publishable_zw039kyiXe27oY4ITTcNnA_-B_FsG5H';
   var PRODUCT = 'timertrain';
+  var FREE_MAX = 2; // 無料プランで保存できるマイタイマーの数（サーバー側の制限は決済と一緒に入れる）
   var Q_RE = /^\?t=[A-Za-z0-9.,%_\-~!*'()]{1,7000}&r=(?:inf|\d{1,2})$/;
 
   if (!window.supabase || typeof serialize !== 'function') return;
@@ -21,21 +22,24 @@
     del: 'Delete', delQ: 'Delete?', saved: 'Saved', err: 'Could not connect. Please try again later.',
     limit: 'You have reached the limit of saved timers.', signin: 'Sign in again',
     cur: 'In use', changed: 'edited', over: 'Save changes', asNew: 'Save as new', rename: 'Rename', renameQ: 'New name',
-    overDone: 'Changes saved', renamed: 'Renamed', badge: 'My timer'
+    overDone: 'Changes saved', renamed: 'Renamed', badge: 'My timer',
+    full: 'The free plan saves up to 2 timers. Save changes over one you have, or delete one first. Unlimited with Premium (coming soon).', plans: 'See plans'
   } : lang === 'es' ? {
     title: 'Mis temporizadores', save: 'Guardar configuración actual', namePh: 'Nombre', ok: 'Guardar', cancel: 'Cancelar',
     empty: 'Aún no hay temporizadores guardados. Guarda la configuración actual para usarla en cualquier dispositivo.',
     del: 'Eliminar', delQ: '¿Eliminar?', saved: 'Guardado', err: 'No se pudo conectar. Inténtalo más tarde.',
     limit: 'Has alcanzado el límite de temporizadores guardados.', signin: 'Vuelve a iniciar sesión',
     cur: 'En uso', changed: 'con cambios', over: 'Guardar cambios', asNew: 'Guardar como nuevo', rename: 'Renombrar', renameQ: 'Nuevo nombre',
-    overDone: 'Cambios guardados', renamed: 'Nombre cambiado', badge: 'Mi temporizador'
+    overDone: 'Cambios guardados', renamed: 'Nombre cambiado', badge: 'Mi temporizador',
+    full: 'El plan gratis guarda hasta 2 temporizadores. Guarda los cambios sobre uno que ya tengas o elimina uno primero. Ilimitados con Premium (próximamente).', plans: 'Ver planes'
   } : {
     title: 'マイタイマー', save: '今の編成を保存', namePh: '名前', ok: '保存', cancel: 'やめる',
     empty: 'まだ保存したタイマーはありません。今の編成を保存すると、どの端末からでも呼び出せます。',
     del: '削除', delQ: '削除する？', saved: '保存しました', err: 'つながりませんでした。時間をおいてもう一度お試しください。',
     limit: '保存できる数の上限に達しました。', signin: 'もう一度ログイン',
     cur: '使用中', changed: '変更あり', over: '上書き保存', asNew: '別に保存', rename: '名前を変更', renameQ: '新しい名前',
-    overDone: '上書き保存しました', renamed: '名前を変更しました', badge: 'マイタイマー'
+    overDone: '上書き保存しました', renamed: '名前を変更しました', badge: 'マイタイマー',
+    full: '無料プランで保存できるマイタイマーは2つまでです。今あるものに上書き保存するか、1つ削除してから保存してください。プレミアム（準備中）では無制限になります。', plans: 'プランを見る'
   };
   var acctHref = '/account?l=' + (['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja');
   function ev(name, p) { try { if (window.gtag) gtag('event', name, p || {}); } catch (e) {} }
@@ -179,6 +183,7 @@
 
   function render() {
     list.textContent = '';
+    title.textContent = T.title + ' ' + items.length + '/' + FREE_MAX;
     renderCur();
     if (!items.length) { list.appendChild(el('p', { cls: 'tt-my-empty', text: T.empty })); return; }
     items.forEach(function (it) {
@@ -225,6 +230,13 @@
 
   saveBtn.addEventListener('click', function () {
     if (!form.hidden) return;
+    if (items.length >= FREE_MAX) {
+      ev('timer_limit', { count: items.length });
+      setNote(T.full, true);
+      note.appendChild(document.createTextNode(' '));
+      note.appendChild(el('a', { href: acctHref, text: T.plans }));
+      return;
+    }
     form.textContent = '';
     var input = el('input', { type: 'text', cls: 'tt-my-input', maxlength: '60', placeholder: T.namePh, 'aria-label': T.namePh });
     input.value = defaultName();
