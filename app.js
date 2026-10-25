@@ -43,7 +43,7 @@ more: '詳しい設定', auto: '次のタイマーへ自動で進む', autoNote:
 notify: 'ブラウザ通知', notifyNote: '別のタブやアプリを見ていても、区切りでお知らせします', notifyBlocked: 'ブラウザの設定で通知がブロックされています', pausedNext: n => `次は「${n}」。▶で開始`,
 nNext: n => `次: ${n}`, nDone: 'すべて終わりました 🎉', nSoon: (n, m) => `${n} はあと${m}分です`,
 askNotify: '別のタブを見ているときや最小化中も、ポップアップでお知らせしますか？', askYes: 'オンにする', askNo: '今はしない',
-restored: 'タイマーを続きから再開しました', tapSound: '音を鳴らすには画面をタップしてください',
+restored: 'タイマーを続きから再開しました', caught: n => `見ていない間に ${n} 回切り替わりました`, tapSound: '音を鳴らすには画面をタップしてください',
 silent: 'マナーモードでも鳴らす', silentNote: 'iPhone・iPad はマナーモード中だと音が出ません。オンにすると鳴りますが、音楽アプリの再生が止まることがあります',
 askSilent: 'iPhone はマナーモード中だと音が鳴りません。マナーモードでも鳴らしますか？（音楽アプリは止まることがあります）',
 },
@@ -62,7 +62,7 @@ more: 'More settings', auto: 'Go to the next timer automatically', autoNote: 'Wh
 notify: 'Browser notifications', notifyNote: 'Get notified at each switch, even in another tab or app', notifyBlocked: 'Notifications are blocked in your browser settings', pausedNext: n => `Next: ${n}. Press ▶ to start`,
 nNext: n => `Next: ${n}`, nDone: 'All done 🎉', nSoon: (n, m) => `${n}: ${m} min left`,
 askNotify: 'Get a pop-up notification at each switch, even in another tab or when minimized?', askYes: 'Turn on', askNo: 'Not now',
-restored: 'Timer resumed where it left off', tapSound: 'Tap the screen to turn the sound back on',
+restored: 'Timer resumed where it left off', caught: n => `${n} switch${n > 1 ? 'es' : ''} happened while you were away`, tapSound: 'Tap the screen to turn the sound back on',
 silent: 'Play sound in silent mode', silentNote: 'iPhone and iPad stay quiet when the silent switch is on. Turn this on to hear the timer anyway (music apps may pause)',
 askSilent: 'Your iPhone stays quiet in silent mode. Play the timer sound even in silent mode? (Music apps may pause)',
 },
@@ -81,7 +81,7 @@ more: 'Más ajustes', auto: 'Pasar al siguiente temporizador automáticamente', 
 notify: 'Notificaciones del navegador', notifyNote: 'Te avisa en cada cambio, aunque estés en otra pestaña o app', notifyBlocked: 'Las notificaciones están bloqueadas en tu navegador', pausedNext: n => `Siguiente: ${n}. Pulsa ▶ para empezar`,
 nNext: n => `Siguiente: ${n}`, nDone: '¡Todo listo! 🎉', nSoon: (n, m) => `${n}: quedan ${m} min`,
 askNotify: '¿Quieres un aviso emergente en cada cambio, aunque estés en otra pestaña o la ventana esté minimizada?', askYes: 'Activar', askNo: 'Ahora no',
-restored: 'El temporizador continúa donde se quedó', tapSound: 'Toca la pantalla para volver a activar el sonido',
+restored: 'El temporizador continúa donde se quedó', caught: n => `Hubo ${n} cambio${n > 1 ? 's' : ''} mientras no mirabas`, tapSound: 'Toca la pantalla para volver a activar el sonido',
 silent: 'Sonar en modo silencio', silentNote: 'El iPhone y el iPad no suenan en modo silencio. Actívalo para oír el temporizador (la música puede pausarse)',
 askSilent: 'Tu iPhone no suena en modo silencio. ¿Quieres que el temporizador suene igualmente? (la música puede pausarse)',
 },
@@ -99,6 +99,7 @@ repeat: 4, // Infinityで無限
 };
 let run = { active: false, paused: false, finished: false, idx: 0, cycle: 1, endAt: 0, remainMs: 0, lastSec: -1 };
 let tickId = null;
+let lateAdvance = false; // 遅れて処理する区切り（音・通知を出さない）
 let wakeLock = null;
 let audioCtx = null;
 let masterGain = null;
@@ -689,6 +690,8 @@ else updateIdleView();
 }
 function pauseToggle() {
 if (!run.active || run.finished) return;
+// 一時停止・再開の直前に知らせる（利用記録が、止まっていた時間を数えないように）
+if (window.__ttOnPause) { try { window.__ttOnPause(); } catch (e) {} }
 if (run.paused) {
 applySilentMode(true);
 unlockAudio();
@@ -715,6 +718,8 @@ saveRun();
 }
 function resetRun() { resetToIdle(); }
 function advance(withSound) {
+// 区切りが変わる直前に知らせる（利用記録で区切りごとの時間を数えるため）
+if (window.__ttOnSeg) { try { window.__ttOnSeg(); } catch (e) {} }
 const now = Date.now();
 // 時間切れで進むときは本来の区切り時刻から数える（裏のタブで処理が遅れても後ろにずれない）
 const base = withSound && !run.paused && run.endAt > 0 ? Math.min(run.endAt, now) : now;
@@ -726,9 +731,11 @@ run.cycle++; run.idx = 0;
 finish(); return;
 }
 if (withSound) {
-if (!bgSched) soundSegment();
 const nx = state.timers[run.idx];
+if (!lateAdvance) {
+if (!bgSched) soundSegment();
 notify(STR.nNext(nx.name || STR.defName));
+}
 if (!opts.auto && !run.paused) {
 run.paused = true;
 pauseBtn.innerHTML = ICONS.play;
@@ -748,7 +755,7 @@ if (withSound && !run.paused) scheduleAhead(1.5);
 saveRun();
 }
 function finish() {
-if (!bgSched) soundFinish();
+if (!bgSched && !lateAdvance) soundFinish();
 run.finished = true;
 run.paused = true;
 releaseWakeLock();
@@ -761,7 +768,7 @@ if (DT) { DT.done(); DT.fit(runTime); } else setRing(1, '#34C759');
 document.title = STR.doneTitle;
 updateEta();
 saveRun();
-notify(STR.nDone, true);
+if (!lateAdvance) notify(STR.nDone, true);
 setTimeout(() => { if (run.finished) applySilentMode(false); }, 4000);
 if (window.__ttOnFinish) { try { window.__ttOnFinish(); } catch (e) {} }
 }
@@ -769,8 +776,15 @@ function tick() {
 if (!run.active || run.paused || run.finished) return;
 const remain = run.endAt - Date.now();
 if (remain <= 0) {
-let guard = 0;
-do { advance(true); } while (run.active && !run.paused && !run.finished && run.endAt - Date.now() <= 0 && ++guard < 500);
+let guard = 0, late = 0;
+do {
+// 区切りの時刻から2秒以上たってから気づいた（スマホで別のアプリを見ていて止められていた等）なら、音と通知は出さない
+lateAdvance = Date.now() - run.endAt > 2000;
+if (lateAdvance) late++;
+advance(true);
+} while (run.active && !run.paused && !run.finished && run.endAt - Date.now() <= 0 && ++guard < 500);
+lateAdvance = false;
+if (late) { toast(STR.caught(late)); if (run.active && !run.paused && !run.finished) scheduleAhead(); }
 return;
 }
 const sec = Math.ceil(remain / 1000);
@@ -1092,11 +1106,14 @@ pauseBtn.innerHTML = run.paused ? ICONS.play : ICONS.pause;
 renderStations(); updateHighlight();
 // 閉じていた間に過ぎた区切りは音を鳴らさずに進める
 let guard = 0;
+lateAdvance = true;
 while (!run.paused && !run.finished && run.endAt - Date.now() <= 0 && ++guard < 2000) advance(true);
+lateAdvance = false;
 if (run.finished) return;
 updateRunView(); updateEta();
 clearInterval(tickId); tickId = setInterval(tick, 200);
 if (!run.paused) acquireWakeLock();
+window.__ttRestored = true; // 利用記録（sync.js）が読み込まれたら記録を始め直す
 toast(STR.restored);
 // 音はブラウザの決まりで、画面を一度さわるまで鳴らせないことがある
 unlockAudio();
@@ -1242,7 +1259,7 @@ a.setAttribute('aria-label', signed ? L.me : L.in);
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=5'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=6'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 })();
