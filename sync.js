@@ -268,7 +268,7 @@
     var s = L.segs[L.segs.length - 1];
     if (s && !s.closed) return s;
     var t = null; try { t = state.timers[run.idx]; } catch (e) {}
-    s = { seq: L.segs.length, label: String((t && t.name) || '').slice(0, 30), secs: 0, startedAt: new Date().toISOString(), sent: -1, closed: false };
+    s = { seq: L.segs.length, label: String((t && t.name) || '').slice(0, 30), secs: 0, startedAt: new Date(last || Date.now()).toISOString(), sent: -1, closed: false };
     if (L.segs.length < 2000) L.segs.push(s);
     return s;
   }
