@@ -1256,6 +1256,8 @@ var sp = document.createElement('span'); sp.textContent = signed ? L.me : L.in;
 a.appendChild(ic); a.appendChild(sp);
 a.setAttribute('aria-label', signed ? L.me : L.in);
 (document.querySelector('.header') || document.body).appendChild(a);
+// ログイン中は、説明文の「無料ログインでできること」を出さない
+if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.hidden = true; }
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
