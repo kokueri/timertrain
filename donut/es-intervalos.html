@@ -76,7 +76,8 @@ gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="/donut/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/donut/favicon-48.png">
 <link rel="manifest" href="/donut/manifest-es.webmanifest">
 <link rel="apple-touch-icon" href="/donut/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -86,7 +87,7 @@ gtag('config', 'G-GSFVNEDCGN');
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Titan+One&text=DonutTimer&display=swap">
-<link rel="stylesheet" href="/style.css?v=26">
+<link rel="stylesheet" href="/style.css?v=27">
 <link rel="stylesheet" href="/donut.css?v=3">
 </head>
 <body>
@@ -153,12 +154,17 @@ gtag('config', 'G-GSFVNEDCGN');
 
 <!-- Texto SEO -->
 <article class="about">
+<section id="tt-perks" class="about-perks" aria-labelledby="tt-perks-h">
+<h2 id="tt-perks-h">Lo que añade una cuenta gratis</h2>
+<p class="about-perks-lead">Todo el temporizador es gratis sin cuenta. Si inicias sesión gratis con Google, además puedes:</p>
+<ul class="acct-checklist"><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Mis temporizadores</p><p class="acct-perk-d">Guarda con nombre las configuraciones que más usas (hasta 2) y ábrelas con un toque</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Lo mismo en el móvil y el ordenador</p><p class="acct-perk-d">Con la misma cuenta de Google, lo que guardes en el ordenador estará listo en el móvil</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Historial de 7 días</p><p class="acct-perk-d">El tiempo de uso se registra solo: tiempo total, sesiones y un gráfico por día</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Rachas 🔥</p><p class="acct-perk-d">Mira cuántos días seguidos lo has usado</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Proyectos</p><p class="acct-perk-d">Agrupa por «Estudio», «Trabajo», etc. y mira el tiempo por etapa (1 proyecto)</p></div></li></ul>
+<p class="about-perks-cta"><a class="about-perks-btn" href="/account?l=es&amp;from=donut">Inicia sesión gratis con Google</a></p>
+<p class="about-perks-note">Nunca tratamos contraseñas. Puedes darte de baja cuando quieras.</p>
+</section>
 <h2>Trabajo y descanso, por sabores</h2>
 <p>Esta página empieza con 1 minuto de trabajo (menta con chocolate) y 30 segundos de descanso (chocolate), 8 veces. El sabor cambia en cada fase, así que con una mirada rápida sabes si toca esforzarse o descansar, incluso en mitad del ejercicio.</p>
 <h2>Cómo se usa</h2>
 <p>Pulsa reproducir y las rondas avanzan solas, con un sonido en cada cambio. Cambia los segundos o las rondas en los ajustes, o añade un calentamiento con otro temporizador. Copia el enlace para guardar tu rutina.</p>
-<h2>Guarda tu registro (opcional)</h2>
-<p>Si inicias sesión gratis con Google, puedes guardar tus temporizadores con nombre, abrirlos desde el móvil o el ordenador y ver el tiempo que has usado en <a href="/account?l=es&amp;from=donut">tu cuenta</a>. Los días seguidos aparecen como una racha 🔥 arriba a la izquierda. Todo lo demás funciona sin cuenta.</p>
 <h2>Preguntas frecuentes</h2>
 <p style="margin-top:10px"><strong>¿Puedo añadir más de dos fases?</strong><br>Sí. Añade todos los temporizadores que quieras y se reproducirán en orden.</p>
 <p style="margin-top:10px"><strong>¿Funciona en el móvil?</strong><br>Sí, en el navegador del móvil, la tableta o el ordenador. Mantén la pantalla encendida para que el sonido sea fiable.</p>
@@ -170,8 +176,8 @@ gtag('config', 'G-GSFVNEDCGN');
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "Trabajo", "secs": 60, "color": "green"}, {"name": "Descanso", "secs": 30, "color": "gray"}], "repeat": 8};</script>
-<script src="/donut.js?v=3"></script>
-<script src="/app.js?v=27d"></script>
+<script src="/donut.js?v=4"></script>
+<script src="/app.js?v=28d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

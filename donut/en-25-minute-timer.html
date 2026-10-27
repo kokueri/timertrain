@@ -80,7 +80,8 @@ gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="/donut/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/donut/favicon-48.png">
 <link rel="manifest" href="/donut/manifest-en.webmanifest">
 <link rel="apple-touch-icon" href="/donut/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -90,7 +91,7 @@ gtag('config', 'G-GSFVNEDCGN');
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Titan+One&text=DonutTimer&display=swap">
-<link rel="stylesheet" href="/style.css?v=26">
+<link rel="stylesheet" href="/style.css?v=27">
 <link rel="stylesheet" href="/donut.css?v=3">
 </head>
 <body>
@@ -154,14 +155,19 @@ gtag('config', 'G-GSFVNEDCGN');
 <div id="toast" class="toast" role="status"></div>
 
 <article class="about">
+<section id="tt-perks" class="about-perks" aria-labelledby="tt-perks-h">
+<h2 id="tt-perks-h">What a free account adds</h2>
+<p class="about-perks-lead">Every timer feature is free without an account. Sign in with Google for free and you also get:</p>
+<ul class="acct-checklist"><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">My timers</p><p class="acct-perk-d">Save setups you use often under a name (up to 2) and open them in one tap</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Same setups on phone and computer</p><p class="acct-perk-d">With the same Google account, timers saved on your computer are ready on your phone too</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">7-day history</p><p class="acct-perk-d">Time used is logged automatically: total time, sessions and a daily chart</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Streaks 🔥</p><p class="acct-perk-d">See how many days in a row you have used it</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Projects</p><p class="acct-perk-d">Group timers like &quot;Study&quot; or &quot;Work&quot; and see time per segment (1 project)</p></div></li></ul>
+<p class="about-perks-cta"><a class="about-perks-btn" href="/account?l=en&amp;from=donut">Sign in free with Google</a></p>
+<p class="about-perks-note">We never handle passwords. Delete your account any time.</p>
+</section>
 <h2>A 25 minute timer you can read at a glance</h2>
 <p>Press play and a strawberry milk donut starts disappearing clockwise from 12 o'clock. When it's gone, time is up and an alarm sounds. You can tell how much is left from across the room without reading the numbers — though the countdown sits right in the donut hole too.</p>
 <h2>Good for</h2>
 <p>One Pomodoro focus block. For the full 25 + 5 rhythm, try the <a href="/donut/en-pomodoro">Pomodoro timer</a>.</p>
 <h2>How to use it</h2>
 <p>Press play to start, press again to pause, and use the reset button to start over. Space starts and pauses from the keyboard. Want a break after it? Press "Add timer" and the next donut starts automatically when this one is finished.</p>
-<h2>Keep a record (optional)</h2>
-<p>Sign in free with Google to save your setups with a name, open them on your phone or computer, and see the time you spent on your <a href="/account?l=en&amp;from=donut">account page</a>. The days you keep going show up as a 🔥 streak at the top left. Everything else works without an account.</p>
 <h2>FAQ</h2>
 <p style="margin-top:10px"><strong>Does it make a sound when time is up?</strong><br>Yes. An alarm sounds when the donut is finished. You can change the sound and volume in the settings.</p>
 <p style="margin-top:10px"><strong>Can I add a 5-minute break?</strong><br>Yes. Press "Add timer", set it to 5 minutes, and set the repeat count for a full Pomodoro cycle.</p>
@@ -174,8 +180,8 @@ gtag('config', 'G-GSFVNEDCGN');
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "Focus", "secs": 1500, "color": "red"}], "repeat": 1};</script>
-<script src="/donut.js?v=3"></script>
-<script src="/app.js?v=27d"></script>
+<script src="/donut.js?v=4"></script>
+<script src="/app.js?v=28d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

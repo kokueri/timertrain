@@ -75,7 +75,8 @@ gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="/donut/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/donut/favicon-48.png">
 <link rel="manifest" href="/donut/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/donut/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -85,7 +86,7 @@ gtag('config', 'G-GSFVNEDCGN');
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Titan+One&text=DonutTimer&display=swap">
-<link rel="stylesheet" href="/style.css?v=26">
+<link rel="stylesheet" href="/style.css?v=27">
 <link rel="stylesheet" href="/donut.css?v=3">
 </head>
 <body>
@@ -152,14 +153,19 @@ gtag('config', 'G-GSFVNEDCGN');
 
   <!-- SEO テキスト -->
   <article class="about">
+<section id="tt-perks" class="about-perks" aria-labelledby="tt-perks-h">
+<h2 id="tt-perks-h">無料ログインでできること</h2>
+<p class="about-perks-lead">タイマーはログインしなくても全部無料で使えます。Googleで無料ログインすると、さらにこんなことができます。</p>
+<ul class="acct-checklist"><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">マイタイマー</p><p class="acct-perk-d">よく使う編成に名前を付けて保存（2つまで）。ワンタップで呼び出せます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">スマホとPCで同じ設定</p><p class="acct-perk-d">同じGoogleアカウントなら、PCで保存したタイマーをスマホでもそのまま使えます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">7日間の利用記録</p><p class="acct-perk-d">使った時間を自動で記録。合計時間・回数・日ごとのグラフで振り返れます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">連続日数 🔥</p><p class="acct-perk-d">何日続けて使っているかが分かります</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">マイプロジェクト</p><p class="acct-perk-d">「勉強」「仕事」などに分けて、区切りごとの時間を集計できます（1つまで）</p></div></li></ul>
+<p class="about-perks-cta"><a class="about-perks-btn" href="/account?l=ja&amp;from=donut">Googleで無料ログイン</a></p>
+<p class="about-perks-note">パスワードは扱いません。いつでも退会できます。</p>
+</section>
 <h2>がんばる時間も、かわいく</h2>
 <p>HIIT（高強度インターバルトレーニング）は、きつめの運動と短い休憩を交互にくり返すトレーニングです。運動はいちごミルク、休憩はブルーベリーのドーナツで表示。息が上がっていても、ドーナツの残りで「あと何秒か」が感覚でつかめます。</p>
 <h2>使い方</h2>
 <p>「運動40秒→休憩20秒」が8回分、合計8分でセットされています。再生ボタンを押すと自動で進み、切り替えのたびに音が鳴ります。慣れてきたら、運動を45秒に延ばしたり回数を増やしたりしてみてください。</p>
 <h2>種目ごとに並べる</h2>
 <p>バーピー、マウンテンクライマー、ジャンプスクワットのように種目ごとにタイマーを分けて名前を付ければ、自分だけのHIITメニューになります。作ったメニューは共有リンクで保存・共有できます。</p>
-<h2>ログインするとできること</h2>
-<p>無料のGoogleログインをすると、作ったタイマーに名前を付けて保存でき、使った時間が<a href="/account">マイページ</a>に記録されます。続けて使った日数は左上に🔥で表示されます。</p>
 <h2>よくある質問</h2>
 <p style="margin-top:10px"><strong>初心者でも使えますか？</strong><br>使えます。最初は運動を短く、休憩を長めに設定して、体の調子を見ながら少しずつ伸ばしてください。</p>
 <p style="margin-top:10px"><strong>音を消して使えますか？</strong><br>音の種類と大きさは設定から変えられます。音なしにもできます。</p>
@@ -171,8 +177,8 @@ gtag('config', 'G-GSFVNEDCGN');
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 40, "color": "red"}, {"name": "休憩", "secs": 20, "color": "blue"}], "repeat": 8};</script>
-<script src="/donut.js?v=3"></script>
-<script src="/app.js?v=27d"></script>
+<script src="/donut.js?v=4"></script>
+<script src="/app.js?v=28d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
