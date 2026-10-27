@@ -742,3 +742,17 @@ body.focus-mode .tt-ask { display: none; }
 .tt-my-proj[hidden] { display: none; }
 .tt-my-projnew { display: inline-flex; gap: 6px; flex: 1 1 200px; }
 .tt-my-form .tt-my-proj { flex: 0 1 180px; }
+/* ---- 説明文の一番上: 無料ログインでできること（2026-10-27） ---- */
+.about-perks { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px 20px 18px; margin-bottom: 8px; border: 1.5px solid var(--line); }
+.about-perks[hidden] { display: none; }
+.about .about-perks h2 { margin: 0 0 6px; font-size: 19px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.about .about-perks h2::before { content: "★"; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #34C759; color: #fff; font-size: 14px; flex-shrink: 0; }
+.about .about-perks .about-perks-lead { font-size: 14px; margin-bottom: 14px; }
+.about-perks .acct-checklist { gap: 10px; }
+.about .about-perks .acct-perk-t { font-size: 15px; font-weight: 700; color: var(--text); }
+.about .about-perks .acct-perk-d { font-size: 13px; }
+.about .about-perks-cta { margin-top: 16px; }
+.about .about-perks-btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 24px; border-radius: 999px; background: var(--accent); color: var(--accent-text); font-weight: 700; font-size: 15px; text-decoration: none; }
+.about .about-perks-btn:hover { opacity: .9; }
+.about .about-perks .about-perks-note { font-size: 12px; margin-top: 8px; }
+.about-perks + h2 { margin-top: 32px; }

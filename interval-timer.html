@@ -48,7 +48,7 @@
   "description": "複数のタイマーを連結して順番に自動再生できる無料のWebタイマー。くり返し・色分け・共有に対応。"
 }
 </script>
-<link rel="stylesheet" href="/style.css?v=26">
+<link rel="stylesheet" href="/style.css?v=27">
 </head>
 <body>
 
@@ -114,6 +114,13 @@
 
   <!-- SEO テキスト -->
   <article class="about">
+<section id="tt-perks" class="about-perks" aria-labelledby="tt-perks-h">
+<h2 id="tt-perks-h">無料ログインでできること</h2>
+<p class="about-perks-lead">タイマーはログインしなくても全部無料で使えます。Googleで無料ログインすると、さらにこんなことができます。</p>
+<ul class="acct-checklist"><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">マイタイマー</p><p class="acct-perk-d">よく使う編成に名前を付けて保存（2つまで）。ワンタップで呼び出せます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">スマホとPCで同じ設定</p><p class="acct-perk-d">同じGoogleアカウントなら、PCで保存したタイマーをスマホでもそのまま使えます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">7日間の利用記録</p><p class="acct-perk-d">使った時間を自動で記録。合計時間・回数・日ごとのグラフで振り返れます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">連続日数 🔥</p><p class="acct-perk-d">何日続けて使っているかが分かります</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">マイプロジェクト</p><p class="acct-perk-d">「勉強」「仕事」などに分けて、区切りごとの時間を集計できます（1つまで）</p></div></li></ul>
+<p class="about-perks-cta"><a class="about-perks-btn" href="/account?l=ja">Googleで無料ログイン</a></p>
+<p class="about-perks-note">パスワードは扱いません。いつでも退会できます。</p>
+</section>
     <h2>インターバルタイマーとは</h2>
     <p>インターバルタイマーは、「運動（または作業）」と「休憩」をあらかじめ決めた秒数でくり返し計るタイマーです。1種目だけを計るストップウォッチと違い、〈45秒動いて15秒休む〉を10セット、のように“動と静の切り替え”を自動でこなしてくれるのが特徴。筋トレのサーキット、HIIT、ランニングの疾走⇄流し、さらには勉強の集中⇄小休憩まで、リズムを作りたいあらゆる場面で使えます。</p>
     <h2>このタイマーの使い方</h2>
@@ -132,7 +139,7 @@
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 45, "color": "red"}, {"name": "休憩", "secs": 15, "color": "blue"}], "repeat": 10};</script>
-<script src="/app.js?v=27"></script>
+<script src="/app.js?v=28"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

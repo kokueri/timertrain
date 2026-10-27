@@ -76,7 +76,7 @@
  ]
 }
 </script>
-<link rel="stylesheet" href="/style.css?v=26">
+<link rel="stylesheet" href="/style.css?v=27">
 </head>
 <body>
 
@@ -142,6 +142,13 @@
 
   <!-- SEO テキスト -->
   <article class="about">
+<section id="tt-perks" class="about-perks" aria-labelledby="tt-perks-h">
+<h2 id="tt-perks-h">無料ログインでできること</h2>
+<p class="about-perks-lead">タイマーはログインしなくても全部無料で使えます。Googleで無料ログインすると、さらにこんなことができます。</p>
+<ul class="acct-checklist"><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">マイタイマー</p><p class="acct-perk-d">よく使う編成に名前を付けて保存（2つまで）。ワンタップで呼び出せます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">スマホとPCで同じ設定</p><p class="acct-perk-d">同じGoogleアカウントなら、PCで保存したタイマーをスマホでもそのまま使えます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">7日間の利用記録</p><p class="acct-perk-d">使った時間を自動で記録。合計時間・回数・日ごとのグラフで振り返れます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">連続日数 🔥</p><p class="acct-perk-d">何日続けて使っているかが分かります</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">マイプロジェクト</p><p class="acct-perk-d">「勉強」「仕事」などに分けて、区切りごとの時間を集計できます（1つまで）</p></div></li></ul>
+<p class="about-perks-cta"><a class="about-perks-btn" href="/account?l=ja">Googleで無料ログイン</a></p>
+<p class="about-perks-note">パスワードは扱いません。いつでも退会できます。</p>
+</section>
     <h2>同じ時間を、止めずにくり返す</h2>
     <p>繰り返しタイマーは、決めた時間が終わるたびに音で知らせ、すぐに次の回を自動で始めるタイマーです。このページには「1分」が無限にくり返す設定で入っています。開始を押せば、止めるまで1分ごとに合図が鳴り続けます。</p>
     <h2>使い方</h2>
@@ -162,7 +169,7 @@
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "1分", "secs": 60, "color": "blue"}], "repeat": "inf"};</script>
-<script src="/app.js?v=27"></script>
+<script src="/app.js?v=28"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

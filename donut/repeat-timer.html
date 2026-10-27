@@ -72,7 +72,8 @@ gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="/donut/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/donut/favicon-48.png">
 <link rel="manifest" href="/donut/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/donut/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -81,8 +82,9 @@ gtag('config', 'G-GSFVNEDCGN');
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Titan+One&text=DonutTimer&display=swap">
-<link rel="stylesheet" href="/style.css?v=26">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titan+One&text=DonutTimer&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Nunito:wght@800&display=swap">
+<link rel="stylesheet" href="/style.css?v=27">
 <link rel="stylesheet" href="/donut.css?v=3">
 </head>
 <body>
@@ -149,14 +151,19 @@ gtag('config', 'G-GSFVNEDCGN');
 
   <!-- SEO テキスト -->
   <article class="about">
+<section id="tt-perks" class="about-perks" aria-labelledby="tt-perks-h">
+<h2 id="tt-perks-h">無料ログインでできること</h2>
+<p class="about-perks-lead">タイマーはログインしなくても全部無料で使えます。Googleで無料ログインすると、さらにこんなことができます。</p>
+<ul class="acct-checklist"><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">マイタイマー</p><p class="acct-perk-d">よく使う編成に名前を付けて保存（2つまで）。ワンタップで呼び出せます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">スマホとPCで同じ設定</p><p class="acct-perk-d">同じGoogleアカウントなら、PCで保存したタイマーをスマホでもそのまま使えます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">7日間の利用記録</p><p class="acct-perk-d">使った時間を自動で記録。合計時間・回数・日ごとのグラフで振り返れます</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">連続日数 🔥</p><p class="acct-perk-d">何日続けて使っているかが分かります</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">マイプロジェクト</p><p class="acct-perk-d">「勉強」「仕事」などに分けて、区切りごとの時間を集計できます（1つまで）</p></div></li></ul>
+<p class="about-perks-cta"><a class="about-perks-btn" href="/account?l=ja&amp;from=donut">Googleで無料ログイン</a></p>
+<p class="about-perks-note">パスワードは扱いません。いつでも退会できます。</p>
+</section>
 <h2>止めるまで、くり返しドーナツ</h2>
 <p>同じ長さの時間を、自動で何度でもくり返すタイマーです。ドーナツを食べ終わると音が鳴り、また新しいドーナツから始まります。上には今が何周目かが表示されます。</p>
 <h2>使い方</h2>
 <p>開くと「1分」が無限にくり返す設定になっています。時間を変えるには「タイマー設定」で数字を押して書きかえます。回数を決めたいときは、∞を外して回数を選んでください。</p>
 <h2>こんなときに</h2>
 <p>1分ごとの区切りで行うトレーニング、一定時間ごとの休憩や水分補給の合図、スピーチの練習、子どもの「1回5分ずつ交代」など、決まった間隔で合図がほしいときに便利です。</p>
-<h2>ログインするとできること</h2>
-<p>無料のGoogleログインをすると、作ったタイマーに名前を付けて保存でき、使った時間が<a href="/account">マイページ</a>に記録されます。続けて使った日数は左上に🔥で表示されます。</p>
 <h2>よくある質問</h2>
 <p style="margin-top:10px"><strong>くり返す回数を決められますか？</strong><br>決められます。「くり返し」の回数を選ぶか、数字を直接入力してください。∞を選ぶと止めるまで続きます。</p>
 <p style="margin-top:10px"><strong>途中で止めたらどうなりますか？</strong><br>一時停止するとその場で止まり、もう一度押すと続きから再開します。リセットすると最初に戻ります。</p>
@@ -168,8 +175,8 @@ gtag('config', 'G-GSFVNEDCGN');
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "1分", "secs": 60, "color": "blue"}], "repeat": "inf"};</script>
-<script src="/donut.js?v=3"></script>
-<script src="/app.js?v=27d"></script>
+<script src="/donut.js?v=4"></script>
+<script src="/app.js?v=28d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

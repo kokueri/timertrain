@@ -76,7 +76,8 @@ gtag('config', 'G-GSFVNEDCGN');
 </script>
 <meta name="theme-color" content="#FFF9EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1A1614" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%A9%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/png" sizes="32x32" href="/donut/favicon-32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="/donut/favicon-48.png">
 <link rel="manifest" href="/donut/manifest-es.webmanifest">
 <link rel="apple-touch-icon" href="/donut/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -85,8 +86,9 @@ gtag('config', 'G-GSFVNEDCGN');
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800&family=Titan+One&text=DonutTimer&display=swap">
-<link rel="stylesheet" href="/style.css?v=26">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titan+One&text=DonutTimer&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Nunito:wght@800&display=swap">
+<link rel="stylesheet" href="/style.css?v=27">
 <link rel="stylesheet" href="/donut.css?v=3">
 </head>
 <body>
@@ -153,12 +155,17 @@ gtag('config', 'G-GSFVNEDCGN');
 
 <!-- Texto SEO -->
 <article class="about">
+<section id="tt-perks" class="about-perks" aria-labelledby="tt-perks-h">
+<h2 id="tt-perks-h">Lo que añade una cuenta gratis</h2>
+<p class="about-perks-lead">Todo el temporizador es gratis sin cuenta. Si inicias sesión gratis con Google, además puedes:</p>
+<ul class="acct-checklist"><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Mis temporizadores</p><p class="acct-perk-d">Guarda con nombre las configuraciones que más usas (hasta 2) y ábrelas con un toque</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Lo mismo en el móvil y el ordenador</p><p class="acct-perk-d">Con la misma cuenta de Google, lo que guardes en el ordenador estará listo en el móvil</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Historial de 7 días</p><p class="acct-perk-d">El tiempo de uso se registra solo: tiempo total, sesiones y un gráfico por día</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Rachas 🔥</p><p class="acct-perk-d">Mira cuántos días seguidos lo has usado</p></div></li><li><span class="acct-check" aria-hidden="true">✓</span><div><p class="acct-perk-t">Proyectos</p><p class="acct-perk-d">Agrupa por «Estudio», «Trabajo», etc. y mira el tiempo por etapa (1 proyecto)</p></div></li></ul>
+<p class="about-perks-cta"><a class="about-perks-btn" href="/account?l=es&amp;from=donut">Inicia sesión gratis con Google</a></p>
+<p class="about-perks-note">Nunca tratamos contraseñas. Puedes darte de baja cuando quieras.</p>
+</section>
 <h2>Cuatro minutos en donas</h2>
 <p>El Tabata son 20 segundos de esfuerzo máximo y 10 de descanso, ocho veces: cuatro minutos en total. Aquí el trabajo es una dona de té con leche y el descanso una de menta con chocolate. Las mini donas bajo el temporizador muestran cuántas rondas quedan.</p>
 <h2>Cómo se usa</h2>
 <p>Está listo al abrir la página: pulsa reproducir y las 8 rondas avanzan solas, con un sonido en cada cambio. Para hacer dos bloques, sube el número de rondas; para nombrar los ejercicios, cambia el nombre de los temporizadores.</p>
-<h2>Guarda tu registro (opcional)</h2>
-<p>Si inicias sesión gratis con Google, puedes guardar tus temporizadores con nombre, abrirlos desde el móvil o el ordenador y ver el tiempo que has usado en <a href="/account?l=es&amp;from=donut">tu cuenta</a>. Los días seguidos aparecen como una racha 🔥 arriba a la izquierda. Todo lo demás funciona sin cuenta.</p>
 <h2>Preguntas frecuentes</h2>
 <p style="margin-top:10px"><strong>¿Puedo cambiar el 20/10?</strong><br>Sí. Cambia los segundos en los ajustes, por ejemplo 30/15, y las rondas seguirán el nuevo patrón.</p>
 <p style="margin-top:10px"><strong>¿Cómo veo cuántas rondas quedan?</strong><br>La fila de mini donas bajo el temporizador muestra todas las rondas; las terminadas se atenúan.</p>
@@ -170,8 +177,8 @@ gtag('config', 'G-GSFVNEDCGN');
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "Trabajo", "secs": 20, "color": "orange"}, {"name": "Descanso", "secs": 10, "color": "teal"}], "repeat": 8};</script>
-<script src="/donut.js?v=3"></script>
-<script src="/app.js?v=27d"></script>
+<script src="/donut.js?v=4"></script>
+<script src="/app.js?v=28d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
