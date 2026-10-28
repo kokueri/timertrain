@@ -297,13 +297,181 @@
     ];
   }
 
+  /* ---------- プレミアム（Stripe）----------
+   * 購入ボタンは試し用の環境だけに出す（本番の決済を始めるまで）。
+   * 有料かどうかは entitlements（本人は読むだけ。書けるのは決済の通知を受けたサーバーだけ） */
+  var BILLING_ON = /^login-preview\./.test(location.hostname) || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  var FN_URL = SB_URL + '/functions/v1/billing/';
+  var ENT = null;
+  var B = {
+    ja: {
+      title: 'プレミアムにする', titleOn: 'プレミアム', badge: 'プレミアム',
+      lead: '初めての方は、最初の7日間は無料です。マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
+      leadNoTrial: 'マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
+      monthly: '月額プランで始める', yearly: '年額プランで始める（おトク）',
+      note: '金額はお住まいの地域の通貨で、次の画面（Stripe の決済画面）に表示されます。いつでも解約できます。', more: '料金と条件',
+      test: '試し用の環境です。テスト用のカードでだけ購入できます。',
+      going: '決済画面を開いています…', err: '決済画面を開けませんでした。時間をおいてもう一度お試しください。',
+      already: 'すでにプレミアムです。反映まで少し時間がかかることがあります。',
+      trial: function (d) { return '無料期間中です（' + d + 'まで）。' + d + 'に初回の料金を請求します。'; },
+      trialEnd: function (d) { return '無料期間の終わり（' + d + '）で終了します。料金はかかりません。'; },
+      active: function (d) { return '次の更新日: ' + d; },
+      ending: function (d) { return d + 'で終了します（自動更新はオフです）。'; },
+      pastDue: 'お支払いを確認できませんでした。「お支払い・解約の管理」からカードを更新してください。',
+      plan: { premium_monthly: '月額プラン', premium_yearly: '年額プラン' },
+      manage: 'お支払い・解約の管理', manageErr: '管理画面を開けませんでした。時間をおいてもう一度お試しください。',
+      thanks: 'お申込みありがとうございます。反映まで数秒かかることがあります。',
+      slow: '反映に時間がかかっています。少したってから、このページを開き直してください。',
+      canceled: 'お申込みは完了していません。',
+      quota: function (n) { return 'マイタイマー ' + n + '（プレミアム: 無制限）'; },
+      delSub: '有料プランが自動更新される状態のままでは削除できません。先に「お支払い・解約の管理」から解約してください。'
+    },
+    en: {
+      title: 'Go Premium', titleOn: 'Premium', badge: 'Premium',
+      lead: 'New subscribers get the first 7 days free. Unlimited saved timers and projects, full history and more.',
+      leadNoTrial: 'Unlimited saved timers and projects, full history and more.',
+      monthly: 'Start monthly', yearly: 'Start yearly (best value)',
+      note: 'The price is shown in your local currency on the next screen (Stripe checkout). Cancel any time.', more: 'Pricing and terms',
+      test: 'This is the test site. Only test cards can be used.',
+      going: 'Opening checkout…', err: 'Could not open checkout. Please try again later.',
+      already: 'You already have Premium. It can take a moment to show up.',
+      trial: function (d) { return 'Free trial until ' + d + '. Your first charge is on ' + d + '.'; },
+      trialEnd: function (d) { return 'Ends when the trial ends (' + d + '). You will not be charged.'; },
+      active: function (d) { return 'Next renewal: ' + d; },
+      ending: function (d) { return 'Ends on ' + d + ' (auto-renew is off).'; },
+      pastDue: 'We could not confirm your payment. Update your card in "Billing and cancellation".',
+      plan: { premium_monthly: 'Monthly plan', premium_yearly: 'Yearly plan' },
+      manage: 'Billing and cancellation', manageErr: 'Could not open billing. Please try again later.',
+      thanks: 'Thank you for subscribing. It can take a few seconds to show up.',
+      slow: 'This is taking longer than usual. Please reopen this page in a moment.',
+      canceled: 'Your subscription was not completed.',
+      quota: function (n) { return 'Saved timers ' + n + ' (Premium: no limit)'; },
+      delSub: 'You cannot delete your account while a paid plan is set to renew. Please cancel it first in "Billing and cancellation".'
+    },
+    es: {
+      title: 'Hazte Premium', titleOn: 'Premium', badge: 'Premium',
+      lead: 'Si es tu primera vez, los primeros 7 días son gratis. Temporizadores y proyectos sin límite, historial completo y más.',
+      leadNoTrial: 'Temporizadores y proyectos sin límite, historial completo y más.',
+      monthly: 'Empezar plan mensual', yearly: 'Empezar plan anual (mejor precio)',
+      note: 'El precio se muestra en tu moneda en la siguiente pantalla (pago con Stripe). Cancela cuando quieras.', more: 'Precios y condiciones',
+      test: 'Este es el sitio de prueba. Solo se pueden usar tarjetas de prueba.',
+      going: 'Abriendo el pago…', err: 'No se pudo abrir el pago. Inténtalo más tarde.',
+      already: 'Ya tienes Premium. Puede tardar un momento en aparecer.',
+      trial: function (d) { return 'Prueba gratis hasta el ' + d + '. El primer cobro es el ' + d + '.'; },
+      trialEnd: function (d) { return 'Termina al final de la prueba (' + d + '). No se te cobrará.'; },
+      active: function (d) { return 'Próxima renovación: ' + d; },
+      ending: function (d) { return 'Termina el ' + d + ' (renovación automática desactivada).'; },
+      pastDue: 'No pudimos confirmar tu pago. Actualiza tu tarjeta en "Pagos y cancelación".',
+      plan: { premium_monthly: 'Plan mensual', premium_yearly: 'Plan anual' },
+      manage: 'Pagos y cancelación', manageErr: 'No se pudo abrir la gestión de pagos. Inténtalo más tarde.',
+      thanks: 'Gracias por suscribirte. Puede tardar unos segundos en aparecer.',
+      slow: 'Está tardando más de lo normal. Vuelve a abrir esta página en un momento.',
+      canceled: 'La suscripción no se completó.',
+      quota: function (n) { return 'Temporizadores ' + n + ' (Premium: sin límite)'; },
+      delSub: 'No puedes eliminar la cuenta mientras un plan de pago se renueva. Cancélalo primero en "Pagos y cancelación".'
+    }
+  }[lang];
+  var PRICING = { ja: '/pricing', en: '/en-pricing', es: '/es-pricing' }[lang];
+  var CHECKOUT = params.get('checkout');
+  function isPrem(e) {
+    return !!e && e.plan === 'premium' && ['active', 'trialing', 'past_due'].indexOf(e.status) >= 0 &&
+      (!e.current_period_end || new Date(e.current_period_end).getTime() > Date.now() - 3 * 864e5);
+  }
+  function fmtDate(iso) {
+    try { return new Date(iso).toLocaleDateString(lang === 'ja' ? 'ja-JP' : lang, { year: 'numeric', month: 'long', day: 'numeric' }); } catch (e) { return ''; }
+  }
+  async function loadEnt() {
+    var r = await sb.from('entitlements').select('plan,status,current_period_end,cancel_at_period_end,trial_end,trial_used,price_lookup_key').maybeSingle();
+    ENT = r.error ? null : r.data;
+    if (isPrem(ENT)) { FREE_MAX = 100; PJ_FREE = 50; }
+    return ENT;
+  }
+  async function callBilling(route, body) {
+    var s = await sb.auth.getSession();
+    var tok = s.data && s.data.session && s.data.session.access_token;
+    if (!tok) throw new Error('nosession');
+    var r = await fetch(FN_URL + route, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: 'Bearer ' + tok, apikey: SB_KEY },
+      body: JSON.stringify(body)
+    });
+    var j = {}; try { j = await r.json(); } catch (e) {}
+    if (!r.ok) { var er = new Error(j.error || ('http ' + r.status)); er.code = j.error; throw er; }
+    if (typeof j.url !== 'string' || !/^https:\/\/(checkout|billing)\.stripe\.com\//.test(j.url)) throw new Error('bad url');
+    return j;
+  }
+  function fillBilling(box, badge, note) {
+    box.textContent = '';
+    var prem = isPrem(ENT);
+    var pl = prem && ENT.price_lookup_key && B.plan[ENT.price_lookup_key];
+    badge.textContent = prem ? B.badge + (pl ? (lang === 'ja' ? '（' + pl + '）' : ' (' + pl + ')') : '') : P.now;
+    if (!prem && !BILLING_ON) { box.hidden = true; return; }
+    box.hidden = false;
+    box.appendChild(el('h2', { text: prem ? B.titleOn : B.title }));
+    if (note) box.appendChild(msg(note));
+    if (!prem && note === B.thanks) return; // 反映待ちの間はボタンを出さない
+    var err = el('p', { cls: 'acct-msg err', role: 'status' }); err.hidden = true;
+    function fail(t) { err.textContent = t; err.hidden = false; }
+    if (prem) {
+      var end = ENT.trial_end && ENT.status === 'trialing' ? ENT.trial_end : ENT.current_period_end;
+      var d = end ? fmtDate(end) : '';
+      var line = ENT.status === 'past_due' ? B.pastDue
+        : ENT.status === 'trialing' ? (ENT.cancel_at_period_end ? B.trialEnd(d) : B.trial(d))
+        : (ENT.cancel_at_period_end ? B.ending(d) : B.active(d));
+      box.appendChild(el('p', { cls: 'acct-small', text: line }));
+      var mg = el('button', { type: 'button', cls: 'acct-btn', text: B.manage });
+      mg.addEventListener('click', async function () {
+        mg.disabled = true; err.hidden = true;
+        try { var j = await callBilling('portal', { lang: lang }); ev('billing_portal'); location.assign(j.url); }
+        catch (e) { mg.disabled = false; fail(B.manageErr); }
+      });
+      box.appendChild(el('div', { cls: 'acct-row' }, [mg]));
+    } else {
+      box.appendChild(el('p', { cls: 'acct-small', text: ENT && ENT.trial_used ? B.leadNoTrial : B.lead }));
+      var bm = el('button', { type: 'button', cls: 'acct-btn', text: B.monthly });
+      var by = el('button', { type: 'button', cls: 'acct-btn acct-btn-primary', text: B.yearly });
+      [[bm, 'monthly'], [by, 'yearly']].forEach(function (x) {
+        x[0].addEventListener('click', async function () {
+          bm.disabled = true; by.disabled = true; err.hidden = true;
+          x[0].textContent = B.going;
+          ev('checkout_start', { plan: x[1] });
+          try { var j = await callBilling('checkout', { plan: x[1], lang: lang, back: '/account' }); location.assign(j.url); }
+          catch (e) {
+            bm.disabled = false; by.disabled = false; bm.textContent = B.monthly; by.textContent = B.yearly;
+            fail(e.code === 'already_premium' ? B.already : B.err);
+          }
+        });
+      });
+      box.appendChild(el('div', { cls: 'acct-row' }, [by, bm]));
+      box.appendChild(el('p', { cls: 'acct-small' }, [B.note, ' ', el('a', { href: PRICING, text: B.more })]));
+      if (BILLING_ON) box.appendChild(el('p', { cls: 'acct-small', text: B.test }));
+    }
+    box.appendChild(err);
+  }
+  async function startBilling(box, badge) {
+    try { await loadEnt(); } catch (e) {}
+    var note = CHECKOUT === 'success' ? B.thanks : CHECKOUT === 'cancel' ? B.canceled : '';
+    fillBilling(box, badge, note);
+    if (CHECKOUT === 'success' && !isPrem(ENT)) {
+      for (var i = 0; i < 8 && !isPrem(ENT); i++) {
+        await new Promise(function (r) { setTimeout(r, 2500); });
+        try { await loadEnt(); } catch (e) {}
+      }
+      if (isPrem(ENT)) { ev('checkout_done'); location.reload(); return; }
+      fillBilling(box, badge, B.slow);
+    } else if (CHECKOUT === 'success') ev('checkout_done');
+    CHECKOUT = null;
+  }
+
   function renderSignedIn(user) {
     var meta = user.user_metadata || {};
+    var badge = el('p', { cls: 'acct-plan-now', text: P.now });
+    var bill = el('section', { cls: 'acct-usage acct-billing', 'aria-label': B.title }); bill.hidden = true;
     var who = el('div', { cls: 'acct-card' }, [
       el('p', { cls: 'acct-label', text: T.signedIn }),
       el('p', { cls: 'acct-name', text: meta.full_name || meta.name || '' }),
       el('p', { cls: 'acct-email', text: user.email || '' }),
-      el('p', { cls: 'acct-plan-now', text: P.now })
+      badge
     ]);
     var out = el('button', { type: 'button', cls: 'acct-btn', text: T.logout });
     out.addEventListener('click', async function () {
@@ -332,7 +500,7 @@
         var r = await sb.rpc('delete_my_account');
         if (r.error) {
           go.disabled = false; cancel.disabled = false; input.disabled = false;
-          box.appendChild(msg(T.errDelete, 'err'));
+          box.appendChild(msg(/active subscription/.test((r.error && r.error.message) || '') ? B.delSub : T.errDelete, 'err'));
           return;
         }
         ev('account_delete');
@@ -350,8 +518,8 @@
     var usage = el('section', { cls: 'acct-usage', 'aria-label': T.usageTitle }, [el('h2', { text: T.usageTitle }), msg(T.loading)]);
     var mine = el('section', { cls: 'acct-usage acct-my', 'aria-label': T.myTitle }, [el('h2', { text: T.myTitle }), msg(T.loading)]);
     var pj = el('section', { cls: 'acct-usage acct-pj', 'aria-label': T.pjTitle }, [el('h2', { text: T.pjTitle }), msg(T.loading)]);
-    show([who, pj, mine, usage, planTable(1), el('div', { cls: 'acct-row' }, [out]), danger]);
-    loadAll(pj, mine);
+    show([who, bill, pj, mine, usage, planTable(1), el('div', { cls: 'acct-row' }, [out]), danger]);
+    startBilling(bill, badge).catch(function () {}).then(function () { loadAll(pj, mine); });
     loadUsage(usage);
   }
 
@@ -469,7 +637,7 @@
       });
       box.appendChild(ul);
     }
-    box.appendChild(el('p', { cls: 'acct-small acct-quota', text: P.quota(rows.length) }));
+    box.appendChild(el('p', { cls: 'acct-small acct-quota', text: isPrem(ENT) ? B.quota(rows.length) : P.quota(rows.length) }));
   }
   var refresh = function () {};
   async function loadProjects(box, mineBox, err) {
