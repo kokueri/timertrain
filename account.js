@@ -174,7 +174,7 @@
         ['記録のCSVダウンロード', false, false, true],
         ['ミニプレーヤー（小窓で表示）', false, false, true]
       ],
-      note: 'プレミアムは準備中です。料金や開始時期は、決まりしだいこのページでお知らせします。今あるタイマーの機能は、これからもログインなしで無料で使えます。',
+      note: 'プレミアムは準備中です（月額250円・年額2,000円、最初の7日間は無料の予定）。開始時期は料金ページでお知らせします。今あるタイマーの機能は、これからもログインなしで無料で使えます。', more: '料金と詳しい条件', href: '/pricing',
       quota: function (n) { return n > FREE_MAX ? '保存中のマイタイマー ' + n + '個（無料プランで新しく保存できるのは2つまで）' : 'マイタイマー ' + n + ' / ' + FREE_MAX + '（プレミアムで無制限・準備中）'; }
     },
     en: {
@@ -190,7 +190,7 @@
         ['Download history as CSV', false, false, true],
         ['Mini player (small floating window)', false, false, true]
       ],
-      note: 'Premium is in preparation. We will announce the price and launch date on this page. Everything the timer does today stays free without an account.',
+      note: 'Premium is in preparation (planned: US$1.99/month or US$15.99/year, 7 days free). We will announce the launch date on the Pricing page. Everything the timer does today stays free without an account.', more: 'Pricing and terms', href: '/en-pricing',
       quota: function (n) { return n > FREE_MAX ? n + ' saved timers (the free plan can save new ones up to 2)' : 'Saved timers ' + n + ' / ' + FREE_MAX + ' (unlimited with Premium, coming soon)'; }
     },
     es: {
@@ -206,7 +206,7 @@
         ['Descargar el historial en CSV', false, false, true],
         ['Minirreproductor (ventana flotante)', false, false, true]
       ],
-      note: 'Premium está en preparación. Anunciaremos el precio y la fecha en esta página. Todo lo que hace el temporizador hoy sigue siendo gratis sin cuenta.',
+      note: 'Premium está en preparación (previsto: MXN 29 o US$1.99 al mes, 7 días gratis). Anunciaremos la fecha en la página de Precios. Todo lo que hace el temporizador hoy sigue siendo gratis sin cuenta.', more: 'Precios y condiciones', href: '/es-pricing',
       quota: function (n) { return n > FREE_MAX ? n + ' temporizadores guardados (el plan gratis permite guardar nuevos hasta 2)' : 'Temporizadores ' + n + ' / ' + FREE_MAX + ' (ilimitados con Premium, próximamente)'; }
     }
   }[lang];
@@ -227,7 +227,7 @@
     return el('section', { cls: 'acct-plans', 'aria-label': P.title }, [
       el('h2', { text: P.title }),
       el('div', { cls: 'acct-plans-wrap' }, [el('table', { cls: 'acct-plans-t' }, [el('colgroup', null, [el('col', { cls: 'c0' }), el('col'), el('col'), el('col')]), el('thead', null, [head]), el('tbody', null, body)])]),
-      el('p', { cls: 'acct-small', text: P.note })
+      el('p', { cls: 'acct-small' }, [P.note, ' ', el('a', { href: P.href, text: P.more })])
     ]);
   }
 
