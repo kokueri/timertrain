@@ -157,6 +157,17 @@
 
 
   /* ---------- 使い方の例（プロジェクト → マイタイマー → ラベル） ---------- */
+  var D2 = {
+    ja: { pjTitle: 'プロジェクト', pjEmpty: 'マイタイマーをプロジェクトにまとめると、「データ」でプロジェクトごと・ラベル（区切りの名前）ごとの時間が見られます。下の「使い方の例」も参考にしてください。',
+      pjTimers: 'マイタイマー: ', pjNoTimers: 'まだマイタイマーが入っていません（上の「マイタイマー」でプロジェクトを選べます）', pjNote: '「休憩」などの名前は自動で休憩として作業の時間から外します。切り替えは「データ」のラベルごとの表でできます。',
+      dataTitle: 'データ（記録とグラフ）', dataLead: 'タイマー画面の「データ」で、作業の時間・使った日数・🔥連続日数と、プロジェクトやラベルごとのグラフが見られます。無料プランは直近7日間です。', dataBtn: 'データを見る' },
+    en: { pjTitle: 'Projects', pjEmpty: 'Group your saved timers into projects to see time per project and per label (segment name) in Data. See "How it works" below for an example.',
+      pjTimers: 'Saved timers: ', pjNoTimers: 'No saved timers in it yet (pick a project for a timer under "My timers" above)', pjNote: 'Names like "Break" are left out of work time automatically. You can change this in the label table in Data.',
+      dataTitle: 'Data (history and charts)', dataLead: 'Open "Data" on the timer screen to see work time, days used, your 🔥 streak, and charts by project and label. The free plan shows the last 7 days.', dataBtn: 'Open Data' },
+    es: { pjTitle: 'Proyectos', pjEmpty: 'Agrupa tus temporizadores en proyectos para ver en Datos el tiempo por proyecto y por etiqueta (nombre del tramo). Mira el ejemplo de abajo.',
+      pjTimers: 'Temporizadores: ', pjNoTimers: 'Aún no tiene temporizadores (elige un proyecto para cada uno en «Mis temporizadores»)', pjNote: 'Los nombres como «Descanso» no cuentan como trabajo. Puedes cambiarlo en la tabla de etiquetas de Datos.',
+      dataTitle: 'Datos (historial y gráficos)', dataLead: 'Abre «Datos» en la pantalla del temporizador para ver el tiempo de trabajo, los días de uso, tu racha 🔥 y gráficos por proyecto y etiqueta. El plan gratis muestra los últimos 7 días.', dataBtn: 'Ver datos' }
+  }[lang];
   var HOW = {
     ja: {
       title: '使い方の例（プロジェクト・マイタイマー・ラベル）',
@@ -361,6 +372,15 @@
   var B = {
     ja: {
       title: 'プレミアムにする', titleOn: 'プレミアム', seePlans: 'プランを確認する', soonTitle: 'プレミアム（準備中）', soonLead: 'マイタイマーとプロジェクトが無制限になり、全期間の記録・月／年のグラフ・CSVが使えるようになります。月額250円・年額2,000円、最初の7日間は無料の予定です。', badge: 'プレミアム',
+      termsHead: 'お申込み前にご確認ください',
+      terms: function (trial) { return [
+        ['料金', '年額プラン 2,000円／年、月額プラン 250円／月（税込）'],
+        ['お支払い', trial ? '初めての方は最初の7日間は無料です。8日目に初回の料金を請求し、以後は解約するまで毎年（月額プランは毎月）同じ日に自動で更新・請求します。' : 'お申込みと同時に初回の料金を請求し、以後は解約するまで毎年（月額プランは毎月）同じ日に自動で更新・請求します。'],
+        ['支払方法', 'クレジットカードなど（決済は Stripe／Link）'],
+        ['ご利用開始', 'お申込み後すぐに使えます。'],
+        ['解約', 'このページの「お支払い・解約の管理」からいつでも解約できます。次の更新日からの請求が止まり、期間の終わりまで使えます。無料期間中に解約すれば料金はかかりません。解約料はありません。'],
+        ['返金', 'お支払い後の返金は原則できません（法令や決済会社の規定による場合を除きます）。']
+      ]; },
       lead: '初めての方は、最初の7日間は無料です。マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
       leadNoTrial: 'マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
       monthly: '月額プランで始める', yearly: '年額プランで始める（おトク）',
@@ -383,6 +403,15 @@
     },
     en: {
       title: 'Go Premium', titleOn: 'Premium', seePlans: 'See plans', soonTitle: 'Premium (coming soon)', soonLead: 'Unlimited saved timers and projects, all-time history, monthly/yearly charts and CSV. Planned at US$1.99/month or US$15.99/year, with 7 days free.', badge: 'Premium',
+      termsHead: 'Please check before you subscribe',
+      terms: function (trial) { return [
+        ['Price', 'Yearly US$15.99/year or monthly US$1.99/month. The price in your local currency, with any tax, is shown on the next screen.'],
+        ['Payment', trial ? 'New subscribers get the first 7 days free. You are charged on day 8, and the plan then renews and is charged automatically every year (monthly plan: every month) until you cancel.' : 'You are charged when you subscribe, and the plan then renews and is charged automatically every year (monthly plan: every month) until you cancel.'],
+        ['Payment methods', 'Cards and more (processed by Stripe / Link)'],
+        ['Access', 'Available right after you subscribe.'],
+        ['Cancellation', 'Cancel any time in "Billing and cancellation" on this page. You will not be charged again and keep Premium until the end of the period. No charge if you cancel during the trial. No cancellation fee.'],
+        ['Refunds', 'Payments are non-refundable, except where required by law or the payment provider\'s rules.']
+      ]; },
       lead: 'New subscribers get the first 7 days free. Unlimited saved timers and projects, full history and more.',
       leadNoTrial: 'Unlimited saved timers and projects, full history and more.',
       monthly: 'Start monthly', yearly: 'Start yearly (best value)',
@@ -405,6 +434,15 @@
     },
     es: {
       title: 'Hazte Premium', titleOn: 'Premium', seePlans: 'Ver planes', soonTitle: 'Premium (próximamente)', soonLead: 'Temporizadores y proyectos ilimitados, historial completo, gráficos mensuales/anuales y CSV. Previsto: US$1.99 o MXN 29 al mes, con 7 días gratis.', badge: 'Premium',
+      termsHead: 'Revisa antes de suscribirte',
+      terms: function (trial) { return [
+        ['Precio', 'Plan anual US$15.99 al año o mensual US$1.99 al mes (en México: MXN 229 / MXN 29). El precio en tu moneda, con impuestos, se muestra en la siguiente pantalla.'],
+        ['Pago', trial ? 'Si es tu primera vez, los primeros 7 días son gratis. El día 8 se hace el primer cobro y después se renueva y se cobra automáticamente cada año (plan mensual: cada mes) hasta que canceles.' : 'Se cobra al suscribirte y después se renueva y se cobra automáticamente cada año (plan mensual: cada mes) hasta que canceles.'],
+        ['Formas de pago', 'Tarjetas y más (procesado por Stripe / Link)'],
+        ['Acceso', 'Disponible en cuanto te suscribes.'],
+        ['Cancelación', 'Cancela cuando quieras en "Pagos y cancelación" de esta página. No se te vuelve a cobrar y mantienes Premium hasta el final del periodo. Sin cargo si cancelas durante la prueba. Sin penalización.'],
+        ['Reembolsos', 'Los pagos no son reembolsables, salvo cuando lo exija la ley o el proveedor de pagos.']
+      ]; },
       lead: 'Si es tu primera vez, los primeros 7 días son gratis. Temporizadores y proyectos sin límite, historial completo y más.',
       leadNoTrial: 'Temporizadores y proyectos sin límite, historial completo y más.',
       monthly: 'Empezar plan mensual', yearly: 'Empezar plan anual (mejor precio)',
@@ -498,7 +536,14 @@
       });
       box.appendChild(el('div', { cls: 'acct-row' }, [mg]));
     } else {
-      box.appendChild(el('p', { cls: 'acct-small', text: ENT && ENT.trial_used ? B.leadNoTrial : B.lead }));
+      var hasTrial = !(ENT && ENT.trial_used);
+      box.appendChild(el('p', { cls: 'acct-small', text: hasTrial ? B.lead : B.leadNoTrial }));
+      // 申込み前の確認（特商法の最終確認画面の表示事項。Stripe の決済画面には独自の文章を載せられないため、ここに出す）
+      var terms = el('div', { cls: 'acct-terms', id: 'acct-terms' });
+      terms.appendChild(el('p', { cls: 'acct-small' }, [el('strong', { text: B.termsHead })]));
+      B.terms(hasTrial).forEach(function (t) {
+        terms.appendChild(el('p', { cls: 'acct-small' }, [el('strong', { text: t[0] + (lang === 'ja' ? '：' : ': ') }), t[1]]));
+      });
       var bm = el('button', { type: 'button', cls: 'acct-btn', text: B.monthly });
       var by = el('button', { type: 'button', cls: 'acct-btn acct-btn-primary', text: B.yearly });
       [[bm, 'monthly'], [by, 'yearly']].forEach(function (x) {
@@ -513,6 +558,7 @@
           }
         });
       });
+      box.appendChild(terms);
       box.appendChild(el('div', { cls: 'acct-row' }, [by, bm]));
       box.appendChild(el('div', { cls: 'acct-row' }, [seePlans()]));
       box.appendChild(el('p', { cls: 'acct-small' }, [B.note, ' ', el('a', { href: PRICING, text: B.more })]));
@@ -587,12 +633,19 @@
       input.focus();
     });
 
-    var usage = el('section', { cls: 'acct-usage', 'aria-label': T.usageTitle }, [el('h2', { text: T.usageTitle }), msg(T.loading)]);
     var mine = el('section', { cls: 'acct-usage acct-my', 'aria-label': T.myTitle }, [el('h2', { text: T.myTitle }), msg(T.loading)]);
-    var pj = el('section', { cls: 'acct-usage acct-pj', 'aria-label': T.pjTitle }, [el('h2', { text: T.pjTitle }), msg(T.loading)]);
-    show([cols([who, bill, pj, mine, usage], [planTable(1), el('div', { cls: 'acct-row' }, [out]), danger])]);
+    var pj = el('section', { cls: 'acct-usage acct-pj', 'aria-label': D2.pjTitle }, [el('h2', { text: D2.pjTitle }), msg(T.loading)]);
+    var openData = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm', text: D2.dataBtn });
+    openData.addEventListener('click', function () {
+      try { sessionStorage.setItem('tt-open-data', '1'); } catch (e) {}
+      ev('data_from_account');
+      location.href = HOME;
+    });
+    var data = el('section', { cls: 'acct-usage acct-data', 'aria-label': D2.dataTitle }, [el('h2', { text: D2.dataTitle }), el('p', { cls: 'acct-small', text: D2.dataLead }), openData]);
+    howBox = el('div', { cls: 'acct-how-box' });
+    show([cols([who, bill, mine, pj, data, planTable(1), howBox, el('div', { cls: 'acct-row' }, [out]), danger], [])]);
+    if (location.hash === '#acct-plans') setTimeout(function () { var t = document.getElementById('acct-plans'); if (t) t.scrollIntoView({ block: 'start' }); }, 300);
     startBilling(bill, badge).catch(function () {}).then(function () { loadAll(pj, mine); });
-    loadUsage(usage);
   }
 
   /* ---------- マイタイマーの一覧（スタート＝そのページで開く、データ＝準備中） ---------- */
@@ -712,105 +765,59 @@
     box.appendChild(el('p', { cls: 'acct-small acct-quota', text: isPrem(ENT) ? B.quota(rows.length) : P.quota(rows.length) }));
   }
   var refresh = function () {};
+  var howBox = null;
+  /* プロジェクトの管理: 作る・名前を変える・削除。時間の集計は「データ」の窓（data.js）で見る */
   async function loadProjects(box, mineBox, err) {
     refresh = function () { renderMine(mineBox, false); loadProjects(box, mineBox, false); };
-    var start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - 6);
-    var rl = await sb.from('usage_logs').select('id,started_at,total_secs,timer_id').eq('product', 'timertrain')
-      .gte('started_at', start.toISOString()).limit(2100);
-    var rs = await sb.from('usage_segments').select('log_id,label,secs').eq('product', 'timertrain')
-      .gte('started_at', new Date(start.getTime() - 86400000).toISOString()).limit(10000);
     box.textContent = '';
-    box.appendChild(el('h2', { text: T.pjTitle }));
-    if (err || rl.error) { box.appendChild(msg(T.errLogin, 'err')); return; }
-    var segsByLog = {};
-    (rs.error ? [] : rs.data || []).forEach(function (s) { (segsByLog[s.log_id] = segsByLog[s.log_id] || []).push(s); });
-    var tmap = {}; DATA.timers.forEach(function (t) { tmap[t.id] = t; });
-    // プロジェクトごと → ラベルごとの秒数
-    var buckets = {};
-    function bucket(key) { return buckets[key] = buckets[key] || { labels: {}, total: 0, brk: 0, timers: {} }; }
-    (rl.data || []).forEach(function (l) {
-      var t = l.timer_id && tmap[l.timer_id];
-      var key = t ? (t.project_id || '__none') : '__other';
-      var b = bucket(key);
-      var segs = segsByLog[l.id];
-      var list = segs && segs.length ? segs.map(function (s) { return { label: s.label || '', secs: s.secs, seg: true }; })
-        : [{ label: '\u0000', secs: Math.max(0, Number(l.total_secs) || 0), seg: false }];
-      list.forEach(function (s) {
-        b.labels[s.label] = (b.labels[s.label] || 0) + s.secs;
-        if (s.label !== '\u0000' && isBreak(s.label)) b.brk += s.secs; else { b.total += s.secs; if (t) b.timers[t.id] = (b.timers[t.id] || 0) + s.secs; }
-      });
-    });
-    var order = DATA.projects.map(function (p) { return { key: p.id, name: p.name, p: p }; });
-    order.push({ key: '__none', name: T.pjNone }, { key: '__other', name: T.pjOther });
-    var max = 1; order.forEach(function (o) { if (buckets[o.key]) max = Math.max(max, buckets[o.key].total); });
+    box.appendChild(el('h2', { text: D2.pjTitle }));
     var anyProject = DATA.projects.length > 0;
-    if (!anyProject) box.appendChild(el('p', { cls: 'acct-small', text: T.pjEmpty }));
-    box.appendChild(howTo(!anyProject));
+    if (howBox) { howBox.textContent = ''; howBox.appendChild(howTo(!anyProject)); }
+    if (err) { box.appendChild(msg(T.errLogin, 'err')); return; }
+    if (!anyProject) box.appendChild(el('p', { cls: 'acct-small', text: D2.pjEmpty }));
     var list = el('div', { cls: 'acct-pj-list' });
-    order.forEach(function (o) {
-      var b = buckets[o.key];
-      if (!o.p && !b) return; // 使っていない「なし」「以外」は出さない
-      if (!anyProject && o.key !== '__none' && o.key !== '__other') return;
-      b = b || { labels: {}, total: 0, brk: 0, timers: {} };
+    DATA.projects.forEach(function (p) {
       var card = el('div', { cls: 'acct-pj' });
-      var head = el('div', { cls: 'acct-pj-head' }, [el('p', { cls: 'acct-pj-name', text: o.name }), el('p', { cls: 'acct-pj-total', text: fmtDur(b.total) })]);
-      card.appendChild(head);
-      var bar = el('div', { cls: 'acct-pj-bar' }); var fill = el('div', { cls: 'acct-pj-fill' }); fill.style.width = Math.round(b.total / max * 100) + '%'; bar.appendChild(fill); card.appendChild(bar);
-      var tids = Object.keys(b.timers || {}).filter(function (id) { return tmap[id]; }).sort(function (a, c) { return b.timers[c] - b.timers[a]; });
-      if (tids.length) card.appendChild(el('p', { cls: 'acct-pj-timers' }, [el('span', { cls: 'acct-pj-timers-k', text: T.pjByTimer }), tids.map(function (id) { return (tmap[id].name || '') + ' ' + fmtDur(b.timers[id]); }).join(lang === 'ja' ? ' ／ ' : ' / ')]));
-      var labels = Object.keys(b.labels).sort(function (a, c) { return b.labels[c] - b.labels[a]; });
-      var work = labels.filter(function (l) { return l === '\u0000' || !isBreak(l); }), brk = labels.filter(function (l) { return l !== '\u0000' && isBreak(l); });
-      function row(l, isB) {
-        var name = l === '\u0000' ? T.pjNoSeg : (l || T.pjNoLabel);
-        var r = el('li', { cls: 'acct-pj-row' + (isB ? ' brk' : '') }, [el('span', { cls: 'acct-pj-lab', text: name }), el('span', { cls: 'acct-pj-sec', text: fmtDur(b.labels[l]) })]);
-        if (l !== '\u0000') {
-          var t = el('button', { type: 'button', cls: 'acct-pj-tog', text: isB ? T.pjToWork : T.pjToBreak });
-          t.addEventListener('click', async function () { t.disabled = true; var ok = await saveBreak(l, isB ? 0 : 1); if (!ok) { t.disabled = false; card.appendChild(msg(T.pjErr, 'err')); return; } ev('label_break_toggle'); refresh(); });
-          r.appendChild(t);
-        }
-        return r;
-      }
-      if (work.length) card.appendChild(el('ul', { cls: 'acct-pj-rows' }, work.map(function (l) { return row(l, false); })));
-      if (brk.length) {
-        card.appendChild(el('p', { cls: 'acct-pj-sub', text: T.pjBreak + ' ' + fmtDur(b.brk) }));
-        card.appendChild(el('ul', { cls: 'acct-pj-rows' }, brk.map(function (l) { return row(l, true); })));
-      }
-      if (o.p) {
-        var acts = el('div', { cls: 'acct-pj-acts' });
-        var rn = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjRename });
-        rn.addEventListener('click', function () {
-          nameForm(card, T.pjNamePh, o.p.name, T.pjSave, async function (name) {
-            var r = await sb.from('projects').update({ name: name.slice(0, 40) }).eq('id', o.p.id).select('id').single();
-            if (r.error) return false; o.p.name = name.slice(0, 40); refresh(); return true;
-          });
+      card.appendChild(el('div', { cls: 'acct-pj-head' }, [el('p', { cls: 'acct-pj-name', text: p.name })]));
+      var names = DATA.timers.filter(function (t) { return t.project_id === p.id; }).map(function (t) { return t.name || ''; });
+      card.appendChild(el('p', { cls: 'acct-pj-timers' }, names.length ? [el('span', { cls: 'acct-pj-timers-k', text: D2.pjTimers }), names.join(lang === 'ja' ? '・' : ', ')] : [D2.pjNoTimers]));
+      var acts = el('div', { cls: 'acct-pj-acts' });
+      var rn = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjRename });
+      rn.addEventListener('click', function () {
+        nameForm(card, T.pjNamePh, p.name, T.pjSave, async function (name) {
+          var r = await sb.from('projects').update({ name: name.slice(0, 40) }).eq('id', p.id).select('id').single();
+          if (r.error) return false; p.name = name.slice(0, 40); refresh(); return true;
         });
-        var del = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjDel });
-        del.addEventListener('click', function () {
-          if (acts.querySelector('.acct-pj-yes')) return;
-          var yes = el('button', { type: 'button', cls: 'acct-pj-tog acct-pj-yes', text: T.pjDelQ });
-          yes.addEventListener('click', async function () {
-            yes.disabled = true;
-            var r = await sb.from('projects').delete().eq('id', o.p.id);
-            if (r.error) { yes.disabled = false; card.appendChild(msg(T.pjErr, 'err')); return; }
-            DATA.projects = DATA.projects.filter(function (p) { return p.id !== o.p.id; });
-            DATA.timers.forEach(function (t) { if (t.project_id === o.p.id) t.project_id = null; });
-            ev('project_delete'); refresh();
-          });
-          acts.appendChild(yes);
+      });
+      var del = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjDel });
+      del.addEventListener('click', function () {
+        if (acts.querySelector('.acct-pj-yes')) return;
+        var yes = el('button', { type: 'button', cls: 'acct-pj-tog acct-pj-yes', text: T.pjDelQ });
+        yes.addEventListener('click', async function () {
+          yes.disabled = true;
+          var r = await sb.from('projects').delete().eq('id', p.id);
+          if (r.error) { yes.disabled = false; card.appendChild(msg(T.pjErr, 'err')); return; }
+          DATA.projects = DATA.projects.filter(function (x) { return x.id !== p.id; });
+          DATA.timers.forEach(function (t) { if (t.project_id === p.id) t.project_id = null; });
+          ev('project_delete'); refresh();
         });
-        acts.appendChild(rn); acts.appendChild(del);
-        card.appendChild(acts);
-      }
+        acts.appendChild(yes);
+      });
+      acts.appendChild(rn); acts.appendChild(del);
+      card.appendChild(acts);
       list.appendChild(card);
     });
     box.appendChild(list);
-    if (DATA.projects.length >= PJ_FREE) { box.appendChild(el('p', { cls: 'acct-small acct-quota', text: T.pjFull })); box.appendChild(el('p', { cls: 'acct-small', text: T.pjNote })); return; }
-    var add = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm', text: T.pjNew });
-    add.addEventListener('click', function () {
-      nameForm(box, T.pjNamePh, '', T.pjOk, async function (name) { var p = await createProject(name); if (!p) return false; refresh(); return true; });
-    });
-    box.appendChild(add);
-    box.appendChild(el('p', { cls: 'acct-small', text: T.pjNote }));
+    var full = DATA.projects.length >= PJ_FREE;
+    if (full) box.appendChild(el('p', { cls: 'acct-small acct-quota', text: T.pjFull }));
+    else {
+      var add = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm', text: T.pjNew });
+      add.addEventListener('click', function () {
+        nameForm(box, T.pjNamePh, '', T.pjOk, async function (name) { var p = await createProject(name); if (!p) return false; refresh(); return true; });
+      });
+      box.appendChild(add);
+    }
+    box.appendChild(el('p', { cls: 'acct-small', text: D2.pjNote }));
   }
 
   /* ---------- 直近7日の利用記録 ---------- */

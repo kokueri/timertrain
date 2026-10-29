@@ -341,34 +341,97 @@
     var now = Date.now();
     if (isRunning()) { var d = (now - last) / 1000; log.secs += d; curSeg(log).secs += d; }
     last = now;
+    showStats();
     if (!log.id && !log.busy && log.secs >= 15) persistLog(log, false);
     else if (log.id && now - log.saved > 60000) persistLog(log, false);
   }
-  /* ---------- 連続日数（マイページと同じ数え方: タイマーを15秒以上動かした日が続いた数） ---------- */
-  var STREAK_KEY = 'tt-streak';
+  /* ---------- ホームの ⏱ 今日 · 📅 7日中n日 · 🔥 n日連続 ----------
+   * 連続日数: タイマーを15秒以上動かした日が続いた数（今日まだなら昨日まで）
+   * 今日の時間: 休憩（名前で判定。マイページ／データで切り替えた設定 settings.data.breaks を優先）を除いた秒数。
+   *   記録済みの分（ログごと）＋いま動いている分（このページの log）を足して表示する */
+  var STATS_KEY = 'tt-stats2';
   var streakToday = false;
+  var ST = null; // { n, streakToday, days7, day, at, todayLogs: {logId: 作業秒} }
+  var BREAKS = {};
+  var BREAK_RE = /休憩|きゅうけい|やすみ|break|rest|descanso|pausa|recreo/i;
+  function isBreak(label) {
+    if (Object.prototype.hasOwnProperty.call(BREAKS, label)) return BREAKS[label] === 1;
+    return BREAK_RE.test(label);
+  }
   function dayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
-  function showStreak(n, today) { streakToday = !!today; if (window.__ttSetStreak) { try { window.__ttSetStreak(n, today); } catch (e) {} } }
+  function workOf(L) {
+    if (!L) return 0;
+    var w = 0; L.segs.forEach(function (g) { if (!isBreak(g.label)) w += g.secs; });
+    return w;
+  }
+  var lastShown = '';
+  function showStats() {
+    if (!ST || !window.__ttSetStats) return;
+    var t = 0, cur = log && log.id;
+    for (var k in ST.todayLogs) if (k !== cur) t += ST.todayLogs[k];
+    if (log && ST.day === dayKey(new Date(log.startedAt))) t += workOf(log);
+    var key = Math.floor(t / 60) + '/' + ST.days7 + '/' + ST.n + '/' + ST.streakToday;
+    if (key === lastShown) return;
+    lastShown = key;
+    try { window.__ttSetStats({ today: t, days7: ST.days7, streak: ST.n, streakToday: ST.streakToday }); } catch (e) {}
+  }
   async function loadStreak(force) {
     try {
-      var c = JSON.parse(sessionStorage.getItem(STREAK_KEY) || 'null');
-      if (!force && c && c.day === dayKey(new Date()) && Date.now() - c.at < 600000) { showStreak(c.n, c.today); return; }
+      var c = JSON.parse(sessionStorage.getItem(STATS_KEY) || 'null');
+      if (!force && c && c.day === dayKey(new Date()) && Date.now() - c.at < 600000) { ST = c; streakToday = c.streakToday; BREAKS = c.breaks || {}; lastShown = ''; showStats(); return; }
     } catch (e) {}
     try {
       var since = new Date(); since.setHours(0, 0, 0, 0); since.setDate(since.getDate() - 120);
-      var r = await sb.from('usage_logs').select('started_at')
+      var today0 = new Date(); today0.setHours(0, 0, 0, 0);
+      var r = await sb.from('usage_logs').select('id,started_at,total_secs')
         .eq('product', PRODUCT).gte('started_at', since.toISOString())
-        .order('started_at', { ascending: false }).limit(5000);
+        .order('started_at', { ascending: false }).limit(1000);
       if (r.error || !r.data) return;
-      var set = {};
-      r.data.forEach(function (x) { set[dayKey(new Date(x.started_at))] = 1; });
+      var rs = await sb.from('usage_segments').select('log_id,label,secs').eq('product', PRODUCT)
+        .gte('started_at', new Date(today0.getTime() - 86400000).toISOString()).limit(1000);
+      var r3 = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
+      var sd = (!r3.error && r3.data && r3.data.data) || {};
+      BREAKS = (sd.breaks && typeof sd.breaks === 'object') ? sd.breaks : {};
+      var set = {}, todayLogs = {}, segs = {};
+      (rs.error ? [] : rs.data || []).forEach(function (g) { (segs[g.log_id] = segs[g.log_id] || []).push(g); });
+      var week0 = new Date(today0); week0.setDate(week0.getDate() - 6);
+      var days7 = {};
+      r.data.forEach(function (x) {
+        var t = new Date(x.started_at);
+        set[dayKey(t)] = 1;
+        if (t >= week0) days7[dayKey(t)] = 1;
+        if (t >= today0) {
+          var g = segs[x.id];
+          var w = 0;
+          if (g && g.length) g.forEach(function (z) { if (!isBreak(z.label || '')) w += Math.max(0, Number(z.secs) || 0); });
+          else w = Math.max(0, Number(x.total_secs) || 0);
+          todayLogs[x.id] = w;
+        }
+      });
       var d = new Date(); d.setHours(0, 0, 0, 0);
       var today = !!set[dayKey(d)];
       if (!today) d.setDate(d.getDate() - 1);
       var n = 0;
       while (set[dayKey(d)] && n < 121) { n++; d.setDate(d.getDate() - 1); }
-      try { sessionStorage.setItem(STREAK_KEY, JSON.stringify({ n: n, today: today, day: dayKey(new Date()), at: Date.now() })); } catch (e) {}
-      showStreak(n, today);
+      // いま動いている記録が保存直後なら、今日に入れる
+      if (log && log.id) { today = true; }
+      streakToday = today;
+      ST = { n: n + (log && log.id && !set[dayKey(new Date())] ? 1 : 0), streakToday: today, days7: Object.keys(days7).length, day: dayKey(new Date()), at: Date.now(), todayLogs: todayLogs, breaks: BREAKS };
+      try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {}
+      lastShown = ''; showStats();
+    } catch (e) {}
+  }
+  /* ---------- ラベルの候補（一度使った区切りの名前。タイマー名の入力欄に出す） ---------- */
+  async function loadLabels() {
+    try {
+      var r = await sb.from('usage_segments').select('label').eq('product', PRODUCT).order('started_at', { ascending: false }).limit(500);
+      if (r.error || !r.data) return;
+      var seen = {}, out = [];
+      r.data.forEach(function (x) { var l = String(x.label || '').trim().slice(0, 30); if (l && !seen[l] && out.length < 40) { seen[l] = 1; out.push(l); } });
+      var dl = document.getElementById('tt-labels');
+      if (!dl) { dl = document.createElement('datalist'); dl.id = 'tt-labels'; document.body.appendChild(dl); }
+      dl.textContent = '';
+      out.forEach(function (l) { var o = document.createElement('option'); o.value = l; dl.appendChild(o); });
     } catch (e) {}
   }
   function persistLog(L, done) {
@@ -408,7 +471,9 @@
     step();
     clearInterval(logTick); logTick = null;
     var L = log; log = null;
-    persistLog(L, done);
+    if (ST && ST.day === dayKey(new Date(L.startedAt)) && L.secs >= 15) { ST.todayLogs[L.id || ('local' + Date.now())] = workOf(L); try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {} }
+    showStats();
+    persistLog(L, done).then(function () { if (L.id && ST) { var k; for (k in ST.todayLogs) if (/^local/.test(k)) delete ST.todayLogs[k]; ST.todayLogs[L.id] = workOf(L); showStats(); } });
   }
   function startLog() {
     endLog(false);
@@ -507,7 +572,8 @@
     if (!s.data || !s.data.session) {
       // セッション切れ: 入口の表示を「ログイン」に戻し、欄はログインの案内だけにする
       var link = document.querySelector('#acct-link span'); if (link) link.textContent = T.signin;
-      try { sessionStorage.removeItem('tt-streak'); } catch (e) {}
+      try { sessionStorage.removeItem('tt-stats2'); } catch (e) {}
+      window.__ttSb = null; window.__ttSignedOut = true;
       head.removeChild(saveBtn);
       list.appendChild(el('a', { cls: 'tt-chip', href: acctHref, text: T.signin }));
       return;
@@ -519,9 +585,13 @@
       if (e && e.plan === 'premium' && ['active', 'trialing', 'past_due'].indexOf(e.status) >= 0 &&
           (!e.current_period_end || new Date(e.current_period_end).getTime() > Date.now() - 3 * 864e5)) { FREE_MAX = 100; PJ_FREE = 50; PREMIUM = true; }
     } catch (e) {}
+    window.__ttSb = sb; window.__ttPremium = PREMIUM;
+    window.__ttBreaks = function () { return BREAKS; };
+    window.__ttStatsRefresh = function () { loadStreak(true); };
     hookLogs();
     hookSettings();
     loadStreak(false);
+    loadLabels();
     await load();
     if (window.__ttRestored && isRunning() && !log) startLog();
     syncSettings().catch(function () {});
