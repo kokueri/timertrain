@@ -51,7 +51,7 @@
       ],
       pjTitle: 'プロジェクト（この7日間）', pjNew: '＋ プロジェクトを作る', pjNamePh: 'プロジェクト名（例: 勉強）', pjOk: '作る', pjNone: 'プロジェクトなし',
       pjEmpty: 'マイタイマーをプロジェクトにまとめると、ここにプロジェクトごと・区切り（ラベル）ごとの時間が出ます。下の「マイタイマー」で、それぞれのプロジェクトを選んでください。',
-      pjOther: 'マイタイマー以外', pjNoSeg: '（区切りの記録なし）', pjNoLabel: '（名前なし）', pjBreak: '休憩（合計に入れない）',
+      pjOther: 'マイタイマー以外', pjByTimer: 'マイタイマーごと: ', pjNoSeg: '（区切りの記録なし）', pjNoLabel: '（名前なし）', pjBreak: '休憩（合計に入れない）',
       pjToBreak: '休憩にする', pjToWork: '合計に入れる', pjRename: '名前を変更', pjDel: '削除', pjDelQ: '削除する？（マイタイマーは残ります）', pjSave: '保存',
       pjSel: 'プロジェクト', pjNewOpt: '＋ 新しいプロジェクト…', pjTotal: '合計', pjNote: '「休憩」「Break」などの名前は自動で休憩として合計から外します。違うときは「合計に入れる」を押してください。区切りごとの記録は 2026/10/25 から始まりました。',
       pjErr: '保存できませんでした。時間をおいてもう一度お試しください。',
@@ -89,7 +89,7 @@
       ],
       pjTitle: 'Projects (last 7 days)', pjNew: '+ New project', pjNamePh: 'Project name (e.g. Study)', pjOk: 'Create', pjNone: 'No project',
       pjEmpty: 'Group your saved timers into projects to see time per project and per segment (label) here. Pick a project for each timer under "My timers" below.',
-      pjOther: 'Not a saved timer', pjNoSeg: '(no segment data)', pjNoLabel: '(no name)', pjBreak: 'Breaks (not counted)',
+      pjOther: 'Not a saved timer', pjByTimer: 'Per saved timer: ', pjNoSeg: '(no segment data)', pjNoLabel: '(no name)', pjBreak: 'Breaks (not counted)',
       pjToBreak: 'Mark as break', pjToWork: 'Count it', pjRename: 'Rename', pjDel: 'Delete', pjDelQ: 'Delete? (Timers are kept)', pjSave: 'Save',
       pjSel: 'Project', pjNewOpt: '+ New project…', pjTotal: 'Total', pjNote: 'Names like "Break" or "Rest" are treated as breaks and left out of the totals. If that is wrong, press "Count it". Segment data started on 2026-10-25.',
       pjErr: 'Could not save. Please try again later.',
@@ -127,7 +127,7 @@
       ],
       pjTitle: 'Proyectos (últimos 7 días)', pjNew: '+ Nuevo proyecto', pjNamePh: 'Nombre del proyecto (p. ej. Estudio)', pjOk: 'Crear', pjNone: 'Sin proyecto',
       pjEmpty: 'Agrupa tus temporizadores en proyectos para ver aquí el tiempo por proyecto y por etapa (etiqueta). Elige un proyecto para cada temporizador en «Mis temporizadores».',
-      pjOther: 'No es un temporizador guardado', pjNoSeg: '(sin datos por etapa)', pjNoLabel: '(sin nombre)', pjBreak: 'Descansos (no cuentan)',
+      pjOther: 'No es un temporizador guardado', pjByTimer: 'Por temporizador: ', pjNoSeg: '(sin datos por etapa)', pjNoLabel: '(sin nombre)', pjBreak: 'Descansos (no cuentan)',
       pjToBreak: 'Marcar como descanso', pjToWork: 'Contarlo', pjRename: 'Renombrar', pjDel: 'Eliminar', pjDelQ: '¿Eliminar? (los temporizadores se conservan)', pjSave: 'Guardar',
       pjSel: 'Proyecto', pjNewOpt: '+ Nuevo proyecto…', pjTotal: 'Total', pjNote: 'Los nombres como «Descanso» o «Break» se toman como descansos y no cuentan en el total. Si no es así, pulsa «Contarlo». Los datos por etapa empezaron el 25/10/2026.',
       pjErr: 'No se pudo guardar. Inténtalo más tarde.',
@@ -154,6 +154,65 @@
       streakKeep: function (n) { return '🔥 Racha de ' + n + (n === 1 ? ' día' : ' días') + '. Úsalo hoy para llegar a ' + (n + 1); }
     }
   }[lang];
+
+
+  /* ---------- 使い方の例（プロジェクト → マイタイマー → ラベル） ---------- */
+  var HOW = {
+    ja: {
+      title: '使い方の例（プロジェクト・マイタイマー・ラベル）',
+      lead: '「プロジェクト」の中に「マイタイマー」を入れます。マイタイマーの中の区切りの名前（国語・数学など）が「ラベル」です。それぞれの単位で、使った時間を集計できます。',
+      kP: 'プロジェクト', kM: 'マイタイマー',
+      tree: [['📚 勉強', [['平日', '国語 25分 → 休憩 5分 → 数学 25分'], ['休日', '国語 25分 → 休憩 5分 → 社会 25分']]],
+             ['💪 筋トレ', [['朝トレ', 'スクワット 1分 → 休憩 30秒 → 腕立て 1分（×3回）']]]],
+      resT: '1週間使うと、たとえば「勉強」はこう見えます',
+      res: [['プロジェクトの合計', '勉強 6時間40分'], ['マイタイマーごと', '平日 4時間10分 ／ 休日 2時間30分'], ['ラベルごと', '国語 3時間20分 ・ 数学 2時間05分 ・ 社会 1時間15分']],
+      resNote: '平日と休日の「国語」は、同じ名前なので合わせて数えます。「休憩」は自動で合計から外します。',
+      plan: '無料ログインは、プロジェクト1つ・マイタイマー2つまで（この例なら「勉強」の平日と休日）。プレミアム（準備中）では、いくつでも作れます。'
+    },
+    en: {
+      title: 'How it fits together (projects, timers, labels)',
+      lead: 'Put your saved timers into a project. The name of each segment inside a timer (Math, Reading…) is its label. Time is totaled at every level.',
+      kP: 'Project', kM: 'Saved timer',
+      tree: [['📚 Study', [['Weekdays', 'Reading 25 min → Break 5 min → Math 25 min'], ['Weekend', 'Reading 25 min → Break 5 min → Science 25 min']]],
+             ['💪 Workout', [['Morning', 'Squats 1 min → Break 30 s → Push-ups 1 min (×3)']]]],
+      resT: 'After a week, "Study" might look like this',
+      res: [['Project total', 'Study 6 h 40 min'], ['Per saved timer', 'Weekdays 4 h 10 min / Weekend 2 h 30 min'], ['Per label', 'Reading 3 h 20 min · Math 2 h 05 min · Science 1 h 15 min']],
+      resNote: '"Reading" from both timers is counted together because the name is the same. Breaks are left out of the total automatically.',
+      plan: 'A free account includes 1 project and 2 saved timers (here: Study with Weekdays and Weekend). Premium (coming soon) has no limit.'
+    },
+    es: {
+      title: 'Cómo se organiza (proyectos, temporizadores, etiquetas)',
+      lead: 'Agrupa tus temporizadores guardados en un proyecto. El nombre de cada etapa dentro de un temporizador (Lectura, Matemáticas…) es su etiqueta. El tiempo se suma en cada nivel.',
+      kP: 'Proyecto', kM: 'Temporizador guardado',
+      tree: [['📚 Estudio', [['Entre semana', 'Lectura 25 min → Descanso 5 min → Matemáticas 25 min'], ['Fin de semana', 'Lectura 25 min → Descanso 5 min → Ciencias 25 min']]],
+             ['💪 Ejercicio', [['Mañana', 'Sentadillas 1 min → Descanso 30 s → Flexiones 1 min (×3)']]]],
+      resT: 'Después de una semana, «Estudio» se vería así',
+      res: [['Total del proyecto', 'Estudio 6 h 40 min'], ['Por temporizador', 'Entre semana 4 h 10 min / Fin de semana 2 h 30 min'], ['Por etiqueta', 'Lectura 3 h 20 min · Matemáticas 2 h 05 min · Ciencias 1 h 15 min']],
+      resNote: '«Lectura» de los dos temporizadores se suma junta porque tiene el mismo nombre. Los descansos se quitan del total automáticamente.',
+      plan: 'La cuenta gratis incluye 1 proyecto y 2 temporizadores guardados (aquí: Estudio con Entre semana y Fin de semana). Premium (próximamente) no tiene límite.'
+    }
+  }[lang];
+  function howTo(open) {
+    var d = el('details', { cls: 'acct-howto' });
+    if (open) d.open = true;
+    d.appendChild(el('summary', { text: HOW.title }));
+    d.appendChild(el('p', { cls: 'acct-small', text: HOW.lead }));
+    var ul = el('ul', { cls: 'acct-howto-tree' });
+    HOW.tree.forEach(function (pj) {
+      var li = el('li', { cls: 'acct-howto-pj' }, [el('span', { cls: 'acct-howto-name', text: pj[0] }), el('span', { cls: 'acct-howto-kind', text: HOW.kP })]);
+      li.appendChild(el('ul', null, pj[1].map(function (m) {
+        return el('li', { cls: 'acct-howto-my' }, [el('span', { cls: 'acct-howto-name', text: m[0] }), el('span', { cls: 'acct-howto-kind', text: HOW.kM }), el('p', { cls: 'acct-howto-segs', text: m[1] })]);
+      })));
+      ul.appendChild(li);
+    });
+    d.appendChild(ul);
+    d.appendChild(el('p', { cls: 'acct-howto-rt', text: HOW.resT }));
+    d.appendChild(el('dl', { cls: 'acct-howto-res' }, [].concat.apply([], HOW.res.map(function (r) { return [el('dt', { text: r[0] }), el('dd', { text: r[1] })]; }))));
+    d.appendChild(el('p', { cls: 'acct-small', text: HOW.resNote }));
+    d.appendChild(el('p', { cls: 'acct-small acct-howto-plan', text: HOW.plan }));
+    d.addEventListener('toggle', function () { if (d.open) ev('howto_open'); });
+    return d;
+  }
 
   /* ---------- プランの比較（無料ログイン／プレミアム準備中） ---------- */
   var FREE_MAX = 2;
@@ -284,6 +343,7 @@
             el('div', null, [el('p', { cls: 'acct-perk-t', text: p[0] }), el('p', { cls: 'acct-perk-d', text: p[1] })])]);
         }))
       ]),
+      howTo(true),
       planTable(1)
     ];
   }
@@ -646,7 +706,7 @@
     var tmap = {}; DATA.timers.forEach(function (t) { tmap[t.id] = t; });
     // プロジェクトごと → ラベルごとの秒数
     var buckets = {};
-    function bucket(key) { return buckets[key] = buckets[key] || { labels: {}, total: 0, brk: 0 }; }
+    function bucket(key) { return buckets[key] = buckets[key] || { labels: {}, total: 0, brk: 0, timers: {} }; }
     (rl.data || []).forEach(function (l) {
       var t = l.timer_id && tmap[l.timer_id];
       var key = t ? (t.project_id || '__none') : '__other';
@@ -656,7 +716,7 @@
         : [{ label: '\u0000', secs: Math.max(0, Number(l.total_secs) || 0), seg: false }];
       list.forEach(function (s) {
         b.labels[s.label] = (b.labels[s.label] || 0) + s.secs;
-        if (s.label !== '\u0000' && isBreak(s.label)) b.brk += s.secs; else b.total += s.secs;
+        if (s.label !== '\u0000' && isBreak(s.label)) b.brk += s.secs; else { b.total += s.secs; if (t) b.timers[t.id] = (b.timers[t.id] || 0) + s.secs; }
       });
     });
     var order = DATA.projects.map(function (p) { return { key: p.id, name: p.name, p: p }; });
@@ -664,16 +724,19 @@
     var max = 1; order.forEach(function (o) { if (buckets[o.key]) max = Math.max(max, buckets[o.key].total); });
     var anyProject = DATA.projects.length > 0;
     if (!anyProject) box.appendChild(el('p', { cls: 'acct-small', text: T.pjEmpty }));
+    box.appendChild(howTo(!anyProject));
     var list = el('div', { cls: 'acct-pj-list' });
     order.forEach(function (o) {
       var b = buckets[o.key];
       if (!o.p && !b) return; // 使っていない「なし」「以外」は出さない
       if (!anyProject && o.key !== '__none' && o.key !== '__other') return;
-      b = b || { labels: {}, total: 0, brk: 0 };
+      b = b || { labels: {}, total: 0, brk: 0, timers: {} };
       var card = el('div', { cls: 'acct-pj' });
       var head = el('div', { cls: 'acct-pj-head' }, [el('p', { cls: 'acct-pj-name', text: o.name }), el('p', { cls: 'acct-pj-total', text: fmtDur(b.total) })]);
       card.appendChild(head);
       var bar = el('div', { cls: 'acct-pj-bar' }); var fill = el('div', { cls: 'acct-pj-fill' }); fill.style.width = Math.round(b.total / max * 100) + '%'; bar.appendChild(fill); card.appendChild(bar);
+      var tids = Object.keys(b.timers || {}).filter(function (id) { return tmap[id]; }).sort(function (a, c) { return b.timers[c] - b.timers[a]; });
+      if (tids.length) card.appendChild(el('p', { cls: 'acct-pj-timers' }, [el('span', { cls: 'acct-pj-timers-k', text: T.pjByTimer }), tids.map(function (id) { return (tmap[id].name || '') + ' ' + fmtDur(b.timers[id]); }).join(lang === 'ja' ? ' ／ ' : ' / ')]));
       var labels = Object.keys(b.labels).sort(function (a, c) { return b.labels[c] - b.labels[a]; });
       var work = labels.filter(function (l) { return l === '\u0000' || !isBreak(l); }), brk = labels.filter(function (l) { return l !== '\u0000' && isBreak(l); });
       function row(l, isB) {

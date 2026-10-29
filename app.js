@@ -367,7 +367,7 @@ const soundTick = () => SOUNDS[sound.s].tick();
 
 /* その他の設定（自動で次へ・終了前のお知らせ・ブラウザ通知。端末に保存） */
 const OPT_KEY = 'tt-opts';
-let opts = { auto: true, remind: 0, notify: false, silent: false, keep: true };
+let opts = { auto: true, remind: 0, notify: true, silent: false, keep: true };
 try {
 const ov = JSON.parse(localStorage.getItem(OPT_KEY) || 'null');
 if (ov) {
@@ -429,9 +429,11 @@ if (ctr) ctr.insertAdjacentElement('afterend', box);
 function askNotifyOnce() {
 if (IS_IOS) { askSilentOnce(); if (document.getElementById('tt-ask')) return; }
 try {
-if (!canNotify() || opts.notify || Notification.permission !== 'default' || localStorage.getItem(ASK_KEY)) return;
+if (!canNotify() || Notification.permission !== 'default' || localStorage.getItem(ASK_KEY)) return;
 } catch (e) { return; }
 if (document.getElementById('tt-ask')) return;
+// 通知は最初からオン: 初めて再生したとき（ボタンを押した流れのまま）、ブラウザの許可を直接たずねる
+if (opts.notify) { try { localStorage.setItem(ASK_KEY, 'auto'); } catch (e) {} enableNotify(); return; }
 const box = document.createElement('div'); box.id = 'tt-ask'; box.className = 'tt-ask'; box.setAttribute('role', 'status');
 const tx = document.createElement('p'); tx.textContent = STR.askNotify;
 const yes = document.createElement('button'); yes.type = 'button'; yes.className = 'tt-ask-yes'; yes.textContent = STR.askYes;
