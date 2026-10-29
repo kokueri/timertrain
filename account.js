@@ -361,6 +361,15 @@
   var B = {
     ja: {
       title: 'プレミアムにする', titleOn: 'プレミアム', seePlans: 'プランを確認する', soonTitle: 'プレミアム（準備中）', soonLead: 'マイタイマーとプロジェクトが無制限になり、全期間の記録・月／年のグラフ・CSVが使えるようになります。月額250円・年額2,000円、最初の7日間は無料の予定です。', badge: 'プレミアム',
+      termsHead: 'お申込み前にご確認ください',
+      terms: function (trial) { return [
+        ['料金', '年額プラン 2,000円／年、月額プラン 250円／月（税込）'],
+        ['お支払い', trial ? '初めての方は最初の7日間は無料です。8日目に初回の料金を請求し、以後は解約するまで毎年（月額プランは毎月）同じ日に自動で更新・請求します。' : 'お申込みと同時に初回の料金を請求し、以後は解約するまで毎年（月額プランは毎月）同じ日に自動で更新・請求します。'],
+        ['支払方法', 'クレジットカードなど（決済は Stripe／Link）'],
+        ['ご利用開始', 'お申込み後すぐに使えます。'],
+        ['解約', 'このページの「お支払い・解約の管理」からいつでも解約できます。次の更新日からの請求が止まり、期間の終わりまで使えます。無料期間中に解約すれば料金はかかりません。解約料はありません。'],
+        ['返金', 'お支払い後の返金は原則できません（法令や決済会社の規定による場合を除きます）。']
+      ]; },
       lead: '初めての方は、最初の7日間は無料です。マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
       leadNoTrial: 'マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
       monthly: '月額プランで始める', yearly: '年額プランで始める（おトク）',
@@ -383,6 +392,15 @@
     },
     en: {
       title: 'Go Premium', titleOn: 'Premium', seePlans: 'See plans', soonTitle: 'Premium (coming soon)', soonLead: 'Unlimited saved timers and projects, all-time history, monthly/yearly charts and CSV. Planned at US$1.99/month or US$15.99/year, with 7 days free.', badge: 'Premium',
+      termsHead: 'Please check before you subscribe',
+      terms: function (trial) { return [
+        ['Price', 'Yearly US$15.99/year or monthly US$1.99/month. The price in your local currency, with any tax, is shown on the next screen.'],
+        ['Payment', trial ? 'New subscribers get the first 7 days free. You are charged on day 8, and the plan then renews and is charged automatically every year (monthly plan: every month) until you cancel.' : 'You are charged when you subscribe, and the plan then renews and is charged automatically every year (monthly plan: every month) until you cancel.'],
+        ['Payment methods', 'Cards and more (processed by Stripe / Link)'],
+        ['Access', 'Available right after you subscribe.'],
+        ['Cancellation', 'Cancel any time in "Billing and cancellation" on this page. You will not be charged again and keep Premium until the end of the period. No charge if you cancel during the trial. No cancellation fee.'],
+        ['Refunds', 'Payments are non-refundable, except where required by law or the payment provider\'s rules.']
+      ]; },
       lead: 'New subscribers get the first 7 days free. Unlimited saved timers and projects, full history and more.',
       leadNoTrial: 'Unlimited saved timers and projects, full history and more.',
       monthly: 'Start monthly', yearly: 'Start yearly (best value)',
@@ -405,6 +423,15 @@
     },
     es: {
       title: 'Hazte Premium', titleOn: 'Premium', seePlans: 'Ver planes', soonTitle: 'Premium (próximamente)', soonLead: 'Temporizadores y proyectos ilimitados, historial completo, gráficos mensuales/anuales y CSV. Previsto: US$1.99 o MXN 29 al mes, con 7 días gratis.', badge: 'Premium',
+      termsHead: 'Revisa antes de suscribirte',
+      terms: function (trial) { return [
+        ['Precio', 'Plan anual US$15.99 al año o mensual US$1.99 al mes (en México: MXN 229 / MXN 29). El precio en tu moneda, con impuestos, se muestra en la siguiente pantalla.'],
+        ['Pago', trial ? 'Si es tu primera vez, los primeros 7 días son gratis. El día 8 se hace el primer cobro y después se renueva y se cobra automáticamente cada año (plan mensual: cada mes) hasta que canceles.' : 'Se cobra al suscribirte y después se renueva y se cobra automáticamente cada año (plan mensual: cada mes) hasta que canceles.'],
+        ['Formas de pago', 'Tarjetas y más (procesado por Stripe / Link)'],
+        ['Acceso', 'Disponible en cuanto te suscribes.'],
+        ['Cancelación', 'Cancela cuando quieras en "Pagos y cancelación" de esta página. No se te vuelve a cobrar y mantienes Premium hasta el final del periodo. Sin cargo si cancelas durante la prueba. Sin penalización.'],
+        ['Reembolsos', 'Los pagos no son reembolsables, salvo cuando lo exija la ley o el proveedor de pagos.']
+      ]; },
       lead: 'Si es tu primera vez, los primeros 7 días son gratis. Temporizadores y proyectos sin límite, historial completo y más.',
       leadNoTrial: 'Temporizadores y proyectos sin límite, historial completo y más.',
       monthly: 'Empezar plan mensual', yearly: 'Empezar plan anual (mejor precio)',
@@ -498,7 +525,14 @@
       });
       box.appendChild(el('div', { cls: 'acct-row' }, [mg]));
     } else {
-      box.appendChild(el('p', { cls: 'acct-small', text: ENT && ENT.trial_used ? B.leadNoTrial : B.lead }));
+      var hasTrial = !(ENT && ENT.trial_used);
+      box.appendChild(el('p', { cls: 'acct-small', text: hasTrial ? B.lead : B.leadNoTrial }));
+      // 申込み前の確認（特商法の最終確認画面の表示事項。Stripe の決済画面には独自の文章を載せられないため、ここに出す）
+      var terms = el('div', { cls: 'acct-terms', id: 'acct-terms' });
+      terms.appendChild(el('p', { cls: 'acct-small' }, [el('strong', { text: B.termsHead })]));
+      B.terms(hasTrial).forEach(function (t) {
+        terms.appendChild(el('p', { cls: 'acct-small' }, [el('strong', { text: t[0] + (lang === 'ja' ? '：' : ': ') }), t[1]]));
+      });
       var bm = el('button', { type: 'button', cls: 'acct-btn', text: B.monthly });
       var by = el('button', { type: 'button', cls: 'acct-btn acct-btn-primary', text: B.yearly });
       [[bm, 'monthly'], [by, 'yearly']].forEach(function (x) {
@@ -513,6 +547,7 @@
           }
         });
       });
+      box.appendChild(terms);
       box.appendChild(el('div', { cls: 'acct-row' }, [by, bm]));
       box.appendChild(el('div', { cls: 'acct-row' }, [seePlans()]));
       box.appendChild(el('p', { cls: 'acct-small' }, [B.note, ' ', el('a', { href: PRICING, text: B.more })]));
