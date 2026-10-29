@@ -157,6 +157,17 @@
 
 
   /* ---------- 使い方の例（プロジェクト → マイタイマー → ラベル） ---------- */
+  var D2 = {
+    ja: { pjTitle: 'プロジェクト', pjEmpty: 'マイタイマーをプロジェクトにまとめると、「データ」でプロジェクトごと・ラベル（区切りの名前）ごとの時間が見られます。下の「使い方の例」も参考にしてください。',
+      pjTimers: 'マイタイマー: ', pjNoTimers: 'まだマイタイマーが入っていません（上の「マイタイマー」でプロジェクトを選べます）', pjNote: '「休憩」などの名前は自動で休憩として作業の時間から外します。切り替えは「データ」のラベルごとの表でできます。',
+      dataTitle: 'データ（記録とグラフ）', dataLead: 'タイマー画面の「データ」で、作業の時間・使った日数・🔥連続日数と、プロジェクトやラベルごとのグラフが見られます。無料プランは直近7日間です。', dataBtn: 'データを見る' },
+    en: { pjTitle: 'Projects', pjEmpty: 'Group your saved timers into projects to see time per project and per label (segment name) in Data. See "How it works" below for an example.',
+      pjTimers: 'Saved timers: ', pjNoTimers: 'No saved timers in it yet (pick a project for a timer under "My timers" above)', pjNote: 'Names like "Break" are left out of work time automatically. You can change this in the label table in Data.',
+      dataTitle: 'Data (history and charts)', dataLead: 'Open "Data" on the timer screen to see work time, days used, your 🔥 streak, and charts by project and label. The free plan shows the last 7 days.', dataBtn: 'Open Data' },
+    es: { pjTitle: 'Proyectos', pjEmpty: 'Agrupa tus temporizadores en proyectos para ver en Datos el tiempo por proyecto y por etiqueta (nombre del tramo). Mira el ejemplo de abajo.',
+      pjTimers: 'Temporizadores: ', pjNoTimers: 'Aún no tiene temporizadores (elige un proyecto para cada uno en «Mis temporizadores»)', pjNote: 'Los nombres como «Descanso» no cuentan como trabajo. Puedes cambiarlo en la tabla de etiquetas de Datos.',
+      dataTitle: 'Datos (historial y gráficos)', dataLead: 'Abre «Datos» en la pantalla del temporizador para ver el tiempo de trabajo, los días de uso, tu racha 🔥 y gráficos por proyecto y etiqueta. El plan gratis muestra los últimos 7 días.', dataBtn: 'Ver datos' }
+  }[lang];
   var HOW = {
     ja: {
       title: '使い方の例（プロジェクト・マイタイマー・ラベル）',
@@ -622,12 +633,19 @@
       input.focus();
     });
 
-    var usage = el('section', { cls: 'acct-usage', 'aria-label': T.usageTitle }, [el('h2', { text: T.usageTitle }), msg(T.loading)]);
     var mine = el('section', { cls: 'acct-usage acct-my', 'aria-label': T.myTitle }, [el('h2', { text: T.myTitle }), msg(T.loading)]);
-    var pj = el('section', { cls: 'acct-usage acct-pj', 'aria-label': T.pjTitle }, [el('h2', { text: T.pjTitle }), msg(T.loading)]);
-    show([cols([who, bill, pj, mine, usage], [planTable(1), el('div', { cls: 'acct-row' }, [out]), danger])]);
+    var pj = el('section', { cls: 'acct-usage acct-pj', 'aria-label': D2.pjTitle }, [el('h2', { text: D2.pjTitle }), msg(T.loading)]);
+    var openData = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm', text: D2.dataBtn });
+    openData.addEventListener('click', function () {
+      try { sessionStorage.setItem('tt-open-data', '1'); } catch (e) {}
+      ev('data_from_account');
+      location.href = HOME;
+    });
+    var data = el('section', { cls: 'acct-usage acct-data', 'aria-label': D2.dataTitle }, [el('h2', { text: D2.dataTitle }), el('p', { cls: 'acct-small', text: D2.dataLead }), openData]);
+    howBox = el('div', { cls: 'acct-how-box' });
+    show([cols([who, bill, mine, pj, data, planTable(1), howBox, el('div', { cls: 'acct-row' }, [out]), danger], [])]);
+    if (location.hash === '#acct-plans') setTimeout(function () { var t = document.getElementById('acct-plans'); if (t) t.scrollIntoView({ block: 'start' }); }, 300);
     startBilling(bill, badge).catch(function () {}).then(function () { loadAll(pj, mine); });
-    loadUsage(usage);
   }
 
   /* ---------- マイタイマーの一覧（スタート＝そのページで開く、データ＝準備中） ---------- */
@@ -747,105 +765,59 @@
     box.appendChild(el('p', { cls: 'acct-small acct-quota', text: isPrem(ENT) ? B.quota(rows.length) : P.quota(rows.length) }));
   }
   var refresh = function () {};
+  var howBox = null;
+  /* プロジェクトの管理: 作る・名前を変える・削除。時間の集計は「データ」の窓（data.js）で見る */
   async function loadProjects(box, mineBox, err) {
     refresh = function () { renderMine(mineBox, false); loadProjects(box, mineBox, false); };
-    var start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() - 6);
-    var rl = await sb.from('usage_logs').select('id,started_at,total_secs,timer_id').eq('product', 'timertrain')
-      .gte('started_at', start.toISOString()).limit(2100);
-    var rs = await sb.from('usage_segments').select('log_id,label,secs').eq('product', 'timertrain')
-      .gte('started_at', new Date(start.getTime() - 86400000).toISOString()).limit(10000);
     box.textContent = '';
-    box.appendChild(el('h2', { text: T.pjTitle }));
-    if (err || rl.error) { box.appendChild(msg(T.errLogin, 'err')); return; }
-    var segsByLog = {};
-    (rs.error ? [] : rs.data || []).forEach(function (s) { (segsByLog[s.log_id] = segsByLog[s.log_id] || []).push(s); });
-    var tmap = {}; DATA.timers.forEach(function (t) { tmap[t.id] = t; });
-    // プロジェクトごと → ラベルごとの秒数
-    var buckets = {};
-    function bucket(key) { return buckets[key] = buckets[key] || { labels: {}, total: 0, brk: 0, timers: {} }; }
-    (rl.data || []).forEach(function (l) {
-      var t = l.timer_id && tmap[l.timer_id];
-      var key = t ? (t.project_id || '__none') : '__other';
-      var b = bucket(key);
-      var segs = segsByLog[l.id];
-      var list = segs && segs.length ? segs.map(function (s) { return { label: s.label || '', secs: s.secs, seg: true }; })
-        : [{ label: '\u0000', secs: Math.max(0, Number(l.total_secs) || 0), seg: false }];
-      list.forEach(function (s) {
-        b.labels[s.label] = (b.labels[s.label] || 0) + s.secs;
-        if (s.label !== '\u0000' && isBreak(s.label)) b.brk += s.secs; else { b.total += s.secs; if (t) b.timers[t.id] = (b.timers[t.id] || 0) + s.secs; }
-      });
-    });
-    var order = DATA.projects.map(function (p) { return { key: p.id, name: p.name, p: p }; });
-    order.push({ key: '__none', name: T.pjNone }, { key: '__other', name: T.pjOther });
-    var max = 1; order.forEach(function (o) { if (buckets[o.key]) max = Math.max(max, buckets[o.key].total); });
+    box.appendChild(el('h2', { text: D2.pjTitle }));
     var anyProject = DATA.projects.length > 0;
-    if (!anyProject) box.appendChild(el('p', { cls: 'acct-small', text: T.pjEmpty }));
-    box.appendChild(howTo(!anyProject));
+    if (howBox) { howBox.textContent = ''; howBox.appendChild(howTo(!anyProject)); }
+    if (err) { box.appendChild(msg(T.errLogin, 'err')); return; }
+    if (!anyProject) box.appendChild(el('p', { cls: 'acct-small', text: D2.pjEmpty }));
     var list = el('div', { cls: 'acct-pj-list' });
-    order.forEach(function (o) {
-      var b = buckets[o.key];
-      if (!o.p && !b) return; // 使っていない「なし」「以外」は出さない
-      if (!anyProject && o.key !== '__none' && o.key !== '__other') return;
-      b = b || { labels: {}, total: 0, brk: 0, timers: {} };
+    DATA.projects.forEach(function (p) {
       var card = el('div', { cls: 'acct-pj' });
-      var head = el('div', { cls: 'acct-pj-head' }, [el('p', { cls: 'acct-pj-name', text: o.name }), el('p', { cls: 'acct-pj-total', text: fmtDur(b.total) })]);
-      card.appendChild(head);
-      var bar = el('div', { cls: 'acct-pj-bar' }); var fill = el('div', { cls: 'acct-pj-fill' }); fill.style.width = Math.round(b.total / max * 100) + '%'; bar.appendChild(fill); card.appendChild(bar);
-      var tids = Object.keys(b.timers || {}).filter(function (id) { return tmap[id]; }).sort(function (a, c) { return b.timers[c] - b.timers[a]; });
-      if (tids.length) card.appendChild(el('p', { cls: 'acct-pj-timers' }, [el('span', { cls: 'acct-pj-timers-k', text: T.pjByTimer }), tids.map(function (id) { return (tmap[id].name || '') + ' ' + fmtDur(b.timers[id]); }).join(lang === 'ja' ? ' ／ ' : ' / ')]));
-      var labels = Object.keys(b.labels).sort(function (a, c) { return b.labels[c] - b.labels[a]; });
-      var work = labels.filter(function (l) { return l === '\u0000' || !isBreak(l); }), brk = labels.filter(function (l) { return l !== '\u0000' && isBreak(l); });
-      function row(l, isB) {
-        var name = l === '\u0000' ? T.pjNoSeg : (l || T.pjNoLabel);
-        var r = el('li', { cls: 'acct-pj-row' + (isB ? ' brk' : '') }, [el('span', { cls: 'acct-pj-lab', text: name }), el('span', { cls: 'acct-pj-sec', text: fmtDur(b.labels[l]) })]);
-        if (l !== '\u0000') {
-          var t = el('button', { type: 'button', cls: 'acct-pj-tog', text: isB ? T.pjToWork : T.pjToBreak });
-          t.addEventListener('click', async function () { t.disabled = true; var ok = await saveBreak(l, isB ? 0 : 1); if (!ok) { t.disabled = false; card.appendChild(msg(T.pjErr, 'err')); return; } ev('label_break_toggle'); refresh(); });
-          r.appendChild(t);
-        }
-        return r;
-      }
-      if (work.length) card.appendChild(el('ul', { cls: 'acct-pj-rows' }, work.map(function (l) { return row(l, false); })));
-      if (brk.length) {
-        card.appendChild(el('p', { cls: 'acct-pj-sub', text: T.pjBreak + ' ' + fmtDur(b.brk) }));
-        card.appendChild(el('ul', { cls: 'acct-pj-rows' }, brk.map(function (l) { return row(l, true); })));
-      }
-      if (o.p) {
-        var acts = el('div', { cls: 'acct-pj-acts' });
-        var rn = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjRename });
-        rn.addEventListener('click', function () {
-          nameForm(card, T.pjNamePh, o.p.name, T.pjSave, async function (name) {
-            var r = await sb.from('projects').update({ name: name.slice(0, 40) }).eq('id', o.p.id).select('id').single();
-            if (r.error) return false; o.p.name = name.slice(0, 40); refresh(); return true;
-          });
+      card.appendChild(el('div', { cls: 'acct-pj-head' }, [el('p', { cls: 'acct-pj-name', text: p.name })]));
+      var names = DATA.timers.filter(function (t) { return t.project_id === p.id; }).map(function (t) { return t.name || ''; });
+      card.appendChild(el('p', { cls: 'acct-pj-timers' }, names.length ? [el('span', { cls: 'acct-pj-timers-k', text: D2.pjTimers }), names.join(lang === 'ja' ? '・' : ', ')] : [D2.pjNoTimers]));
+      var acts = el('div', { cls: 'acct-pj-acts' });
+      var rn = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjRename });
+      rn.addEventListener('click', function () {
+        nameForm(card, T.pjNamePh, p.name, T.pjSave, async function (name) {
+          var r = await sb.from('projects').update({ name: name.slice(0, 40) }).eq('id', p.id).select('id').single();
+          if (r.error) return false; p.name = name.slice(0, 40); refresh(); return true;
         });
-        var del = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjDel });
-        del.addEventListener('click', function () {
-          if (acts.querySelector('.acct-pj-yes')) return;
-          var yes = el('button', { type: 'button', cls: 'acct-pj-tog acct-pj-yes', text: T.pjDelQ });
-          yes.addEventListener('click', async function () {
-            yes.disabled = true;
-            var r = await sb.from('projects').delete().eq('id', o.p.id);
-            if (r.error) { yes.disabled = false; card.appendChild(msg(T.pjErr, 'err')); return; }
-            DATA.projects = DATA.projects.filter(function (p) { return p.id !== o.p.id; });
-            DATA.timers.forEach(function (t) { if (t.project_id === o.p.id) t.project_id = null; });
-            ev('project_delete'); refresh();
-          });
-          acts.appendChild(yes);
+      });
+      var del = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjDel });
+      del.addEventListener('click', function () {
+        if (acts.querySelector('.acct-pj-yes')) return;
+        var yes = el('button', { type: 'button', cls: 'acct-pj-tog acct-pj-yes', text: T.pjDelQ });
+        yes.addEventListener('click', async function () {
+          yes.disabled = true;
+          var r = await sb.from('projects').delete().eq('id', p.id);
+          if (r.error) { yes.disabled = false; card.appendChild(msg(T.pjErr, 'err')); return; }
+          DATA.projects = DATA.projects.filter(function (x) { return x.id !== p.id; });
+          DATA.timers.forEach(function (t) { if (t.project_id === p.id) t.project_id = null; });
+          ev('project_delete'); refresh();
         });
-        acts.appendChild(rn); acts.appendChild(del);
-        card.appendChild(acts);
-      }
+        acts.appendChild(yes);
+      });
+      acts.appendChild(rn); acts.appendChild(del);
+      card.appendChild(acts);
       list.appendChild(card);
     });
     box.appendChild(list);
-    if (DATA.projects.length >= PJ_FREE) { box.appendChild(el('p', { cls: 'acct-small acct-quota', text: T.pjFull })); box.appendChild(el('p', { cls: 'acct-small', text: T.pjNote })); return; }
-    var add = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm', text: T.pjNew });
-    add.addEventListener('click', function () {
-      nameForm(box, T.pjNamePh, '', T.pjOk, async function (name) { var p = await createProject(name); if (!p) return false; refresh(); return true; });
-    });
-    box.appendChild(add);
-    box.appendChild(el('p', { cls: 'acct-small', text: T.pjNote }));
+    var full = DATA.projects.length >= PJ_FREE;
+    if (full) box.appendChild(el('p', { cls: 'acct-small acct-quota', text: T.pjFull }));
+    else {
+      var add = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm', text: T.pjNew });
+      add.addEventListener('click', function () {
+        nameForm(box, T.pjNamePh, '', T.pjOk, async function (name) { var p = await createProject(name); if (!p) return false; refresh(); return true; });
+      });
+      box.appendChild(add);
+    }
+    box.appendChild(el('p', { cls: 'acct-small', text: D2.pjNote }));
   }
 
   /* ---------- 直近7日の利用記録 ---------- */

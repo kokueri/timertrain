@@ -565,6 +565,8 @@ name.className = 'name-input';
 name.value = t.name;
 name.placeholder = STR.namePh;
 name.maxLength = 30;
+name.setAttribute('list', 'tt-labels');
+name.autocomplete = 'off';
 name.addEventListener('change', () => { t.name = name.value; persist(); });
 
 const time = document.createElement('button');
@@ -1339,13 +1341,43 @@ ic.appendChild(path);
 var sp = document.createElement('span'); sp.textContent = signed ? L.me : L.in;
 a.appendChild(ic); a.appendChild(sp);
 a.setAttribute('aria-label', signed ? L.me : L.in);
-(document.querySelector('.header') || document.body).appendChild(a);
+// 左上: マイページ（ログイン）＋データ
+var tl = document.createElement('div'); tl.id = 'tt-topleft';
+(document.querySelector('.header') || document.body).appendChild(tl);
+tl.appendChild(a);
+if (document.getElementById('setup')) {
+var LD = lang === 'en' ? 'Data' : lang === 'es' ? 'Datos' : 'データ';
+var db = document.createElement('button'); db.type = 'button'; db.id = 'data-btn'; db.setAttribute('aria-label', LD);
+var ic2 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+ic2.setAttribute('viewBox', '0 0 24 24'); ic2.setAttribute('aria-hidden', 'true');
+[[4, 13, 4, 7], [10, 8, 4, 12], [16, 4, 4, 16]].forEach(function (r) {
+var b = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+b.setAttribute('x', r[0]); b.setAttribute('y', r[1]); b.setAttribute('width', r[2]); b.setAttribute('height', r[3]); b.setAttribute('rx', '1.5'); ic2.appendChild(b);
+});
+var sp2 = document.createElement('span'); sp2.textContent = LD;
+db.appendChild(ic2); db.appendChild(sp2);
+db.addEventListener('click', function () { openData('button'); });
+tl.appendChild(db);
+}
+/* データの窓は押したときだけ読み込む（data.js） */
+var dataLoading = null;
+function openData(src) {
+if (window.__ttData) { window.__ttData.open(src); return; }
+if (dataLoading) return;
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=1';
+dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
+dataLoading.onerror = function () { dataLoading = null; };
+document.body.appendChild(dataLoading);
+}
+window.__ttOpenData = openData;
+// マイページの「データを見る」から来たとき
+try { if (sessionStorage.getItem('tt-open-data') && document.getElementById('setup')) { sessionStorage.removeItem('tt-open-data'); setTimeout(function () { openData('account'); }, 200); } } catch (e) {}
 // ログイン中は、説明文の「無料ログインでできること」を出さない
 if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.hidden = true; }
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=8'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=9'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 })();
@@ -1417,21 +1449,28 @@ box.appendChild(a);
 box.appendChild(theme);
 }
 
-// 左上: 連続日数（sync.js がログイン中に呼ぶ）
-window.__ttSetStreak = function (n, today) {
-var link = document.getElementById('acct-link');
-if (!link) return;
-var b = link.querySelector('.tt-streak');
-if (!(n >= 1)) { if (b) b.remove(); return; }
-if (!b) { b = document.createElement('b'); b.className = 'tt-streak'; link.insertBefore(b, link.firstChild); }
-b.textContent = '🔥' + n;
-b.classList.toggle('keep', !today);
-var msg = lang === 'en' ? (today ? n + '-day streak' : n + '-day streak. Use it today to make it ' + (n + 1))
-: lang === 'es' ? (today ? 'Racha de ' + n + (n === 1 ? ' día' : ' días') : 'Racha de ' + n + (n === 1 ? ' día' : ' días') + '. Úsalo hoy para llegar a ' + (n + 1))
-: (today ? n + '日連続で使っています' : n + '日連続中。今日も使うと' + (n + 1) + '日になります');
-link.title = msg;
-var label = link.querySelector('span');
-link.setAttribute('aria-label', (label ? label.textContent + '・' : '') + msg);
+// ホーム: ⏱ 今日 · 📅 7日中n日 · 🔥 n日連続（sync.js がログイン中に呼ぶ。押すとデータの窓）
+window.__ttSetStats = function (st) {
+var row = document.getElementById('tt-stats');
+if (!st) { if (row) row.remove(); return; }
+if (!row) {
+row = document.createElement('button'); row.type = 'button'; row.id = 'tt-stats'; row.className = 'tt-stats';
+row.addEventListener('click', function () { if (window.__ttOpenData) window.__ttOpenData('stats'); });
+var tag = header.querySelector('.tagline');
+if (tag) tag.insertAdjacentElement('afterend', row); else header.appendChild(row);
+}
+var m = Math.floor((st.today || 0) / 60), h = Math.floor(m / 60), mm = m % 60;
+var dur = lang === 'ja' ? (h ? h + '時間' + mm + '分' : m + '分') : lang === 'es' ? (h ? h + ' h ' + mm + ' min' : m + ' min') : (h ? h + 'h ' + mm + 'm' : m + 'm');
+var n = st.streak || 0, d7 = st.days7 || 0;
+var parts = lang === 'en' ? ['⏱ Today ' + dur, '📅 ' + d7 + ' of 7 days', '🔥 ' + n + '-day streak']
+: lang === 'es' ? ['⏱ Hoy ' + dur, '📅 ' + d7 + ' de 7 días', '🔥 Racha de ' + n + (n === 1 ? ' día' : ' días')]
+: ['⏱ 今日 ' + dur, '📅 7日中 ' + d7 + '日', '🔥 ' + n + '日連続'];
+row.textContent = '';
+parts.forEach(function (t, i) { var s = document.createElement('span'); s.textContent = t; if (i === 2 && n > 0 && !st.streakToday) s.className = 'keep'; row.appendChild(s); });
+var hint = lang === 'en' ? (st.streakToday || !n ? '' : ' Use it today to make it ' + (n + 1) + '.') : lang === 'es' ? (st.streakToday || !n ? '' : ' Úsalo hoy para llegar a ' + (n + 1) + '.') : (st.streakToday || !n ? '' : '今日も使うと' + (n + 1) + '日になります。');
+var open = lang === 'en' ? 'Open data' : lang === 'es' ? 'Ver datos' : 'データを見る';
+row.title = parts.join(' · ') + (hint ? ' — ' + hint : '');
+row.setAttribute('aria-label', open + ': ' + parts.join('、') + (hint ? '。' + hint : ''));
 };
 })();
 
