@@ -756,3 +756,8 @@ body.focus-mode .tt-ask { display: none; }
 .about .about-perks-btn:hover { opacity: .9; }
 .about .about-perks .about-perks-note { font-size: 12px; margin-top: 8px; }
 .about-perks + h2 { margin-top: 32px; }
+
+/* ---- 動作の記録（#ttdebug のときだけ） ---- */
+.tt-diag { position: fixed; inset: 8px; z-index: 9999; background: var(--card); color: var(--text); border: 1.5px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); padding: 10px; display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
+.tt-diag button { padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--bg); color: var(--text); font: inherit; font-size: 13px; cursor: pointer; }
+.tt-diag pre { flex-basis: 100%; height: calc(100% - 44px); overflow: auto; margin: 0; font-size: 11px; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }

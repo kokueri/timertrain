@@ -44,6 +44,7 @@ notify: 'ブラウザ通知', notifyNote: '別のタブやアプリを見てい�
 nNext: n => `次: ${n}`, nDone: 'すべて終わりました 🎉', nSoon: (n, m) => `${n} はあと${m}分です`,
 askNotify: '別のタブを見ているときや最小化中も、ポップアップでお知らせしますか？', askYes: 'オンにする', askNo: '今はしない',
 restored: 'タイマーを続きから再開しました', caught: n => `見ていない間に ${n} 回切り替わりました`, tapSound: '音を鳴らすには画面をタップしてください',
+keep: '裏でも止まりにくくする', keepNote: 'PCのブラウザは、音を出していないタブを省エネのために止めることがあります。オンにすると、動かしている間だけ聞こえないくらい小さな音を流して止まりにくくします（タブにスピーカーのマークが出ます）',
 silent: 'マナーモードでも鳴らす', silentNote: 'iPhone・iPad はマナーモード中だと音が出ません。オンにすると鳴りますが、音楽アプリの再生が止まることがあります',
 askSilent: 'iPhone はマナーモード中だと音が鳴りません。マナーモードでも鳴らしますか？（音楽アプリは止まることがあります）',
 },
@@ -63,6 +64,7 @@ notify: 'Browser notifications', notifyNote: 'Get notified at each switch, even 
 nNext: n => `Next: ${n}`, nDone: 'All done 🎉', nSoon: (n, m) => `${n}: ${m} min left`,
 askNotify: 'Get a pop-up notification at each switch, even in another tab or when minimized?', askYes: 'Turn on', askNo: 'Not now',
 restored: 'Timer resumed where it left off', caught: n => `${n} switch${n > 1 ? 'es' : ''} happened while you were away`, tapSound: 'Tap the screen to turn the sound back on',
+keep: 'Keep running in the background', keepNote: 'Computer browsers may pause silent tabs to save energy. When on, a nearly inaudible sound plays while the timer runs so it keeps going (a speaker icon appears on the tab)',
 silent: 'Play sound in silent mode', silentNote: 'iPhone and iPad stay quiet when the silent switch is on. Turn this on to hear the timer anyway (music apps may pause)',
 askSilent: 'Your iPhone stays quiet in silent mode. Play the timer sound even in silent mode? (Music apps may pause)',
 },
@@ -82,6 +84,7 @@ notify: 'Notificaciones del navegador', notifyNote: 'Te avisa en cada cambio, au
 nNext: n => `Siguiente: ${n}`, nDone: '¡Todo listo! 🎉', nSoon: (n, m) => `${n}: quedan ${m} min`,
 askNotify: '¿Quieres un aviso emergente en cada cambio, aunque estés en otra pestaña o la ventana esté minimizada?', askYes: 'Activar', askNo: 'Ahora no',
 restored: 'El temporizador continúa donde se quedó', caught: n => `Hubo ${n} cambio${n > 1 ? 's' : ''} mientras no mirabas`, tapSound: 'Toca la pantalla para volver a activar el sonido',
+keep: 'Seguir en segundo plano', keepNote: 'Los navegadores del ordenador pueden pausar las pestañas sin sonido para ahorrar energía. Al activarlo, suena un sonido casi inaudible mientras el temporizador corre para que no se detenga (aparece un altavoz en la pestaña)',
 silent: 'Sonar en modo silencio', silentNote: 'El iPhone y el iPad no suenan en modo silencio. Actívalo para oír el temporizador (la música puede pausarse)',
 askSilent: 'Tu iPhone no suena en modo silencio. ¿Quieres que el temporizador suene igualmente? (la música puede pausarse)',
 },
@@ -219,6 +222,69 @@ try { const pr = silentEl.play(); if (pr && pr.catch) pr.catch(() => {}); } catc
 } else if (silentEl) { try { silentEl.pause(); } catch (e) {} }
 }
 
+/* ---------- 動作の記録（端末の中だけ。#ttdebug を付けて開くと表示） ----------
+ * タイマー名などは残さない。区切りの番号・遅れ（ミリ秒）・画面の見え方・音の状態だけ。 */
+var DIAG_KEY = 'tt-diag', diagBuf = null, diagT0 = Date.now(), diagC0 = 0;
+function diag(ev, x) {
+try {
+if (!diagBuf) { try { diagBuf = JSON.parse(localStorage.getItem(DIAG_KEY) || '[]'); } catch (e) { diagBuf = []; } if (!Array.isArray(diagBuf)) diagBuf = []; }
+var row = [Date.now(), String(ev).slice(0, 24)];
+if (x !== undefined) row.push(typeof x === 'number' ? Math.round(x) : String(x).slice(0, 40));
+// 音の時計がどれだけ止まっていたか（壁の時計との差）
+if (audioCtx) { if (!diagC0) { diagC0 = audioCtx.currentTime; diagT0 = Date.now(); } row.push('ac:' + audioCtx.state + ':' + Math.round((Date.now() - diagT0) - (audioCtx.currentTime - diagC0) * 1000)); }
+row.push(document.visibilityState[0] + (document.hasFocus() ? 'f' : ''));
+diagBuf.push(row);
+if (diagBuf.length > 400) diagBuf = diagBuf.slice(-400);
+localStorage.setItem(DIAG_KEY, JSON.stringify(diagBuf));
+} catch (e) {}
+}
+['visibilitychange', 'freeze', 'resume', 'focus', 'blur', 'pageshow', 'pagehide'].forEach(function (n) {
+(n === 'focus' || n === 'blur' || n === 'pageshow' || n === 'pagehide' ? window : document).addEventListener(n, function (e) { diag(n === 'visibilitychange' ? 'vis-' + document.visibilityState : n, e && e.persisted ? 'persisted' : undefined); });
+});
+if (/(^|[#&?])ttdebug\b/.test(location.hash + location.search)) {
+window.addEventListener('load', function () {
+var raw = []; try { raw = JSON.parse(localStorage.getItem(DIAG_KEY) || '[]'); } catch (e) {}
+var lines = raw.map(function (r) { var d = new Date(r[0]); return d.toLocaleString() + '.' + String(r[0] % 1000).padStart(3, '0') + '  ' + r.slice(1).join('  '); });
+var box = document.createElement('div'); box.className = 'tt-diag';
+var pre = document.createElement('pre'); pre.textContent = navigator.userAgent + '\n' + lines.join('\n');
+var cp = document.createElement('button'); cp.type = 'button'; cp.textContent = 'Copy';
+cp.addEventListener('click', function () { try { navigator.clipboard.writeText(pre.textContent); cp.textContent = 'Copied'; } catch (e) {} });
+var clr = document.createElement('button'); clr.type = 'button'; clr.textContent = 'Clear';
+clr.addEventListener('click', function () { try { localStorage.removeItem(DIAG_KEY); } catch (e) {} diagBuf = []; pre.textContent = ''; });
+var x = document.createElement('button'); x.type = 'button'; x.textContent = '×'; x.addEventListener('click', function () { box.remove(); });
+box.append(x, cp, clr, pre); document.body.appendChild(box);
+});
+}
+
+/* ---------- 裏でも止まりにくくする（PC） ----------
+ * Chrome は「音を出さずに5分以上隠れている」タブを省エネで止めることがある（予約した音も止まる）。
+ * 実行中だけ、聞こえないくらい小さく低い音（ブラウンノイズ、約 -60dBFS）を流して「音を出しているタブ」にする。
+ * 完全な無音はブラウザに無音と判定されるので効かない。音量のつまみ・音なしの設定とは別（destination に直接）。 */
+const KEEP_OK = !IS_IOS && !/Android/i.test(navigator.userAgent);
+let keepNode = null;
+function keepAlive(on) {
+on = !!(on && KEEP_OK && opts.keep && audioCtx);
+if (!on) { if (keepNode) { try { keepNode.stop(0); keepNode.disconnect(); } catch (e) {} keepNode = null; diag('keep-off'); } return; }
+if (keepNode) return;
+try {
+const sr = audioCtx.sampleRate, len = sr * 4, buf = audioCtx.createBuffer(1, len, sr), d = buf.getChannelData(0);
+let last = 0, sum = 0;
+for (let i = 0; i < len; i++) { last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02; d[i] = last; }
+// つなぎ目で音が跳ねないよう、両端を少しずつ 0 に寄せる
+const fade = Math.floor(sr * 0.05);
+for (let i = 0; i < fade; i++) { const k = i / fade; d[i] *= k; d[len - 1 - i] *= k; }
+for (let i = 0; i < len; i++) sum += d[i] * d[i];
+const rms = Math.sqrt(sum / len) || 1, target = 0.001; // 約 -60dBFS
+for (let i = 0; i < len; i++) d[i] *= target / rms;
+const src = audioCtx.createBufferSource(); src.buffer = buf; src.loop = true;
+const lp = audioCtx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 300;
+src.connect(lp); lp.connect(audioCtx.destination);
+src.start();
+keepNode = src;
+diag('keep-on');
+} catch (e) {}
+}
+
 /* ---------- 音（iOS Safari 対応） ---------- */
 function unlockAudio() {
 if (!audioCtx) {
@@ -227,7 +293,8 @@ if (!AC) return;
 audioCtx = new AC();
 // 他のアプリ（音楽など）に音を取られて止まった後、戻ったら予約をし直す
 audioCtx.onstatechange = () => {
-if (audioCtx.state === 'running') { if (run.active && !run.paused && !run.finished) scheduleAhead(); }
+diag('ac-state', audioCtx.state);
+if (audioCtx.state === 'running') { if (run.active && !run.paused && !run.finished) { scheduleAhead(); keepAlive(true); } }
 else if (run.active && !run.paused) { bgSched = false; try { audioCtx.resume(); } catch (e) {} }
 };
 }
@@ -300,7 +367,7 @@ const soundTick = () => SOUNDS[sound.s].tick();
 
 /* その他の設定（自動で次へ・終了前のお知らせ・ブラウザ通知。端末に保存） */
 const OPT_KEY = 'tt-opts';
-let opts = { auto: true, remind: 0, notify: false, silent: false };
+let opts = { auto: true, remind: 0, notify: false, silent: false, keep: true };
 try {
 const ov = JSON.parse(localStorage.getItem(OPT_KEY) || 'null');
 if (ov) {
@@ -308,6 +375,7 @@ if (typeof ov.auto === 'boolean') opts.auto = ov.auto;
 if ([0, 1, 2, 5].includes(ov.remind)) opts.remind = ov.remind;
 if (typeof ov.notify === 'boolean') opts.notify = ov.notify;
 if (typeof ov.silent === 'boolean') opts.silent = ov.silent;
+if (typeof ov.keep === 'boolean') opts.keep = ov.keep;
 }
 } catch (e) {}
 function saveOpts() { try { localStorage.setItem(OPT_KEY, JSON.stringify(opts)); } catch (e) {} }
@@ -650,6 +718,8 @@ clearInterval(tickId);
 tickId = setInterval(tick, 200);
 tick();
 scheduleAhead();
+keepAlive(true);
+diag('start', state.timers.length);
 saveRun();
 askNotifyOnce();
 }
@@ -658,6 +728,8 @@ function resetToIdle() {
 if (window.__ttOnStop) { try { window.__ttOnStop(); } catch (e) {} }
 clearInterval(tickId); tickId = null;
 cancelSched();
+keepAlive(false);
+diag('reset');
 run = { active: false, paused: true, finished: false, idx: 0, cycle: 1, endAt: 0, remainMs: 0, lastSec: -1 };
 saveRun();
 applySilentMode(false);
@@ -708,6 +780,8 @@ releaseWakeLock();
 updateRunView();
 updateEta();
 scheduleAhead();
+keepAlive(!run.paused);
+diag(run.paused ? 'pause' : 'resume');
 saveRun();
 }
 function skip() {
@@ -755,6 +829,8 @@ if (withSound && !run.paused) scheduleAhead(1.5);
 saveRun();
 }
 function finish() {
+diag('finish', Date.now() - run.endAt);
+keepAlive(false);
 if (!bgSched && !lateAdvance) soundFinish();
 run.finished = true;
 run.paused = true;
@@ -780,11 +856,12 @@ let guard = 0, late = 0;
 do {
 // 区切りの時刻から2秒以上たってから気づいた（スマホで別のアプリを見ていて止められていた等）なら、音と通知は出さない
 lateAdvance = Date.now() - run.endAt > 2000;
+diag('seg', (run.idx + 1) + '/' + (Date.now() - run.endAt) + (bgSched ? ' sched' : ''));
 if (lateAdvance) late++;
 advance(true);
 } while (run.active && !run.paused && !run.finished && run.endAt - Date.now() <= 0 && ++guard < 500);
 lateAdvance = false;
-if (late) { toast(STR.caught(late)); if (run.active && !run.paused && !run.finished) scheduleAhead(); }
+if (late) { diag('caught', late); toast(STR.caught(late)); if (run.active && !run.paused && !run.finished) scheduleAhead(); }
 return;
 }
 const sec = Math.ceil(remain / 1000);
@@ -875,7 +952,7 @@ try {
 const o = audioCtx.createOscillator(), g = audioCtx.createGain();
 g.gain.value = 0;
 o.connect(g); g.connect(audioCtx.destination);
-o.onended = () => { if (wakeNode !== o) return; wakeNode = null; tick(); scheduleWake(); };
+o.onended = () => { if (wakeNode !== o) return; wakeNode = null; diag('wake', Date.now() - run.endAt); tick(); scheduleWake(); };
 o.start();
 o.stop(audioCtx.currentTime + next / 1000 + 0.03);
 wakeNode = o;
@@ -1025,6 +1102,11 @@ const rem = document.createElement('select'); rem.id = 'opt-remind'; rem.classNa
 rem.value = String(opts.remind);
 rem.addEventListener('change', () => { opts.remind = parseInt(rem.value, 10) || 0; saveOpts(); if (run.active) scheduleAhead(); });
 mkRow(STR.remind, '', rem, 'opt-remind');
+if (KEEP_OK) {
+const kSw = sw('opt-keep', opts.keep);
+kSw.addEventListener('change', () => { opts.keep = kSw.checked; saveOpts(); keepAlive(run.active && !run.paused && !run.finished); if (window.gtag) gtag('event', kSw.checked ? 'keep_on' : 'keep_off'); });
+mkRow(STR.keep, STR.keepNote, kSw, 'opt-keep');
+}
 if (IS_IOS) {
 const sSw = sw('opt-silent', opts.silent);
 sSw.addEventListener('change', () => {

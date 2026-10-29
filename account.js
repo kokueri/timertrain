@@ -44,9 +44,8 @@
       leadOut: 'タイマーはこれまでどおり、ログインしなくても無料で使えます。Googleで無料ログインすると、次のことができるようになります。',
       perksTitle: '無料ログインでできること',
       perks: [
-        ['マイタイマー', '「勉強」「HIIT」など、よく使う編成に名前を付けて2つまで保存。ワンタップで呼び出せます'],
-        ['スマホとPCで同じ設定', '同じGoogleアカウントでログインすれば、PCで保存したマイタイマーをスマホでもそのまま使えます。「最近の編成」とライト／ダークの設定も、どちらの端末にも反映されます'],
-        ['7日間の利用記録', 'タイマーを動かした時間を自動で記録。合計時間・回数・日ごとのグラフで振り返れます（一時停止中は数えません）'],
+        ['マイタイマー', '「勉強」「HIIT」など、よく使う編成に名前を付けて2つまで保存。スマホでもPCでも、ワンタップで呼び出せます'],
+        ['7日間のデータ（グラフ）', 'タイマーを動かした時間を自動で記録。合計時間・回数・日ごとのグラフで振り返れます（一時停止中は数えません）'],
         ['連続日数', '何日続けて使っているかが分かります'],
         ['いつでも退会', 'アカウントと保存したデータは、このページからいつでも削除できます']
       ],
@@ -83,9 +82,8 @@
       leadOut: 'The timer stays free to use without an account. Sign in with Google for free and you also get:',
       perksTitle: 'What a free account adds',
       perks: [
-        ['My timers', 'Save up to 2 setups you use often, like "Study" or "HIIT", under a name and open them in one tap'],
-        ['Same setups on phone and computer', 'Sign in with the same Google account and the timers you saved on your computer are ready on your phone too. Recent setups and the light/dark theme follow you as well'],
-        ['7-day history', 'The time your timer runs is logged automatically: total time, sessions and a daily chart (paused time is not counted)'],
+        ['My timers', 'Save up to 2 setups you use often, like "Study" or "HIIT", under a name and open them in one tap on any device'],
+        ['7-day stats and charts', 'The time your timer runs is logged automatically: total time, sessions and a daily chart (paused time is not counted)'],
         ['Streaks', 'See how many days in a row you have used it'],
         ['Leave any time', 'Delete your account and everything you saved from this page whenever you like']
       ],
@@ -122,9 +120,8 @@
       leadOut: 'El temporizador sigue siendo gratis sin cuenta. Si inicias sesión gratis con Google, además puedes:',
       perksTitle: 'Lo que añade una cuenta gratis',
       perks: [
-        ['Mis temporizadores', 'Guarda con nombre hasta 2 configuraciones que más usas, como «Estudio» o «HIIT», y ábrelas con un toque'],
-        ['Lo mismo en el móvil y el ordenador', 'Con la misma cuenta de Google, los temporizadores que guardes en el ordenador estarán listos en el móvil. Las configuraciones recientes y el tema claro/oscuro también se sincronizan'],
-        ['Historial de 7 días', 'Se registra automáticamente el tiempo de uso: tiempo total, sesiones y un gráfico por día (las pausas no cuentan)'],
+        ['Mis temporizadores', 'Guarda con nombre hasta 2 configuraciones que más usas, como «Estudio» o «HIIT», y ábrelas con un toque en cualquier dispositivo'],
+        ['Datos y gráficos de 7 días', 'Se registra automáticamente el tiempo de uso: tiempo total, sesiones y un gráfico por día (las pausas no cuentan)'],
         ['Rachas', 'Mira cuántos días seguidos lo has usado'],
         ['Baja cuando quieras', 'Puedes eliminar tu cuenta y todo lo guardado desde esta página en cualquier momento']
       ],
@@ -167,12 +164,10 @@
       rows: [
         ['タイマーを使う（並べる・くり返し・共有）', true, true, true],
         ['マイタイマーの保存', false, '2つ', '無制限'],
-        ['スマホとPCで同じ設定', false, true, true],
-        ['利用記録', false, '7日間', '全期間・月／年のグラフ'],
+        ['利用記録・グラフ（データ）', false, '7日間', '全期間・月／年のグラフ'],
         ['連続日数', false, true, true],
         ['マイプロジェクト（勉強・仕事などに分けて集計）', false, '1つ', '無制限'],
-        ['記録のCSVダウンロード', false, false, true],
-        ['ミニプレーヤー（小窓で表示）', false, false, true]
+        ['記録のCSVダウンロード', false, false, true]
       ],
       note: 'プレミアムは準備中です（月額250円・年額2,000円、最初の7日間は無料の予定）。開始時期は料金ページでお知らせします。今あるタイマーの機能は、これからもログインなしで無料で使えます。', more: '料金と詳しい条件', href: '/pricing',
       quota: function (n) { return n > FREE_MAX ? '保存中のマイタイマー ' + n + '個（無料プランで新しく保存できるのは2つまで）' : 'マイタイマー ' + n + ' / ' + FREE_MAX + '（プレミアムで無制限・準備中）'; }
@@ -183,12 +178,10 @@
       rows: [
         ['Use the timer (chain, repeat, share)', true, true, true],
         ['Saved timers', false, '2', 'No limit'],
-        ['Same setups on phone and computer', false, true, true],
-        ['History', false, '7 days', 'All time + charts'],
+        ['History and charts', false, '7 days', 'All time + charts'],
         ['Streaks', false, true, true],
         ['Projects (track study, work, etc. separately)', false, '1', 'No limit'],
-        ['Download history as CSV', false, false, true],
-        ['Mini player (small floating window)', false, false, true]
+        ['Download history as CSV', false, false, true]
       ],
       note: 'Premium is in preparation (planned: US$1.99/month or US$15.99/year, 7 days free). We will announce the launch date on the Pricing page. Everything the timer does today stays free without an account.', more: 'Pricing and terms', href: '/en-pricing',
       quota: function (n) { return n > FREE_MAX ? n + ' saved timers (the free plan can save new ones up to 2)' : 'Saved timers ' + n + ' / ' + FREE_MAX + ' (unlimited with Premium, coming soon)'; }
@@ -199,12 +192,10 @@
       rows: [
         ['Usar el temporizador (encadenar, repetir, compartir)', true, true, true],
         ['Temporizadores guardados', false, '2', 'Sin límite'],
-        ['Lo mismo en el móvil y el ordenador', false, true, true],
-        ['Historial', false, '7 días', 'Todo + gráficos'],
+        ['Historial y gráficos', false, '7 días', 'Todo + gráficos'],
         ['Rachas', false, true, true],
         ['Proyectos (estudio, trabajo, etc. por separado)', false, '1', 'Sin límite'],
-        ['Descargar el historial en CSV', false, false, true],
-        ['Minirreproductor (ventana flotante)', false, false, true]
+        ['Descargar el historial en CSV', false, false, true]
       ],
       note: 'Premium está en preparación (previsto: MXN 29 o US$1.99 al mes, 7 días gratis). Anunciaremos la fecha en la página de Precios. Todo lo que hace el temporizador hoy sigue siendo gratis sin cuenta.', more: 'Precios y condiciones', href: '/es-pricing',
       quota: function (n) { return n > FREE_MAX ? n + ' temporizadores guardados (el plan gratis permite guardar nuevos hasta 2)' : 'Temporizadores ' + n + ' / ' + FREE_MAX + ' (ilimitados con Premium, próximamente)'; }
@@ -280,6 +271,11 @@
   }
   function signedOutNodes(btn) {
     return [
+      btn,
+      el('p', { cls: 'acct-small acct-agree' }, [
+        T.agree1, el('a', { href: PRIV, text: T.agreeP }), T.agreeAnd,
+        el('a', { href: TERMS, text: T.agreeT }), T.agree2
+      ]),
       el('p', { cls: 'acct-lead', text: T.leadOut }),
       el('section', { cls: 'acct-perks', 'aria-label': T.perksTitle }, [
         el('h2', { text: T.perksTitle }),
@@ -287,11 +283,6 @@
           return el('li', null, [el('span', { cls: 'acct-check', 'aria-hidden': 'true', text: '✓' }),
             el('div', null, [el('p', { cls: 'acct-perk-t', text: p[0] }), el('p', { cls: 'acct-perk-d', text: p[1] })])]);
         }))
-      ]),
-      btn,
-      el('p', { cls: 'acct-small' }, [
-        T.agree1, el('a', { href: PRIV, text: T.agreeP }), T.agreeAnd,
-        el('a', { href: TERMS, text: T.agreeT }), T.agree2
       ]),
       planTable(1)
     ];
