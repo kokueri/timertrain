@@ -756,3 +756,38 @@ body.focus-mode .tt-ask { display: none; }
 .about .about-perks-btn:hover { opacity: .9; }
 .about .about-perks .about-perks-note { font-size: 12px; margin-top: 8px; }
 .about-perks + h2 { margin-top: 32px; }
+
+/* ---- 動作の記録（#ttdebug のときだけ） ---- */
+.tt-diag { position: fixed; inset: 8px; z-index: 9999; background: var(--card); color: var(--text); border: 1.5px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); padding: 10px; display: flex; flex-wrap: wrap; gap: 6px; align-content: flex-start; }
+.tt-diag button { padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--bg); color: var(--text); font: inherit; font-size: 13px; cursor: pointer; }
+.tt-diag pre { flex-basis: 100%; height: calc(100% - 44px); overflow: auto; margin: 0; font-size: 11px; line-height: 1.5; white-space: pre-wrap; word-break: break-all; }
+
+/* ---- 使い方の例（プロジェクト → マイタイマー → ラベル） ---- */
+.acct-howto { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 18px; }
+.acct-howto summary { cursor: pointer; font-size: 15px; font-weight: 700; }
+.acct-howto[open] summary { margin-bottom: 8px; }
+.acct-howto-tree, .acct-howto-tree ul { list-style: none; margin: 0; padding: 0; }
+.acct-howto-tree { margin: 12px 0; display: grid; gap: 10px; }
+.acct-howto-pj { border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.acct-howto-pj > ul { margin-top: 8px; display: grid; gap: 8px; }
+.acct-howto-my { margin-left: 6px; padding-left: 12px; border-left: 3px solid var(--line); }
+.acct-howto-name { font-weight: 700; font-size: 14px; }
+.acct-howto-kind { margin-left: 8px; font-size: 11px; color: var(--text2); border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; vertical-align: 1px; }
+.acct-howto-segs { font-size: 13px; color: var(--text2); margin-top: 3px; line-height: 1.6; }
+.acct-howto-rt { font-size: 13px; font-weight: 700; margin-top: 4px; }
+.acct-howto-res { margin: 6px 0 8px; display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
+.acct-howto-res dt { color: var(--text2); white-space: nowrap; }
+.acct-howto-res dd { margin: 0; font-weight: 600; }
+.acct-howto-plan { margin-top: 6px; }
+@media (max-width: 420px) { .acct-howto-res { grid-template-columns: 1fr; gap: 0; } .acct-howto-res dd { margin-bottom: 6px; } }
+.acct-pj-timers { font-size: 13px; color: var(--text2); margin: 6px 0 2px; }
+.acct-pj-timers-k { font-weight: 600; }
+
+/* ---- アカウントのページ（1列。PC は横幅を広げる） ---- */
+.acct-cols, .acct-col { display: flex; flex-direction: column; gap: 16px; }
+.acct-plans:focus { outline: none; }
+.acct-see-plans { align-self: flex-start; }
+/* PC は1列のまま、カードの横幅を広げる */
+@media (min-width: 900px) {
+.acct-page { max-width: 820px; }
+}

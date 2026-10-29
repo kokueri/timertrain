@@ -44,15 +44,14 @@
       leadOut: 'タイマーはこれまでどおり、ログインしなくても無料で使えます。Googleで無料ログインすると、次のことができるようになります。',
       perksTitle: '無料ログインでできること',
       perks: [
-        ['マイタイマー', '「勉強」「HIIT」など、よく使う編成に名前を付けて2つまで保存。ワンタップで呼び出せます'],
-        ['スマホとPCで同じ設定', '同じGoogleアカウントでログインすれば、PCで保存したマイタイマーをスマホでもそのまま使えます。「最近の編成」とライト／ダークの設定も、どちらの端末にも反映されます'],
-        ['7日間の利用記録', 'タイマーを動かした時間を自動で記録。合計時間・回数・日ごとのグラフで振り返れます（一時停止中は数えません）'],
+        ['マイタイマー', '「勉強」「HIIT」など、よく使う編成に名前を付けて2つまで保存。スマホでもPCでも、ワンタップで呼び出せます'],
+        ['7日間のデータ（グラフ）', 'タイマーを動かした時間を自動で記録。合計時間・回数・日ごとのグラフで振り返れます（一時停止中は数えません）'],
         ['連続日数', '何日続けて使っているかが分かります'],
         ['いつでも退会', 'アカウントと保存したデータは、このページからいつでも削除できます']
       ],
       pjTitle: 'プロジェクト（この7日間）', pjNew: '＋ プロジェクトを作る', pjNamePh: 'プロジェクト名（例: 勉強）', pjOk: '作る', pjNone: 'プロジェクトなし',
       pjEmpty: 'マイタイマーをプロジェクトにまとめると、ここにプロジェクトごと・区切り（ラベル）ごとの時間が出ます。下の「マイタイマー」で、それぞれのプロジェクトを選んでください。',
-      pjOther: 'マイタイマー以外', pjNoSeg: '（区切りの記録なし）', pjNoLabel: '（名前なし）', pjBreak: '休憩（合計に入れない）',
+      pjOther: 'マイタイマー以外', pjByTimer: 'マイタイマーごと: ', pjNoSeg: '（区切りの記録なし）', pjNoLabel: '（名前なし）', pjBreak: '休憩（合計に入れない）',
       pjToBreak: '休憩にする', pjToWork: '合計に入れる', pjRename: '名前を変更', pjDel: '削除', pjDelQ: '削除する？（マイタイマーは残ります）', pjSave: '保存',
       pjSel: 'プロジェクト', pjNewOpt: '＋ 新しいプロジェクト…', pjTotal: '合計', pjNote: '「休憩」「Break」などの名前は自動で休憩として合計から外します。違うときは「合計に入れる」を押してください。区切りごとの記録は 2026/10/25 から始まりました。',
       pjErr: '保存できませんでした。時間をおいてもう一度お試しください。',
@@ -83,15 +82,14 @@
       leadOut: 'The timer stays free to use without an account. Sign in with Google for free and you also get:',
       perksTitle: 'What a free account adds',
       perks: [
-        ['My timers', 'Save up to 2 setups you use often, like "Study" or "HIIT", under a name and open them in one tap'],
-        ['Same setups on phone and computer', 'Sign in with the same Google account and the timers you saved on your computer are ready on your phone too. Recent setups and the light/dark theme follow you as well'],
-        ['7-day history', 'The time your timer runs is logged automatically: total time, sessions and a daily chart (paused time is not counted)'],
+        ['My timers', 'Save up to 2 setups you use often, like "Study" or "HIIT", under a name and open them in one tap on any device'],
+        ['7-day stats and charts', 'The time your timer runs is logged automatically: total time, sessions and a daily chart (paused time is not counted)'],
         ['Streaks', 'See how many days in a row you have used it'],
         ['Leave any time', 'Delete your account and everything you saved from this page whenever you like']
       ],
       pjTitle: 'Projects (last 7 days)', pjNew: '+ New project', pjNamePh: 'Project name (e.g. Study)', pjOk: 'Create', pjNone: 'No project',
       pjEmpty: 'Group your saved timers into projects to see time per project and per segment (label) here. Pick a project for each timer under "My timers" below.',
-      pjOther: 'Not a saved timer', pjNoSeg: '(no segment data)', pjNoLabel: '(no name)', pjBreak: 'Breaks (not counted)',
+      pjOther: 'Not a saved timer', pjByTimer: 'Per saved timer: ', pjNoSeg: '(no segment data)', pjNoLabel: '(no name)', pjBreak: 'Breaks (not counted)',
       pjToBreak: 'Mark as break', pjToWork: 'Count it', pjRename: 'Rename', pjDel: 'Delete', pjDelQ: 'Delete? (Timers are kept)', pjSave: 'Save',
       pjSel: 'Project', pjNewOpt: '+ New project…', pjTotal: 'Total', pjNote: 'Names like "Break" or "Rest" are treated as breaks and left out of the totals. If that is wrong, press "Count it". Segment data started on 2026-10-25.',
       pjErr: 'Could not save. Please try again later.',
@@ -122,15 +120,14 @@
       leadOut: 'El temporizador sigue siendo gratis sin cuenta. Si inicias sesión gratis con Google, además puedes:',
       perksTitle: 'Lo que añade una cuenta gratis',
       perks: [
-        ['Mis temporizadores', 'Guarda con nombre hasta 2 configuraciones que más usas, como «Estudio» o «HIIT», y ábrelas con un toque'],
-        ['Lo mismo en el móvil y el ordenador', 'Con la misma cuenta de Google, los temporizadores que guardes en el ordenador estarán listos en el móvil. Las configuraciones recientes y el tema claro/oscuro también se sincronizan'],
-        ['Historial de 7 días', 'Se registra automáticamente el tiempo de uso: tiempo total, sesiones y un gráfico por día (las pausas no cuentan)'],
+        ['Mis temporizadores', 'Guarda con nombre hasta 2 configuraciones que más usas, como «Estudio» o «HIIT», y ábrelas con un toque en cualquier dispositivo'],
+        ['Datos y gráficos de 7 días', 'Se registra automáticamente el tiempo de uso: tiempo total, sesiones y un gráfico por día (las pausas no cuentan)'],
         ['Rachas', 'Mira cuántos días seguidos lo has usado'],
         ['Baja cuando quieras', 'Puedes eliminar tu cuenta y todo lo guardado desde esta página en cualquier momento']
       ],
       pjTitle: 'Proyectos (últimos 7 días)', pjNew: '+ Nuevo proyecto', pjNamePh: 'Nombre del proyecto (p. ej. Estudio)', pjOk: 'Crear', pjNone: 'Sin proyecto',
       pjEmpty: 'Agrupa tus temporizadores en proyectos para ver aquí el tiempo por proyecto y por etapa (etiqueta). Elige un proyecto para cada temporizador en «Mis temporizadores».',
-      pjOther: 'No es un temporizador guardado', pjNoSeg: '(sin datos por etapa)', pjNoLabel: '(sin nombre)', pjBreak: 'Descansos (no cuentan)',
+      pjOther: 'No es un temporizador guardado', pjByTimer: 'Por temporizador: ', pjNoSeg: '(sin datos por etapa)', pjNoLabel: '(sin nombre)', pjBreak: 'Descansos (no cuentan)',
       pjToBreak: 'Marcar como descanso', pjToWork: 'Contarlo', pjRename: 'Renombrar', pjDel: 'Eliminar', pjDelQ: '¿Eliminar? (los temporizadores se conservan)', pjSave: 'Guardar',
       pjSel: 'Proyecto', pjNewOpt: '+ Nuevo proyecto…', pjTotal: 'Total', pjNote: 'Los nombres como «Descanso» o «Break» se toman como descansos y no cuentan en el total. Si no es así, pulsa «Contarlo». Los datos por etapa empezaron el 25/10/2026.',
       pjErr: 'No se pudo guardar. Inténtalo más tarde.',
@@ -158,6 +155,65 @@
     }
   }[lang];
 
+
+  /* ---------- 使い方の例（プロジェクト → マイタイマー → ラベル） ---------- */
+  var HOW = {
+    ja: {
+      title: '使い方の例（プロジェクト・マイタイマー・ラベル）',
+      lead: '「プロジェクト」の中に「マイタイマー」を入れます。マイタイマーの中の区切りの名前（国語・数学など）が「ラベル」です。それぞれの単位で、使った時間を集計できます。',
+      kP: 'プロジェクト', kM: 'マイタイマー',
+      tree: [['📚 勉強', [['平日', '国語 25分 → 休憩 5分 → 数学 25分'], ['休日', '国語 25分 → 休憩 5分 → 社会 25分']]],
+             ['💪 筋トレ', [['朝トレ', 'スクワット 1分 → 休憩 30秒 → 腕立て 1分（×3回）']]]],
+      resT: '1週間使うと、たとえば「勉強」はこう見えます',
+      res: [['プロジェクトの合計', '勉強 6時間40分'], ['マイタイマーごと', '平日 4時間10分 ／ 休日 2時間30分'], ['ラベルごと', '国語 3時間20分 ・ 数学 2時間05分 ・ 社会 1時間15分']],
+      resNote: '平日と休日の「国語」は、同じ名前なので合わせて数えます。「休憩」は自動で合計から外します。',
+      plan: '無料ログインは、プロジェクト1つ・マイタイマー2つまで（この例なら「勉強」の平日と休日）。プレミアム（準備中）では、いくつでも作れます。'
+    },
+    en: {
+      title: 'How it fits together (projects, timers, labels)',
+      lead: 'Put your saved timers into a project. The name of each segment inside a timer (Math, Reading…) is its label. Time is totaled at every level.',
+      kP: 'Project', kM: 'Saved timer',
+      tree: [['📚 Study', [['Weekdays', 'Reading 25 min → Break 5 min → Math 25 min'], ['Weekend', 'Reading 25 min → Break 5 min → Science 25 min']]],
+             ['💪 Workout', [['Morning', 'Squats 1 min → Break 30 s → Push-ups 1 min (×3)']]]],
+      resT: 'After a week, "Study" might look like this',
+      res: [['Project total', 'Study 6 h 40 min'], ['Per saved timer', 'Weekdays 4 h 10 min / Weekend 2 h 30 min'], ['Per label', 'Reading 3 h 20 min · Math 2 h 05 min · Science 1 h 15 min']],
+      resNote: '"Reading" from both timers is counted together because the name is the same. Breaks are left out of the total automatically.',
+      plan: 'A free account includes 1 project and 2 saved timers (here: Study with Weekdays and Weekend). Premium (coming soon) has no limit.'
+    },
+    es: {
+      title: 'Cómo se organiza (proyectos, temporizadores, etiquetas)',
+      lead: 'Agrupa tus temporizadores guardados en un proyecto. El nombre de cada etapa dentro de un temporizador (Lectura, Matemáticas…) es su etiqueta. El tiempo se suma en cada nivel.',
+      kP: 'Proyecto', kM: 'Temporizador guardado',
+      tree: [['📚 Estudio', [['Entre semana', 'Lectura 25 min → Descanso 5 min → Matemáticas 25 min'], ['Fin de semana', 'Lectura 25 min → Descanso 5 min → Ciencias 25 min']]],
+             ['💪 Ejercicio', [['Mañana', 'Sentadillas 1 min → Descanso 30 s → Flexiones 1 min (×3)']]]],
+      resT: 'Después de una semana, «Estudio» se vería así',
+      res: [['Total del proyecto', 'Estudio 6 h 40 min'], ['Por temporizador', 'Entre semana 4 h 10 min / Fin de semana 2 h 30 min'], ['Por etiqueta', 'Lectura 3 h 20 min · Matemáticas 2 h 05 min · Ciencias 1 h 15 min']],
+      resNote: '«Lectura» de los dos temporizadores se suma junta porque tiene el mismo nombre. Los descansos se quitan del total automáticamente.',
+      plan: 'La cuenta gratis incluye 1 proyecto y 2 temporizadores guardados (aquí: Estudio con Entre semana y Fin de semana). Premium (próximamente) no tiene límite.'
+    }
+  }[lang];
+  function howTo(open) {
+    var d = el('details', { cls: 'acct-howto' });
+    if (open) d.open = true;
+    d.appendChild(el('summary', { text: HOW.title }));
+    d.appendChild(el('p', { cls: 'acct-small', text: HOW.lead }));
+    var ul = el('ul', { cls: 'acct-howto-tree' });
+    HOW.tree.forEach(function (pj) {
+      var li = el('li', { cls: 'acct-howto-pj' }, [el('span', { cls: 'acct-howto-name', text: pj[0] }), el('span', { cls: 'acct-howto-kind', text: HOW.kP })]);
+      li.appendChild(el('ul', null, pj[1].map(function (m) {
+        return el('li', { cls: 'acct-howto-my' }, [el('span', { cls: 'acct-howto-name', text: m[0] }), el('span', { cls: 'acct-howto-kind', text: HOW.kM }), el('p', { cls: 'acct-howto-segs', text: m[1] })]);
+      })));
+      ul.appendChild(li);
+    });
+    d.appendChild(ul);
+    d.appendChild(el('p', { cls: 'acct-howto-rt', text: HOW.resT }));
+    d.appendChild(el('dl', { cls: 'acct-howto-res' }, [].concat.apply([], HOW.res.map(function (r) { return [el('dt', { text: r[0] }), el('dd', { text: r[1] })]; }))));
+    d.appendChild(el('p', { cls: 'acct-small', text: HOW.resNote }));
+    d.appendChild(el('p', { cls: 'acct-small acct-howto-plan', text: HOW.plan }));
+    d.addEventListener('toggle', function () { if (d.open) ev('howto_open'); });
+    return d;
+  }
+
   /* ---------- プランの比較（無料ログイン／プレミアム準備中） ---------- */
   var FREE_MAX = 2;
   var P = {
@@ -167,12 +223,10 @@
       rows: [
         ['タイマーを使う（並べる・くり返し・共有）', true, true, true],
         ['マイタイマーの保存', false, '2つ', '無制限'],
-        ['スマホとPCで同じ設定', false, true, true],
-        ['利用記録', false, '7日間', '全期間・月／年のグラフ'],
+        ['利用記録・グラフ（データ）', false, '7日間', '全期間・月／年のグラフ'],
         ['連続日数', false, true, true],
         ['マイプロジェクト（勉強・仕事などに分けて集計）', false, '1つ', '無制限'],
-        ['記録のCSVダウンロード', false, false, true],
-        ['ミニプレーヤー（小窓で表示）', false, false, true]
+        ['記録のCSVダウンロード', false, false, true]
       ],
       note: 'プレミアムは準備中です（月額250円・年額2,000円、最初の7日間は無料の予定）。開始時期は料金ページでお知らせします。今あるタイマーの機能は、これからもログインなしで無料で使えます。', more: '料金と詳しい条件', href: '/pricing',
       quota: function (n) { return n > FREE_MAX ? '保存中のマイタイマー ' + n + '個（無料プランで新しく保存できるのは2つまで）' : 'マイタイマー ' + n + ' / ' + FREE_MAX + '（プレミアムで無制限・準備中）'; }
@@ -183,12 +237,10 @@
       rows: [
         ['Use the timer (chain, repeat, share)', true, true, true],
         ['Saved timers', false, '2', 'No limit'],
-        ['Same setups on phone and computer', false, true, true],
-        ['History', false, '7 days', 'All time + charts'],
+        ['History and charts', false, '7 days', 'All time + charts'],
         ['Streaks', false, true, true],
         ['Projects (track study, work, etc. separately)', false, '1', 'No limit'],
-        ['Download history as CSV', false, false, true],
-        ['Mini player (small floating window)', false, false, true]
+        ['Download history as CSV', false, false, true]
       ],
       note: 'Premium is in preparation (planned: US$1.99/month or US$15.99/year, 7 days free). We will announce the launch date on the Pricing page. Everything the timer does today stays free without an account.', more: 'Pricing and terms', href: '/en-pricing',
       quota: function (n) { return n > FREE_MAX ? n + ' saved timers (the free plan can save new ones up to 2)' : 'Saved timers ' + n + ' / ' + FREE_MAX + ' (unlimited with Premium, coming soon)'; }
@@ -199,12 +251,10 @@
       rows: [
         ['Usar el temporizador (encadenar, repetir, compartir)', true, true, true],
         ['Temporizadores guardados', false, '2', 'Sin límite'],
-        ['Lo mismo en el móvil y el ordenador', false, true, true],
-        ['Historial', false, '7 días', 'Todo + gráficos'],
+        ['Historial y gráficos', false, '7 días', 'Todo + gráficos'],
         ['Rachas', false, true, true],
         ['Proyectos (estudio, trabajo, etc. por separado)', false, '1', 'Sin límite'],
-        ['Descargar el historial en CSV', false, false, true],
-        ['Minirreproductor (ventana flotante)', false, false, true]
+        ['Descargar el historial en CSV', false, false, true]
       ],
       note: 'Premium está en preparación (previsto: MXN 29 o US$1.99 al mes, 7 días gratis). Anunciaremos la fecha en la página de Precios. Todo lo que hace el temporizador hoy sigue siendo gratis sin cuenta.', more: 'Precios y condiciones', href: '/es-pricing',
       quota: function (n) { return n > FREE_MAX ? n + ' temporizadores guardados (el plan gratis permite guardar nuevos hasta 2)' : 'Temporizadores ' + n + ' / ' + FREE_MAX + ' (ilimitados con Premium, próximamente)'; }
@@ -224,7 +274,7 @@
         return el('td', a);
       })));
     });
-    return el('section', { cls: 'acct-plans', 'aria-label': P.title }, [
+    return el('section', { cls: 'acct-plans', id: 'acct-plans', tabindex: '-1', 'aria-label': P.title }, [
       el('h2', { text: P.title }),
       el('div', { cls: 'acct-plans-wrap' }, [el('table', { cls: 'acct-plans-t' }, [el('colgroup', null, [el('col', { cls: 'c0' }), el('col'), el('col'), el('col')]), el('thead', null, [head]), el('tbody', null, body)])]),
       el('p', { cls: 'acct-small' }, [P.note, ' ', el('a', { href: P.href, text: P.more })])
@@ -278,8 +328,17 @@
     if (errText) nodes.unshift(msg(errText, 'err'));
     show(nodes);
   }
+  // PC では2列（左: 本人の操作、右: 比較・説明）。スマホは今までどおり縦に1列
+  function cols(left, right) {
+    return el('div', { cls: 'acct-cols' }, [el('div', { cls: 'acct-col' }, left.filter(Boolean)), el('div', { cls: 'acct-col acct-side' }, right.filter(Boolean))]);
+  }
   function signedOutNodes(btn) {
-    return [
+    return [cols([
+      btn,
+      el('p', { cls: 'acct-small acct-agree' }, [
+        T.agree1, el('a', { href: PRIV, text: T.agreeP }), T.agreeAnd,
+        el('a', { href: TERMS, text: T.agreeT }), T.agree2
+      ]),
       el('p', { cls: 'acct-lead', text: T.leadOut }),
       el('section', { cls: 'acct-perks', 'aria-label': T.perksTitle }, [
         el('h2', { text: T.perksTitle }),
@@ -288,22 +347,203 @@
             el('div', null, [el('p', { cls: 'acct-perk-t', text: p[0] }), el('p', { cls: 'acct-perk-d', text: p[1] })])]);
         }))
       ]),
-      btn,
-      el('p', { cls: 'acct-small' }, [
-        T.agree1, el('a', { href: PRIV, text: T.agreeP }), T.agreeAnd,
-        el('a', { href: TERMS, text: T.agreeT }), T.agree2
-      ]),
-      planTable(1)
-    ];
+      planTable(1)], [
+      howTo(true)
+    ])];
+  }
+
+  /* ---------- プレミアム（Stripe）----------
+   * 購入ボタンは試し用の環境だけに出す（本番の決済を始めるまで）。
+   * 有料かどうかは entitlements（本人は読むだけ。書けるのは決済の通知を受けたサーバーだけ） */
+  var BILLING_ON = /^login-preview\./.test(location.hostname) || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  var FN_URL = SB_URL + '/functions/v1/billing/';
+  var ENT = null;
+  var B = {
+    ja: {
+      title: 'プレミアムにする', titleOn: 'プレミアム', seePlans: 'プランを確認する', soonTitle: 'プレミアム（準備中）', soonLead: 'マイタイマーとプロジェクトが無制限になり、全期間の記録・月／年のグラフ・CSVが使えるようになります。月額250円・年額2,000円、最初の7日間は無料の予定です。', badge: 'プレミアム',
+      lead: '初めての方は、最初の7日間は無料です。マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
+      leadNoTrial: 'マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
+      monthly: '月額プランで始める', yearly: '年額プランで始める（おトク）',
+      note: '金額はお住まいの地域の通貨で、次の画面（Stripe の決済画面）に表示されます。いつでも解約できます。', more: '料金と条件',
+      test: '試し用の環境です。テスト用のカードでだけ購入できます。',
+      going: '決済画面を開いています…', err: '決済画面を開けませんでした。時間をおいてもう一度お試しください。',
+      already: 'すでにプレミアムです。反映まで少し時間がかかることがあります。',
+      trial: function (d) { return '無料期間中です（' + d + 'まで）。' + d + 'に初回の料金を請求します。'; },
+      trialEnd: function (d) { return '無料期間の終わり（' + d + '）で終了します。料金はかかりません。'; },
+      active: function (d) { return '次の更新日: ' + d; },
+      ending: function (d) { return d + 'で終了します（自動更新はオフです）。'; },
+      pastDue: 'お支払いを確認できませんでした。「お支払い・解約の管理」からカードを更新してください。',
+      plan: { premium_monthly: '月額プラン', premium_yearly: '年額プラン' },
+      manage: 'お支払い・解約の管理', manageErr: '管理画面を開けませんでした。時間をおいてもう一度お試しください。',
+      thanks: 'お申込みありがとうございます。反映まで数秒かかることがあります。',
+      slow: '反映に時間がかかっています。少したってから、このページを開き直してください。',
+      canceled: 'お申込みは完了していません。',
+      quota: function (n) { return 'マイタイマー ' + n + '（プレミアム: 無制限）'; },
+      delSub: '有料プランが自動更新される状態のままでは削除できません。先に「お支払い・解約の管理」から解約してください。'
+    },
+    en: {
+      title: 'Go Premium', titleOn: 'Premium', seePlans: 'See plans', soonTitle: 'Premium (coming soon)', soonLead: 'Unlimited saved timers and projects, all-time history, monthly/yearly charts and CSV. Planned at US$1.99/month or US$15.99/year, with 7 days free.', badge: 'Premium',
+      lead: 'New subscribers get the first 7 days free. Unlimited saved timers and projects, full history and more.',
+      leadNoTrial: 'Unlimited saved timers and projects, full history and more.',
+      monthly: 'Start monthly', yearly: 'Start yearly (best value)',
+      note: 'The price is shown in your local currency on the next screen (Stripe checkout). Cancel any time.', more: 'Pricing and terms',
+      test: 'This is the test site. Only test cards can be used.',
+      going: 'Opening checkout…', err: 'Could not open checkout. Please try again later.',
+      already: 'You already have Premium. It can take a moment to show up.',
+      trial: function (d) { return 'Free trial until ' + d + '. Your first charge is on ' + d + '.'; },
+      trialEnd: function (d) { return 'Ends when the trial ends (' + d + '). You will not be charged.'; },
+      active: function (d) { return 'Next renewal: ' + d; },
+      ending: function (d) { return 'Ends on ' + d + ' (auto-renew is off).'; },
+      pastDue: 'We could not confirm your payment. Update your card in "Billing and cancellation".',
+      plan: { premium_monthly: 'Monthly plan', premium_yearly: 'Yearly plan' },
+      manage: 'Billing and cancellation', manageErr: 'Could not open billing. Please try again later.',
+      thanks: 'Thank you for subscribing. It can take a few seconds to show up.',
+      slow: 'This is taking longer than usual. Please reopen this page in a moment.',
+      canceled: 'Your subscription was not completed.',
+      quota: function (n) { return 'Saved timers ' + n + ' (Premium: no limit)'; },
+      delSub: 'You cannot delete your account while a paid plan is set to renew. Please cancel it first in "Billing and cancellation".'
+    },
+    es: {
+      title: 'Hazte Premium', titleOn: 'Premium', seePlans: 'Ver planes', soonTitle: 'Premium (próximamente)', soonLead: 'Temporizadores y proyectos ilimitados, historial completo, gráficos mensuales/anuales y CSV. Previsto: US$1.99 o MXN 29 al mes, con 7 días gratis.', badge: 'Premium',
+      lead: 'Si es tu primera vez, los primeros 7 días son gratis. Temporizadores y proyectos sin límite, historial completo y más.',
+      leadNoTrial: 'Temporizadores y proyectos sin límite, historial completo y más.',
+      monthly: 'Empezar plan mensual', yearly: 'Empezar plan anual (mejor precio)',
+      note: 'El precio se muestra en tu moneda en la siguiente pantalla (pago con Stripe). Cancela cuando quieras.', more: 'Precios y condiciones',
+      test: 'Este es el sitio de prueba. Solo se pueden usar tarjetas de prueba.',
+      going: 'Abriendo el pago…', err: 'No se pudo abrir el pago. Inténtalo más tarde.',
+      already: 'Ya tienes Premium. Puede tardar un momento en aparecer.',
+      trial: function (d) { return 'Prueba gratis hasta el ' + d + '. El primer cobro es el ' + d + '.'; },
+      trialEnd: function (d) { return 'Termina al final de la prueba (' + d + '). No se te cobrará.'; },
+      active: function (d) { return 'Próxima renovación: ' + d; },
+      ending: function (d) { return 'Termina el ' + d + ' (renovación automática desactivada).'; },
+      pastDue: 'No pudimos confirmar tu pago. Actualiza tu tarjeta en "Pagos y cancelación".',
+      plan: { premium_monthly: 'Plan mensual', premium_yearly: 'Plan anual' },
+      manage: 'Pagos y cancelación', manageErr: 'No se pudo abrir la gestión de pagos. Inténtalo más tarde.',
+      thanks: 'Gracias por suscribirte. Puede tardar unos segundos en aparecer.',
+      slow: 'Está tardando más de lo normal. Vuelve a abrir esta página en un momento.',
+      canceled: 'La suscripción no se completó.',
+      quota: function (n) { return 'Temporizadores ' + n + ' (Premium: sin límite)'; },
+      delSub: 'No puedes eliminar la cuenta mientras un plan de pago se renueva. Cancélalo primero en "Pagos y cancelación".'
+    }
+  }[lang];
+  var PRICING = { ja: '/pricing', en: '/en-pricing', es: '/es-pricing' }[lang];
+  var CHECKOUT = params.get('checkout');
+  function isPrem(e) {
+    return !!e && e.plan === 'premium' && ['active', 'trialing', 'past_due'].indexOf(e.status) >= 0 &&
+      (!e.current_period_end || new Date(e.current_period_end).getTime() > Date.now() - 3 * 864e5);
+  }
+  function fmtDate(iso) {
+    try { return new Date(iso).toLocaleDateString(lang === 'ja' ? 'ja-JP' : lang, { year: 'numeric', month: 'long', day: 'numeric' }); } catch (e) { return ''; }
+  }
+  async function loadEnt() {
+    var r = await sb.from('entitlements').select('plan,status,current_period_end,cancel_at_period_end,trial_end,trial_used,price_lookup_key').maybeSingle();
+    ENT = r.error ? null : r.data;
+    if (isPrem(ENT)) { FREE_MAX = 100; PJ_FREE = 50; }
+    return ENT;
+  }
+  async function callBilling(route, body) {
+    var s = await sb.auth.getSession();
+    var tok = s.data && s.data.session && s.data.session.access_token;
+    if (!tok) throw new Error('nosession');
+    var r = await fetch(FN_URL + route, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: 'Bearer ' + tok, apikey: SB_KEY },
+      body: JSON.stringify(body)
+    });
+    var j = {}; try { j = await r.json(); } catch (e) {}
+    if (!r.ok) { var er = new Error(j.error || ('http ' + r.status)); er.code = j.error; throw er; }
+    if (typeof j.url !== 'string' || !/^https:\/\/(checkout|billing)\.stripe\.com\//.test(j.url)) throw new Error('bad url');
+    return j;
+  }
+  function fillBilling(box, badge, note) {
+    box.textContent = '';
+    var prem = isPrem(ENT);
+    var pl = prem && ENT.price_lookup_key && B.plan[ENT.price_lookup_key];
+    badge.textContent = prem ? B.badge + (pl ? (lang === 'ja' ? '（' + pl + '）' : ' (' + pl + ')') : '') : P.now;
+    function seePlans() {
+      var b = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm acct-see-plans', text: B.seePlans });
+      b.addEventListener('click', function () {
+        var t = document.getElementById('acct-plans'); if (!t) return;
+        t.scrollIntoView({ behavior: 'smooth', block: 'start' }); try { t.focus({ preventScroll: true }); } catch (e) {}
+        ev('see_plans');
+      });
+      return b;
+    }
+    if (!prem && !BILLING_ON) {
+      // 決済を始めるまでは「準備中」の案内と、比較へ移動するボタンだけ
+      box.hidden = false;
+      box.appendChild(el('h2', { text: B.soonTitle }));
+      box.appendChild(el('p', { cls: 'acct-small', text: B.soonLead }));
+      box.appendChild(el('div', { cls: 'acct-row' }, [seePlans()]));
+      return;
+    }
+    box.hidden = false;
+    box.appendChild(el('h2', { text: prem ? B.titleOn : B.title }));
+    if (note) box.appendChild(msg(note));
+    if (!prem && note === B.thanks) return; // 反映待ちの間はボタンを出さない
+    var err = el('p', { cls: 'acct-msg err', role: 'status' }); err.hidden = true;
+    function fail(t) { err.textContent = t; err.hidden = false; }
+    if (prem) {
+      var end = ENT.trial_end && ENT.status === 'trialing' ? ENT.trial_end : ENT.current_period_end;
+      var d = end ? fmtDate(end) : '';
+      var line = ENT.status === 'past_due' ? B.pastDue
+        : ENT.status === 'trialing' ? (ENT.cancel_at_period_end ? B.trialEnd(d) : B.trial(d))
+        : (ENT.cancel_at_period_end ? B.ending(d) : B.active(d));
+      box.appendChild(el('p', { cls: 'acct-small', text: line }));
+      var mg = el('button', { type: 'button', cls: 'acct-btn', text: B.manage });
+      mg.addEventListener('click', async function () {
+        mg.disabled = true; err.hidden = true;
+        try { var j = await callBilling('portal', { lang: lang }); ev('billing_portal'); location.assign(j.url); }
+        catch (e) { mg.disabled = false; fail(B.manageErr); }
+      });
+      box.appendChild(el('div', { cls: 'acct-row' }, [mg]));
+    } else {
+      box.appendChild(el('p', { cls: 'acct-small', text: ENT && ENT.trial_used ? B.leadNoTrial : B.lead }));
+      var bm = el('button', { type: 'button', cls: 'acct-btn', text: B.monthly });
+      var by = el('button', { type: 'button', cls: 'acct-btn acct-btn-primary', text: B.yearly });
+      [[bm, 'monthly'], [by, 'yearly']].forEach(function (x) {
+        x[0].addEventListener('click', async function () {
+          bm.disabled = true; by.disabled = true; err.hidden = true;
+          x[0].textContent = B.going;
+          ev('checkout_start', { plan: x[1] });
+          try { var j = await callBilling('checkout', { plan: x[1], lang: lang, back: '/account' }); location.assign(j.url); }
+          catch (e) {
+            bm.disabled = false; by.disabled = false; bm.textContent = B.monthly; by.textContent = B.yearly;
+            fail(e.code === 'already_premium' ? B.already : B.err);
+          }
+        });
+      });
+      box.appendChild(el('div', { cls: 'acct-row' }, [by, bm]));
+      box.appendChild(el('div', { cls: 'acct-row' }, [seePlans()]));
+      box.appendChild(el('p', { cls: 'acct-small' }, [B.note, ' ', el('a', { href: PRICING, text: B.more })]));
+      if (BILLING_ON) box.appendChild(el('p', { cls: 'acct-small', text: B.test }));
+    }
+    box.appendChild(err);
+  }
+  async function startBilling(box, badge) {
+    try { await loadEnt(); } catch (e) {}
+    var note = CHECKOUT === 'success' ? B.thanks : CHECKOUT === 'cancel' ? B.canceled : '';
+    fillBilling(box, badge, note);
+    if (CHECKOUT === 'success' && !isPrem(ENT)) {
+      for (var i = 0; i < 8 && !isPrem(ENT); i++) {
+        await new Promise(function (r) { setTimeout(r, 2500); });
+        try { await loadEnt(); } catch (e) {}
+      }
+      if (isPrem(ENT)) { ev('checkout_done'); location.reload(); return; }
+      fillBilling(box, badge, B.slow);
+    } else if (CHECKOUT === 'success') ev('checkout_done');
+    CHECKOUT = null;
   }
 
   function renderSignedIn(user) {
     var meta = user.user_metadata || {};
+    var badge = el('p', { cls: 'acct-plan-now', text: P.now });
+    var bill = el('section', { cls: 'acct-usage acct-billing', 'aria-label': B.title }); bill.hidden = true;
     var who = el('div', { cls: 'acct-card' }, [
       el('p', { cls: 'acct-label', text: T.signedIn }),
       el('p', { cls: 'acct-name', text: meta.full_name || meta.name || '' }),
       el('p', { cls: 'acct-email', text: user.email || '' }),
-      el('p', { cls: 'acct-plan-now', text: P.now })
+      badge
     ]);
     var out = el('button', { type: 'button', cls: 'acct-btn', text: T.logout });
     out.addEventListener('click', async function () {
@@ -332,7 +572,7 @@
         var r = await sb.rpc('delete_my_account');
         if (r.error) {
           go.disabled = false; cancel.disabled = false; input.disabled = false;
-          box.appendChild(msg(T.errDelete, 'err'));
+          box.appendChild(msg(/active subscription/.test((r.error && r.error.message) || '') ? B.delSub : T.errDelete, 'err'));
           return;
         }
         ev('account_delete');
@@ -350,8 +590,8 @@
     var usage = el('section', { cls: 'acct-usage', 'aria-label': T.usageTitle }, [el('h2', { text: T.usageTitle }), msg(T.loading)]);
     var mine = el('section', { cls: 'acct-usage acct-my', 'aria-label': T.myTitle }, [el('h2', { text: T.myTitle }), msg(T.loading)]);
     var pj = el('section', { cls: 'acct-usage acct-pj', 'aria-label': T.pjTitle }, [el('h2', { text: T.pjTitle }), msg(T.loading)]);
-    show([who, pj, mine, usage, planTable(1), el('div', { cls: 'acct-row' }, [out]), danger]);
-    loadAll(pj, mine);
+    show([cols([who, bill, pj, mine, usage], [planTable(1), el('div', { cls: 'acct-row' }, [out]), danger])]);
+    startBilling(bill, badge).catch(function () {}).then(function () { loadAll(pj, mine); });
     loadUsage(usage);
   }
 
@@ -469,7 +709,7 @@
       });
       box.appendChild(ul);
     }
-    box.appendChild(el('p', { cls: 'acct-small acct-quota', text: P.quota(rows.length) }));
+    box.appendChild(el('p', { cls: 'acct-small acct-quota', text: isPrem(ENT) ? B.quota(rows.length) : P.quota(rows.length) }));
   }
   var refresh = function () {};
   async function loadProjects(box, mineBox, err) {
@@ -487,7 +727,7 @@
     var tmap = {}; DATA.timers.forEach(function (t) { tmap[t.id] = t; });
     // プロジェクトごと → ラベルごとの秒数
     var buckets = {};
-    function bucket(key) { return buckets[key] = buckets[key] || { labels: {}, total: 0, brk: 0 }; }
+    function bucket(key) { return buckets[key] = buckets[key] || { labels: {}, total: 0, brk: 0, timers: {} }; }
     (rl.data || []).forEach(function (l) {
       var t = l.timer_id && tmap[l.timer_id];
       var key = t ? (t.project_id || '__none') : '__other';
@@ -497,7 +737,7 @@
         : [{ label: '\u0000', secs: Math.max(0, Number(l.total_secs) || 0), seg: false }];
       list.forEach(function (s) {
         b.labels[s.label] = (b.labels[s.label] || 0) + s.secs;
-        if (s.label !== '\u0000' && isBreak(s.label)) b.brk += s.secs; else b.total += s.secs;
+        if (s.label !== '\u0000' && isBreak(s.label)) b.brk += s.secs; else { b.total += s.secs; if (t) b.timers[t.id] = (b.timers[t.id] || 0) + s.secs; }
       });
     });
     var order = DATA.projects.map(function (p) { return { key: p.id, name: p.name, p: p }; });
@@ -505,16 +745,19 @@
     var max = 1; order.forEach(function (o) { if (buckets[o.key]) max = Math.max(max, buckets[o.key].total); });
     var anyProject = DATA.projects.length > 0;
     if (!anyProject) box.appendChild(el('p', { cls: 'acct-small', text: T.pjEmpty }));
+    box.appendChild(howTo(!anyProject));
     var list = el('div', { cls: 'acct-pj-list' });
     order.forEach(function (o) {
       var b = buckets[o.key];
       if (!o.p && !b) return; // 使っていない「なし」「以外」は出さない
       if (!anyProject && o.key !== '__none' && o.key !== '__other') return;
-      b = b || { labels: {}, total: 0, brk: 0 };
+      b = b || { labels: {}, total: 0, brk: 0, timers: {} };
       var card = el('div', { cls: 'acct-pj' });
       var head = el('div', { cls: 'acct-pj-head' }, [el('p', { cls: 'acct-pj-name', text: o.name }), el('p', { cls: 'acct-pj-total', text: fmtDur(b.total) })]);
       card.appendChild(head);
       var bar = el('div', { cls: 'acct-pj-bar' }); var fill = el('div', { cls: 'acct-pj-fill' }); fill.style.width = Math.round(b.total / max * 100) + '%'; bar.appendChild(fill); card.appendChild(bar);
+      var tids = Object.keys(b.timers || {}).filter(function (id) { return tmap[id]; }).sort(function (a, c) { return b.timers[c] - b.timers[a]; });
+      if (tids.length) card.appendChild(el('p', { cls: 'acct-pj-timers' }, [el('span', { cls: 'acct-pj-timers-k', text: T.pjByTimer }), tids.map(function (id) { return (tmap[id].name || '') + ' ' + fmtDur(b.timers[id]); }).join(lang === 'ja' ? ' ／ ' : ' / ')]));
       var labels = Object.keys(b.labels).sort(function (a, c) { return b.labels[c] - b.labels[a]; });
       var work = labels.filter(function (l) { return l === '\u0000' || !isBreak(l); }), brk = labels.filter(function (l) { return l !== '\u0000' && isBreak(l); });
       function row(l, isB) {

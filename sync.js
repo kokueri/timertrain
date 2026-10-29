@@ -9,7 +9,8 @@
   var SB_KEY = 'sb_publishable_zw039kyiXe27oY4ITTcNnA_-B_FsG5H';
   var PRODUCT = 'timertrain';
   var PJ_FREE = 1; // 無料プランのプロジェクト数
-  var FREE_MAX = 2; // 無料プランで保存できるマイタイマーの数（サーバー側の制限は決済と一緒に入れる）
+  var FREE_MAX = 2; // 無料プランで保存できるマイタイマーの数（サーバー側でも timers_plan_limit トリガーで制限）
+  var PREMIUM = false; // entitlements が有料なら init で true（上限を外す）
   var Q_RE = /^\?t=[A-Za-z0-9.,%_\-~!*'()]{1,7000}&r=(?:inf|\d{1,2})$/;
 
   if (!window.supabase || typeof serialize !== 'function') return;
@@ -228,7 +229,7 @@
 
   function render() {
     list.textContent = '';
-    title.textContent = T.title + ' ' + items.length + '/' + FREE_MAX;
+    title.textContent = T.title + ' ' + items.length + (PREMIUM ? '' : '/' + FREE_MAX);
     renderCur();
     if (!items.length) { list.appendChild(el('p', { cls: 'tt-my-empty', text: T.empty })); return; }
     items.forEach(function (it) {
@@ -512,6 +513,12 @@
       return;
     }
     var test = document.getElementById('tt-sync'); if (test) test.remove(); // ログイン中は「準備中」の需要テストを出さない
+    try {
+      var en = await sb.from('entitlements').select('plan,status,current_period_end').maybeSingle();
+      var e = en.data;
+      if (e && e.plan === 'premium' && ['active', 'trialing', 'past_due'].indexOf(e.status) >= 0 &&
+          (!e.current_period_end || new Date(e.current_period_end).getTime() > Date.now() - 3 * 864e5)) { FREE_MAX = 100; PJ_FREE = 50; PREMIUM = true; }
+    } catch (e) {}
     hookLogs();
     hookSettings();
     loadStreak(false);
