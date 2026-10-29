@@ -782,3 +782,14 @@ body.focus-mode .tt-ask { display: none; }
 @media (max-width: 420px) { .acct-howto-res { grid-template-columns: 1fr; gap: 0; } .acct-howto-res dd { margin-bottom: 6px; } }
 .acct-pj-timers { font-size: 13px; color: var(--text2); margin: 6px 0 2px; }
 .acct-pj-timers-k { font-weight: 600; }
+
+/* ---- アカウントのページ: PC は2列（左: 本人の操作、右: 比較・説明） ---- */
+.acct-cols, .acct-col { display: flex; flex-direction: column; gap: 16px; }
+.acct-plans:focus { outline: none; }
+.acct-see-plans { align-self: flex-start; }
+@media (min-width: 900px) {
+.acct-page { max-width: 1080px; }
+.acct-cols { flex-direction: row; align-items: flex-start; gap: 24px; }
+.acct-col { flex: 1 1 0; min-width: 0; }
+.acct-col.acct-side { flex: 0 0 440px; }
+}

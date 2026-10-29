@@ -274,7 +274,7 @@
         return el('td', a);
       })));
     });
-    return el('section', { cls: 'acct-plans', 'aria-label': P.title }, [
+    return el('section', { cls: 'acct-plans', id: 'acct-plans', tabindex: '-1', 'aria-label': P.title }, [
       el('h2', { text: P.title }),
       el('div', { cls: 'acct-plans-wrap' }, [el('table', { cls: 'acct-plans-t' }, [el('colgroup', null, [el('col', { cls: 'c0' }), el('col'), el('col'), el('col')]), el('thead', null, [head]), el('tbody', null, body)])]),
       el('p', { cls: 'acct-small' }, [P.note, ' ', el('a', { href: P.href, text: P.more })])
@@ -328,8 +328,12 @@
     if (errText) nodes.unshift(msg(errText, 'err'));
     show(nodes);
   }
+  // PC では2列（左: 本人の操作、右: 比較・説明）。スマホは今までどおり縦に1列
+  function cols(left, right) {
+    return el('div', { cls: 'acct-cols' }, [el('div', { cls: 'acct-col' }, left.filter(Boolean)), el('div', { cls: 'acct-col acct-side' }, right.filter(Boolean))]);
+  }
   function signedOutNodes(btn) {
-    return [
+    return [cols([
       btn,
       el('p', { cls: 'acct-small acct-agree' }, [
         T.agree1, el('a', { href: PRIV, text: T.agreeP }), T.agreeAnd,
@@ -343,9 +347,9 @@
             el('div', null, [el('p', { cls: 'acct-perk-t', text: p[0] }), el('p', { cls: 'acct-perk-d', text: p[1] })])]);
         }))
       ]),
-      howTo(true),
-      planTable(1)
-    ];
+      planTable(1)], [
+      howTo(true)
+    ])];
   }
 
   /* ---------- プレミアム（Stripe）----------
@@ -356,7 +360,7 @@
   var ENT = null;
   var B = {
     ja: {
-      title: 'プレミアムにする', titleOn: 'プレミアム', badge: 'プレミアム',
+      title: 'プレミアムにする', titleOn: 'プレミアム', seePlans: 'プランを確認する', soonTitle: 'プレミアム（準備中）', soonLead: 'マイタイマーとプロジェクトが無制限になり、全期間の記録・月／年のグラフ・CSVが使えるようになります。月額250円・年額2,000円、最初の7日間は無料の予定です。', badge: 'プレミアム',
       lead: '初めての方は、最初の7日間は無料です。マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
       leadNoTrial: 'マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
       monthly: '月額プランで始める', yearly: '年額プランで始める（おトク）',
@@ -378,7 +382,7 @@
       delSub: '有料プランが自動更新される状態のままでは削除できません。先に「お支払い・解約の管理」から解約してください。'
     },
     en: {
-      title: 'Go Premium', titleOn: 'Premium', badge: 'Premium',
+      title: 'Go Premium', titleOn: 'Premium', seePlans: 'See plans', soonTitle: 'Premium (coming soon)', soonLead: 'Unlimited saved timers and projects, all-time history, monthly/yearly charts and CSV. Planned at US$1.99/month or US$15.99/year, with 7 days free.', badge: 'Premium',
       lead: 'New subscribers get the first 7 days free. Unlimited saved timers and projects, full history and more.',
       leadNoTrial: 'Unlimited saved timers and projects, full history and more.',
       monthly: 'Start monthly', yearly: 'Start yearly (best value)',
@@ -400,7 +404,7 @@
       delSub: 'You cannot delete your account while a paid plan is set to renew. Please cancel it first in "Billing and cancellation".'
     },
     es: {
-      title: 'Hazte Premium', titleOn: 'Premium', badge: 'Premium',
+      title: 'Hazte Premium', titleOn: 'Premium', seePlans: 'Ver planes', soonTitle: 'Premium (próximamente)', soonLead: 'Temporizadores y proyectos ilimitados, historial completo, gráficos mensuales/anuales y CSV. Previsto: US$1.99 o MXN 29 al mes, con 7 días gratis.', badge: 'Premium',
       lead: 'Si es tu primera vez, los primeros 7 días son gratis. Temporizadores y proyectos sin límite, historial completo y más.',
       leadNoTrial: 'Temporizadores y proyectos sin límite, historial completo y más.',
       monthly: 'Empezar plan mensual', yearly: 'Empezar plan anual (mejor precio)',
@@ -456,7 +460,23 @@
     var prem = isPrem(ENT);
     var pl = prem && ENT.price_lookup_key && B.plan[ENT.price_lookup_key];
     badge.textContent = prem ? B.badge + (pl ? (lang === 'ja' ? '（' + pl + '）' : ' (' + pl + ')') : '') : P.now;
-    if (!prem && !BILLING_ON) { box.hidden = true; return; }
+    function seePlans() {
+      var b = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm acct-see-plans', text: B.seePlans });
+      b.addEventListener('click', function () {
+        var t = document.getElementById('acct-plans'); if (!t) return;
+        t.scrollIntoView({ behavior: 'smooth', block: 'start' }); try { t.focus({ preventScroll: true }); } catch (e) {}
+        ev('see_plans');
+      });
+      return b;
+    }
+    if (!prem && !BILLING_ON) {
+      // 決済を始めるまでは「準備中」の案内と、比較へ移動するボタンだけ
+      box.hidden = false;
+      box.appendChild(el('h2', { text: B.soonTitle }));
+      box.appendChild(el('p', { cls: 'acct-small', text: B.soonLead }));
+      box.appendChild(el('div', { cls: 'acct-row' }, [seePlans()]));
+      return;
+    }
     box.hidden = false;
     box.appendChild(el('h2', { text: prem ? B.titleOn : B.title }));
     if (note) box.appendChild(msg(note));
@@ -494,6 +514,7 @@
         });
       });
       box.appendChild(el('div', { cls: 'acct-row' }, [by, bm]));
+      box.appendChild(el('div', { cls: 'acct-row' }, [seePlans()]));
       box.appendChild(el('p', { cls: 'acct-small' }, [B.note, ' ', el('a', { href: PRICING, text: B.more })]));
       if (BILLING_ON) box.appendChild(el('p', { cls: 'acct-small', text: B.test }));
     }
@@ -569,7 +590,7 @@
     var usage = el('section', { cls: 'acct-usage', 'aria-label': T.usageTitle }, [el('h2', { text: T.usageTitle }), msg(T.loading)]);
     var mine = el('section', { cls: 'acct-usage acct-my', 'aria-label': T.myTitle }, [el('h2', { text: T.myTitle }), msg(T.loading)]);
     var pj = el('section', { cls: 'acct-usage acct-pj', 'aria-label': T.pjTitle }, [el('h2', { text: T.pjTitle }), msg(T.loading)]);
-    show([who, bill, pj, mine, usage, planTable(1), el('div', { cls: 'acct-row' }, [out]), danger]);
+    show([cols([who, bill, pj, mine, usage], [planTable(1), el('div', { cls: 'acct-row' }, [out]), danger])]);
     startBilling(bill, badge).catch(function () {}).then(function () { loadAll(pj, mine); });
     loadUsage(usage);
   }
