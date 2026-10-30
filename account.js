@@ -55,7 +55,7 @@
       pjToBreak: '休憩にする', pjToWork: '合計に入れる', pjRename: '名前を変更', pjDel: '削除', pjDelQ: '削除する？（マイタイマーは残ります）', pjSave: '保存',
       pjSel: 'プロジェクト', pjNewOpt: '＋ 新しいプロジェクト…', pjTotal: '合計', pjNote: '「休憩」「Break」などの名前は自動で休憩として合計から外します。違うときは「合計に入れる」を押してください。区切りごとの記録は 2026/10/25 から始まりました。',
       pjErr: '保存できませんでした。時間をおいてもう一度お試しください。',
-      pjFull: '無料プランで作れるプロジェクトは1つまでです。名前を変えて使うか、削除してから作り直せます。プレミアム（準備中）では無制限になります。',
+      pjFull: '無料プランで作れるプロジェクトは1つまでです。名前を変えて使うか、削除してから作り直せます。プレミアムでは無制限になります。',
       myTitle: 'マイタイマー', myEmpty: 'まだ保存したタイマーはありません。タイマーの画面で「今の編成を保存」を押すと、ここに並びます。',
       start: 'スタート', data: 'データ', soon: '近日公開',
       myNote: '「データ」では、マイタイマーごとの利用時間を見られるようにする予定です（準備中）。',
@@ -93,7 +93,7 @@
       pjToBreak: 'Mark as break', pjToWork: 'Count it', pjRename: 'Rename', pjDel: 'Delete', pjDelQ: 'Delete? (Timers are kept)', pjSave: 'Save',
       pjSel: 'Project', pjNewOpt: '+ New project…', pjTotal: 'Total', pjNote: 'Names like "Break" or "Rest" are treated as breaks and left out of the totals. If that is wrong, press "Count it". Segment data started on 2026-10-25.',
       pjErr: 'Could not save. Please try again later.',
-      pjFull: 'The free plan has 1 project. Rename it, or delete it and make a new one. Unlimited with Premium (coming soon).',
+      pjFull: 'The free plan has 1 project. Rename it, or delete it and make a new one. Unlimited with Premium.',
       myTitle: 'My timers', myEmpty: 'No saved timers yet. On the timer screen, press "Save current setup" and they will appear here.',
       start: 'Start', data: 'Data', soon: 'Coming soon',
       myNote: '"Data" will show how much you used each saved timer (in preparation).',
@@ -131,7 +131,7 @@
       pjToBreak: 'Marcar como descanso', pjToWork: 'Contarlo', pjRename: 'Renombrar', pjDel: 'Eliminar', pjDelQ: '¿Eliminar? (los temporizadores se conservan)', pjSave: 'Guardar',
       pjSel: 'Proyecto', pjNewOpt: '+ Nuevo proyecto…', pjTotal: 'Total', pjNote: 'Los nombres como «Descanso» o «Break» se toman como descansos y no cuentan en el total. Si no es así, pulsa «Contarlo». Los datos por etapa empezaron el 25/10/2026.',
       pjErr: 'No se pudo guardar. Inténtalo más tarde.',
-      pjFull: 'El plan gratis tiene 1 proyecto. Cámbiale el nombre o elimínalo y crea otro. Ilimitados con Premium (próximamente).',
+      pjFull: 'El plan gratis tiene 1 proyecto. Cámbiale el nombre o elimínalo y crea otro. Ilimitados con Premium.',
       myTitle: 'Mis temporizadores', myEmpty: 'Aún no hay temporizadores guardados. En la pantalla del temporizador, pulsa «Guardar configuración actual» y aparecerán aquí.',
       start: 'Empezar', data: 'Datos', soon: 'Próximamente',
       myNote: 'En «Datos» podrás ver cuánto has usado cada temporizador guardado (en preparación).',
@@ -178,7 +178,7 @@
       resT: '1週間使うと、たとえば「勉強」はこう見えます',
       res: [['プロジェクトの合計', '勉強 6時間40分'], ['マイタイマーごと', '平日 4時間10分 ／ 休日 2時間30分'], ['ラベルごと', '国語 3時間20分 ・ 数学 2時間05分 ・ 社会 1時間15分']],
       resNote: '平日と休日の「国語」は、同じ名前なので合わせて数えます。「休憩」は自動で合計から外します。',
-      plan: '無料ログインは、プロジェクト1つ・マイタイマー2つまで（この例なら「勉強」の平日と休日）。プレミアム（準備中）では、いくつでも作れます。'
+      plan: '無料ログインは、プロジェクト1つ・マイタイマー2つまで（この例なら「勉強」の平日と休日）。プレミアムでは、いくつでも作れます。'
     },
     en: {
       title: 'How it fits together (projects, timers, labels)',
@@ -189,7 +189,7 @@
       resT: 'After a week, "Study" might look like this',
       res: [['Project total', 'Study 6 h 40 min'], ['Per saved timer', 'Weekdays 4 h 10 min / Weekend 2 h 30 min'], ['Per label', 'Reading 3 h 20 min · Math 2 h 05 min · Science 1 h 15 min']],
       resNote: '"Reading" from both timers is counted together because the name is the same. Breaks are left out of the total automatically.',
-      plan: 'A free account includes 1 project and 2 saved timers (here: Study with Weekdays and Weekend). Premium (coming soon) has no limit.'
+      plan: 'A free account includes 1 project and 2 saved timers (here: Study with Weekdays and Weekend). Premium has no limit.'
     },
     es: {
       title: 'Cómo se organiza (proyectos, temporizadores, etiquetas)',
@@ -200,7 +200,7 @@
       resT: 'Después de una semana, «Estudio» se vería así',
       res: [['Total del proyecto', 'Estudio 6 h 40 min'], ['Por temporizador', 'Entre semana 4 h 10 min / Fin de semana 2 h 30 min'], ['Por etiqueta', 'Lectura 3 h 20 min · Matemáticas 2 h 05 min · Ciencias 1 h 15 min']],
       resNote: '«Lectura» de los dos temporizadores se suma junta porque tiene el mismo nombre. Los descansos se quitan del total automáticamente.',
-      plan: 'La cuenta gratis incluye 1 proyecto y 2 temporizadores guardados (aquí: Estudio con Entre semana y Fin de semana). Premium (próximamente) no tiene límite.'
+      plan: 'La cuenta gratis incluye 1 proyecto y 2 temporizadores guardados (aquí: Estudio con Entre semana y Fin de semana). Premium no tiene límite.'
     }
   }[lang];
   function howTo(open) {
@@ -229,7 +229,7 @@
   var FREE_MAX = 2;
   var P = {
     ja: {
-      title: 'プランの比較', cols: ['ログイン\nなし', '無料\nログイン', 'プレミアム'], soon: '準備中', now: '無料プラン',
+      title: 'プランの比較', cols: ['ログイン\nなし', '無料\nログイン', 'プレミアム'], soon: '', now: '無料プラン',
       yes: 'あり', no: 'なし',
       rows: [
         ['タイマーを使う（並べる・くり返し・共有）', true, true, true],
@@ -239,11 +239,11 @@
         ['マイプロジェクト（勉強・仕事などに分けて集計）', false, '1つ', '無制限'],
         ['記録のCSVダウンロード', false, false, true]
       ],
-      note: 'プレミアムは準備中です（月額250円・年額2,000円、最初の7日間は無料の予定）。開始時期は料金ページでお知らせします。今あるタイマーの機能は、これからもログインなしで無料で使えます。', more: '料金と詳しい条件', href: '/pricing',
-      quota: function (n) { return n > FREE_MAX ? '保存中のマイタイマー ' + n + '個（無料プランで新しく保存できるのは2つまで）' : 'マイタイマー ' + n + ' / ' + FREE_MAX + '（プレミアムで無制限・準備中）'; }
+      note: 'プレミアムは月額250円・年額2,000円（税込）。初めての方は最初の7日間が無料で、いつでも解約できます。今あるタイマーの機能は、これからもログインなしで無料で使えます。', more: '料金と詳しい条件', href: '/pricing',
+      quota: function (n) { return n > FREE_MAX ? '保存中のマイタイマー ' + n + '個（無料プランで新しく保存できるのは2つまで）' : 'マイタイマー ' + n + ' / ' + FREE_MAX + '（プレミアムで無制限）'; }
     },
     en: {
-      title: 'Compare plans', cols: ['No\naccount', 'Free\naccount', 'Premium'], soon: 'Coming soon', now: 'Free plan',
+      title: 'Compare plans', cols: ['No\naccount', 'Free\naccount', 'Premium'], soon: '', now: 'Free plan',
       yes: 'Included', no: 'Not included',
       rows: [
         ['Use the timer (chain, repeat, share)', true, true, true],
@@ -253,11 +253,11 @@
         ['Projects (track study, work, etc. separately)', false, '1', 'No limit'],
         ['Download history as CSV', false, false, true]
       ],
-      note: 'Premium is in preparation (planned: US$1.99/month or US$15.99/year, 7 days free). We will announce the launch date on the Pricing page. Everything the timer does today stays free without an account.', more: 'Pricing and terms', href: '/en-pricing',
-      quota: function (n) { return n > FREE_MAX ? n + ' saved timers (the free plan can save new ones up to 2)' : 'Saved timers ' + n + ' / ' + FREE_MAX + ' (unlimited with Premium, coming soon)'; }
+      note: 'Premium is US$1.99/month or US$15.99/year (your local currency is shown at checkout). New subscribers get 7 days free, and you can cancel any time. Everything the timer does today stays free without an account.', more: 'Pricing and terms', href: '/en-pricing',
+      quota: function (n) { return n > FREE_MAX ? n + ' saved timers (the free plan can save new ones up to 2)' : 'Saved timers ' + n + ' / ' + FREE_MAX + ' (unlimited with Premium)'; }
     },
     es: {
-      title: 'Comparar planes', cols: ['Sin\ncuenta', 'Cuenta\ngratis', 'Premium'], soon: 'Próximamente', now: 'Plan gratis',
+      title: 'Comparar planes', cols: ['Sin\ncuenta', 'Cuenta\ngratis', 'Premium'], soon: '', now: 'Plan gratis',
       yes: 'Incluido', no: 'No incluido',
       rows: [
         ['Usar el temporizador (encadenar, repetir, compartir)', true, true, true],
@@ -267,17 +267,17 @@
         ['Proyectos (estudio, trabajo, etc. por separado)', false, '1', 'Sin límite'],
         ['Descargar el historial en CSV', false, false, true]
       ],
-      note: 'Premium está en preparación (previsto: MXN 29 o US$1.99 al mes, 7 días gratis). Anunciaremos la fecha en la página de Precios. Todo lo que hace el temporizador hoy sigue siendo gratis sin cuenta.', more: 'Precios y condiciones', href: '/es-pricing',
-      quota: function (n) { return n > FREE_MAX ? n + ' temporizadores guardados (el plan gratis permite guardar nuevos hasta 2)' : 'Temporizadores ' + n + ' / ' + FREE_MAX + ' (ilimitados con Premium, próximamente)'; }
+      note: 'Premium cuesta MXN 29 o US$1.99 al mes (tu moneda se muestra al pagar). Si es tu primera vez, los primeros 7 días son gratis y puedes cancelar cuando quieras. Todo lo que hace el temporizador hoy sigue siendo gratis sin cuenta.', more: 'Precios y condiciones', href: '/es-pricing',
+      quota: function (n) { return n > FREE_MAX ? n + ' temporizadores guardados (el plan gratis permite guardar nuevos hasta 2)' : 'Temporizadores ' + n + ' / ' + FREE_MAX + ' (ilimitados con Premium)'; }
     }
   }[lang];
   // cur: 強調する列（1=無料ログイン。ログイン前は「おすすめ」、ログイン中は「今のプラン」）
   function planTable(cur) {
     var head = el('tr', null, [el('td', { cls: 'acct-plans-blank' })].concat(P.cols.map(function (c, i) {
-      return el('th', { scope: 'col', cls: i === cur ? 'cur' : '' }, [c, i === 2 ? el('span', { cls: 'acct-soon', text: P.soon }) : null]);
+      return el('th', { scope: 'col', cls: i === cur ? 'cur' : '' }, [c, i === 2 && P.soon ? el('span', { cls: 'acct-soon', text: P.soon }) : null]);
     })));
     var body = P.rows.map(function (r) {
-      var th = el('th', { scope: 'row' }, [r[0], r[4] ? el('span', { cls: 'acct-soon', text: P.soon }) : null]);
+      var th = el('th', { scope: 'row' }, [r[0], r[4] && P.soon ? el('span', { cls: 'acct-soon', text: P.soon }) : null]);
       return el('tr', null, [th].concat(r.slice(1, 4).map(function (v, i) {
         var cls = (i === cur ? 'cur ' : '') + (v === true ? 'yes' : v === false ? 'no' : 'val');
         var a = { cls: cls, text: v === true ? '✓' : v === false ? '—' : v };
@@ -367,14 +367,8 @@
    * 購入ボタンは試し用の環境だけに出す（本番の決済を始めるまで）。
    * 有料かどうかは entitlements（本人は読むだけ。書けるのは決済の通知を受けたサーバーだけ） */
   var IS_TEST_SITE = /^login-preview\./.test(location.hostname) || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-  // 本番は公開前の確認のため ?try=billing を付けたときだけ購入ボタンを出す（決済から戻ったときも出す）
-  var TRY_BILLING = false;
-  try {
-    var qs = new URLSearchParams(location.search);
-    if (qs.get('try') === 'billing') sessionStorage.setItem('tt-try-billing', '1');
-    TRY_BILLING = sessionStorage.getItem('tt-try-billing') === '1' || qs.has('checkout');
-  } catch (e) {}
-  var BILLING_ON = IS_TEST_SITE || TRY_BILLING;
+  // 2026-10-30 販売開始: 本番でも購入ボタンを出す（本番サイトは本番の決済、試し用サイトはテスト決済）
+  var BILLING_ON = true;
   var FN_URL = SB_URL + '/functions/v1/billing/';
   var ENT = null;
   var B = {

@@ -10,7 +10,7 @@
   var lang = document.documentElement.lang;
   if (['ja', 'en', 'es'].indexOf(lang) < 0) lang = 'ja';
   var PRODUCT = 'timertrain';
-  var BILLING_ON = /^login-preview\./.test(location.hostname) || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  var BILLING_ON = true; // 2026-10-30 販売開始
   var ACCT = '/account?l=' + lang + (window.DT ? '&from=donut' : '');
   function ev(name, p) { try { if (window.gtag) gtag('event', name, p || {}); } catch (e) {} }
 
