@@ -914,3 +914,8 @@ background: var(--bg); color: var(--text); border-radius: 20px; box-shadow: 0 10
 .ttd-out-t { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
 .ttd-out-l { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 12px; }
 @media (prefers-reduced-motion: no-preference) { .ttd { animation: ttd-in .18s ease-out; } @keyframes ttd-in { from { transform: translateY(8px); opacity: 0; } } }
+/* 縁をドラッグして時間を合わせる（2026-10-29） */
+.ring-wrap.seekable { cursor: grab; }
+.ring-wrap.seeking { cursor: grabbing; user-select: none; -webkit-user-select: none; }
+.ring-wrap.seeking .ring-fg { transition: stroke .3s ease !important; }
+.ring-wrap.seekable { -webkit-touch-callout: none; }
