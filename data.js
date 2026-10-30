@@ -134,7 +134,8 @@
     back.hidden = false;
     document.documentElement.classList.add('ttd-open');
     box.querySelector('.ttd-x').focus();
-    ev('data_open', { from: src || '' });
+    S.dayEv = 0;
+    ev('data_open', { from: src || '', member: signedLocal() ? (window.__ttPremium ? 'premium' : 'free') : 'guest' });
     start();
   }
   function close() {
@@ -430,7 +431,7 @@
       if (C.B[0].month && C.B.length > 12) show = b.d.getMonth() % 3 === 0 || i === C.B.length - 1;
       col.appendChild(el('span', { cls: 'ttd-x-l' + (show ? '' : ' hide'), text: lab(b) }));
       if (S.period === '7d') col.appendChild(el('span', { cls: 'ttd-x-w', text: T.wd[b.d.getDay()] }));
-      col.addEventListener('click', function () { S.sel = i; say(i); });
+      col.addEventListener('click', function () { S.sel = i; say(i); if (!S.dayEv) { S.dayEv = 1; ev('data_day_click', { period: S.period }); } });
       col.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { S.sel = i; say(i); } });
       cols.push(col); grid.appendChild(col);
     });
@@ -507,7 +508,7 @@
     sec.appendChild(ul);
     if (rows.length > S.more) {
       var m = el('button', { type: 'button', cls: 'ttd-more', text: T.more + '（' + (rows.length - S.more) + '）' });
-      m.addEventListener('click', function () { S.more += 20; var n = details(C, D); sec.replaceWith(n); var b = n.querySelector('.ttd-log li:nth-child(' + (S.more - 19) + ')'); if (b) b.scrollIntoView({ block: 'nearest' }); });
+      m.addEventListener('click', function () { ev('data_more'); S.more += 20; var n = details(C, D); sec.replaceWith(n); var b = n.querySelector('.ttd-log li:nth-child(' + (S.more - 19) + ')'); if (b) b.scrollIntoView({ block: 'nearest' }); });
       sec.appendChild(m);
     }
     return sec;

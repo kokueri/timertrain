@@ -476,7 +476,8 @@ DT.set(frac, c ? c.id : 'blue');
 DT.fit(runTime);
 return;
 }
-ringFg.style.strokeDashoffset = RING_C * (1 - Math.min(1, Math.max(0, frac)));
+// 12時から時計回りに減る（ドーナツと同じ向き）: 残りは「端 → 12時」の部分
+ringFg.style.strokeDashoffset = -RING_C * (1 - Math.min(1, Math.max(0, frac)));
 if (color) ringFg.style.stroke = color;
 }
 // 色の丸（DonutTimer ではミニドーナツ）を塗る
@@ -795,6 +796,26 @@ scheduleAhead();
 saveRun();
 }
 function resetRun() { resetToIdle(); }
+/* 細かい早送り・巻き戻し（いまの区切りの中だけ）。利用記録は実際に動いた時間で数えるので、ここでは変わらない */
+function seekTo(remMs) {
+if (!run.active || run.finished) return;
+const full = state.timers[run.idx].secs * 1000;
+if (remMs <= 0) { skip(); return; }
+remMs = Math.min(full, remMs);
+if (run.paused) run.remainMs = remMs; else run.endAt = Date.now() + remMs;
+run.lastSec = -1;
+if (opts.remind && remMs > opts.remind * 60000) run.reminded = false;
+updateRunView();
+updateEta();
+if (!run.paused) scheduleAhead();
+saveRun();
+}
+function curRemain() { return run.paused ? run.remainMs : Math.max(0, run.endAt - Date.now()); }
+function seek(ms) {
+if (!run.active || run.finished) return;
+seekTo(curRemain() - ms);
+diag('seek', ms);
+}
 function advance(withSound) {
 // 区切りが変わる直前に知らせる（利用記録で区切りごとの時間を数えるため）
 if (window.__ttOnSeg) { try { window.__ttOnSeg(); } catch (e) {} }
@@ -1160,6 +1181,7 @@ $('skip-btn').addEventListener('click', skip);
 $('reset-btn').addEventListener('click', resetRun);
 function resetAndGo() { resetToIdle(); startRun(); }
 
+let seekKeyed = false;
 document.addEventListener('keydown', e => {
 if (e.target.tagName === 'INPUT') return;
 if (e.code === 'Space') {
@@ -1171,8 +1193,93 @@ else pauseToggle();
 if (!run.active) return;
 if (e.key === 's' || e.key === 'S') skip();
 if (e.key === 'r' || e.key === 'R') resetRun();
+if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && !e.metaKey && !e.ctrlKey && !e.altKey
+&& !/^(SELECT|TEXTAREA)$/.test(e.target.tagName) && !e.target.isContentEditable && !document.documentElement.classList.contains('ttd-open')) {
+e.preventDefault();
+const step = (e.shiftKey ? 60000 : 10000) * (e.key === 'ArrowRight' ? 1 : -1);
+seek(step);
+if (window.gtag && !seekKeyed) { seekKeyed = true; gtag('event', 'seek_key'); }
+}
 if (e.key === 'Escape') resetToIdle();
 });
+
+/* ---------- リング／ドーナツの縁をドラッグして残り時間を合わせる ----------
+ * リング・ドーナツとも、12時から時計回りに減っていく端 → 残り = 1 − 角度の割合
+ * スマホは画面のスクロールと区別するため、縁を約0.35秒押してから動かす */
+(function () {
+const wrap = document.querySelector('.ring-wrap');
+if (!wrap) return;
+const SEEK_T = LANG === 'en' ? 'Drag the edge to adjust the time · ← → 10 s (Shift: 1 min)'
+: LANG === 'es' ? 'Arrastra el borde para ajustar el tiempo · ← → 10 s (Mayús: 1 min)'
+: '縁をドラッグで時間を調整 · ← → で10秒（Shift で1分）';
+function live() { return run.active && !run.finished; }
+function sync() { wrap.classList.toggle('seekable', live()); if (live()) wrap.title = SEEK_T; else wrap.removeAttribute('title'); }
+setInterval(sync, 500);
+function geo(x, y) {
+const r = wrap.getBoundingClientRect();
+const cx = r.left + r.width / 2, cy = r.top + r.height / 2, R = r.width / 2;
+const dx = x - cx, dy = y - cy, d = Math.hypot(dx, dy);
+let a = Math.atan2(dx, -dy) / (2 * Math.PI); if (a < 0) a += 1; // 12時=0、時計回り
+return { a: a, band: d > R * 0.66 && d < R * 1.12 };
+}
+let drag = null;
+function begin(x, y) {
+const g = geo(x, y);
+if (!live() || !g.band) return false;
+const t = state.timers[run.idx];
+// いまの端の位置から始める（つかんだ場所に飛ばない）
+const frac = curRemain() / (t.secs * 1000);
+drag = { last: 1 - frac, moved: false };
+wrap.classList.add('seeking');
+return true;
+}
+function move(x, y) {
+if (!drag || !live()) return;
+let a = geo(x, y).a;
+// 12時をまたいだら端で止める（一周回って反対側に飛ばない）
+if (a - drag.last > 0.5) a = 0; else if (drag.last - a > 0.5) a = 1;
+if (Math.abs(a - drag.last) < 0.0005) return;
+drag.last = a; drag.moved = true;
+const full = state.timers[run.idx].secs * 1000;
+const frac = 1 - a;
+// 1秒単位に丸める（最後は少しでも残す。0 にすると次へ進む）
+let rem = Math.round(frac * full / 1000) * 1000;
+if (frac >= 0.999) rem = full;
+seekTo(Math.max(1000, rem));
+}
+function end() {
+if (!drag) return;
+if (drag.moved && window.gtag) gtag('event', 'seek_drag');
+drag = null; wrap.classList.remove('seeking');
+}
+// マウス・ペン
+wrap.addEventListener('pointerdown', e => {
+if (e.pointerType === 'touch' || e.button !== 0) return;
+if (!begin(e.clientX, e.clientY)) return;
+e.preventDefault();
+try { wrap.setPointerCapture(e.pointerId); } catch (err) {}
+});
+wrap.addEventListener('pointermove', e => { if (e.pointerType !== 'touch' && drag) move(e.clientX, e.clientY); });
+wrap.addEventListener('pointerup', e => { if (e.pointerType !== 'touch') end(); });
+wrap.addEventListener('pointercancel', e => { if (e.pointerType !== 'touch') end(); });
+// タッチ: 長押しで開始し、そのあとはスクロールを止める
+let hold = null, sx = 0, sy = 0;
+wrap.addEventListener('touchstart', e => {
+if (e.touches.length !== 1 || !live()) return;
+const t0 = e.touches[0]; sx = t0.clientX; sy = t0.clientY;
+if (!geo(sx, sy).band) return;
+clearTimeout(hold);
+hold = setTimeout(() => { hold = null; if (begin(sx, sy)) { try { navigator.vibrate && navigator.vibrate(10); } catch (err) {} } }, 350);
+}, { passive: true });
+wrap.addEventListener('touchmove', e => {
+const t0 = e.touches[0];
+if (drag) { e.preventDefault(); move(t0.clientX, t0.clientY); return; }
+if (hold && Math.hypot(t0.clientX - sx, t0.clientY - sy) > 10) { clearTimeout(hold); hold = null; }
+}, { passive: false });
+wrap.addEventListener('touchend', () => { clearTimeout(hold); hold = null; end(); });
+wrap.addEventListener('touchcancel', () => { clearTimeout(hold); hold = null; end(); });
+wrap.addEventListener('contextmenu', e => { if (drag || hold) e.preventDefault(); });
+})();
 
 /* ---------- 起動 ---------- */
 load();
@@ -1229,10 +1336,10 @@ runSec.appendChild(btn);
 var hint = document.createElement('p');
 hint.className = 'kbd-hint';
 hint.innerHTML = lang === 'en'
-? '<kbd>Space</kbd> start / pause · <kbd>S</kbd> skip · <kbd>R</kbd> reset · <kbd>F</kbd> focus mode'
+? '<kbd>Space</kbd> start / pause · <kbd>S</kbd> skip · <kbd>←</kbd><kbd>→</kbd> 10 s (Shift: 1 min) · <kbd>R</kbd> reset · <kbd>F</kbd> focus mode'
 : lang === 'es'
-? '<kbd>Espacio</kbd> iniciar / pausar · <kbd>S</kbd> saltar · <kbd>R</kbd> reiniciar · <kbd>F</kbd> concentración'
-: '<kbd>Space</kbd> 開始・一時停止 · <kbd>S</kbd> スキップ · <kbd>R</kbd> リセット · <kbd>F</kbd> 集中モード';
+? '<kbd>Espacio</kbd> iniciar / pausar · <kbd>S</kbd> saltar · <kbd>←</kbd><kbd>→</kbd> 10 s (Mayús: 1 min) · <kbd>R</kbd> reiniciar · <kbd>F</kbd> concentración'
+: '<kbd>Space</kbd> 開始・一時停止 · <kbd>S</kbd> スキップ · <kbd>←</kbd><kbd>→</kbd> 10秒（Shiftで1分） · <kbd>R</kbd> リセット · <kbd>F</kbd> 集中モード';
 runSec.appendChild(hint);
 
 function isOn() { return document.body.classList.contains('focus-mode'); }
@@ -1364,7 +1471,7 @@ var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=1';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=2';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
