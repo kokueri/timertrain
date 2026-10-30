@@ -366,7 +366,15 @@
   /* ---------- プレミアム（Stripe）----------
    * 購入ボタンは試し用の環境だけに出す（本番の決済を始めるまで）。
    * 有料かどうかは entitlements（本人は読むだけ。書けるのは決済の通知を受けたサーバーだけ） */
-  var BILLING_ON = /^login-preview\./.test(location.hostname) || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  var IS_TEST_SITE = /^login-preview\./.test(location.hostname) || location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  // 本番は公開前の確認のため ?try=billing を付けたときだけ購入ボタンを出す（決済から戻ったときも出す）
+  var TRY_BILLING = false;
+  try {
+    var qs = new URLSearchParams(location.search);
+    if (qs.get('try') === 'billing') sessionStorage.setItem('tt-try-billing', '1');
+    TRY_BILLING = sessionStorage.getItem('tt-try-billing') === '1' || qs.has('checkout');
+  } catch (e) {}
+  var BILLING_ON = IS_TEST_SITE || TRY_BILLING;
   var FN_URL = SB_URL + '/functions/v1/billing/';
   var ENT = null;
   var B = {
@@ -562,7 +570,7 @@
       box.appendChild(el('div', { cls: 'acct-row' }, [by, bm]));
       box.appendChild(el('div', { cls: 'acct-row' }, [seePlans()]));
       box.appendChild(el('p', { cls: 'acct-small' }, [B.note, ' ', el('a', { href: PRICING, text: B.more })]));
-      if (BILLING_ON) box.appendChild(el('p', { cls: 'acct-small', text: B.test }));
+      if (IS_TEST_SITE) box.appendChild(el('p', { cls: 'acct-small', text: B.test }));
     }
     box.appendChild(err);
   }
