@@ -476,7 +476,8 @@ DT.set(frac, c ? c.id : 'blue');
 DT.fit(runTime);
 return;
 }
-ringFg.style.strokeDashoffset = RING_C * (1 - Math.min(1, Math.max(0, frac)));
+// 12時から時計回りに減る（ドーナツと同じ向き）: 残りは「端 → 12時」の部分
+ringFg.style.strokeDashoffset = -RING_C * (1 - Math.min(1, Math.max(0, frac)));
 if (color) ringFg.style.stroke = color;
 }
 // 色の丸（DonutTimer ではミニドーナツ）を塗る
@@ -1203,8 +1204,7 @@ if (e.key === 'Escape') resetToIdle();
 });
 
 /* ---------- リング／ドーナツの縁をドラッグして残り時間を合わせる ----------
- * リング: 12時から時計回りに残っている部分の端 → 残り = 角度の割合
- * ドーナツ: 12時から時計回りに食べた部分の端 → 残り = 1 − 角度の割合
+ * リング・ドーナツとも、12時から時計回りに減っていく端 → 残り = 1 − 角度の割合
  * スマホは画面のスクロールと区別するため、縁を約0.35秒押してから動かす */
 (function () {
 const wrap = document.querySelector('.ring-wrap');
@@ -1229,7 +1229,7 @@ if (!live() || !g.band) return false;
 const t = state.timers[run.idx];
 // いまの端の位置から始める（つかんだ場所に飛ばない）
 const frac = curRemain() / (t.secs * 1000);
-drag = { last: DT ? 1 - frac : frac, moved: false };
+drag = { last: 1 - frac, moved: false };
 wrap.classList.add('seeking');
 return true;
 }
@@ -1241,7 +1241,7 @@ if (a - drag.last > 0.5) a = 0; else if (drag.last - a > 0.5) a = 1;
 if (Math.abs(a - drag.last) < 0.0005) return;
 drag.last = a; drag.moved = true;
 const full = state.timers[run.idx].secs * 1000;
-const frac = DT ? 1 - a : a;
+const frac = 1 - a;
 // 1秒単位に丸める（最後は少しでも残す。0 にすると次へ進む）
 let rem = Math.round(frac * full / 1000) * 1000;
 if (frac >= 0.999) rem = full;
