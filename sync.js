@@ -26,7 +26,7 @@
     cur: 'In use', changed: 'edited', over: 'Save changes', asNew: 'Save as new', rename: 'Rename', renameQ: 'New name',
     overDone: 'Changes saved', renamed: 'Renamed', badge: 'My timer',
     proj: 'Project', projNone: 'No project', projNew: '+ New project…', projNamePh: 'Project name',
-    full: 'The free plan saves up to 2 timers. Save changes over one you have, or delete one first. Unlimited with Premium (coming soon).', plans: 'See plans'
+    full: 'The free plan saves up to 2 timers. Save changes over one you have, or delete one first. Unlimited with Premium.', plans: 'See plans'
   } : lang === 'es' ? {
     title: 'Mis temporizadores', save: 'Guardar configuración actual', namePh: 'Nombre', ok: 'Guardar', cancel: 'Cancelar',
     empty: 'Aún no hay temporizadores guardados. Guarda la configuración actual para usarla en cualquier dispositivo.',
@@ -35,7 +35,7 @@
     cur: 'En uso', changed: 'con cambios', over: 'Guardar cambios', asNew: 'Guardar como nuevo', rename: 'Renombrar', renameQ: 'Nuevo nombre',
     overDone: 'Cambios guardados', renamed: 'Nombre cambiado', badge: 'Mi temporizador',
     proj: 'Proyecto', projNone: 'Sin proyecto', projNew: '+ Nuevo proyecto…', projNamePh: 'Nombre del proyecto',
-    full: 'El plan gratis guarda hasta 2 temporizadores. Guarda los cambios sobre uno que ya tengas o elimina uno primero. Ilimitados con Premium (próximamente).', plans: 'Ver planes'
+    full: 'El plan gratis guarda hasta 2 temporizadores. Guarda los cambios sobre uno que ya tengas o elimina uno primero. Ilimitados con Premium.', plans: 'Ver planes'
   } : {
     title: 'マイタイマー', save: '今の編成を保存', namePh: '名前', ok: '保存', cancel: 'やめる',
     empty: 'まだ保存したタイマーはありません。今の編成を保存すると、どの端末からでも呼び出せます。',
@@ -44,7 +44,7 @@
     cur: '使用中', changed: '変更あり', over: '上書き保存', asNew: '別に保存', rename: '名前を変更', renameQ: '新しい名前',
     overDone: '上書き保存しました', renamed: '名前を変更しました', badge: 'マイタイマー',
     proj: 'プロジェクト', projNone: 'プロジェクトなし', projNew: '＋ 新しいプロジェクト…', projNamePh: 'プロジェクト名',
-    full: '無料プランで保存できるマイタイマーは2つまでです。今あるものに上書き保存するか、1つ削除してから保存してください。プレミアム（準備中）では無制限になります。', plans: 'プランを見る'
+    full: '無料プランで保存できるマイタイマーは2つまでです。今あるものに上書き保存するか、1つ削除してから保存してください。プレミアムでは無制限になります。', plans: 'プランを見る'
   };
   var acctHref = '/account?l=' + (['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja');
   function ev(name, p) { try { if (window.gtag) gtag('event', name, p || {}); } catch (e) {} }
