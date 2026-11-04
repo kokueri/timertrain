@@ -8,7 +8,7 @@
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-  gtag('config', 'G-GSFVNEDCGN');
+  gtag('config', 'G-GSFVNEDCGN', (function(){try{var m=/[?&]tt_internal=([01])/.exec(location.search);if(m){if(m[1]==='1')localStorage.setItem('tt-internal','1');else localStorage.removeItem('tt-internal');}if(localStorage.getItem('tt-internal')==='1')return {traffic_type:'internal'};}catch(e){}return {};})());
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HIITタイマー｜40秒＋20秒×8セットを音で自動進行・種目ごとに色分け - TimerTrain</title>
@@ -87,7 +87,7 @@
  ]
 }
 </script>
-<link rel="stylesheet" href="/style.css?v=33">
+<link rel="stylesheet" href="/style.css?v=34">
 </head>
 <body>
 
@@ -180,7 +180,7 @@
 </main>
 
 <script>window.TT_PRESET = {"timers": [{"name": "運動", "secs": 40, "color": "red"}, {"name": "休憩", "secs": 20, "color": "blue"}], "repeat": 8};</script>
-<script src="/app.js?v=33"></script>
+<script src="/app.js?v=34"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>

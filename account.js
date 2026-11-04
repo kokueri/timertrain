@@ -16,7 +16,8 @@
   window.gtag = function () { window.dataLayer.push(arguments); };
   gtag('js', new Date());
   if (GA_ID) {
-  gtag('config', GA_ID);
+  var gaCfg = {}; try { if (localStorage.getItem('tt-internal') === '1') gaCfg.traffic_type = 'internal'; } catch (e) {} // 運営者のブラウザ（?tt_internal=1 で設定）は GA で除外
+  gtag('config', GA_ID, gaCfg);
   var ga = document.createElement('script');
   ga.async = true; ga.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
   document.head.appendChild(ga);
@@ -328,12 +329,16 @@
     ]);
     btn.addEventListener('click', async function () {
       btn.disabled = true;
-      ev('login_start', { method: 'google' });
+      // Google へ移動する前に login_start を送り切る（すぐ移動すると GA に届かないことがある）
       var r = await sb.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: location.origin + '/account?l=' + lang }
+        options: { redirectTo: location.origin + '/account?l=' + lang, skipBrowserRedirect: true }
       });
-      if (r.error) { btn.disabled = false; show([msg(T.errLogin, 'err')].concat(signedOutNodes(btn))); }
+      if (r.error || !r.data || !r.data.url) { btn.disabled = false; show([msg(T.errLogin, 'err')].concat(signedOutNodes(btn))); return; }
+      var url = r.data.url, gone = false;
+      var go = function () { if (gone) return; gone = true; location.assign(url); };
+      try { gtag('event', 'login_start', { method: 'google', transport_type: 'beacon', event_callback: go, event_timeout: 1200 }); } catch (e) {}
+      setTimeout(go, 1500);
     });
     var nodes = signedOutNodes(btn);
     if (errText) nodes.unshift(msg(errText, 'err'));

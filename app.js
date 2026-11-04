@@ -102,6 +102,7 @@ repeat: 4, // Infinityで無限
 };
 let run = { active: false, paused: false, finished: false, idx: 0, cycle: 1, endAt: 0, remainMs: 0, lastSec: -1 };
 let tickId = null;
+let startVia = 'play'; // timer_start の via（play / key / quick_○○）
 let lateAdvance = false; // 遅れて処理する区切り（音・通知を出さない）
 let wakeLock = null;
 let audioCtx = null;
@@ -710,7 +711,8 @@ $('rep-inf').classList.toggle('active', state.repeat === Infinity);
 function startRun() {
 applySilentMode(true);
 unlockAudio();
-if (window.gtag) gtag('event', 'timer_start');
+if (window.gtag) gtag('event', 'timer_start', { via: startVia });
+startVia = 'play';
 if (window.__ttOnStart) { try { window.__ttOnStart(); } catch (e) {} }
 run = { active: true, paused: false, finished: false, idx: 0, cycle: 1,
 endAt: Date.now() + state.timers[0].secs * 1000, remainMs: 0, lastSec: -1 };
@@ -1177,6 +1179,25 @@ prompt(STR.copyPrompt, url);
 }
 });
 $('pause-btn').addEventListener('click', () => { if (run.finished) resetAndGo(); else if (run.active) pauseToggle(); else startRun(); });
+/* すぐ始める（ページに #tt-quick があるときだけ）: 押すとその編成に切り替えて、そのまま開始 */
+(function () {
+const box = document.getElementById('tt-quick');
+if (!box) return;
+box.addEventListener('click', e => {
+const a = e.target.closest && e.target.closest('a[data-q]');
+if (!a) return;
+const href = a.getAttribute('href') || '';
+const i = href.indexOf('?');
+const c = i < 0 ? null : parseConfig(href.slice(i));
+if (!c) return; // 読めないときは普通のリンクとして開く
+e.preventDefault();
+if (run.active) resetToIdle();
+state = c;
+persist(); renderList();
+startVia = 'quick_' + String(a.dataset.q || '').replace(/[^a-z0-9_]/gi, '').slice(0, 20);
+startRun();
+});
+})();
 $('skip-btn').addEventListener('click', skip);
 $('reset-btn').addEventListener('click', resetRun);
 function resetAndGo() { resetToIdle(); startRun(); }
@@ -1186,7 +1207,7 @@ document.addEventListener('keydown', e => {
 if (e.target.tagName === 'INPUT') return;
 if (e.code === 'Space') {
 e.preventDefault();
-if (!run.active) startRun();
+if (!run.active) { startVia = 'key'; startRun(); }
 else if (run.finished) resetAndGo();
 else pauseToggle();
 }
@@ -1501,7 +1522,7 @@ var DONUT_PREFIX = '/donut';
 var SHOW_DONUT_ON_TT = true;
 // DonutTimer にあるページ（TimerTrain からはこのページだけ同じ用途のページへ飛ぶ。無ければその言語のトップへ）
 var DT_PAGES = ['/', '/pomodoro', '/interval-timer', '/tabata', '/hiit', '/study', '/kitchen', '/multi-timer', '/repeat-timer', '/pomodoro-50-10',
-'/en', '/en-pomodoro', '/en-interval-timer', '/en-tabata', '/en-hiit', '/en-kitchen', '/en-study', '/en-1-minute-timer', '/en-5-minute-timer', '/en-10-minute-timer', '/en-25-minute-timer',
+'/en', '/en-pomodoro', '/en-interval-timer', '/en-tabata', '/en-hiit', '/en-kitchen', '/en-study', '/en-1-minute-timer', '/en-2-minute-timer', '/en-3-minute-timer', '/en-4-minute-timer', '/en-5-minute-timer', '/en-10-minute-timer', '/en-15-minute-timer', '/en-20-minute-timer', '/en-25-minute-timer', '/en-30-minute-timer',
 '/es', '/es-pomodoro', '/es-intervalos', '/es-tabata'];
 var DT_HOME = { ja: '/', en: '/en', es: '/es' };
 var NS = 'http://www.w3.org/2000/svg';
@@ -1746,4 +1767,14 @@ summary(); paint();
 var _ut = updateTotal, _ps = persist;
 updateTotal = function () { _ut(); summary(); paint(); };
 persist = function () { _ps(); summary(); paint(); };
+})();
+
+/* 運営者のブラウザ（?tt_internal=1 で設定、?tt_internal=0 で解除）: GA4 では traffic_type=internal として除外。目印を小さく表示 */
+(function () {
+try { if (localStorage.getItem('tt-internal') !== '1') return; } catch (e) { return; }
+var b = document.createElement('div');
+b.className = 'tt-internal-badge';
+b.textContent = 'GA除外中';
+b.title = '?tt_internal=0 で解除';
+document.body.appendChild(b);
 })();
