@@ -98,7 +98,7 @@ body.dt .color-pop button.sel { outline: 2px solid var(--text); outline-offset: 
 /* ---- PC ---- */
 @media (min-width: 900px) {
 .app { grid-template-columns: minmax(0, 1.2fr) minmax(300px, .85fr); column-gap: 48px; }
-.ring-wrap { width: min(36vw, 440px); }
+.ring-wrap { width: min(36vw, 440px); width: clamp(260px, calc(100vh - 410px), min(36vw, 440px)); } /* 低い画面でも再生ボタンが最初の画面に入るように */
 }
 
 /* ---- 集中モード（文字は穴に合わせて cqw で自動的に拡大縮小） ---- */

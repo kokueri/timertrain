@@ -30,6 +30,12 @@ Key facts:
 - [5 minute timer](https://timertrain.com/en-5-minute-timer)
 - [10 minute timer](https://timertrain.com/en-10-minute-timer)
 - [25 minute timer](https://timertrain.com/en-25-minute-timer)
+- [2 minute timer](https://timertrain.com/en-2-minute-timer)
+- [3 minute timer](https://timertrain.com/en-3-minute-timer)
+- [4 minute timer](https://timertrain.com/en-4-minute-timer)
+- [15 minute timer](https://timertrain.com/en-15-minute-timer)
+- [20 minute timer](https://timertrain.com/en-20-minute-timer)
+- [30 minute timer](https://timertrain.com/en-30-minute-timer)
 
 ## 用途別タイマー（日本語）
 
@@ -77,6 +83,12 @@ The same timer with a cute, aesthetic look (kawaii pastel donuts, colorful sprin
 - [Cute 5 Minute Timer](https://timertrain.com/donut/en-5-minute-timer): A free 5 minute timer where the time left is a blueberry donut that gets eaten bite by bite
 - [Cute 10 Minute Timer](https://timertrain.com/donut/en-10-minute-timer): A free 10 minute timer where the time left is a mint chocolate donut that gets eaten bite by bite
 - [Cute 25 Minute Timer](https://timertrain.com/donut/en-25-minute-timer): A free 25 minute timer where the time left is a strawberry milk donut that gets eaten bite by bite
+- [Cute 2 Minute Timer](https://timertrain.com/donut/en-2-minute-timer): A free 2 minute timer where the time left is a strawberry milk donut that gets eaten bite by bite
+- [Cute 3 Minute Timer](https://timertrain.com/donut/en-3-minute-timer): A free 3 minute timer where the time left is a vanilla donut that gets eaten bite by bite
+- [Cute 4 Minute Timer](https://timertrain.com/donut/en-4-minute-timer): A free 4 minute timer where the time left is a milk tea donut that gets eaten bite by bite
+- [Cute 15 Minute Timer](https://timertrain.com/donut/en-15-minute-timer): A free 15 minute timer where the time left is a mint chocolate donut that gets eaten bite by bite
+- [Cute 20 Minute Timer](https://timertrain.com/donut/en-20-minute-timer): A free 20 minute timer where the time left is a blueberry donut that gets eaten bite by bite
+- [Cute 30 Minute Timer](https://timertrain.com/donut/en-30-minute-timer): A free 30 minute timer where the time left is a chocolate donut that gets eaten bite by bite
 
 ## DonutTimer (Español)
 

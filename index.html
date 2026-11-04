@@ -8,7 +8,7 @@
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', 'G-GSFVNEDCGN');
+gtag('config', 'G-GSFVNEDCGN', (function(){try{var m=/[?&]tt_internal=([01])/.exec(location.search);if(m){if(m[1]==='1')localStorage.setItem('tt-internal','1');else localStorage.removeItem('tt-internal');}if(localStorage.getItem('tt-internal')==='1')return {traffic_type:'internal'};}catch(e){}return {};})());
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>複数タイマーをWebで連続・くり返し再生｜共有できる無料タイマー - TimerTrain</title>
@@ -108,7 +108,7 @@ gtag('config', 'G-GSFVNEDCGN');
  ]
 }
 </script>
-<link rel="stylesheet" href="/style.css?v=33">
+<link rel="stylesheet" href="/style.css?v=34">
 </head>
 <body>
 
@@ -144,6 +144,12 @@ gtag('config', 'G-GSFVNEDCGN');
 <button id="reset-btn" type="button" aria-label="リセット"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg></button>
 <button id="pause-btn" type="button" aria-label="開始・一時停止"><svg width="34" height="34" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
 <button id="skip-btn" type="button" aria-label="スキップ"><svg width="24" height="24" viewBox="0 0 24 24"><path d="M6 6l8.5 6L6 18V6zM16 6h2v12h-2z"/></svg></button>
+</div>
+<div id="tt-quick" class="tt-quick" role="group" aria-label="すぐ始めるタイマー">
+<span class="tt-quick-label">すぐ始める</span>
+<a class="tt-chip tt-quick-chip" data-q="pomo" href="/?t=red.1500.%E4%BD%9C%E6%A5%AD,blue.300.%E4%BC%91%E6%86%A9&amp;r=4"><span aria-hidden="true">▶</span> ポモドーロ 25分＋5分</a>
+<a class="tt-chip tt-quick-chip" data-q="workout" href="/?t=orange.40.%E9%81%8B%E5%8B%95,green.20.%E4%BC%91%E6%86%A9&amp;r=8"><span aria-hidden="true">▶</span> 運動40秒＋休憩20秒 ×8</a>
+<a class="tt-chip tt-quick-chip" data-q="chain" href="/?t=red.3000.%E5%8B%89%E5%BC%B7,blue.600.%E4%BC%91%E6%86%A9,purple.3000.%E5%8B%89%E5%BC%B7&amp;r=1"><span aria-hidden="true">▶</span> 3つ連続：勉強50→休憩10→勉強50</a>
 </div>
 </section>
 
@@ -204,7 +210,7 @@ gtag('config', 'G-GSFVNEDCGN');
 <footer class="footer">© 2026 TimerTrain · <a href="/en" class="lang-link">English</a> · <a href="/es" class="lang-link">Español</a> · <a href="/privacy">プライバシー</a> · <a href="/terms">利用規約</a> · <a href="/pricing">料金</a> · <a href="/legal">特定商取引法に基づく表記</a> · <a href="/about">運営者情報</a></footer>
 </main>
 
-<script src="/app.js?v=33"></script>
+<script src="/app.js?v=34"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
