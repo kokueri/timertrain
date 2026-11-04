@@ -8,18 +8,18 @@
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-gtag('config', 'G-GSFVNEDCGN');
+gtag('config', 'G-GSFVNEDCGN', (function(){try{var m=/[?&]tt_internal=([01])/.exec(location.search);if(m){if(m[1]==='1')localStorage.setItem('tt-internal','1');else localStorage.removeItem('tt-internal');}if(localStorage.getItem('tt-internal')==='1')return {traffic_type:'internal'};}catch(e){}return {};})());
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>DonutTimer — Cute, Aesthetic Visual Timer: Time Left as a Donut (Free)</title>
-<meta name="description" content="A cute, aesthetic and free online visual timer: the time left is a donut eaten bite by bite. Great for study sessions, kids and classrooms. Chain timers, repeat rounds and pick from six flavors. No sign-up, no install.">
+<meta name="description" content="A cute, aesthetic and free online visual timer: the time left is a donut eaten bite by bite. Cute but practical — chain timers that play one after another, repeat rounds and share your setup with one link. Great for study, kids and classrooms. No sign-up.">
 <link rel="canonical" href="https://timertrain.com/donut/en">
 <link rel="alternate" hreflang="ja" href="https://timertrain.com/donut/">
 <link rel="alternate" hreflang="en" href="https://timertrain.com/donut/en">
 <link rel="alternate" hreflang="es" href="https://timertrain.com/donut/es">
 <link rel="alternate" hreflang="x-default" href="https://timertrain.com/donut/en">
 <meta property="og:title" content="DonutTimer — Cute, Aesthetic Visual Timer: Time Left as a Donut (Free)">
-<meta property="og:description" content="A cute, aesthetic and free online visual timer: the time left is a donut eaten bite by bite. Great for study sessions, kids and classrooms. Chain timers, repeat rounds and pick from six flavors. No sign-up, no install.">
+<meta property="og:description" content="A cute, aesthetic and free online visual timer: the time left is a donut eaten bite by bite. Cute but practical — chain timers that play one after another, repeat rounds and share your setup with one link. Great for study, kids and classrooms. No sign-up.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://timertrain.com/donut/en">
 <meta property="og:image" content="https://timertrain.com/donut/ogp-en.png">
@@ -42,7 +42,7 @@ gtag('config', 'G-GSFVNEDCGN');
   "priceCurrency": "USD"
  },
  "isAccessibleForFree": true,
- "description": "A cute, free online timer that shows the time left as a donut being eaten bite by bite. Chain several timers, switch automatically, repeat rounds and pick from six flavors. No sign-up, no install.",
+ "description": "A cute, free online timer that shows the time left as a donut being eaten bite by bite. Chain several timers, switch automatically, repeat rounds, share your setup with one link and pick from six flavors. No sign-up, no install.",
  "isPartOf": {
   "@type": "WebSite",
   "name": "TimerTrain",
@@ -102,6 +102,14 @@ gtag('config', 'G-GSFVNEDCGN');
     "@type": "Answer",
     "text": "Yes. The amount of donut left shows how much time remains, so children who cannot read a clock yet can still see how much longer. It works well for clean-up time, brushing teeth, getting ready in the morning, tests and group work, and it is easy to read when projected on a big screen."
    }
+  },
+  {
+   "@type": "Question",
+   "name": "Can I share a timer I made?",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "Yes. Press \"Share link\" to copy a URL. Whoever opens it gets the same timers, names, flavors and repeat count, ready to start. No sign-up needed."
+   }
   }
  ]
 }
@@ -120,8 +128,8 @@ gtag('config', 'G-GSFVNEDCGN');
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titan+One&text=DonutTimer&display=swap">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700&family=Nunito:wght@800&display=swap">
-<link rel="stylesheet" href="/style.css?v=33">
-<link rel="stylesheet" href="/donut.css?v=3">
+<link rel="stylesheet" href="/style.css?v=34">
+<link rel="stylesheet" href="/donut.css?v=4">
 </head>
 <body>
 
@@ -198,6 +206,8 @@ gtag('config', 'G-GSFVNEDCGN');
 <p>DonutTimer is a free online timer that shows the time left as a donut. As the minutes pass, the donut is eaten clockwise from 12 o'clock, one small bite at a time; when it's gone, time is up. You can see how much is left at a glance, without staring at numbers. Under the frosting it's the same engine as <a href="/en">TimerTrain</a>, a timer that plays several timers in a row.</p>
 <h2>How to use it</h2>
 <p>1) Press "Add timer" to line up as many timers as you need — work, break, a warm-up. 2) Set each one's length, name and flavor. 3) Choose how many rounds and press play. A sound marks every switch, and the next donut takes over automatically. Copy the share link to send your exact setup to someone else.</p>
+<h2>Cute, but built to work: chain, repeat, share</h2>
+<p>Under the frosting it is a practical timer. Line up several timers — say 25 minutes of focus and 5 minutes of break — and each one plays after the last, with a sound at every switch. Set how many rounds to repeat. Press "Share link" and your whole setup becomes a URL: send it to family, a class or a study group and it opens exactly the same timer.</p>
 <h2>Six flavors</h2>
 <p>Strawberry milk, chocolate, mint chocolate, vanilla, blueberry and milk tea. Each timer can have its own flavor, so "strawberry for work, blueberry for breaks" tells you which part you're in even from across the room.</p>
 <h2>Good for</h2>
@@ -213,15 +223,16 @@ gtag('config', 'G-GSFVNEDCGN');
 <p style="margin-top:10px"><strong>Does it make a sound?</strong><br>Yes — when one timer switches to the next and when everything is finished. Pick the sound and volume in the settings.</p>
 <p style="margin-top:10px"><strong>Is there a cute, aesthetic Pomodoro timer?</strong><br>Yes. DonutTimer is a free, aesthetic online timer: pastel icing, colorful sprinkles and rounded type, with the time left shown as a donut. Its Pomodoro page runs 25 minutes of focus and 5 minutes of break on repeat, in any browser with no sign-up.</p>
 <p style="margin-top:10px"><strong>Can I use it as a visual timer for kids or in a classroom?</strong><br>Yes. The amount of donut left shows how much time remains, so children who cannot read a clock yet can still see how much longer. It works well for clean-up time, brushing teeth, getting ready in the morning, tests and group work, and it is easy to read when projected on a big screen.</p>
+<p style="margin-top:10px"><strong>Can I share a timer I made?</strong><br>Yes. Press "Share link" to copy a URL. Whoever opens it gets the same timers, names, flavors and repeat count, ready to start. No sign-up needed.</p>
 <h2>More donut timers</h2>
-<p><a href="/donut/en">DonutTimer (build your own)</a> · <a href="/donut/en-pomodoro">Pomodoro</a> · <a href="/donut/en-study">Study</a> · <a href="/donut/en-interval-timer">Interval</a> · <a href="/donut/en-tabata">Tabata</a> · <a href="/donut/en-hiit">HIIT</a> · <a href="/donut/en-kitchen">Kitchen</a> · <a href="/donut/en-1-minute-timer">1 minute</a> · <a href="/donut/en-5-minute-timer">5 minutes</a> · <a href="/donut/en-10-minute-timer">10 minutes</a> · <a href="/donut/en-25-minute-timer">25 minutes</a></p>
+<p><a href="/donut/en">DonutTimer (build your own)</a> · <a href="/donut/en-pomodoro">Pomodoro</a> · <a href="/donut/en-study">Study</a> · <a href="/donut/en-interval-timer">Interval</a> · <a href="/donut/en-tabata">Tabata</a> · <a href="/donut/en-hiit">HIIT</a> · <a href="/donut/en-kitchen">Kitchen</a> · <a href="/donut/en-1-minute-timer">1 minute</a> · <a href="/donut/en-2-minute-timer">2 minutes</a> · <a href="/donut/en-3-minute-timer">3 minutes</a> · <a href="/donut/en-4-minute-timer">4 minutes</a> · <a href="/donut/en-5-minute-timer">5 minutes</a> · <a href="/donut/en-10-minute-timer">10 minutes</a> · <a href="/donut/en-15-minute-timer">15 minutes</a> · <a href="/donut/en-20-minute-timer">20 minutes</a> · <a href="/donut/en-25-minute-timer">25 minutes</a> · <a href="/donut/en-30-minute-timer">30 minutes</a></p>
 </article>
 
 <footer class="footer">© 2026 DonutTimer · <a href="/donut/" class="lang-link">日本語</a> · <a href="/donut/es" class="lang-link">Español</a> · <a href="/en-privacy">Privacy</a> · <a href="/en-terms">Terms</a> · <a href="/en-pricing">Pricing</a> · <a href="/en-legal">Commerce Disclosure</a> · <a href="/en-about">About</a></footer>
 </main>
 
 <script src="/donut.js?v=4"></script>
-<script src="/app.js?v=33d"></script>
+<script src="/app.js?v=34d"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
