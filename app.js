@@ -874,6 +874,7 @@ saveRun();
 if (!lateAdvance) notify(STR.nDone, true);
 setTimeout(() => { if (run.finished) applySilentMode(false); }, 4000);
 if (window.__ttOnFinish) { try { window.__ttOnFinish(); } catch (e) {} }
+if (window.__ttPromoFinish) setTimeout(function () { if (run.finished) { try { window.__ttPromoFinish(); } catch (e) {} } }, 800);
 }
 function tick() {
 if (!run.active || run.paused || run.finished) return;
@@ -1505,7 +1506,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=9'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=10'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 })();
@@ -1777,4 +1778,191 @@ b.className = 'tt-internal-badge';
 b.textContent = 'GA除外中';
 b.title = '?tt_internal=0 で解除';
 document.body.appendChild(b);
+})();
+
+/* ---------- 自社の案内（プレミアム）：常設バナー・終了時の案内・ヘッダーのボタン（2026-11-05）
+ * 外部の広告は読み込まない。中身はすべてこのファイルの文言（textContent のみ）。
+ * プレミアムの人には出さない（tt-plan は sync.js / account.js が確認して保存する）。ドーナツ版には出さない */
+(function () {
+if (window.DT) return;
+var lang = document.documentElement.lang;
+var l = ['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja';
+var PRICING = { ja: '/pricing', en: '/en-pricing', es: '/es-pricing' }[l];
+var ACCT = '/account?l=' + l;
+function isSigned() { try { return !!localStorage.getItem('sb-arsfocfjfwtlykfdkiea-auth-token'); } catch (e) { return false; } }
+function cachedPlan() { try { return localStorage.getItem('tt-plan'); } catch (e) { return null; } }
+var plan = isSigned() ? cachedPlan() : null;
+function isPremium() { return isSigned() && plan === 'premium'; }
+function ev(name, p) { try { if (window.gtag) gtag('event', name, p || {}); } catch (e) {} }
+// 訪問回数（このブラウザで何回目のセッションか）
+var visits = 0;
+try {
+visits = Number(localStorage.getItem('tt-visits')) || 0;
+if (!sessionStorage.getItem('tt-visit')) { visits++; localStorage.setItem('tt-visits', String(visits)); sessionStorage.setItem('tt-visit', '1'); }
+} catch (e) {}
+
+var T = {
+ja: {
+kicker: 'もっと使いたい人へ', title: 'TimerTrain', title2: 'プレミアム', label: 'プレミアムのご案内', cta: '7日間無料で試す', close: '閉じる',
+items: [['広告なし'], ['全期間の', '記録グラフ'], ['マイタイマー・', 'マイプロジェクト\u200b無制限'], ['記録を', 'CSVで保存']],
+head: 'プレミアム（広告なし）', headShort: '広告なし', crown: 'プレミアム',
+guest: [
+['このタイマー、保存しておきませんか？', '無料ログインで、次からワンタップで呼び出せます。', '無料でログインして保存'],
+['スマホでもPCでも、同じタイマーを。', '無料ログインで、作ったタイマーと記録が端末をまたいで同期されます。', '無料でログイン'],
+['今日の集中、記録に残しませんか？', '無料ログインで、直近7日の時間と連続日数が見られます。', '無料で記録をはじめる']],
+free: [
+['続けてきた時間を、ぜんぶ見返そう。', 'プレミアムなら全期間の記録と月・年のグラフ。初めての方は最初の7日間無料です。', '7日間無料で試す'],
+['お気に入りのタイマーを、好きなだけ。', 'プレミアムならマイタイマーもマイプロジェクトも上限なし。勉強・仕事・運動を分けて集計できます。', '7日間無料で試す'],
+['画面を、もっとすっきり。', 'プレミアムは広告なし。タイマーと記録だけに集中できます。初めての方は最初の7日間無料です。', '7日間無料で試す']]
+},
+en: {
+kicker: 'Want more?', title: 'TimerTrain', title2: 'Premium', label: 'About Premium', cta: 'Try 7 days free', close: 'Close',
+items: [['No ads'], ['Full history', '& charts'], ['Unlimited timers', '& projects'], ['Export', 'to CSV']],
+head: 'Premium (no ads)', headShort: 'No ads', crown: 'Premium',
+guest: [
+['Save this timer?', 'Sign in free and bring it back with one tap next time.', 'Sign in free to save'],
+['Same timers on phone and computer.', 'Sign in free to sync your timers and history across devices.', 'Sign in free'],
+['Keep a record of today’s focus?', 'Sign in free to see your last 7 days and your streak.', 'Start tracking free']],
+free: [
+['Look back on all the time you’ve put in.', 'Premium keeps your full history with monthly and yearly charts. 7 days free for new subscribers.', 'Try 7 days free'],
+['Save as many timers as you like.', 'Premium removes the limits on timers and projects, so you can track study, work and workouts separately.', 'Try 7 days free'],
+['A cleaner screen.', 'Premium has no ads — just your timer and your records. 7 days free for new subscribers.', 'Try 7 days free']]
+},
+es: {
+kicker: '¿Quieres más?', title: 'TimerTrain', title2: 'Premium', label: 'Sobre Premium', cta: 'Prueba 7 días gratis', close: 'Cerrar',
+items: [['Sin anuncios'], ['Historial', 'y gráficos'], ['Temporizadores y', 'proyectos ilimitados'], ['Exportar', 'a CSV']],
+head: 'Premium (sin anuncios)', headShort: 'Sin anuncios', crown: 'Premium',
+guest: [
+['¿Guardar este temporizador?', 'Inicia sesión gratis y recupéralo con un toque la próxima vez.', 'Iniciar sesión y guardar'],
+['Los mismos temporizadores en el móvil y el ordenador.', 'Inicia sesión gratis para sincronizar tus temporizadores y tu historial.', 'Iniciar sesión gratis'],
+['¿Guardar un registro de tu concentración de hoy?', 'Inicia sesión gratis para ver tus últimos 7 días y tu racha.', 'Empezar a registrar gratis']],
+free: [
+['Revisa todo el tiempo que has dedicado.', 'Premium guarda todo tu historial con gráficos mensuales y anuales. 7 días gratis si eres nuevo.', 'Prueba 7 días gratis'],
+['Guarda todos los temporizadores que quieras.', 'Premium quita los límites de temporizadores y proyectos para que registres estudio, trabajo y ejercicio por separado.', 'Prueba 7 días gratis'],
+['Una pantalla más limpia.', 'Premium no tiene anuncios: solo tu temporizador y tus registros. 7 días gratis si eres nuevo.', 'Prueba 7 días gratis']]
+}
+}[l];
+
+var NS = 'http://www.w3.org/2000/svg';
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function svg(d, opt) {
+var s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true');
+if (opt && opt.cls) s.setAttribute('class', opt.cls);
+d.forEach(function (x) {
+var p = document.createElementNS(NS, x[0]);
+Object.keys(x[1]).forEach(function (k) { p.setAttribute(k, x[1][k]); });
+s.appendChild(p);
+});
+return s;
+}
+var CROWN = [['path', { d: 'M3 8l4.5 4 4.5-7 4.5 7L21 8l-2 11H5z' }]];
+var ICONS = [
+{ c: '#E07A2E', d: [['circle', { cx: 12, cy: 12, r: 9 }], ['path', { d: 'M5.6 5.6l12.8 12.8' }]] },
+{ c: '#4A8FE7', d: [['path', { d: 'M5 20V11M12 20V5M19 20v-6' }]] },
+{ c: '#FF6B6B', d: [['path', { d: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' }]] },
+{ c: '#2BA89A', d: [['path', { d: 'M12 4v11M7 10l5 5 5-5M5 20h14' }]] }
+];
+
+/* 1) 常設バナー（タイマー設定の下〜説明文の上。1ページに1つ） */
+function addBanner() {
+if (isPremium() || document.getElementById('tt-promo')) return;
+var about = document.querySelector('.about');
+if (!about || !document.getElementById('setup')) return;
+var box = el('aside', 'tt-promo'); box.id = 'tt-promo'; box.setAttribute('aria-label', T.label);
+var a = el('a', 'tt-promo-in'); a.href = PRICING;
+var head = el('span', 'tt-promo-head');
+head.appendChild(el('span', 'tt-promo-kicker', T.kicker));
+var title = el('span', 'tt-promo-title');
+title.appendChild(el('span', null, T.title)); title.appendChild(document.createTextNode(' ')); title.appendChild(el('span', 'tt-promo-t2', T.title2));
+head.appendChild(title);
+var list = el('span', 'tt-promo-list');
+T.items.forEach(function (lines, i) {
+var it = el('span', 'tt-promo-item');
+var ic = svg(ICONS[i].d, { cls: 'tt-promo-ic' }); ic.style.stroke = ICONS[i].c; it.appendChild(ic);
+var tx = el('span', 'tt-promo-tx');
+lines.forEach(function (ln) { tx.appendChild(el('span', 'tt-promo-ln', ln)); });
+it.appendChild(tx); list.appendChild(it);
+});
+a.appendChild(head); a.appendChild(list); a.appendChild(el('span', 'tt-promo-cta', T.cta));
+a.addEventListener('click', function () { ev('promo_click', { slot: 'banner', signed: isSigned() ? 1 : 0 }); });
+box.appendChild(a);
+about.parentNode.insertBefore(box, about);
+}
+
+/* 2) ヘッダー：無料ログインの人に「プレミアム（広告なし）」→ 料金ページ。プレミアムの人は王冠だけ */
+function paintHeader() {
+var tl = document.getElementById('tt-topleft');
+var acct = document.getElementById('acct-link');
+var old = document.getElementById('tt-prem-link'); if (old) old.remove();
+var oldC = document.getElementById('tt-crown'); if (oldC) oldC.remove();
+if (!tl || !acct || !isSigned()) return;
+if (isPremium()) {
+var c = svg(CROWN, { cls: 'tt-crown' }); c.id = 'tt-crown';
+acct.insertBefore(c, acct.firstChild);
+acct.setAttribute('aria-label', acct.getAttribute('aria-label') + ' · ' + T.crown);
+return;
+}
+var b = el('a', 'tt-prem-link'); b.id = 'tt-prem-link'; b.href = PRICING; b.setAttribute('aria-label', T.head);
+b.appendChild(svg(CROWN, { cls: 'tt-crown' }));
+b.appendChild(el('span', 'tt-pl-full', T.head));
+b.appendChild(el('span', 'tt-pl-short', T.headShort));
+b.addEventListener('click', function () { ev('promo_click', { slot: 'header' }); });
+tl.appendChild(b);
+}
+
+/* 3) 終了時の案内（未ログイン・無料の人。パターンはランダム。×で3日間出さない。1セッション1回） */
+var HIDE_MS = 3 * 864e5;
+function pick(n, key) {
+var last = -1; try { last = Number(localStorage.getItem(key)); } catch (e) {}
+var i = Math.floor(Math.random() * n);
+if (n > 1 && i === last) i = (i + 1 + Math.floor(Math.random() * (n - 1))) % n;
+try { localStorage.setItem(key, String(i)); } catch (e) {}
+return i;
+}
+function closeCard() { var c = document.getElementById('tt-promo-card'); if (c) c.remove(); }
+window.__ttPromoFinish = function () {
+if (isPremium() || document.getElementById('tt-comeback') || document.getElementById('tt-promo-card')) return;
+var signed = isSigned();
+if (!signed && visits < 2) return; // はじめての人には出さない
+try {
+if (sessionStorage.getItem('tt-promo-shown')) return;
+var x = Number(localStorage.getItem('tt-promo-x')) || 0;
+if (x && Date.now() - x < HIDE_MS) return;
+} catch (e) {}
+var set = signed ? T.free : T.guest;
+var i = pick(set.length, signed ? 'tt-promo-lastf' : 'tt-promo-lastg');
+var v = (signed ? 'F' : 'G') + (i + 1);
+var c = el('div', 'tt-promo-card'); c.id = 'tt-promo-card'; c.setAttribute('role', 'status');
+var xb = el('button', 'tt-pc-x', '×'); xb.type = 'button'; xb.setAttribute('aria-label', T.close);
+xb.addEventListener('click', function () { closeCard(); try { localStorage.setItem('tt-promo-x', String(Date.now())); } catch (e) {} ev('promo_close', { slot: 'finish', variant: v }); });
+c.appendChild(xb);
+if (v === 'F1') {
+var bars = el('span', 'tt-pc-bars'); bars.setAttribute('aria-hidden', 'true');
+[100, 60, 80, 45, 70, 55, 90].forEach(function (h, k) { var s = el('span', k < 3 ? 'old' : (k === 6 ? 'now' : '')); s.style.height = h + '%'; bars.appendChild(s); });
+c.appendChild(bars);
+}
+c.appendChild(el('p', 'tt-pc-t', set[i][0]));
+c.appendChild(el('p', 'tt-pc-b', set[i][1]));
+var go = el('a', 'tt-pc-go', set[i][2]); go.href = signed ? PRICING : ACCT;
+go.addEventListener('click', function () { ev('promo_click', { slot: 'finish', variant: v }); });
+c.appendChild(go);
+document.body.appendChild(c);
+try { sessionStorage.setItem('tt-promo-shown', '1'); } catch (e) {}
+ev('promo_view', { slot: 'finish', variant: v });
+};
+// もう一度スタートしたら案内は閉じる
+var pb = document.getElementById('pause-btn');
+if (pb) pb.addEventListener('click', function () { setTimeout(function () { if (!document.querySelector('.run-time.finished')) closeCard(); }, 0); });
+
+/* sync.js / account.js がプランを確認したら呼ぶ */
+window.__ttSetPlan = function (p) {
+try { if (p) localStorage.setItem('tt-plan', p); else localStorage.removeItem('tt-plan'); } catch (e) {}
+plan = p;
+if (isPremium()) { var b = document.getElementById('tt-promo'); if (b) b.remove(); closeCard(); }
+else addBanner();
+paintHeader();
+};
+
+addBanner();
+paintHeader();
 })();
