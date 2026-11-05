@@ -572,7 +572,7 @@
     if (!s.data || !s.data.session) {
       // セッション切れ: 入口の表示を「ログイン」に戻し、欄はログインの案内だけにする
       var link = document.querySelector('#acct-link span'); if (link) link.textContent = T.signin;
-      try { sessionStorage.removeItem('tt-stats2'); } catch (e) {}
+      try { sessionStorage.removeItem('tt-stats2'); localStorage.removeItem('tt-plan'); } catch (e) {}
       window.__ttSb = null; window.__ttSignedOut = true;
       head.removeChild(saveBtn);
       list.appendChild(el('a', { cls: 'tt-chip', href: acctHref, text: T.signin }));
@@ -586,6 +586,7 @@
           (!e.current_period_end || new Date(e.current_period_end).getTime() > Date.now() - 3 * 864e5)) { FREE_MAX = 100; PJ_FREE = 50; PREMIUM = true; }
     } catch (e) {}
     window.__ttSb = sb; window.__ttPremium = PREMIUM;
+    if (window.__ttSetPlan) { try { window.__ttSetPlan(PREMIUM ? 'premium' : 'free'); } catch (e) {} }
     window.__ttBreaks = function () { return BREAKS; };
     window.__ttStatsRefresh = function () { loadStreak(true); };
     hookLogs();

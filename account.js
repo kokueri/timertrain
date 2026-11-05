@@ -484,6 +484,7 @@
     var r = await sb.from('entitlements').select('plan,status,current_period_end,cancel_at_period_end,trial_end,trial_used,price_lookup_key').maybeSingle();
     ENT = r.error ? null : r.data;
     if (isPrem(ENT)) { FREE_MAX = 100; PJ_FREE = 50; }
+    if (!r.error) { try { localStorage.setItem('tt-plan', isPrem(ENT) ? 'premium' : 'free'); } catch (e) {} }
     return ENT;
   }
   async function callBilling(route, body) {
@@ -602,6 +603,7 @@
     out.addEventListener('click', async function () {
       out.disabled = true;
       await sb.auth.signOut({ scope: 'local' });
+      try { localStorage.removeItem('tt-plan'); } catch (e) {}
       ev('logout');
       renderSignedOut();
     });
@@ -629,7 +631,7 @@
           return;
         }
         ev('account_delete');
-        try { await sb.auth.signOut({ scope: 'local' }); } catch (e) {}
+        try { await sb.auth.signOut({ scope: 'local' }); localStorage.removeItem('tt-plan'); } catch (e) {}
         show([msg(T.deleted)]);
       });
       var box = el('div', { cls: 'acct-confirm' }, [
