@@ -716,6 +716,7 @@ startVia = 'play';
 if (window.__ttOnStart) { try { window.__ttOnStart(); } catch (e) {} }
 run = { active: true, paused: false, finished: false, idx: 0, cycle: 1,
 endAt: Date.now() + state.timers[0].secs * 1000, remainMs: 0, lastSec: -1 };
+snapRun();
 acquireWakeLock();
 pauseBtn.innerHTML = ICONS.pause;
 runTime.classList.remove('finished');
@@ -763,8 +764,53 @@ function updateHighlight() {
 li.classList.toggle('current', run.active && !run.finished && i === run.idx);
 });
 }
+/* 動いている途中で編成を変えても、止めずに続ける（2026-11-05）
+ * いま動いているタイマーを id で追いかける。時間を変えたら経過分はそのままで残りを合わせる。
+ * いまのタイマーを消したら次のタイマーへ。くり返し回数を減らしたら今の周を最後にする */
+let runSnap = null; // 前回の編成（id → 秒数、並び順）
+function snapRun() { runSnap = { ids: state.timers.map(t => t.id), secs: Object.fromEntries(state.timers.map(t => [t.id, t.secs])) }; }
+function reconcileRun() {
+const n = state.timers.length;
+if (!n) { resetToIdle(); return; }
+const snap = runSnap || { ids: [], secs: {} };
+const curId = snap.ids[run.idx];
+const now = Date.now();
+const remainOf = () => run.paused ? run.remainMs : Math.max(0, run.endAt - now);
+const setRemain = ms => { if (run.paused) run.remainMs = ms; else run.endAt = now + ms; };
+let ni = curId ? state.timers.findIndex(t => t.id === curId) : -1;
+if (ni >= 0) {
+run.idx = ni;
+const oldMs = (snap.secs[curId] || state.timers[ni].secs) * 1000, newMs = state.timers[ni].secs * 1000;
+if (oldMs !== newMs) {
+const left = newMs - (oldMs - remainOf());
+if (left > 0) setRemain(left);
+else setRemain(0); // もう過ぎた → 次の tick で次のタイマーへ（音あり）
+run.lastSec = -1;
+if (opts.remind && left > opts.remind * 60000) run.reminded = false;
+}
+} else {
+// いまのタイマーが消えた → 同じ位置に来たタイマー（なければ次の周）を最初から
+if (window.__ttOnSeg) { try { window.__ttOnSeg(); } catch (e) {} }
+let i = Math.min(run.idx, n);
+if (i >= n) {
+if (state.repeat === Infinity || run.cycle < state.repeat) { run.cycle++; i = 0; }
+else { snapRun(); finish(); return; }
+}
+run.idx = i; run.lastSec = -1; run.reminded = false;
+setRemain(state.timers[i].secs * 1000);
+}
+if (state.repeat !== Infinity && run.cycle > state.repeat) run.cycle = state.repeat;
+snapRun();
+renderStations();
+updateHighlight();
+updateRunView();
+updateEta();
+if (!run.paused) scheduleAhead(1.5);
+saveRun();
+}
 function configChanged() {
-if (run.active) resetToIdle();
+if (run.active && !run.finished) reconcileRun();
+else if (run.active) resetToIdle();
 else updateIdleView();
 }
 function pauseToggle() {
@@ -1317,6 +1363,7 @@ const n = state.timers.length;
 if (!(s.idx >= 0 && s.idx < n) || !(s.cycle >= 1) || Date.now() - s.at > 12 * 3600e3) { try { sessionStorage.removeItem(RUN_KEY); } catch (e) {} return; }
 run = { active: true, paused: !!s.paused, finished: false, idx: s.idx, cycle: s.cycle,
 endAt: s.paused ? 0 : s.endAt, remainMs: s.paused ? Math.max(0, s.remainMs) : 0, lastSec: -1, reminded: !!s.reminded };
+snapRun();
 pauseBtn.innerHTML = run.paused ? ICONS.play : ICONS.pause;
 renderStations(); updateHighlight();
 // 閉じていた間に過ぎた区切りは音を鳴らさずに進める
