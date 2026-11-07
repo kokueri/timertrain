@@ -944,7 +944,7 @@ box-shadow: var(--shadow); text-decoration: none; font-family: var(--font-round)
 .tt-promo-who { display: flex; flex-direction: column; line-height: 1.25; }
 .tt-promo-k1 { font-size: 19px; font-weight: 700; white-space: nowrap; }
 .tt-promo-k1n { font-size: 27px; letter-spacing: -.01em; }
-.tt-promo-k2 { font-size: 12px; font-weight: 700; margin-top: 2px; }
+.tt-promo-k2 { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
 .tt-promo-price { display: flex; align-items: baseline; gap: 2px; white-space: nowrap; font-weight: 700; line-height: 1; }
 .tt-promo-pre { font-size: 17px; margin-right: 6px; }
 .tt-promo-u { font-size: 13px; }

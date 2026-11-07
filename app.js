@@ -1918,7 +1918,7 @@ if (!about || !document.getElementById('setup')) return;
 var box = el('aside', 'tt-promo'); box.id = 'tt-promo'; box.setAttribute('aria-label', T.label);
 var a = el('a', 'tt-promo-in'); a.href = PRICING;
 var head = el('span', 'tt-promo-head');
-var who = el('span', 'tt-promo-who'); var k1 = el('span', 'tt-promo-k1'); k1.appendChild(document.createTextNode(T.k1[0])); k1.appendChild(el('span', 'tt-promo-k1n', T.k1[1])); if (T.k1[2]) k1.appendChild(document.createTextNode(T.k1[2])); who.appendChild(k1); who.appendChild(el('span', 'tt-promo-k2', T.k2));
+var who = el('span', 'tt-promo-who'); var k1 = el('span', 'tt-promo-k1'); k1.appendChild(document.createTextNode(T.k1[0])); k1.appendChild(el('span', 'tt-promo-k1n', T.k1[1])); if (T.k1[2]) k1.appendChild(document.createTextNode(T.k1[2])); who.appendChild(el('span', 'tt-promo-k2', T.k2)); who.appendChild(k1);
 var pr = el('span', 'tt-promo-price'); pr.appendChild(el('span', 'tt-promo-pre', T.pre));
 pr.appendChild(el('span', 'tt-promo-u', T.price[0])); pr.appendChild(el('span', 'tt-promo-num', T.price[1])); pr.appendChild(el('span', 'tt-promo-u', T.price[2]));
 head.appendChild(who); head.appendChild(pr);
