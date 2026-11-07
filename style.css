@@ -931,48 +931,63 @@ background: var(--bg); color: var(--text); border-radius: 20px; box-shadow: 0 10
 body.focus-mode .tt-internal-badge { display: none; }
 
 /* ================= 自社の案内（プレミアム）：常設バナー・ヘッダー・終了時（2026-11-05） ================= */
-.tt-promo { margin-top: 44px; }
+.tt-promo { margin-top: 44px; --pm-gold: #8A5A00; --pm-band: #FFE7C2; }
 .tt-promo + .about { margin-top: 40px; }
+/* 2026-11-07 Canva のデザインをもとに作り直し: 左に創設メンバー価格、斜めの帯に特典4つ、右に黒いボタン */
 .tt-promo-in {
-display: flex; flex-direction: column; gap: 16px;
+display: flex; flex-direction: column; overflow: hidden;
 background: var(--card); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius);
-box-shadow: var(--shadow); padding: 18px; text-decoration: none; font-family: var(--font-round);
+box-shadow: var(--shadow); text-decoration: none; font-family: var(--font-round);
 }
 .tt-promo-in:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
-.tt-promo-head { display: flex; flex-direction: column; gap: 2px; }
-.tt-promo-kicker { font-size: 12px; color: var(--text2); }
-.tt-promo-title { font-size: 17px; font-weight: 700; line-height: 1.35; }
-.tt-promo-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; font-size: 13px; line-height: 1.4; }
+.tt-promo-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 16px 18px 14px; color: var(--pm-gold); }
+.tt-promo-who { display: flex; flex-direction: column; line-height: 1.25; }
+.tt-promo-k1 { font-size: 19px; font-weight: 700; }
+.tt-promo-k2 { font-size: 12px; font-weight: 700; margin-top: 2px; }
+.tt-promo-price { display: flex; align-items: baseline; gap: 2px; white-space: nowrap; font-weight: 700; line-height: 1; }
+.tt-promo-pre { font-size: 17px; margin-right: 6px; }
+.tt-promo-u { font-size: 13px; }
+.tt-promo-num { font-size: 32px; letter-spacing: -.01em; }
+.tt-promo-band {
+display: flex; flex-direction: column; gap: 16px; background: var(--pm-band);
+clip-path: polygon(0 14px, 100% 0, 100% 100%, 0 100%); padding: 28px 18px 18px;
+}
+.tt-promo-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 12px; font-size: 13px; line-height: 1.4; color: #272727; }
 .tt-promo-item { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .tt-promo-ic { width: 22px; height: 22px; flex-shrink: 0; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .tt-promo-ln { display: block; }
 .tt-promo-tx { word-break: keep-all; overflow-wrap: anywhere; }
-.tt-promo-title, .tt-pc-t { word-break: auto-phrase; }
+.tt-pc-t { word-break: auto-phrase; }
 .tt-promo-cta {
-display: block; text-align: center; background: var(--accent); color: var(--accent-text);
-border-radius: 999px; padding: 12px 20px; font-size: 14px; font-weight: 700; min-height: 44px;
+display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+background: #272727; color: #fff; border-radius: 999px; padding: 10px 22px; min-height: 52px; text-align: center; line-height: 1.2;
 }
-.tt-promo-in:hover .tt-promo-cta { opacity: .88; }
-/* 創設メンバー価格（2026-11-07） */
-.tt-promo-kicker { color: #8A5A00; font-weight: 700; }
-.tt-promo-go { display: flex; flex-direction: column; gap: 6px; }
-.tt-promo-fm { text-align: center; font-size: 12px; color: var(--text2); }
-.acct-fm { margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: #FFF1D6; border: 1px solid #E8B44A; color: #5C4300; font-size: 13px; line-height: 1.6; }
-.price-box .p-fm { margin-top: 6px; font-weight: 700; color: #8A5A00; }
+.tt-promo-brand { font-size: 11px; opacity: .9; }
+.tt-promo-go { display: flex; align-items: baseline; justify-content: center; gap: 4px; white-space: nowrap; }
+.tt-promo-big { font-size: 17px; font-weight: 700; }
+.tt-promo-sm { font-size: 12px; }
+.tt-promo-in:hover .tt-promo-cta { background: #000; }
 @media (min-width: 900px) {
 .tt-promo { grid-area: promo; max-width: 760px; margin-top: 72px; }
 .tt-promo + .about { margin-top: 56px; }
 }
 @media (min-width: 1100px) {
 .tt-promo { max-width: none; }
-.tt-promo-in { flex-direction: row; align-items: center; gap: 24px; padding: 20px 28px; }
-.tt-promo-head { flex-shrink: 0; }
-.tt-promo-title { font-size: 18px; }
-.tt-promo-t2 { display: block; }
-.tt-promo-list { flex: 1; display: flex; justify-content: space-between; gap: 12px; font-size: 14px; white-space: nowrap; }
-.tt-promo-ic { width: 26px; height: 26px; }
-.tt-promo-go { flex-shrink: 0; }
+.tt-promo-in { flex-direction: row; align-items: stretch; min-height: 116px; }
+.tt-promo-head { flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; padding: 14px 8px 14px 28px; flex-shrink: 0; }
+.tt-promo-k1 { font-size: 20px; }
+.tt-promo-band { flex: 1; flex-direction: row; align-items: center; gap: 20px; clip-path: polygon(34px 0, 100% 0, 100% 100%, 0 100%); padding: 12px 12px 12px 58px; }
+.tt-promo-list { flex: 1; display: flex; justify-content: space-between; gap: 16px; font-size: 14px; white-space: nowrap; }
+.tt-promo-ic { width: 24px; height: 24px; }
+.tt-promo-cta { flex-shrink: 0; min-width: 168px; min-height: 92px; padding: 10px 24px; }
+.tt-promo-big { font-size: 19px; }
 }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tt-promo { --pm-gold: #F5D88A; --pm-band: #3A2E10; } :root:not([data-theme="light"]) .tt-promo-list { color: #F2F2F7; } :root:not([data-theme="light"]) .tt-promo-cta { background: #F5D88A; color: #1C1C1E; } }
+:root[data-theme="dark"] .tt-promo { --pm-gold: #F5D88A; --pm-band: #3A2E10; }
+:root[data-theme="dark"] .tt-promo-list { color: #F2F2F7; }
+:root[data-theme="dark"] .tt-promo-cta { background: #F5D88A; color: #1C1C1E; }
+.acct-fm { margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: #FFF1D6; border: 1px solid #E8B44A; color: #5C4300; font-size: 13px; line-height: 1.6; }
+.price-box .p-fm { margin-top: 6px; font-weight: 700; color: #8A5A00; }
 body.focus-mode .tt-promo { display: none; }
 
 #tt-prem-link {
@@ -985,8 +1000,8 @@ padding: 7px 12px; font-size: 13px; font-weight: 700; line-height: 1; font-famil
 @media (max-width: 480px) { .tt-pl-full { display: none; } .tt-pl-short { display: inline; } #tt-prem-link { padding: 8px 10px; } }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #tt-prem-link { background: #3A2E10; color: #F5D88A; } }
 :root[data-theme="dark"] #tt-prem-link { background: #3A2E10; color: #F5D88A; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tt-promo-kicker, :root:not([data-theme="light"]) .price-box .p-fm { color: #F5D88A; } :root:not([data-theme="light"]) .acct-fm { background: #3A2E10; color: #F5D88A; border-color: #8A6A20; } }
-:root[data-theme="dark"] .tt-promo-kicker, :root[data-theme="dark"] .price-box .p-fm { color: #F5D88A; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .price-box .p-fm { color: #F5D88A; } :root:not([data-theme="light"]) .acct-fm { background: #3A2E10; color: #F5D88A; border-color: #8A6A20; } }
+:root[data-theme="dark"] .price-box .p-fm { color: #F5D88A; }
 :root[data-theme="dark"] .acct-fm { background: #3A2E10; color: #F5D88A; border-color: #8A6A20; }
 
 .tt-promo-card {
