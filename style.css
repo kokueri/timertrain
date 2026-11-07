@@ -953,6 +953,12 @@ display: block; text-align: center; background: var(--accent); color: var(--acce
 border-radius: 999px; padding: 12px 20px; font-size: 14px; font-weight: 700; min-height: 44px;
 }
 .tt-promo-in:hover .tt-promo-cta { opacity: .88; }
+/* 創設メンバー価格（2026-11-07） */
+.tt-promo-kicker { color: #8A5A00; font-weight: 700; }
+.tt-promo-go { display: flex; flex-direction: column; gap: 6px; }
+.tt-promo-fm { text-align: center; font-size: 12px; color: var(--text2); }
+.acct-fm { margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: #FFF1D6; border: 1px solid #E8B44A; color: #5C4300; font-size: 13px; line-height: 1.6; }
+.price-box .p-fm { margin-top: 6px; font-weight: 700; color: #8A5A00; }
 @media (min-width: 900px) {
 .tt-promo { grid-area: promo; max-width: 760px; margin-top: 72px; }
 .tt-promo + .about { margin-top: 56px; }
@@ -965,7 +971,7 @@ border-radius: 999px; padding: 12px 20px; font-size: 14px; font-weight: 700; min
 .tt-promo-t2 { display: block; }
 .tt-promo-list { flex: 1; display: flex; justify-content: space-between; gap: 12px; font-size: 14px; white-space: nowrap; }
 .tt-promo-ic { width: 26px; height: 26px; }
-.tt-promo-cta { flex-shrink: 0; }
+.tt-promo-go { flex-shrink: 0; }
 }
 body.focus-mode .tt-promo { display: none; }
 
@@ -979,6 +985,9 @@ padding: 7px 12px; font-size: 13px; font-weight: 700; line-height: 1; font-famil
 @media (max-width: 480px) { .tt-pl-full { display: none; } .tt-pl-short { display: inline; } #tt-prem-link { padding: 8px 10px; } }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #tt-prem-link { background: #3A2E10; color: #F5D88A; } }
 :root[data-theme="dark"] #tt-prem-link { background: #3A2E10; color: #F5D88A; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tt-promo-kicker, :root:not([data-theme="light"]) .price-box .p-fm { color: #F5D88A; } :root:not([data-theme="light"]) .acct-fm { background: #3A2E10; color: #F5D88A; border-color: #8A6A20; } }
+:root[data-theme="dark"] .tt-promo-kicker, :root[data-theme="dark"] .price-box .p-fm { color: #F5D88A; }
+:root[data-theme="dark"] .acct-fm { background: #3A2E10; color: #F5D88A; border-color: #8A6A20; }
 
 .tt-promo-card {
 position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom)); transform: translateX(-50%);

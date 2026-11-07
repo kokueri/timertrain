@@ -1850,7 +1850,7 @@ if (!sessionStorage.getItem('tt-visit')) { visits++; localStorage.setItem('tt-vi
 
 var T = {
 ja: {
-kicker: 'もっと使いたい人へ', title: 'TimerTrain', title2: 'プレミアム', label: 'プレミアムのご案内', cta: '7日間無料で試す', close: '閉じる',
+kicker: '先着100名・創設メンバー価格', title: 'TimerTrain', title2: 'プレミアム', label: 'プレミアムのご案内', cta: '7日間無料で試す', fm: '値上げ後も、月250円のまま', close: '閉じる',
 items: [['広告なし'], ['全期間の', '記録グラフ'], ['マイタイマー・', 'マイプロジェクト\u200b無制限'], ['記録を', 'CSVで保存']],
 head: 'プレミアム（広告なし）', headShort: '広告なし', crown: 'プレミアム',
 guest: [
@@ -1863,7 +1863,7 @@ free: [
 ['画面を、もっとすっきり。', 'プレミアムは広告なし。タイマーと記録だけに集中できます。初めての方は最初の7日間無料です。', '7日間無料で試す']]
 },
 en: {
-kicker: 'Want more?', title: 'TimerTrain', title2: 'Premium', label: 'About Premium', cta: 'Try 7 days free', close: 'Close',
+kicker: 'Founding member price · first 100', title: 'TimerTrain', title2: 'Premium', label: 'About Premium', cta: 'Try 7 days free', fm: 'Keep today’s price for good', close: 'Close',
 items: [['No ads'], ['Full history', '& charts'], ['Unlimited timers', '& projects'], ['Export', 'to CSV']],
 head: 'Premium (no ads)', headShort: 'No ads', crown: 'Premium',
 guest: [
@@ -1876,7 +1876,7 @@ free: [
 ['A cleaner screen.', 'Premium has no ads — just your timer and your records. 7 days free for new subscribers.', 'Try 7 days free']]
 },
 es: {
-kicker: '¿Quieres más?', title: 'TimerTrain', title2: 'Premium', label: 'Sobre Premium', cta: 'Prueba 7 días gratis', close: 'Cerrar',
+kicker: 'Precio fundador · primeros 100', title: 'TimerTrain', title2: 'Premium', label: 'Sobre Premium', cta: 'Prueba 7 días gratis', fm: 'Mantén el precio de hoy para siempre', close: 'Cerrar',
 items: [['Sin anuncios'], ['Historial', 'y gráficos'], ['Temporizadores y', 'proyectos ilimitados'], ['Exportar', 'a CSV']],
 head: 'Premium (sin anuncios)', headShort: 'Sin anuncios', crown: 'Premium',
 guest: [
@@ -1930,7 +1930,8 @@ var tx = el('span', 'tt-promo-tx');
 lines.forEach(function (ln) { tx.appendChild(el('span', 'tt-promo-ln', ln)); });
 it.appendChild(tx); list.appendChild(it);
 });
-a.appendChild(head); a.appendChild(list); a.appendChild(el('span', 'tt-promo-cta', T.cta));
+var go = el('span', 'tt-promo-go'); go.appendChild(el('span', 'tt-promo-cta', T.cta)); go.appendChild(el('span', 'tt-promo-fm', T.fm));
+a.appendChild(head); a.appendChild(list); a.appendChild(go);
 a.addEventListener('click', function () { ev('promo_click', { slot: 'banner', signed: isSigned() ? 1 : 0 }); });
 box.appendChild(a);
 about.parentNode.insertBefore(box, about);

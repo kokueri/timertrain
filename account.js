@@ -390,6 +390,8 @@
       ]; },
       lead: '初めての方は、最初の7日間は無料です。マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
       leadNoTrial: 'マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
+      fm: '先着100名の創設メンバー価格：今お申込みの方は、今後値上げしても、契約が続くかぎり月額250円・年額2,000円のままです。',
+      fmOn: '創設メンバー価格が適用されています。契約が続くかぎり、今の料金のままです。',
       monthly: '月額プランで始める', yearly: '年額プランで始める（おトク）',
       note: '金額はお住まいの地域の通貨で、次の画面（Stripe の決済画面）に表示されます。いつでも解約できます。', more: '料金と条件',
       test: '試し用の環境です。テスト用のカードでだけ購入できます。',
@@ -421,6 +423,8 @@
       ]; },
       lead: 'New subscribers get the first 7 days free. Unlimited saved timers and projects, full history and more.',
       leadNoTrial: 'Unlimited saved timers and projects, full history and more.',
+      fm: 'Founding member price for the first 100: subscribe now and keep today’s price (US$1.99/month · US$15.99/year, or the price shown in your currency) for as long as you stay subscribed, even if prices go up later.',
+      fmOn: 'Founding member price applied: your price stays the same for as long as you stay subscribed.',
       monthly: 'Start monthly', yearly: 'Start yearly (best value)',
       note: 'The price is shown in your local currency on the next screen (Stripe checkout). Cancel any time.', more: 'Pricing and terms',
       test: 'This is the test site. Only test cards can be used.',
@@ -452,6 +456,8 @@
       ]; },
       lead: 'Si es tu primera vez, los primeros 7 días son gratis. Temporizadores y proyectos sin límite, historial completo y más.',
       leadNoTrial: 'Temporizadores y proyectos sin límite, historial completo y más.',
+      fm: 'Precio fundador para los primeros 100: si te suscribes ahora, mantienes el precio de hoy (MXN 29/mes · MXN 229/año, o el precio en tu moneda) mientras sigas suscrito, aunque el precio suba después.',
+      fmOn: 'Tienes el precio fundador: tu precio no cambia mientras sigas suscrito.',
       monthly: 'Empezar plan mensual', yearly: 'Empezar plan anual (mejor precio)',
       note: 'El precio se muestra en tu moneda en la siguiente pantalla (pago con Stripe). Cancela cuando quieras.', more: 'Precios y condiciones',
       test: 'Este es el sitio de prueba. Solo se pueden usar tarjetas de prueba.',
@@ -536,6 +542,8 @@
         : ENT.status === 'trialing' ? (ENT.cancel_at_period_end ? B.trialEnd(d) : B.trial(d))
         : (ENT.cancel_at_period_end ? B.ending(d) : B.active(d));
       box.appendChild(el('p', { cls: 'acct-small', text: line }));
+      // 創設メンバー価格（今の価格 ID = premium_monthly / premium_yearly で申し込んだ人。値上げ時は新しい lookup_key にする）
+      if (B.fmOn && ENT.status !== 'past_due' && ['premium_monthly', 'premium_yearly'].indexOf(ENT.price_lookup_key) >= 0) box.appendChild(el('p', { cls: 'acct-fm', text: B.fmOn }));
       var mg = el('button', { type: 'button', cls: 'acct-btn', text: B.manage });
       mg.addEventListener('click', async function () {
         mg.disabled = true; err.hidden = true;
@@ -546,6 +554,7 @@
     } else {
       var hasTrial = !(ENT && ENT.trial_used);
       box.appendChild(el('p', { cls: 'acct-small', text: hasTrial ? B.lead : B.leadNoTrial }));
+      if (B.fm) box.appendChild(el('p', { cls: 'acct-fm', text: B.fm }));
       // 申込み前の確認（特商法の最終確認画面の表示事項。Stripe の決済画面には独自の文章を載せられないため、ここに出す）
       var terms = el('div', { cls: 'acct-terms', id: 'acct-terms' });
       terms.appendChild(el('p', { cls: 'acct-small' }, [el('strong', { text: B.termsHead })]));
