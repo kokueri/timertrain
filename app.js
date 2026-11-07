@@ -1850,7 +1850,7 @@ if (!sessionStorage.getItem('tt-visit')) { visits++; localStorage.setItem('tt-vi
 
 var T = {
 ja: {
-kicker: 'もっと使いたい人へ', title: 'TimerTrain', title2: 'プレミアム', label: 'プレミアムのご案内', cta: '7日間無料で試す', close: '閉じる',
+label: 'プレミアムのご案内', cta: '7日間無料で試す', k1: ['先着', '100', '名'], k2: '創設メンバー価格', pre: 'ずっと', price: ['月', '250', '円'], brand: 'TimerTrain プレミアム', go: ['', '7日間無料', 'で試す'], close: '閉じる',
 items: [['広告なし'], ['全期間の', '記録グラフ'], ['マイタイマー・', 'マイプロジェクト\u200b無制限'], ['記録を', 'CSVで保存']],
 head: 'プレミアム（広告なし）', headShort: '広告なし', crown: 'プレミアム',
 guest: [
@@ -1863,7 +1863,7 @@ free: [
 ['画面を、もっとすっきり。', 'プレミアムは広告なし。タイマーと記録だけに集中できます。初めての方は最初の7日間無料です。', '7日間無料で試す']]
 },
 en: {
-kicker: 'Want more?', title: 'TimerTrain', title2: 'Premium', label: 'About Premium', cta: 'Try 7 days free', close: 'Close',
+label: 'About Premium', cta: 'Try 7 days free', k1: ['First ', '100', ''], k2: 'Founding member price', pre: 'For good:', price: ['US$', '1.99', '/mo'], brand: 'TimerTrain Premium', go: ['Try', '7 days free', ''], close: 'Close',
 items: [['No ads'], ['Full history', '& charts'], ['Unlimited timers', '& projects'], ['Export', 'to CSV']],
 head: 'Premium (no ads)', headShort: 'No ads', crown: 'Premium',
 guest: [
@@ -1876,7 +1876,7 @@ free: [
 ['A cleaner screen.', 'Premium has no ads — just your timer and your records. 7 days free for new subscribers.', 'Try 7 days free']]
 },
 es: {
-kicker: '¿Quieres más?', title: 'TimerTrain', title2: 'Premium', label: 'Sobre Premium', cta: 'Prueba 7 días gratis', close: 'Cerrar',
+label: 'Sobre Premium', cta: 'Prueba 7 días gratis', k1: ['Primeros ', '100', ''], k2: 'Precio fundador', pre: 'Siempre:', price: ['MXN ', '29', '/mes'], brand: 'TimerTrain Premium', go: ['Prueba', '7 días gratis', ''], close: 'Cerrar',
 items: [['Sin anuncios'], ['Historial', 'y gráficos'], ['Temporizadores y', 'proyectos ilimitados'], ['Exportar', 'a CSV']],
 head: 'Premium (sin anuncios)', headShort: 'Sin anuncios', crown: 'Premium',
 guest: [
@@ -1904,7 +1904,7 @@ return s;
 }
 var CROWN = [['path', { d: 'M3 8l4.5 4 4.5-7 4.5 7L21 8l-2 11H5z' }]];
 var ICONS = [
-{ c: '#E07A2E', d: [['circle', { cx: 12, cy: 12, r: 9 }], ['path', { d: 'M5.6 5.6l12.8 12.8' }]] },
+{ c: '#7C5CD6', d: [['circle', { cx: 12, cy: 12, r: 9 }], ['path', { d: 'M5.6 5.6l12.8 12.8' }]] },
 { c: '#4A8FE7', d: [['path', { d: 'M5 20V11M12 20V5M19 20v-6' }]] },
 { c: '#FF6B6B', d: [['path', { d: 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' }]] },
 { c: '#2BA89A', d: [['path', { d: 'M12 4v11M7 10l5 5 5-5M5 20h14' }]] }
@@ -1918,10 +1918,11 @@ if (!about || !document.getElementById('setup')) return;
 var box = el('aside', 'tt-promo'); box.id = 'tt-promo'; box.setAttribute('aria-label', T.label);
 var a = el('a', 'tt-promo-in'); a.href = PRICING;
 var head = el('span', 'tt-promo-head');
-head.appendChild(el('span', 'tt-promo-kicker', T.kicker));
-var title = el('span', 'tt-promo-title');
-title.appendChild(el('span', null, T.title)); title.appendChild(document.createTextNode(' ')); title.appendChild(el('span', 'tt-promo-t2', T.title2));
-head.appendChild(title);
+var who = el('span', 'tt-promo-who'); var k1 = el('span', 'tt-promo-k1'); k1.appendChild(document.createTextNode(T.k1[0])); k1.appendChild(el('span', 'tt-promo-k1n', T.k1[1])); if (T.k1[2]) k1.appendChild(document.createTextNode(T.k1[2])); who.appendChild(el('span', 'tt-promo-k2', T.k2)); who.appendChild(k1);
+var pr = el('span', 'tt-promo-price'); pr.appendChild(el('span', 'tt-promo-pre', T.pre));
+pr.appendChild(el('span', 'tt-promo-u', T.price[0])); pr.appendChild(el('span', 'tt-promo-num', T.price[1])); pr.appendChild(el('span', 'tt-promo-u', T.price[2]));
+head.appendChild(who); head.appendChild(pr);
+var band = el('span', 'tt-promo-band');
 var list = el('span', 'tt-promo-list');
 T.items.forEach(function (lines, i) {
 var it = el('span', 'tt-promo-item');
@@ -1930,7 +1931,14 @@ var tx = el('span', 'tt-promo-tx');
 lines.forEach(function (ln) { tx.appendChild(el('span', 'tt-promo-ln', ln)); });
 it.appendChild(tx); list.appendChild(it);
 });
-a.appendChild(head); a.appendChild(list); a.appendChild(el('span', 'tt-promo-cta', T.cta));
+var cta = el('span', 'tt-promo-cta'); cta.appendChild(el('span', 'tt-promo-brand', T.brand));
+var go = el('span', 'tt-promo-go');
+if (T.go[0]) go.appendChild(el('span', 'tt-promo-sm', T.go[0]));
+go.appendChild(el('span', 'tt-promo-big', T.go[1]));
+if (T.go[2]) go.appendChild(el('span', 'tt-promo-sm', T.go[2]));
+cta.appendChild(go);
+band.appendChild(list); band.appendChild(cta);
+a.appendChild(head); a.appendChild(band);
 a.addEventListener('click', function () { ev('promo_click', { slot: 'banner', signed: isSigned() ? 1 : 0 }); });
 box.appendChild(a);
 about.parentNode.insertBefore(box, about);
