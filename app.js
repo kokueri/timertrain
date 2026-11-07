@@ -1850,9 +1850,9 @@ if (!sessionStorage.getItem('tt-visit')) { visits++; localStorage.setItem('tt-vi
 
 var T = {
 ja: {
-label: 'プレミアムのご案内', cta: '7日間無料で試す', k1: ['先着', '100', '名'], k2: '創設メンバー価格', pre: 'ずっと', price: ['月', '250', '円'], brand: 'TimerTrain プレミアム', go: ['', '7日間無料', 'で試す'], close: '閉じる',
+label: 'プレミアムのご案内', cta: '7日間無料で試す', k1: ['先着', '100', '名'], k2: '創設メンバー価格', pre: 'ずっと', price: ['月', '250', '円'], brand: 'TimerTrain プレミアム', go: ['', '7日間無料', 'で試す'], fmCard: ['今なら、ずっとこの価格。', '先着100名は、今後値上げしても契約が続くかぎり月250円（年2,000円）のまま。最初の7日間は無料です。', '7日間無料で試す'], close: '閉じる',
 items: [['広告なし'], ['全期間の', '記録グラフ'], ['マイタイマー・', 'マイプロジェクト\u200b無制限'], ['記録を', 'CSVで保存']],
-head: 'プレミアム（広告なし）', headShort: '広告なし', crown: 'プレミアム',
+head: '広告なし・先着100名までずっと月250円', headShort: 'ずっと月250円', headAria: 'プレミアム：広告なし。先着100名まで、ずっと月250円', crown: 'プレミアム',
 guest: [
 ['このタイマー、保存しておきませんか？', '無料ログインで、次からワンタップで呼び出せます。', '無料でログインして保存'],
 ['スマホでもPCでも、同じタイマーを。', '無料ログインで、作ったタイマーと記録が端末をまたいで同期されます。', '無料でログイン'],
@@ -1863,9 +1863,9 @@ free: [
 ['画面を、もっとすっきり。', 'プレミアムは広告なし。タイマーと記録だけに集中できます。初めての方は最初の7日間無料です。', '7日間無料で試す']]
 },
 en: {
-label: 'About Premium', cta: 'Try 7 days free', k1: ['First ', '100', ''], k2: 'Founding member price', pre: 'For good:', price: ['US$', '1.99', '/mo'], brand: 'TimerTrain Premium', go: ['Try', '7 days free', ''], close: 'Close',
+label: 'About Premium', cta: 'Try 7 days free', k1: ['First ', '100', ''], k2: 'Founding member price', pre: 'For good:', price: ['US$', '1.99', '/mo'], brand: 'TimerTrain Premium', go: ['Try', '7 days free', ''], fmCard: ['Lock in today’s price.', 'The first 100 subscribers keep US$1.99/month (US$15.99/year) for as long as they stay subscribed, even if prices go up. The first 7 days are free.', 'Try 7 days free'], close: 'Close',
 items: [['No ads'], ['Full history', '& charts'], ['Unlimited timers', '& projects'], ['Export', 'to CSV']],
-head: 'Premium (no ads)', headShort: 'No ads', crown: 'Premium',
+head: 'No ads · first 100 keep US$1.99/mo', headShort: 'US$1.99/mo for good', headAria: 'Premium: no ads. The first 100 subscribers keep US$1.99/month for good', crown: 'Premium',
 guest: [
 ['Save this timer?', 'Sign in free and bring it back with one tap next time.', 'Sign in free to save'],
 ['Same timers on phone and computer.', 'Sign in free to sync your timers and history across devices.', 'Sign in free'],
@@ -1876,9 +1876,9 @@ free: [
 ['A cleaner screen.', 'Premium has no ads — just your timer and your records. 7 days free for new subscribers.', 'Try 7 days free']]
 },
 es: {
-label: 'Sobre Premium', cta: 'Prueba 7 días gratis', k1: ['Primeros ', '100', ''], k2: 'Precio fundador', pre: 'Siempre:', price: ['MXN ', '29', '/mes'], brand: 'TimerTrain Premium', go: ['Prueba', '7 días gratis', ''], close: 'Cerrar',
+label: 'Sobre Premium', cta: 'Prueba 7 días gratis', k1: ['Primeros ', '100', ''], k2: 'Precio fundador', pre: 'Siempre:', price: ['MXN ', '29', '/mes'], brand: 'TimerTrain Premium', go: ['Prueba', '7 días gratis', ''], fmCard: ['Asegura el precio de hoy.', 'Los primeros 100 suscriptores mantienen MXN 29 al mes (MXN 229 al año) mientras sigan suscritos, aunque el precio suba. Los primeros 7 días son gratis.', 'Prueba 7 días gratis'], close: 'Cerrar',
 items: [['Sin anuncios'], ['Historial', 'y gráficos'], ['Temporizadores y', 'proyectos ilimitados'], ['Exportar', 'a CSV']],
-head: 'Premium (sin anuncios)', headShort: 'Sin anuncios', crown: 'Premium',
+head: 'Sin anuncios · primeros 100: MXN 29/mes', headShort: 'MXN 29/mes siempre', headAria: 'Premium: sin anuncios. Los primeros 100 mantienen MXN 29 al mes para siempre', crown: 'Premium',
 guest: [
 ['¿Guardar este temporizador?', 'Inicia sesión gratis y recupéralo con un toque la próxima vez.', 'Iniciar sesión y guardar'],
 ['Los mismos temporizadores en el móvil y el ordenador.', 'Inicia sesión gratis para sincronizar tus temporizadores y tu historial.', 'Iniciar sesión gratis'],
@@ -1957,7 +1957,7 @@ acct.insertBefore(c, acct.firstChild);
 acct.setAttribute('aria-label', acct.getAttribute('aria-label') + ' · ' + T.crown);
 return;
 }
-var b = el('a', 'tt-prem-link'); b.id = 'tt-prem-link'; b.href = PRICING; b.setAttribute('aria-label', T.head);
+var b = el('a', 'tt-prem-link'); b.id = 'tt-prem-link'; b.href = PRICING; b.setAttribute('aria-label', T.headAria);
 b.appendChild(svg(CROWN, { cls: 'tt-crown' }));
 b.appendChild(el('span', 'tt-pl-full', T.head));
 b.appendChild(el('span', 'tt-pl-short', T.headShort));
@@ -1984,7 +1984,9 @@ if (sessionStorage.getItem('tt-promo-shown')) return;
 var x = Number(localStorage.getItem('tt-promo-x')) || 0;
 if (x && Date.now() - x < HIDE_MS) return;
 } catch (e) {}
-var set = signed ? T.free : T.guest;
+// 最後の1つは創設メンバー価格（2026-11-07 追加。G4 / F4、リンク先は料金ページ）
+var set = (signed ? T.free : T.guest).concat([T.fmCard]);
+var FM = set.length - 1;
 var i = pick(set.length, signed ? 'tt-promo-lastf' : 'tt-promo-lastg');
 var v = (signed ? 'F' : 'G') + (i + 1);
 var c = el('div', 'tt-promo-card'); c.id = 'tt-promo-card'; c.setAttribute('role', 'status');
@@ -1996,9 +1998,26 @@ var bars = el('span', 'tt-pc-bars'); bars.setAttribute('aria-hidden', 'true');
 [100, 60, 80, 45, 70, 55, 90].forEach(function (h, k) { var s = el('span', k < 3 ? 'old' : (k === 6 ? 'now' : '')); s.style.height = h + '%'; bars.appendChild(s); });
 c.appendChild(bars);
 }
+if (i === FM) {
+var fm = el('span', 'tt-pc-fm');
+var fw = el('span', 'tt-pc-fm-who'); fw.appendChild(el('span', 'tt-pc-fm-k2', T.k2));
+var fk = el('span', 'tt-pc-fm-k1'); fk.appendChild(document.createTextNode(T.k1[0])); fk.appendChild(el('span', 'tt-pc-fm-n1', T.k1[1])); if (T.k1[2]) fk.appendChild(document.createTextNode(T.k1[2])); fw.appendChild(fk);
+var fp = el('span', 'tt-pc-fm-price'); fp.appendChild(el('span', 'tt-pc-fm-u', T.pre + ' ' + T.price[0])); fp.appendChild(el('span', 'tt-pc-fm-n', T.price[1])); fp.appendChild(el('span', 'tt-pc-fm-u', T.price[2]));
+fm.appendChild(fw); fm.appendChild(fp); c.appendChild(fm);
+// 白い部分は特典4つ（アイコン＋短い説明を2×2。スマホのバナーと同じ）
+var fl = el('span', 'tt-pc-list');
+T.items.forEach(function (lines, k) {
+var it = el('span', 'tt-pc-item');
+var ic = svg(ICONS[k].d, { cls: 'tt-promo-ic' }); ic.style.stroke = ICONS[k].c; it.appendChild(ic);
+var tx = el('span', 'tt-promo-tx'); lines.forEach(function (ln) { tx.appendChild(el('span', 'tt-promo-ln', ln)); });
+it.appendChild(tx); fl.appendChild(it);
+});
+c.appendChild(fl);
+} else {
 c.appendChild(el('p', 'tt-pc-t', set[i][0]));
 c.appendChild(el('p', 'tt-pc-b', set[i][1]));
-var go = el('a', 'tt-pc-go', set[i][2]); go.href = signed ? PRICING : ACCT;
+}
+var go = el('a', i === FM ? 'tt-pc-go tt-pc-go-fm' : 'tt-pc-go', set[i][2]); go.href = (signed || i === FM) ? PRICING : ACCT;
 go.addEventListener('click', function () { ev('promo_click', { slot: 'finish', variant: v }); });
 c.appendChild(go);
 document.body.appendChild(c);
