@@ -931,23 +931,24 @@ background: var(--bg); color: var(--text); border-radius: 20px; box-shadow: 0 10
 body.focus-mode .tt-internal-badge { display: none; }
 
 /* ================= 自社の案内（プレミアム）：常設バナー・ヘッダー・終了時（2026-11-05） ================= */
-.tt-promo { margin-top: 44px; --pm-gold: #fff; --pm-head: #D04A0A; --pm-band: #FFE7C2; }
+.tt-promo { margin-top: 44px; --pm-gold: #fff; --pm-head: #1C1C1E; --pm-band: #FFE7C2; --pm-btn: #D04A0A; }
 .tt-promo + .about { margin-top: 40px; }
-/* 2026-11-07 Canva のデザインをもとに作り直し。ライトは左がオレンジ #D04A0A＋白文字（白との差 4.5:1）、ボタンは黒。スマホは帯を斜めにしない: 左に創設メンバー価格、斜めの帯に特典4つ、右に黒いボタン */
+/* 2026-11-07 Canva のデザインをもとに作り直し。左は黒地に白文字（100と250を大きく、250が最大）、ボタンはオレンジ #D04A0A＋白文字（白との差 4.5:1）。スマホは帯を斜めにしない: 左に創設メンバー価格、斜めの帯に特典4つ、右に黒いボタン */
 .tt-promo-in {
 display: flex; flex-direction: column; overflow: hidden;
 background: var(--pm-head); color: var(--text); border: 1px solid var(--line); border-radius: var(--radius);
 box-shadow: var(--shadow); text-decoration: none; font-family: var(--font-round);
 }
 .tt-promo-in:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
-.tt-promo-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 16px 18px 14px; color: var(--pm-gold); }
+.tt-promo-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 12px; padding: 16px 18px 14px; color: var(--pm-gold); }
 .tt-promo-who { display: flex; flex-direction: column; line-height: 1.25; }
-.tt-promo-k1 { font-size: 19px; font-weight: 700; }
+.tt-promo-k1 { font-size: 19px; font-weight: 700; white-space: nowrap; }
+.tt-promo-k1n { font-size: 27px; letter-spacing: -.01em; }
 .tt-promo-k2 { font-size: 12px; font-weight: 700; margin-top: 2px; }
 .tt-promo-price { display: flex; align-items: baseline; gap: 2px; white-space: nowrap; font-weight: 700; line-height: 1; }
 .tt-promo-pre { font-size: 17px; margin-right: 6px; }
 .tt-promo-u { font-size: 13px; }
-.tt-promo-num { font-size: 32px; letter-spacing: -.01em; }
+.tt-promo-num { font-size: 40px; letter-spacing: -.01em; }
 .tt-promo-band {
 display: flex; flex-direction: column; gap: 16px; background: var(--pm-band);
 padding: 18px;
@@ -960,13 +961,13 @@ padding: 18px;
 .tt-pc-t { word-break: auto-phrase; }
 .tt-promo-cta {
 display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-background: #272727; color: #fff; border-radius: 999px; padding: 10px 22px; min-height: 52px; text-align: center; line-height: 1.2;
+background: var(--pm-btn); color: #fff; border-radius: 999px; padding: 10px 22px; min-height: 52px; text-align: center; line-height: 1.2;
 }
 .tt-promo-brand { font-size: 11px; opacity: .9; }
 .tt-promo-go { display: flex; align-items: baseline; justify-content: center; gap: 4px; white-space: nowrap; }
 .tt-promo-big { font-size: 17px; font-weight: 700; }
 .tt-promo-sm { font-size: 12px; }
-.tt-promo-in:hover .tt-promo-cta { background: #000; }
+.tt-promo-in:hover .tt-promo-cta { background: #B53F08; }
 @media (min-width: 900px) {
 .tt-promo { grid-area: promo; max-width: 760px; margin-top: 72px; }
 .tt-promo + .about { margin-top: 56px; }
@@ -976,16 +977,17 @@ background: #272727; color: #fff; border-radius: 999px; padding: 10px 22px; min-
 .tt-promo-in { flex-direction: row; align-items: stretch; min-height: 116px; }
 .tt-promo-head { flex-direction: column; align-items: flex-start; justify-content: center; gap: 10px; padding: 14px 8px 14px 28px; flex-shrink: 0; }
 .tt-promo-k1 { font-size: 20px; }
+.tt-promo-k1n { font-size: 30px; }
+.tt-promo-num { font-size: 46px; }
 .tt-promo-band { flex: 1; flex-direction: row; align-items: center; gap: 20px; clip-path: polygon(34px 0, 100% 0, 100% 100%, 0 100%); padding: 12px 12px 12px 58px; }
 .tt-promo-list { flex: 1; display: flex; justify-content: space-between; gap: 16px; font-size: 14px; white-space: nowrap; }
 .tt-promo-ic { width: 24px; height: 24px; }
 .tt-promo-cta { flex-shrink: 0; min-width: 168px; min-height: 92px; padding: 10px 24px; }
 .tt-promo-big { font-size: 19px; }
 }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tt-promo { --pm-gold: #F5D88A; --pm-head: var(--card); --pm-band: #3A2E10; } :root:not([data-theme="light"]) .tt-promo-list { color: #F2F2F7; } :root:not([data-theme="light"]) .tt-promo-cta { background: #F5D88A; color: #1C1C1E; } }
-:root[data-theme="dark"] .tt-promo { --pm-gold: #F5D88A; --pm-head: var(--card); --pm-band: #3A2E10; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tt-promo { --pm-head: #000; --pm-band: #3A2E10; } :root:not([data-theme="light"]) .tt-promo-list { color: #F2F2F7; } }
+:root[data-theme="dark"] .tt-promo { --pm-head: #000; --pm-band: #3A2E10; }
 :root[data-theme="dark"] .tt-promo-list { color: #F2F2F7; }
-:root[data-theme="dark"] .tt-promo-cta { background: #F5D88A; color: #1C1C1E; }
 .acct-fm { margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: #FFF1D6; border: 1px solid #E8B44A; color: #5C4300; font-size: 13px; line-height: 1.6; }
 .price-box .p-fm { margin-top: 6px; font-weight: 700; color: #8A5A00; }
 body.focus-mode .tt-promo { display: none; }

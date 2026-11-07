@@ -1850,7 +1850,7 @@ if (!sessionStorage.getItem('tt-visit')) { visits++; localStorage.setItem('tt-vi
 
 var T = {
 ja: {
-label: 'プレミアムのご案内', cta: '7日間無料で試す', k1: '先着100名', k2: '創設メンバー価格', pre: 'ずっと', price: ['月', '250', '円'], brand: 'TimerTrain プレミアム', go: ['', '7日間無料', 'で試す'], close: '閉じる',
+label: 'プレミアムのご案内', cta: '7日間無料で試す', k1: ['先着', '100', '名'], k2: '創設メンバー価格', pre: 'ずっと', price: ['月', '250', '円'], brand: 'TimerTrain プレミアム', go: ['', '7日間無料', 'で試す'], close: '閉じる',
 items: [['広告なし'], ['全期間の', '記録グラフ'], ['マイタイマー・', 'マイプロジェクト\u200b無制限'], ['記録を', 'CSVで保存']],
 head: 'プレミアム（広告なし）', headShort: '広告なし', crown: 'プレミアム',
 guest: [
@@ -1863,7 +1863,7 @@ free: [
 ['画面を、もっとすっきり。', 'プレミアムは広告なし。タイマーと記録だけに集中できます。初めての方は最初の7日間無料です。', '7日間無料で試す']]
 },
 en: {
-label: 'About Premium', cta: 'Try 7 days free', k1: 'First 100', k2: 'Founding member price', pre: 'For good:', price: ['US$', '1.99', '/mo'], brand: 'TimerTrain Premium', go: ['Try', '7 days free', ''], close: 'Close',
+label: 'About Premium', cta: 'Try 7 days free', k1: ['First ', '100', ''], k2: 'Founding member price', pre: 'For good:', price: ['US$', '1.99', '/mo'], brand: 'TimerTrain Premium', go: ['Try', '7 days free', ''], close: 'Close',
 items: [['No ads'], ['Full history', '& charts'], ['Unlimited timers', '& projects'], ['Export', 'to CSV']],
 head: 'Premium (no ads)', headShort: 'No ads', crown: 'Premium',
 guest: [
@@ -1876,7 +1876,7 @@ free: [
 ['A cleaner screen.', 'Premium has no ads — just your timer and your records. 7 days free for new subscribers.', 'Try 7 days free']]
 },
 es: {
-label: 'Sobre Premium', cta: 'Prueba 7 días gratis', k1: 'Primeros 100', k2: 'Precio fundador', pre: 'Siempre:', price: ['MXN ', '29', '/mes'], brand: 'TimerTrain Premium', go: ['Prueba', '7 días gratis', ''], close: 'Cerrar',
+label: 'Sobre Premium', cta: 'Prueba 7 días gratis', k1: ['Primeros ', '100', ''], k2: 'Precio fundador', pre: 'Siempre:', price: ['MXN ', '29', '/mes'], brand: 'TimerTrain Premium', go: ['Prueba', '7 días gratis', ''], close: 'Cerrar',
 items: [['Sin anuncios'], ['Historial', 'y gráficos'], ['Temporizadores y', 'proyectos ilimitados'], ['Exportar', 'a CSV']],
 head: 'Premium (sin anuncios)', headShort: 'Sin anuncios', crown: 'Premium',
 guest: [
@@ -1918,7 +1918,7 @@ if (!about || !document.getElementById('setup')) return;
 var box = el('aside', 'tt-promo'); box.id = 'tt-promo'; box.setAttribute('aria-label', T.label);
 var a = el('a', 'tt-promo-in'); a.href = PRICING;
 var head = el('span', 'tt-promo-head');
-var who = el('span', 'tt-promo-who'); who.appendChild(el('span', 'tt-promo-k1', T.k1)); who.appendChild(el('span', 'tt-promo-k2', T.k2));
+var who = el('span', 'tt-promo-who'); var k1 = el('span', 'tt-promo-k1'); k1.appendChild(document.createTextNode(T.k1[0])); k1.appendChild(el('span', 'tt-promo-k1n', T.k1[1])); if (T.k1[2]) k1.appendChild(document.createTextNode(T.k1[2])); who.appendChild(k1); who.appendChild(el('span', 'tt-promo-k2', T.k2));
 var pr = el('span', 'tt-promo-price'); pr.appendChild(el('span', 'tt-promo-pre', T.pre));
 pr.appendChild(el('span', 'tt-promo-u', T.price[0])); pr.appendChild(el('span', 'tt-promo-num', T.price[1])); pr.appendChild(el('span', 'tt-promo-u', T.price[2]));
 head.appendChild(who); head.appendChild(pr);
