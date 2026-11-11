@@ -912,6 +912,38 @@ background: var(--bg); color: var(--text); border-radius: 20px; box-shadow: 0 10
 .ttd .s1 { background: var(--ttd-s1); } .ttd .s2 { background: var(--ttd-s2); } .ttd .s3 { background: var(--ttd-s3); } .ttd .s4 { background: var(--ttd-s4); }
 .ttd .s5 { background: var(--ttd-s5); } .ttd .s6 { background: var(--ttd-s6); } .ttd .s7 { background: var(--ttd-s7); } .ttd .s8 { background: var(--ttd-s8); }
 .ttd .g { background: var(--ttd-g); }
+.ttd .b { background: repeating-linear-gradient(135deg, rgba(127,127,127,.55) 0 2px, transparent 2px 4px); }
+/* 1日の流れ */
+.ttd-views-row { display: flex; justify-content: center; margin-bottom: 12px; }
+.ttd-views .ttd-tab { min-width: 84px; }
+.ttd-daynav { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.ttd-daynav button { width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font: inherit; font-size: 22px; line-height: 1; cursor: pointer; }
+.ttd-daynav button:disabled { opacity: .35; cursor: default; }
+.ttd-daynav button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.ttd-daynav-d { text-align: center; margin: 0; }
+.ttd-daynav-d b { display: block; font-size: 16px; }
+.ttd-daynav-d span { font-size: 12px; color: var(--text2); }
+.ttd-dsum { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.ttd-dsum h3 { margin: 0; color: var(--text2); font-weight: 600; font-size: 13px; }
+.ttd-dsum-v { margin: 0; font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.ttd-dbar { display: flex; gap: 2px; height: 12px; border-radius: 6px; overflow: hidden; margin: 10px 0 12px; }
+.ttd-dbar span { display: block; min-width: 2px; flex-basis: 0; }
+.ttd-tl { position: relative; height: 28px; border-radius: 8px; background: rgba(127,127,127,.12); overflow: hidden; }
+.ttd-tl span { position: absolute; top: 0; bottom: 0; }
+.ttd-tl .now { width: 2px; margin-left: -1px; background: var(--text); }
+.ttd-tl-ax { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin: 4px 0 6px; }
+.ttd-flow { list-style: none; margin: 0; padding: 0; }
+.ttd-flow li { display: grid; grid-template-columns: 44px 4px minmax(0, 1fr) auto; gap: 10px; align-items: start; padding: 10px 0; border-top: 1px solid var(--line); }
+.ttd-flow li:first-child { border-top: 0; }
+.ttd-flow-t { font-size: 13px; font-weight: 700; color: var(--text2); font-variant-numeric: tabular-nums; padding-top: 1px; }
+.ttd-flow-c { align-self: stretch; min-height: 20px; border-radius: 2px; }
+.ttd-flow-b { display: flex; flex-direction: column; min-width: 0; }
+.ttd-flow-n { font-size: 15px; font-weight: 700; overflow-wrap: anywhere; }
+.ttd-flow-p { font-size: 12px; color: var(--text2); line-height: 1.6; margin-top: 2px; white-space: pre-line; overflow-wrap: anywhere; }
+.ttd-flow-v { font-size: 14px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ttd-flow li.now { align-items: center; }
+.ttd-flow li.now .ttd-flow-t { color: var(--text); }
+.ttd-flow-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--text); margin-left: -3px; }
 .ttd-chart-wrap { overflow-x: auto; }
 .ttd-chart { position: relative; display: flex; align-items: stretch; gap: 4px; height: 190px; padding-top: 18px; border-bottom: 1px solid var(--line); min-width: 100%; }
 .ttd-chart.many { min-width: 560px; gap: 2px; }
