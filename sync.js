@@ -349,7 +349,7 @@
    * 連続日数: タイマーを15秒以上動かした日が続いた数（今日まだなら昨日まで）
    * 今日の時間: 休憩（名前で判定。マイページ／データで切り替えた設定 settings.data.breaks を優先）を除いた秒数。
    *   記録済みの分（ログごと）＋いま動いている分（このページの log）を足して表示する */
-  var STATS_KEY = 'tt-stats2';
+  var STATS_KEY = 'tt-stats3';
   var streakToday = false;
   var ST = null; // { n, streakToday, days7, day, at, todayLogs: {logId: 作業秒} }
   var BREAKS = {};
@@ -364,16 +364,32 @@
     var w = 0; L.segs.forEach(function (g) { if (!isBreak(g.label)) w += g.secs; });
     return w;
   }
+  /* 今日のログ（ホームのカード）用: 区切りごとの { lid, s: 開始ms, secs, label, brk } */
+  function blocksOf(L, lid) {
+    var out = [];
+    (L.segs || []).forEach(function (g) {
+      var secs = Math.max(0, Math.round(g.secs));
+      if (secs < 1) return;
+      var s = Date.parse(g.startedAt); if (!isFinite(s)) return;
+      out.push({ lid: lid, s: s, secs: secs, label: String(g.label || '').slice(0, 30), brk: isBreak(g.label || '') });
+    });
+    return out;
+  }
+  function putBlocks(lid, list) {
+    if (!ST) return;
+    ST.blocks = (ST.blocks || []).filter(function (b) { return b.lid !== lid; }).concat(list).slice(-400);
+  }
   var lastShown = '';
   function showStats() {
     if (!ST || !window.__ttSetStats) return;
     var t = 0, cur = log && log.id;
     for (var k in ST.todayLogs) if (k !== cur) t += ST.todayLogs[k];
-    if (log && ST.day === dayKey(new Date(log.startedAt))) t += workOf(log);
-    var key = Math.floor(t / 60) + '/' + ST.days7 + '/' + ST.n + '/' + ST.streakToday;
+    var blocks = (ST.blocks || []).filter(function (b) { return !cur || b.lid !== cur; });
+    if (log && ST.day === dayKey(new Date(log.startedAt))) { t += workOf(log); blocks = blocks.concat(blocksOf(log, cur || 'live')); }
+    var key = Math.floor(t / 60) + '/' + ST.days7 + '/' + ST.n + '/' + ST.streakToday + '/' + blocks.length + '/' + Math.floor(Date.now() / 300000);
     if (key === lastShown) return;
     lastShown = key;
-    try { window.__ttSetStats({ today: t, days7: ST.days7, streak: ST.n, streakToday: ST.streakToday }); } catch (e) {}
+    try { window.__ttSetStats({ today: t, days7: ST.days7, streak: ST.n, streakToday: ST.streakToday, blocks: blocks }); } catch (e) {}
   }
   async function loadStreak(force) {
     try {
@@ -387,7 +403,7 @@
         .eq('product', PRODUCT).gte('started_at', since.toISOString())
         .order('started_at', { ascending: false }).limit(1000);
       if (r.error || !r.data) return;
-      var rs = await sb.from('usage_segments').select('log_id,label,secs').eq('product', PRODUCT)
+      var rs = await sb.from('usage_segments').select('log_id,seq,label,secs,started_at').eq('product', PRODUCT)
         .gte('started_at', new Date(today0.getTime() - 86400000).toISOString()).limit(1000);
       var r3 = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
       var sd = (!r3.error && r3.data && r3.data.data) || {};
@@ -395,7 +411,7 @@
       var set = {}, todayLogs = {}, segs = {};
       (rs.error ? [] : rs.data || []).forEach(function (g) { (segs[g.log_id] = segs[g.log_id] || []).push(g); });
       var week0 = new Date(today0); week0.setDate(week0.getDate() - 6);
-      var days7 = {};
+      var days7 = {}, blocks = [];
       r.data.forEach(function (x) {
         var t = new Date(x.started_at);
         set[dayKey(t)] = 1;
@@ -403,8 +419,17 @@
         if (t >= today0) {
           var g = segs[x.id];
           var w = 0;
-          if (g && g.length) g.forEach(function (z) { if (!isBreak(z.label || '')) w += Math.max(0, Number(z.secs) || 0); });
-          else w = Math.max(0, Number(x.total_secs) || 0);
+          if (g && g.length) {
+            g.slice().sort(function (a, b) { return (a.seq || 0) - (b.seq || 0); }).forEach(function (z) {
+              var secs = Math.max(0, Number(z.secs) || 0);
+              if (!isBreak(z.label || '')) w += secs;
+              var s = Date.parse(z.started_at);
+              if (secs >= 1 && isFinite(s)) blocks.push({ lid: x.id, s: s, secs: Math.round(secs), label: String(z.label || '').slice(0, 30), brk: isBreak(z.label || '') });
+            });
+          } else {
+            w = Math.max(0, Number(x.total_secs) || 0);
+            if (w >= 1) blocks.push({ lid: x.id, s: t.getTime(), secs: Math.round(w), label: '', brk: false });
+          }
           todayLogs[x.id] = w;
         }
       });
@@ -416,7 +441,7 @@
       // いま動いている記録が保存直後なら、今日に入れる
       if (log && log.id) { today = true; }
       streakToday = today;
-      ST = { n: n + (log && log.id && !set[dayKey(new Date())] ? 1 : 0), streakToday: today, days7: Object.keys(days7).length, day: dayKey(new Date()), at: Date.now(), todayLogs: todayLogs, breaks: BREAKS };
+      ST = { n: n + (log && log.id && !set[dayKey(new Date())] ? 1 : 0), streakToday: today, days7: Object.keys(days7).length, day: dayKey(new Date()), at: Date.now(), todayLogs: todayLogs, breaks: BREAKS, blocks: blocks.slice(-400) };
       try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {}
       lastShown = ''; showStats();
     } catch (e) {}
@@ -471,9 +496,18 @@
     step();
     clearInterval(logTick); logTick = null;
     var L = log; log = null;
-    if (ST && ST.day === dayKey(new Date(L.startedAt)) && L.secs >= 15) { ST.todayLogs[L.id || ('local' + Date.now())] = workOf(L); try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {} }
+    var tmpId = L.id || ('local' + Date.now());
+    if (ST && ST.day === dayKey(new Date(L.startedAt)) && L.secs >= 15) { ST.todayLogs[tmpId] = workOf(L); putBlocks(tmpId, blocksOf(L, tmpId)); try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {} }
     showStats();
-    persistLog(L, done).then(function () { if (L.id && ST) { var k; for (k in ST.todayLogs) if (/^local/.test(k)) delete ST.todayLogs[k]; ST.todayLogs[L.id] = workOf(L); showStats(); } });
+    persistLog(L, done).then(function () {
+      if (L.id && ST) {
+        var k; for (k in ST.todayLogs) if (/^local/.test(k)) delete ST.todayLogs[k];
+        ST.blocks = (ST.blocks || []).filter(function (b) { return !/^local/.test(String(b.lid)); });
+        if (ST.day === dayKey(new Date(L.startedAt))) { ST.todayLogs[L.id] = workOf(L); putBlocks(L.id, blocksOf(L, L.id)); }
+        try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {}
+        showStats();
+      }
+    });
   }
   function startLog() {
     endLog(false);
@@ -572,7 +606,7 @@
     if (!s.data || !s.data.session) {
       // セッション切れ: 入口の表示を「ログイン」に戻し、欄はログインの案内だけにする
       var link = document.querySelector('#acct-link span'); if (link) link.textContent = T.signin;
-      try { sessionStorage.removeItem('tt-stats2'); localStorage.removeItem('tt-plan'); } catch (e) {}
+      try { sessionStorage.removeItem('tt-stats3'); localStorage.removeItem('tt-plan'); } catch (e) {}
       window.__ttSb = null; window.__ttSignedOut = true;
       head.removeChild(saveBtn);
       list.appendChild(el('a', { cls: 'tt-chip', href: acctHref, text: T.signin }));

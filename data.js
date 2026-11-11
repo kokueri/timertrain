@@ -316,7 +316,7 @@
     // まとめ
     var nDays = S.period === '7d' ? 7 : S.period === '30d' ? 30 : 0;
     var streak = 0;
-    try { var st = JSON.parse(sessionStorage.getItem('tt-stats2') || 'null'); if (st) streak = st.n || 0; } catch (e) {}
+    try { var st = JSON.parse(sessionStorage.getItem('tt-stats3') || 'null'); if (st) streak = st.n || 0; } catch (e) {}
     if (sample) streak = 5;
     function tile(label, value, sub) { return el('div', { cls: 'ttd-tile' }, [el('p', { cls: 'ttd-tile-v', text: value }), el('p', { cls: 'ttd-tile-l', text: label }), sub ? el('p', { cls: 'ttd-tile-s', text: sub }) : null]); }
     wrap.appendChild(el('div', { cls: 'ttd-tiles' }, [
