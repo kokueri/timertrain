@@ -362,6 +362,7 @@ body.focus-mode #theme-btn { display: none; }
 /* ================= リテンション UI（最近の編成・ホーム画面追加・再訪ヒント） ================= */
 .tt-recents { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: center; margin: 0 0 20px; }
 .tt-recents-label { font-size: 12px; color: var(--text2); }
+.tt-recents .tt-chip { max-width: 34vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tt-chip {
 display: inline-block; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 font-size: 13px; color: var(--text); background: var(--card);
@@ -835,11 +836,14 @@ font: inherit; color: var(--text); text-align: left; cursor: pointer; font-varia
 }
 .tt-today:hover { border-color: var(--text2); }
 .tt-today:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+/* iPhone の Safari ではボタンの中の要素が幅0に縮むことがあるので、幅を明示する */
+.tt-today > span { display: block; width: 100%; box-sizing: border-box; align-self: stretch; }
+.tt-today > .tt-today-head, .tt-today > .tt-today-axis, .tt-today > .tt-today-legend, .tt-today > .tt-today-more { display: flex; }
 .tt-today-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .tt-today-t { font-size: 15px; font-weight: 700; }
 .tt-today-sum { font-size: 15px; font-weight: 800; }
 .tt-today-empty { font-size: 13px; color: var(--text2); line-height: 1.6; }
-.tt-today-bar { position: relative; display: block; height: 24px; border-radius: 8px; background: rgba(0,0,0,.06); overflow: hidden; }
+.tt-today-bar { position: relative; display: block; width: 100%; min-width: 0; height: 24px; border-radius: 8px; background: rgba(0,0,0,.06); overflow: hidden; }
 .tt-today-seg { position: absolute; top: 0; bottom: 0; }
 .tt-today-now { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--text); }
 .tt-today-axis { display: flex; justify-content: space-between; margin-top: -6px; font-size: 11px; color: var(--text2); }

@@ -1783,7 +1783,7 @@ var list = readRecents().filter(function (e) { return !(e.p === location.pathnam
 if (!list.length) return;
 var wrap = document.createElement('div'); wrap.id = 'tt-recents'; wrap.className = 'tt-recents';
 var lab = document.createElement('span'); lab.className = 'tt-recents-label'; lab.textContent = L.recent; wrap.appendChild(lab);
-list.slice(0, 4).forEach(function (e) {
+list.slice(0, 2).forEach(function (e) {
 var a = document.createElement('a'); a.className = 'tt-chip'; a.href = e.p + e.q; a.textContent = e.l; wrap.appendChild(a);
 });
 header.insertAdjacentElement('afterend', wrap);
