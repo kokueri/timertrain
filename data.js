@@ -91,6 +91,40 @@
       tapHint: 'Toca una barra para ver ese día'
     }
   }[lang];
+  /* 1日の流れ（ホームの「今日のログ」から開く）。無料で見られるのは今日を含めて FREE_DAYS 日 */
+  var FREE_DAYS = 7;
+  var TD = {
+    ja: {
+      views: [['day', '1日'], ['period', '期間']], today: '今日', yday: '昨日', prev: '前の日', next: '次の日',
+      total: '休憩をのぞく合計', flow: '1日の流れ', now: 'いま', other: 'ほか', brk: '休憩',
+      empty: 'この日の記録はありません。', emptyToday: 'まだ今日の記録はありません。ログインした状態でタイマーを15秒以上動かすと、ここに残ります。',
+      lockT: 'それより前の日はプレミアム',
+      lockL: function (n) { return '無料プランは直近' + n + '日間の1日の流れを見られます。それより前の記録も残っているので、プレミアムにするとすぐに見られます。'; },
+      note: function (n) { return '無料プランは直近' + n + '日間を見られます。'; },
+      hours: ['0時', '6時', '12時', '18時', '24時'],
+      date: function (d) { return (d.getMonth() + 1) + '月' + d.getDate() + '日（' + '日月火水木金土'.charAt(d.getDay()) + '）'; }
+    },
+    en: {
+      views: [['day', 'Day'], ['period', 'Period']], today: 'Today', yday: 'Yesterday', prev: 'Previous day', next: 'Next day',
+      total: 'Total, excluding breaks', flow: 'Your day', now: 'Now', other: 'Others', brk: 'Break',
+      empty: 'No records on this day.', emptyToday: 'No record yet today. Run a timer for 15 seconds or more while signed in and it shows up here.',
+      lockT: 'Earlier days are Premium',
+      lockL: function (n) { return 'The free plan shows your day for the last ' + n + ' days. Older records are kept, so they appear as soon as you upgrade.'; },
+      note: function (n) { return 'The free plan shows the last ' + n + ' days.'; },
+      hours: ['0', '6', '12', '18', '24'],
+      date: function (d) { return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()] + ', ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate(); }
+    },
+    es: {
+      views: [['day', 'Día'], ['period', 'Periodo']], today: 'Hoy', yday: 'Ayer', prev: 'Día anterior', next: 'Día siguiente',
+      total: 'Total sin descansos', flow: 'Tu día', now: 'Ahora', other: 'Otros', brk: 'Descanso',
+      empty: 'No hay registros este día.', emptyToday: 'Aún no hay registros hoy. Usa un temporizador 15 segundos o más con la sesión iniciada y aparecerá aquí.',
+      lockT: 'Los días anteriores son Premium',
+      lockL: function (n) { return 'El plan gratis muestra tu día de los últimos ' + n + ' días. Los registros anteriores se guardan y aparecen en cuanto te pasas a Premium.'; },
+      note: function (n) { return 'El plan gratis muestra los últimos ' + n + ' días.'; },
+      hours: ['0', '6', '12', '18', '24'],
+      date: function (d) { return ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'][d.getDay()] + ' ' + d.getDate() + ' ' + ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][d.getMonth()]; }
+    }
+  }[lang];
   function pad(n) { return (n < 10 ? '0' : '') + n; }
 
   function el(tag, attrs, kids) {
@@ -135,9 +169,14 @@
     document.documentElement.classList.add('ttd-open');
     box.querySelector('.ttd-x').focus();
     S.dayEv = 0;
-    ev('data_open', { from: src || '', member: signedLocal() ? (window.__ttPremium ? 'premium' : 'free') : 'guest' });
+    S.view = src === 'today' ? 'day' : 'period';
+    if (src === 'today') S.day = today0();
+    S.from = src || '';
+    ev('data_open', { from: src || '', member: member() });
     start();
   }
+  function member() { return signedLocal() ? (window.__ttPremium ? 'premium' : 'free') : 'guest'; }
+  function today0() { var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
   function close() {
     if (!back || back.hidden) return;
     back.hidden = true;
@@ -162,9 +201,17 @@
     body.appendChild(el('p', { cls: 'ttd-msg', text: T.loading }));
     var sb = await waitSb();
     if (!sb) { renderOut(true); return; }
+    S.sb = sb;
     if (!window.__ttPremium && S.period !== '7d') S.period = '7d';
-    try { await load(sb); } catch (e) { body.textContent = ''; body.appendChild(el('p', { cls: 'ttd-msg err', role: 'status', text: T.err })); return; }
-    render(false);
+    if (S.view === 'day') ev('day_view', { from: S.from, member: member() });
+    await show();
+  }
+  /* いまの表示（1日／期間）を読み込んで描く */
+  async function show() {
+    try {
+      if (S.view === 'day') await loadDay(S.sb); else await load(S.sb);
+    } catch (e) { body.textContent = ''; body.appendChild(el('p', { cls: 'ttd-msg err', role: 'status', text: T.err })); return; }
+    if (S.view === 'day') renderDay(); else render(false);
   }
 
   /* ---------- 読み込み（1000件ずつ） ---------- */
@@ -309,7 +356,7 @@
   function render(sample) {
     var D = S.data;
     body.textContent = '';
-    if (!sample) body.appendChild(controls(D));
+    if (!sample) { body.appendChild(viewTabs()); body.appendChild(controls(D)); }
     var C = compute(D);
     var wrap = el('div', { cls: 'ttd-main' });
     body.appendChild(wrap);
@@ -379,16 +426,188 @@
     bar.appendChild(lock);
     return bar;
   }
-  function showLock() {
+  function showLock(title, lead) {
     var lock = body.querySelector('.ttd-lock');
     if (!lock) return;
     lock.textContent = '';
     var a = el('a', { cls: 'ttd-btn', href: ACCT + '#acct-plans', text: T.plans });
-    a.addEventListener('click', function () { ev('data_see_plans'); });
-    lock.appendChild(el('p', { cls: 'ttd-lock-t', text: T.lockTitle }));
-    lock.appendChild(el('p', { cls: 'ttd-lock-l', text: T.lockLead }));
+    a.addEventListener('click', function () { ev('data_see_plans', { view: S.view }); });
+    lock.appendChild(el('p', { cls: 'ttd-lock-t', text: title || T.lockTitle }));
+    lock.appendChild(el('p', { cls: 'ttd-lock-l', text: lead || T.lockLead }));
     lock.appendChild(a);
     lock.hidden = false;
+  }
+
+  /* ---------- 1日の流れ ---------- */
+  function viewTabs() {
+    var row = el('div', { cls: 'ttd-views-row' });
+    var tabs = el('div', { cls: 'ttd-tabs ttd-views', role: 'group' });
+    TD.views.forEach(function (v) {
+      var on = S.view === v[0];
+      var b = el('button', { type: 'button', cls: 'ttd-tab ttd-view' + (on ? ' on' : ''), 'aria-pressed': on ? 'true' : 'false', text: v[1] });
+      b.addEventListener('click', function () {
+        if (S.view === v[0]) return;
+        S.view = v[0]; S.more = 10; S.sel = -1;
+        if (v[0] === 'day') { if (!S.day) S.day = today0(); ev('day_view', { from: 'tab', member: member() }); }
+        body.querySelectorAll('.ttd-tab, .ttd-daynav button').forEach(function (x) { x.disabled = true; });
+        show().then(function () { var f = body.querySelector('.ttd-view.on'); if (f) f.focus(); });
+      });
+      tabs.appendChild(b);
+    });
+    row.appendChild(tabs);
+    return row;
+  }
+  function daysBack(d) { return Math.round((today0() - d) / 86400000); }
+  async function loadDay(sb) {
+    var d0 = new Date(S.day), d1 = new Date(d0); d1.setDate(d1.getDate() + 1);
+    var key = dayKey(d0);
+    if (S.dd && S.dd.key === key && Date.now() - S.dd.at < 30000) return;
+    var r = await sb.from('usage_logs').select('id,started_at,total_secs,timer_id,completed,config').eq('product', PRODUCT)
+      .gte('started_at', d0.toISOString()).lt('started_at', d1.toISOString()).order('started_at', { ascending: true }).limit(1000);
+    if (r.error) throw r.error;
+    var logs = r.data || [], segs = [];
+    for (var i = 0; i < logs.length; i += 100) {
+      var ids = logs.slice(i, i + 100).map(function (l) { return l.id; });
+      var rs = await sb.from('usage_segments').select('log_id,seq,label,secs,started_at').eq('product', PRODUCT).in('log_id', ids).limit(5000);
+      if (rs.error) throw rs.error;
+      segs = segs.concat(rs.data || []);
+    }
+    if (!S.meta || Date.now() - S.meta.at > 60000) {
+      var rt = await sb.from('timers').select('id,name,project_id').eq('product', PRODUCT).limit(1000);
+      var rp = await sb.from('projects').select('id,name,sort,created_at').eq('product', PRODUCT).order('sort').order('created_at').limit(100);
+      var rset = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
+      var sd = (!rset.error && rset.data && rset.data.data) || {};
+      S.meta = { at: Date.now(), timers: rt.error ? [] : rt.data || [], projects: rp.error ? [] : rp.data || [], breaks: (sd.breaks && typeof sd.breaks === 'object') ? sd.breaks : {} };
+    }
+    if (S.data) S.meta.breaks = S.data.breaks; // データの窓で切り替えた休憩を反映
+    S.dd = { key: key, at: Date.now(), D: prepareDay(logs, segs, S.meta) };
+  }
+  function prepareDay(logs, segs, M) {
+    var tmap = {}; M.timers.forEach(function (t) { tmap[t.id] = t; });
+    var pjNames = {}; M.projects.forEach(function (p) { pjNames[p.id] = p.name; });
+    var byLog = {}; segs.forEach(function (g) { (byLog[g.log_id] = byLog[g.log_id] || []).push(g); });
+    var list = [];
+    logs.forEach(function (l) {
+      var t = new Date(l.started_at); if (isNaN(t)) return;
+      var tm = l.timer_id && tmap[l.timer_id];
+      var cfg = (l.config && typeof l.config === 'object') ? l.config : {};
+      var g = (byLog[l.id] || []).slice().sort(function (a, b) { return (a.seq || 0) - (b.seq || 0); });
+      var at = t.getTime(), parts;
+      if (g.length) parts = g.map(function (x) {
+        var secs = Math.max(0, Number(x.secs) || 0), s = Date.parse(x.started_at);
+        if (!isFinite(s)) s = at;
+        at = s + secs * 1000;
+        return { label: String(x.label || '').slice(0, 30), secs: secs, s: s };
+      });
+      else parts = [{ label: '', secs: Math.max(0, Number(l.total_secs) || 0), s: at }];
+      list.push({ t: t, timerName: tm ? (tm.name || '') : (typeof cfg.name === 'string' ? cfg.name.slice(0, 40) : ''),
+        pjName: tm && tm.project_id && pjNames[tm.project_id] ? pjNames[tm.project_id] : '', parts: parts, done: !!l.completed });
+    });
+    return { list: list, breaks: M.breaks };
+  }
+  function renderDay() {
+    var D = S.dd.D, prem = !!window.__ttPremium, isToday = daysBack(S.day) === 0;
+    body.textContent = '';
+    body.appendChild(viewTabs());
+    // 日付の切り替え
+    var nav = el('div', { cls: 'ttd-daynav' });
+    var prev = el('button', { type: 'button', 'aria-label': TD.prev, text: '‹' });
+    var next = el('button', { type: 'button', 'aria-label': TD.next, text: '›' });
+    if (isToday) next.disabled = true;
+    var back = daysBack(S.day);
+    var sub = back === 0 ? TD.today : back === 1 ? TD.yday : '';
+    nav.appendChild(prev);
+    nav.appendChild(el('p', { cls: 'ttd-daynav-d', 'aria-live': 'polite' }, [el('b', { text: TD.date(S.day) }), sub ? el('span', { text: sub }) : null]));
+    nav.appendChild(next);
+    function move(dir) {
+      var nb = back + (dir < 0 ? 1 : -1);
+      if (nb < 0) return;
+      if (!prem && nb > FREE_DAYS - 1) { showLock(TD.lockT, TD.lockL(FREE_DAYS)); ev('data_locked', { period: 'day', back: nb }); return; }
+      var d = new Date(S.day); d.setDate(d.getDate() + (dir < 0 ? -1 : 1)); S.day = d;
+      ev('day_move', { dir: dir < 0 ? 'prev' : 'next', back: nb });
+      nav.querySelectorAll('button').forEach(function (x) { x.disabled = true; });
+      show().then(function () { var f = body.querySelector('.ttd-daynav button:not([disabled])'); var want = body.querySelectorAll('.ttd-daynav button')[dir < 0 ? 0 : 1]; if (want && !want.disabled) want.focus(); else if (f) f.focus(); });
+    }
+    prev.addEventListener('click', function () { move(-1); });
+    next.addEventListener('click', function () { move(1); });
+    body.appendChild(nav);
+    body.appendChild(el('div', { cls: 'ttd-lock', hidden: '', role: 'status' }));
+    var wrap = el('div', { cls: 'ttd-main' });
+    body.appendChild(wrap);
+    // ラベルごとの作業時間 → 多い順に色（ホームのカードと同じ順番）。8つ目以降は「ほか」
+    var tot = {}, work = 0;
+    D.list.forEach(function (e) { e.work = 0; e.brk = 0; e.parts.forEach(function (p) { if (isBreak(D, p.label)) { e.brk += p.secs; return; } e.work += p.secs; work += p.secs; tot[p.label] = (tot[p.label] || 0) + p.secs; }); });
+    var keys = Object.keys(tot).sort(function (a, b) { return tot[b] - tot[a]; });
+    var cls = {}; keys.forEach(function (k, i) { cls[k] = i < 7 ? 's' + (i + 1) : 'g'; });
+    function nm(l) { return l || T.noLabel; }
+    function clsOf(p) { return isBreak(D, p.label) ? 'b' : cls[p.label]; }
+    if (!D.list.length) {
+      wrap.appendChild(el('p', { cls: 'ttd-msg', text: isToday ? TD.emptyToday : TD.empty }));
+    } else {
+      // 合計と内訳
+      var sum = el('section', { cls: 'ttd-sec' });
+      sum.appendChild(el('div', { cls: 'ttd-dsum' }, [el('h3', { text: TD.total }), el('p', { cls: 'ttd-dsum-v', text: T.dur(work) })]));
+      if (work) {
+        var sbar = el('div', { cls: 'ttd-dbar', 'aria-hidden': 'true' });
+        var other = 0;
+        keys.forEach(function (k, i) { if (i >= 7) { other += tot[k]; return; } var s = el('span', { cls: cls[k] }); s.style.flexGrow = String(tot[k]); sbar.appendChild(s); });
+        if (other) { var so = el('span', { cls: 'g' }); so.style.flexGrow = String(other); sbar.appendChild(so); }
+        sum.appendChild(sbar);
+        var rows = keys.slice(0, 7).map(function (k) { return { name: nm(k), cls: cls[k], secs: tot[k] }; });
+        if (other) rows.push({ name: TD.other, cls: 'g', secs: other });
+        sum.appendChild(tableRows(rows, work, true));
+      }
+      wrap.appendChild(sum);
+      // 帯（6時〜24時。6時より前の記録がある日は0時から）
+      var d0 = S.day.getTime(), d1 = d0 + 86400000;
+      var first = d1; D.list.forEach(function (e) { e.parts.forEach(function (p) { if (p.s < first) first = p.s; }); });
+      var startH = first < d0 + 6 * 3600000 ? 0 : 6, a = d0 + startH * 3600000, span = d1 - a;
+      var flow = el('section', { cls: 'ttd-sec' });
+      flow.appendChild(el('h3', { text: TD.flow }));
+      var tl = el('div', { cls: 'ttd-tl', 'aria-hidden': 'true' });
+      D.list.forEach(function (e) {
+        e.parts.forEach(function (p) {
+          var s = Math.max(p.s, a), en = Math.min(p.s + p.secs * 1000, d1);
+          if (en <= s) return;
+          var seg = el('span', { cls: clsOf(p) });
+          seg.style.left = ((s - a) / span * 100).toFixed(2) + '%';
+          seg.style.width = Math.max(0.5, (en - s) / span * 100).toFixed(2) + '%';
+          tl.appendChild(seg);
+        });
+      });
+      var now = Date.now();
+      if (isToday && now > a) { var nw = el('span', { cls: 'now' }); nw.style.left = ((now - a) / span * 100).toFixed(2) + '%'; tl.appendChild(nw); }
+      flow.appendChild(tl);
+      flow.appendChild(el('div', { cls: 'ttd-tl-ax', 'aria-hidden': 'true' }, (startH ? TD.hours.slice(1) : TD.hours.filter(function (x, i) { return i % 2 === 0; })).map(function (h) { return el('span', { text: h }); })));
+      // 1回ずつの流れ
+      var ul = el('ul', { cls: 'ttd-flow' });
+      D.list.forEach(function (e) {
+        var main = e.parts.filter(function (p) { return !isBreak(D, p.label); })[0] || e.parts[0];
+        var title = e.pjName || e.timerName || nm(main.label);
+        var subs = [];
+        if (e.pjName && e.timerName && e.timerName !== title) subs.push(e.timerName);
+        // 区切りが1つで名前が見出しと同じなら、内訳は出さない
+        var seq = [];
+        if (e.parts.length > 1 || (nm(e.parts[0].label) !== title && subs.indexOf(e.parts[0].label) < 0)) {
+          seq = e.parts.slice(0, 6).map(function (p) { return (isBreak(D, p.label) ? (p.label || TD.brk) : nm(p.label)) + ' ' + T.dur(p.secs); });
+          if (e.parts.length > 6) seq.push('…');
+        }
+        var desc = subs.concat(seq.length ? [seq.join(' → ')] : []).join('\n');
+        ul.appendChild(el('li', null, [
+          el('span', { cls: 'ttd-flow-t', text: e.t.getHours() + ':' + pad(e.t.getMinutes()) }),
+          el('span', { cls: 'ttd-flow-c ' + clsOf(main), 'aria-hidden': 'true' }),
+          el('span', { cls: 'ttd-flow-b' }, [el('span', { cls: 'ttd-flow-n', text: title }), el('span', { cls: 'ttd-flow-p', text: desc })]),
+          el('span', { cls: 'ttd-flow-v', text: T.dur(e.work) + (e.done ? ' ✓' : '') })
+        ]));
+      });
+      if (isToday) {
+        var t = new Date();
+        ul.appendChild(el('li', { cls: 'now' }, [el('span', { cls: 'ttd-flow-t', text: t.getHours() + ':' + pad(t.getMinutes()) }), el('span', { cls: 'ttd-flow-dot', 'aria-hidden': 'true' }), el('span', { cls: 'ttd-flow-n', text: TD.now })]));
+      }
+      flow.appendChild(ul);
+      wrap.appendChild(flow);
+    }
+    if (!prem) wrap.appendChild(el('p', { cls: 'ttd-hint', text: TD.note(FREE_DAYS) }));
   }
 
   function chart(C) {
@@ -488,6 +707,7 @@
     var w = await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
     if (w.error) return false;
     S.data.breaks = b;
+    S.dd = null;
     return true;
   }
 
