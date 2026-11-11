@@ -826,6 +826,42 @@ font: inherit; font-size: 13px; font-weight: 600; color: var(--text); font-varia
 .tt-stats .keep { opacity: .55; }
 @media (max-width: 360px) { .tt-stats { gap: 0 10px; font-size: 12px; padding: 5px 10px; } }
 
+/* 今日のログ（ホームのカード） */
+.tt-today {
+--ttd-s1: #2a78d6; --ttd-s2: #eb6834; --ttd-s3: #1baf7a; --ttd-s4: #eda100; --ttd-g: #a3a19b;
+display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 460px; box-sizing: border-box; margin: 20px auto 0;
+padding: 14px 16px 12px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--card); box-shadow: var(--shadow);
+font: inherit; color: var(--text); text-align: left; cursor: pointer; font-variant-numeric: tabular-nums;
+}
+.tt-today:hover { border-color: var(--text2); }
+.tt-today:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.tt-today-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.tt-today-t { font-size: 15px; font-weight: 700; }
+.tt-today-sum { font-size: 15px; font-weight: 800; }
+.tt-today-empty { font-size: 13px; color: var(--text2); line-height: 1.6; }
+.tt-today-bar { position: relative; display: block; height: 24px; border-radius: 8px; background: rgba(0,0,0,.06); overflow: hidden; }
+.tt-today-seg { position: absolute; top: 0; bottom: 0; }
+.tt-today-now { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--text); }
+.tt-today-axis { display: flex; justify-content: space-between; margin-top: -6px; font-size: 11px; color: var(--text2); }
+.tt-today-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; }
+.tt-today-item { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+.tt-today-name { max-width: 9em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-today-v { font-weight: 700; }
+.tt-today-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
+.tt-today .s1 { background: var(--ttd-s1); } .tt-today .s2 { background: var(--ttd-s2); } .tt-today .s3 { background: var(--ttd-s3); } .tt-today .s4 { background: var(--ttd-s4); }
+.tt-today .o { background: var(--ttd-g); } .tt-today .b { background: repeating-linear-gradient(135deg, rgba(0,0,0,.22) 0 2px, transparent 2px 4px); }
+.tt-today-more { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; font-weight: 700; }
+.tt-today-more svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+@media (prefers-color-scheme: dark) {
+:root:where(:not([data-theme="light"])) .tt-today { --ttd-s1: #3987e5; --ttd-s2: #d95926; --ttd-s3: #199e70; --ttd-s4: #c98500; --ttd-g: #77756f; }
+:root:where(:not([data-theme="light"])) .tt-today-bar { background: rgba(255,255,255,.08); }
+:root:where(:not([data-theme="light"])) .tt-today .b { background: repeating-linear-gradient(135deg, rgba(255,255,255,.3) 0 2px, transparent 2px 4px); }
+}
+:root[data-theme="dark"] .tt-today { --ttd-s1: #3987e5; --ttd-s2: #d95926; --ttd-s3: #199e70; --ttd-s4: #c98500; --ttd-g: #77756f; }
+:root[data-theme="dark"] .tt-today-bar { background: rgba(255,255,255,.08); }
+:root[data-theme="dark"] .tt-today .b { background: repeating-linear-gradient(135deg, rgba(255,255,255,.3) 0 2px, transparent 2px 4px); }
+body.focus-mode #tt-today { display: none; }
+
 html.ttd-open, html.ttd-open body { overflow: hidden; }
 .ttd-back { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.42); display: flex; align-items: center; justify-content: center; padding: 16px; }
 .ttd-back[hidden] { display: none; }

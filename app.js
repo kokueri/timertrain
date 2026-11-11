@@ -164,7 +164,10 @@ if (k === 't') tRaw = v;
 if (k === 'r') rRaw = v;
 }
 if (!tRaw) return null;
-const timers = tRaw.split(',').map(item => {
+// YouTube等のリダイレクトを通るとカンマが %2C に変わる。次の「色.秒数.」の直前にある %2C も区切りとして扱う
+const COLOR_RE = PALETTE.map(c => c.id).join('|');
+const SPLIT_RE = new RegExp('%2C(?=(?:' + COLOR_RE + ')\\.\\d+\\.)', 'i');
+const timers = tRaw.split(',').flatMap(x => x.split(SPLIT_RE)).map(item => {
 const i1 = item.indexOf('.'), i2 = item.indexOf('.', i1 + 1);
 if (i1 < 0 || i2 < 0) return null;
 const color = item.slice(0, i1);
@@ -1540,7 +1543,7 @@ var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=2';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=3';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
@@ -1553,7 +1556,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=10'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=11'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 })();
@@ -1628,7 +1631,7 @@ box.appendChild(theme);
 // ホーム: ⏱ 今日 · 📅 7日中n日 · 🔥 n日連続（sync.js がログイン中に呼ぶ。押すとデータの窓）
 window.__ttSetStats = function (st) {
 var row = document.getElementById('tt-stats');
-if (!st) { if (row) row.remove(); return; }
+if (!st) { if (row) row.remove(); renderToday(null); return; }
 if (!row) {
 row = document.createElement('button'); row.type = 'button'; row.id = 'tt-stats'; row.className = 'tt-stats';
 row.addEventListener('click', function () { if (window.__ttOpenData) window.__ttOpenData('stats'); });
@@ -1647,7 +1650,84 @@ var hint = lang === 'en' ? (st.streakToday || !n ? '' : ' Use it today to make i
 var open = lang === 'en' ? 'Open data' : lang === 'es' ? 'Ver datos' : 'データを見る';
 row.title = parts.join(' · ') + (hint ? ' — ' + hint : '');
 row.setAttribute('aria-label', open + ': ' + parts.join('、') + (hint ? '。' + hint : ''));
+renderToday(st);
 };
+
+/* ホーム: 今日のログ（再生ボタンの下のカード。ログイン中だけ。押すとデータの窓）
+ * blocks: sync.js が渡す区切りごとの { s: 開始ms, secs, label, brk }。名前は textContent でだけ表示する */
+var TL = lang === 'en' ? { title: "Today's log", total: function (d) { return d; }, empty: 'No record yet today. Run a timer for 15 seconds or more and it shows up here.', more: 'See details', noName: 'No name', others: 'Others', hours: ['0', '6', '12', '18', '24'], aria: "Today's log. Open data" }
+: lang === 'es' ? { title: 'Registro de hoy', total: function (d) { return d; }, empty: 'Aún no hay registros hoy. Usa un temporizador 15 segundos o más y aparecerá aquí.', more: 'Ver detalles', noName: 'Sin nombre', others: 'Otros', hours: ['0', '6', '12', '18', '24'], aria: 'Registro de hoy. Ver datos' }
+: { title: '今日のログ', total: function (d) { return '合計 ' + d; }, empty: 'まだ今日の記録はありません。タイマーを15秒以上動かすと、ここに残ります。', more: 'くわしく見る', noName: '名前なし', others: 'ほか', hours: ['0時', '6時', '12時', '18時', '24時'], aria: '今日のログ。データを見る' };
+function fmtDur(sec) {
+var m = Math.round(sec / 60), h = Math.floor(m / 60), mm = m % 60;
+if (lang === 'ja') return h ? h + '時間' + (mm ? mm + '分' : '') : m + '分';
+if (lang === 'es') return h ? h + ' h' + (mm ? ' ' + mm + ' min' : '') : m + ' min';
+return h ? h + 'h' + (mm ? ' ' + mm + 'm' : '') : m + 'm';
+}
+function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function renderToday(st) {
+var card = document.getElementById('tt-today');
+var ctr = document.querySelector('#run .run-controls');
+if (!st || !ctr) { if (card) card.remove(); return; }
+if (!card) {
+card = document.createElement('button'); card.type = 'button'; card.id = 'tt-today'; card.className = 'tt-today';
+card.addEventListener('click', function () { if (window.__ttOpenData) window.__ttOpenData('today'); });
+ctr.insertAdjacentElement('afterend', card);
+}
+var day0 = new Date(); day0.setHours(0, 0, 0, 0);
+var t0 = day0.getTime(), t1 = t0 + 86400000, now = Date.now();
+var bl = (st.blocks || []).filter(function (b) { return b && b.s + b.secs * 1000 > t0 && b.s < t1 && b.secs >= 1; })
+.sort(function (a, b) { return a.s - b.s; });
+// ラベルごとの作業の秒数 → 多い順に色（上位4つ）。休憩は灰色、5つ目以降は「ほか」
+var tot = {};
+bl.forEach(function (b) { if (!b.brk) tot[b.label] = (tot[b.label] || 0) + b.secs; });
+var keys = Object.keys(tot).sort(function (a, b) { return tot[b] - tot[a]; });
+var cls = {}; keys.forEach(function (k, i) { cls[k] = i < 4 ? 's' + (i + 1) : 'o'; });
+card.textContent = '';
+card.setAttribute('aria-label', TL.aria + ': ' + fmtDur(st.today || 0));
+var head = mk('span', 'tt-today-head');
+head.appendChild(mk('span', 'tt-today-t', TL.title));
+head.appendChild(mk('span', 'tt-today-sum', TL.total(fmtDur(st.today || 0))));
+card.appendChild(head);
+if (!bl.length) { card.appendChild(mk('span', 'tt-today-empty', TL.empty)); }
+else {
+// 横軸: ふだんは6時〜24時。6時より前の記録がある日は0時から
+var startH = bl[0].s < t0 + 6 * 3600000 ? 0 : 6;
+var a = t0 + startH * 3600000, span = t1 - a;
+var bar = mk('span', 'tt-today-bar'); bar.setAttribute('aria-hidden', 'true');
+bl.forEach(function (b) {
+var s = Math.max(b.s, a), e = Math.min(b.s + b.secs * 1000, t1);
+if (e <= s) return;
+var seg = mk('span', 'tt-today-seg ' + (b.brk ? 'b' : cls[b.label]));
+seg.style.left = ((s - a) / span * 100).toFixed(2) + '%';
+seg.style.width = Math.max(0.5, (e - s) / span * 100).toFixed(2) + '%';
+bar.appendChild(seg);
+});
+if (now > a && now < t1) { var nw = mk('span', 'tt-today-now'); nw.style.left = ((now - a) / span * 100).toFixed(2) + '%'; bar.appendChild(nw); }
+card.appendChild(bar);
+var ax = mk('span', 'tt-today-axis'); ax.setAttribute('aria-hidden', 'true');
+(startH ? TL.hours.slice(1) : TL.hours.filter(function (x, i) { return i % 2 === 0; })).forEach(function (hh) { ax.appendChild(mk('span', '', hh)); });
+card.appendChild(ax);
+var lg = mk('span', 'tt-today-legend');
+var other = 0;
+keys.forEach(function (k, i) {
+if (i >= 4) { other += tot[k]; return; }
+var it = mk('span', 'tt-today-item');
+it.appendChild(mk('span', 'tt-today-dot ' + cls[k]));
+it.appendChild(mk('span', 'tt-today-name', k || TL.noName));
+it.appendChild(mk('span', 'tt-today-v', fmtDur(tot[k])));
+lg.appendChild(it);
+});
+if (other) { var it2 = mk('span', 'tt-today-item'); it2.appendChild(mk('span', 'tt-today-dot o')); it2.appendChild(mk('span', 'tt-today-name', TL.others)); it2.appendChild(mk('span', 'tt-today-v', fmtDur(other))); lg.appendChild(it2); }
+if (lg.childNodes.length) card.appendChild(lg);
+}
+var ft = mk('span', 'tt-today-more');
+ft.appendChild(mk('span', '', TL.more));
+var ch = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); ch.setAttribute('viewBox', '0 0 24 24'); ch.setAttribute('aria-hidden', 'true');
+var p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', 'M9 6l6 6-6 6'); ch.appendChild(p);
+ft.appendChild(ch);
+card.appendChild(ft);
+}
 })();
 
 /* ---------- リテンション: 最近の編成 / ホーム画面追加 / 再訪ヒント ---------- */
