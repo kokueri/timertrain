@@ -1556,7 +1556,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=11'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=12'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 })();
@@ -1655,9 +1655,25 @@ renderToday(st);
 
 /* ホーム: 今日のログ（再生ボタンの下のカード。ログイン中だけ。押すとデータの窓）
  * blocks: sync.js が渡す区切りごとの { s: 開始ms, secs, label, brk }。名前は textContent でだけ表示する */
-var TL = lang === 'en' ? { title: "Today's log", total: function (d) { return d; }, empty: 'No record yet today. Run a timer for 15 seconds or more and it shows up here.', more: 'See details', noName: 'No name', others: 'Others', hours: ['0', '6', '12', '18', '24'], aria: "Today's log. Open data" }
-: lang === 'es' ? { title: 'Registro de hoy', total: function (d) { return d; }, empty: 'Aún no hay registros hoy. Usa un temporizador 15 segundos o más y aparecerá aquí.', more: 'Ver detalles', noName: 'Sin nombre', others: 'Otros', hours: ['0', '6', '12', '18', '24'], aria: 'Registro de hoy. Ver datos' }
-: { title: '今日のログ', total: function (d) { return '合計 ' + d; }, empty: 'まだ今日の記録はありません。タイマーを15秒以上動かすと、ここに残ります。', more: 'くわしく見る', noName: '名前なし', others: 'ほか', hours: ['0時', '6時', '12時', '18時', '24時'], aria: '今日のログ。データを見る' };
+var TL = lang === 'en' ? { title: "Today's log", total: function (d) { return d; }, empty: 'No record yet today. Run a timer for 15 seconds or more and it shows up here.', more: 'See details', noName: 'No name', others: 'Others', hours: ['0', '6', '12', '18', '24'], aria: "Today's log. Open data",
+cStop: 'Stop', cStartOf: function (l) { return 'Start timing ' + l; }, cStopOf: function (l) { return 'Stop timing ' + l; }, cEditOf: function (l) { return 'Edit ' + l; },
+cAdd: 'Add a button', cAddShort: 'Add', cEdit: 'Edit', cDone: 'Done', cName: 'Name', cPh: 'e.g. Walk', cIcon: 'Icon', cSave: 'Save', cCancel: 'Cancel', cDel: 'Delete', cDelSure: 'Tap again to delete', cClose: 'Close',
+cEmpty: 'Turn things you do often into buttons and time them with one tap (walk, chores, reading…).', cErr: 'Could not save. Please try again.',
+cLimit: function (n) { return 'The free plan has up to ' + n + ' buttons. Premium allows up to 30.'; }, cPlans: 'See plans',
+cIcons: { walk: 'Walk', book: 'Book', home: 'Home', child: 'Kids', cup: 'Cup', moon: 'Sleep', pc: 'Computer', gym: 'Workout', music: 'Music', pen: 'Writing', food: 'Meal', heart: 'Heart' } }
+: lang === 'es' ? { title: 'Registro de hoy', total: function (d) { return d; }, empty: 'Aún no hay registros hoy. Usa un temporizador 15 segundos o más y aparecerá aquí.', more: 'Ver detalles', noName: 'Sin nombre', others: 'Otros', hours: ['0', '6', '12', '18', '24'], aria: 'Registro de hoy. Ver datos',
+cStop: 'Parar', cStartOf: function (l) { return 'Empezar a contar ' + l; }, cStopOf: function (l) { return 'Parar ' + l; }, cEditOf: function (l) { return 'Editar ' + l; },
+cAdd: 'Añadir un botón', cAddShort: 'Añadir', cEdit: 'Editar', cDone: 'Listo', cName: 'Nombre', cPh: 'p. ej. Paseo', cIcon: 'Icono', cSave: 'Guardar', cCancel: 'Cancelar', cDel: 'Eliminar', cDelSure: 'Toca otra vez para eliminar', cClose: 'Cerrar',
+cEmpty: 'Convierte lo que haces a menudo en botones y mide el tiempo con un toque (paseo, tareas, lectura…).', cErr: 'No se pudo guardar. Inténtalo de nuevo.',
+cLimit: function (n) { return 'El plan gratis permite hasta ' + n + ' botones. Premium, hasta 30.'; }, cPlans: 'Ver planes',
+cIcons: { walk: 'Paseo', book: 'Libro', home: 'Casa', child: 'Niños', cup: 'Taza', moon: 'Dormir', pc: 'Ordenador', gym: 'Ejercicio', music: 'Música', pen: 'Escribir', food: 'Comida', heart: 'Corazón' } }
+: { title: '今日のログ', total: function (d) { return '合計 ' + d; }, empty: 'まだ今日の記録はありません。タイマーを15秒以上動かすと、ここに残ります。', more: 'くわしく見る', noName: '名前なし', others: 'ほか', hours: ['0時', '6時', '12時', '18時', '24時'], aria: '今日のログ。データを見る',
+cStop: '止める', cStartOf: function (l) { return l + 'を計りはじめる'; }, cStopOf: function (l) { return l + 'を止める'; }, cEditOf: function (l) { return l + 'を編集'; },
+cAdd: 'ボタンを追加', cAddShort: '追加', cEdit: '編集', cDone: '完了', cName: 'なまえ', cPh: '例：散歩', cIcon: 'アイコン', cSave: '保存', cCancel: 'キャンセル', cDel: '削除', cDelSure: 'もう一度押すと削除', cClose: '閉じる',
+cEmpty: 'よくやることをボタンにすると、1タップで時間を計れます（散歩・家事・読書など）。', cErr: '保存できませんでした。もう一度お試しください。',
+cLimit: function (n) { return 'ボタンは無料プランで' + n + 'つまでです。プレミアムなら30個まで作れます。'; }, cPlans: 'プランを見る',
+cIcons: { walk: '散歩', book: '本', home: '家', child: '子ども', cup: 'カップ', moon: '睡眠', pc: 'パソコン', gym: '運動', music: '音楽', pen: '書く', food: 'ごはん', heart: 'ハート' } };
+var PRICING_URL = lang === 'en' ? '/en-pricing' : lang === 'es' ? '/es-pricing' : '/pricing';
 function fmtDur(sec) {
 var m = Math.round(sec / 60), h = Math.floor(m / 60), mm = m % 60;
 if (lang === 'ja') return h ? h + '時間' + (mm ? mm + '分' : '') : m + '分';
@@ -1668,29 +1684,46 @@ function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.cl
 function renderToday(st) {
 var card = document.getElementById('tt-today');
 var ctr = document.querySelector('#run .run-controls');
-if (!st || !ctr) { if (card) card.remove(); return; }
+if (!st || !ctr) { if (card) card.remove(); stopTicker(); return; }
 if (!card) {
-card = document.createElement('button'); card.type = 'button'; card.id = 'tt-today'; card.className = 'tt-today';
-card.addEventListener('click', function () { if (window.__ttOpenData) window.__ttOpenData('today'); });
+card = mk('div', 'tt-today'); card.id = 'tt-today';
+var open = mk('button', 'tt-today-open'); open.type = 'button';
+open.addEventListener('click', openData);
+var cnt = mk('div', 'tt-count');
+var more = mk('button', 'tt-today-more'); more.type = 'button';
+more.appendChild(mk('span', '', TL.more));
+more.appendChild(svgIcon('M9 6l6 6-6 6'));
+more.addEventListener('click', openData);
+card.appendChild(open); card.appendChild(cnt); card.appendChild(more);
 ctr.insertAdjacentElement('afterend', card);
 }
+renderTodayOpen(card.querySelector('.tt-today-open'), st);
+renderCount(card.querySelector('.tt-count'), st.count);
+}
+function openData() { if (window.__ttOpenData) window.__ttOpenData('today'); }
+function svgIcon(d, cls) {
+var NS = 'http://www.w3.org/2000/svg';
+var s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('aria-hidden', 'true'); if (cls) s.setAttribute('class', cls);
+var p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); s.appendChild(p);
+return s;
+}
+function renderTodayOpen(open, st) {
 var day0 = new Date(); day0.setHours(0, 0, 0, 0);
 var t0 = day0.getTime(), t1 = t0 + 86400000, now = Date.now();
 var bl = (st.blocks || []).filter(function (b) { return b && b.s + b.secs * 1000 > t0 && b.s < t1 && b.secs >= 1; })
 .sort(function (a, b) { return a.s - b.s; });
-// ラベルごとの作業の秒数 → 多い順に色（上位4つ）。休憩は灰色、5つ目以降は「ほか」
+// ラベルごとの作業の秒数 → 多い順に色（上位4つ）。休憩は斜線、5つ目以降は「ほか」
 var tot = {};
 bl.forEach(function (b) { if (!b.brk) tot[b.label] = (tot[b.label] || 0) + b.secs; });
 var keys = Object.keys(tot).sort(function (a, b) { return tot[b] - tot[a]; });
 var cls = {}; keys.forEach(function (k, i) { cls[k] = i < 4 ? 's' + (i + 1) : 'o'; });
-card.textContent = '';
-card.setAttribute('aria-label', TL.aria + ': ' + fmtDur(st.today || 0));
+open.textContent = '';
+open.setAttribute('aria-label', TL.aria + ': ' + fmtDur(st.today || 0));
 var head = mk('span', 'tt-today-head');
 head.appendChild(mk('span', 'tt-today-t', TL.title));
 head.appendChild(mk('span', 'tt-today-sum', TL.total(fmtDur(st.today || 0))));
-card.appendChild(head);
-if (!bl.length) { card.appendChild(mk('span', 'tt-today-empty', TL.empty)); }
-else {
+open.appendChild(head);
+if (!bl.length) { open.appendChild(mk('span', 'tt-today-empty', TL.empty)); return; }
 // 横軸: ふだんは6時〜24時。6時より前の記録がある日は0時から
 var startH = bl[0].s < t0 + 6 * 3600000 ? 0 : 6;
 var a = t0 + startH * 3600000, span = t1 - a;
@@ -1704,10 +1737,10 @@ seg.style.width = Math.max(0.5, (e - s) / span * 100).toFixed(2) + '%';
 bar.appendChild(seg);
 });
 if (now > a && now < t1) { var nw = mk('span', 'tt-today-now'); nw.style.left = ((now - a) / span * 100).toFixed(2) + '%'; bar.appendChild(nw); }
-card.appendChild(bar);
+open.appendChild(bar);
 var ax = mk('span', 'tt-today-axis'); ax.setAttribute('aria-hidden', 'true');
 (startH ? TL.hours.slice(1) : TL.hours.filter(function (x, i) { return i % 2 === 0; })).forEach(function (hh) { ax.appendChild(mk('span', '', hh)); });
-card.appendChild(ax);
+open.appendChild(ax);
 var lg = mk('span', 'tt-today-legend');
 var other = 0;
 keys.forEach(function (k, i) {
@@ -1719,14 +1752,150 @@ it.appendChild(mk('span', 'tt-today-v', fmtDur(tot[k])));
 lg.appendChild(it);
 });
 if (other) { var it2 = mk('span', 'tt-today-item'); it2.appendChild(mk('span', 'tt-today-dot o')); it2.appendChild(mk('span', 'tt-today-name', TL.others)); it2.appendChild(mk('span', 'tt-today-v', fmtDur(other))); lg.appendChild(it2); }
-if (lg.childNodes.length) card.appendChild(lg);
+if (lg.childNodes.length) open.appendChild(lg);
 }
-var ft = mk('span', 'tt-today-more');
-ft.appendChild(mk('span', '', TL.more));
-var ch = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); ch.setAttribute('viewBox', '0 0 24 24'); ch.setAttribute('aria-hidden', 'true');
-var p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', 'M9 6l6 6-6 6'); ch.appendChild(p);
-ft.appendChild(ch);
-card.appendChild(ft);
+
+/* ---- 1タップのカウントアップ（ログイン中。中身は sync.js の window.__ttCount） ---- */
+var CI = { // アイコン（線だけ。用意した絵柄から選ぶ）
+walk: 'M13 4.5a1.5 1.5 0 1 0 0-.01M10 21l2-6 3 3v4M8 12l3-4 4 2 2 3M7 21l3-6',
+book: 'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5V5.5M20 18v3H6.5',
+home: 'M3 11l9-7 9 7M5 9.5V20h5v-6h4v6h5V9.5',
+child: 'M12 8m-4 0a4 4 0 1 0 8 0a4 4 0 1 0-8 0M5 21c1-4 4-6 7-6s6 2 7 6',
+cup: 'M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 9.5h1.5a2.5 2.5 0 0 1 0 5H17M8 2.5v2.5M12 2.5v2.5',
+moon: 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z',
+pc: 'M5 4h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM8 20h8M12 16v4',
+gym: 'M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11',
+music: 'M9 18V5l11-2v13M9 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0M20 16m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0',
+pen: 'M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4',
+food: 'M3 12h18a9 9 0 0 1-18 0zM8.5 8c0-2 2-2 2-4.5M13.5 8c0-2 2-2 2-4.5',
+heart: 'M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z'
+};
+var CU = { editing: false, form: null, icon: 'walk', key: '' };
+var tick = null;
+function stopTicker() { clearInterval(tick); tick = null; }
+function clock(sec) { sec = Math.floor(sec); var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60; return (h ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (s < 10 ? '0' : '') + s; }
+function renderCount(box, cs) {
+if (!cs || !window.__ttCount) { box.hidden = true; stopTicker(); return; }
+box.hidden = false;
+var key = JSON.stringify([cs.btns, cs.run && cs.run.id, cs.run && cs.run.start, cs.max, CU.editing, CU.form]);
+if (CU.form && box.querySelector('.tt-cform')) return; // 入力中は作り直さない
+if (key === CU.key && box.childNodes.length) return;
+CU.key = key;
+box.textContent = '';
+// いま計っているもの
+stopTicker();
+if (cs.run) {
+var run = mk('div', 'tt-crun'); run.setAttribute('role', 'status');
+var ic = mk('span', 'tt-crun-ic'); ic.appendChild(svgIcon(CI[cs.run.icon] || CI.walk));
+run.appendChild(ic);
+run.appendChild(mk('span', 'tt-crun-n', cs.run.label));
+var tt = mk('span', 'tt-crun-t', clock((Date.now() - cs.run.start) / 1000));
+run.appendChild(tt);
+var stop = mk('button', 'tt-crun-stop', TL.cStop); stop.type = 'button';
+stop.addEventListener('click', function () { window.__ttCount.stop(); });
+run.appendChild(stop);
+box.appendChild(run);
+var start = cs.run.start;
+tick = setInterval(function () { if (!document.body.contains(tt)) { stopTicker(); return; } tt.textContent = clock(Math.min(43200, (Date.now() - start) / 1000)); }, 1000);
+}
+var row = mk('div', 'tt-crow');
+cs.btns.forEach(function (b) {
+var on = cs.run && cs.run.id === b.id;
+var btn = mk('button', 'tt-cbtn' + (on ? ' on' : '') + (CU.editing ? ' edit' : '')); btn.type = 'button';
+btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+btn.setAttribute('aria-label', CU.editing ? TL.cEditOf(b.label) : (on ? TL.cStopOf(b.label) : TL.cStartOf(b.label)));
+var c = mk('span', 'tt-cbtn-c'); c.appendChild(svgIcon(CI[b.icon] || CI.walk));
+btn.appendChild(c);
+btn.appendChild(mk('span', 'tt-cbtn-l', b.label));
+btn.addEventListener('click', function () {
+if (CU.editing) { CU.form = b.id; CU.icon = b.icon; CU.key = ''; renderCount(box, window.__ttCount.state()); return; }
+window.__ttCount.start(b.id);
+});
+row.appendChild(btn);
+});
+var full = cs.btns.length >= cs.max;
+var add = mk('button', 'tt-cbtn add'); add.type = 'button'; add.setAttribute('aria-label', TL.cAdd);
+var ac = mk('span', 'tt-cbtn-c'); ac.appendChild(svgIcon('M12 5v14M5 12h14')); add.appendChild(ac);
+add.appendChild(mk('span', 'tt-cbtn-l', TL.cAddShort));
+add.addEventListener('click', function () {
+if (full) { CU.form = 'limit'; window.__ttCount.limitHit(); }
+else { CU.form = 'new'; CU.icon = 'walk'; }
+CU.key = ''; renderCount(box, window.__ttCount.state());
+});
+if (!CU.editing) row.appendChild(add);
+box.appendChild(row);
+if (!cs.btns.length && !CU.form) box.appendChild(mk('p', 'tt-cnote', TL.cEmpty));
+if (cs.btns.length && !CU.form) {
+var ed = mk('button', 'tt-cedit', CU.editing ? TL.cDone : TL.cEdit); ed.type = 'button';
+ed.addEventListener('click', function () { CU.editing = !CU.editing; CU.key = ''; renderCount(box, window.__ttCount.state()); });
+box.appendChild(ed);
+}
+if (CU.form === 'limit') {
+var lim = mk('div', 'tt-cform');
+lim.appendChild(mk('p', 'tt-cnote', TL.cLimit(cs.max)));
+var la = mk('a', 'tt-cplans', TL.cPlans); la.href = PRICING_URL; lim.appendChild(la);
+var lc = mk('button', 'tt-cbtn2', TL.cClose); lc.type = 'button';
+lc.addEventListener('click', function () { CU.form = null; CU.key = ''; renderCount(box, window.__ttCount.state()); });
+lim.appendChild(lc);
+box.appendChild(lim);
+} else if (CU.form) {
+box.appendChild(countForm(box, cs));
+}
+}
+function countForm(box, cs) {
+var editing = CU.form !== 'new';
+var cur = editing ? cs.btns.filter(function (b) { return b.id === CU.form; })[0] : null;
+if (editing && !cur) { CU.form = null; return mk('span'); }
+var f = mk('div', 'tt-cform');
+var lab = mk('label', 'tt-cform-l', TL.cName);
+var inp = mk('input', 'tt-cform-in'); inp.type = 'text'; inp.maxLength = 20; inp.id = 'tt-cform-in'; inp.placeholder = TL.cPh; inp.autocomplete = 'off';
+if (cur) inp.value = cur.label;
+lab.htmlFor = 'tt-cform-in';
+f.appendChild(lab); f.appendChild(inp);
+f.appendChild(mk('span', 'tt-cform-l', TL.cIcon));
+var ics = mk('div', 'tt-cform-ic'); ics.setAttribute('role', 'group'); ics.setAttribute('aria-label', TL.cIcon);
+(window.__ttCount.icons || Object.keys(CI)).forEach(function (k) {
+if (!CI[k]) return;
+var ib = mk('button', 'tt-cform-ib' + (CU.icon === k ? ' on' : '')); ib.type = 'button';
+ib.setAttribute('aria-pressed', CU.icon === k ? 'true' : 'false'); ib.setAttribute('aria-label', TL.cIcons[k] || k);
+ib.appendChild(svgIcon(CI[k]));
+ib.addEventListener('click', function () {
+CU.icon = k;
+ics.querySelectorAll('.tt-cform-ib').forEach(function (x) { var y = x === ib; x.classList.toggle('on', y); x.setAttribute('aria-pressed', y ? 'true' : 'false'); });
+});
+ics.appendChild(ib);
+});
+f.appendChild(ics);
+var msg = mk('p', 'tt-cnote'); msg.setAttribute('role', 'status');
+var acts = mk('div', 'tt-cform-a');
+var ok = mk('button', 'tt-cbtn2 pri', TL.cSave); ok.type = 'button';
+var cancel = mk('button', 'tt-cbtn2', TL.cCancel); cancel.type = 'button';
+function close() { CU.form = null; CU.key = ''; renderCount(box, window.__ttCount.state()); }
+cancel.addEventListener('click', close);
+ok.addEventListener('click', function () {
+var v = inp.value.trim();
+if (!v) { inp.focus(); return; }
+var list = window.__ttCount.state().btns;
+if (cur) list = list.map(function (b) { return b.id === cur.id ? { id: b.id, label: v, icon: CU.icon } : b; });
+else list.push({ id: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), label: v, icon: CU.icon });
+ok.disabled = true;
+window.__ttCount.save(list).then(function (r) { if (r === false) { msg.textContent = TL.cErr; ok.disabled = false; return; } CU.editing = false; close(); });
+});
+inp.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); ok.click(); } });
+acts.appendChild(ok); acts.appendChild(cancel);
+if (cur) {
+var del = mk('button', 'tt-cbtn2 del', TL.cDel); del.type = 'button';
+var armed = false;
+del.addEventListener('click', function () {
+if (!armed) { armed = true; del.textContent = TL.cDelSure; return; } // 2回押しで削除（確認ダイアログは使わない）
+if (window.__ttCount.state().run && window.__ttCount.state().run.id === cur.id) window.__ttCount.stop();
+window.__ttCount.save(window.__ttCount.state().btns.filter(function (b) { return b.id !== cur.id; })).then(function () { CU.editing = false; close(); });
+});
+acts.appendChild(del);
+}
+f.appendChild(acts); f.appendChild(msg);
+setTimeout(function () { try { inp.focus({ preventScroll: false }); } catch (e) {} }, 0);
+return f;
 }
 })();
 
