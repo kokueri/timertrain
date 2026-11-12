@@ -1556,7 +1556,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=12'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=13'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 })();
@@ -1657,19 +1657,19 @@ renderToday(st);
  * blocks: sync.js が渡す区切りごとの { s: 開始ms, secs, label, brk }。名前は textContent でだけ表示する */
 var TL = lang === 'en' ? { title: "Today's log", total: function (d) { return d; }, empty: 'No record yet today. Run a timer for 15 seconds or more and it shows up here.', more: 'See details', noName: 'No name', others: 'Others', hours: ['0', '6', '12', '18', '24'], aria: "Today's log. Open data",
 cStop: 'Stop', cStartOf: function (l) { return 'Start timing ' + l; }, cStopOf: function (l) { return 'Stop timing ' + l; }, cEditOf: function (l) { return 'Edit ' + l; },
-cAdd: 'Add a button', cAddShort: 'Add', cEdit: 'Edit', cDone: 'Done', cName: 'Name', cPh: 'e.g. Walk', cIcon: 'Icon', cSave: 'Save', cCancel: 'Cancel', cDel: 'Delete', cDelSure: 'Tap again to delete', cClose: 'Close',
+cFromLabels: 'From your labels', cAdd: 'Add a button', cAddShort: 'Add', cEdit: 'Edit', cDone: 'Done', cName: 'Name', cPh: 'e.g. Walk', cIcon: 'Icon', cSave: 'Save', cCancel: 'Cancel', cDel: 'Delete', cDelSure: 'Tap again to delete', cClose: 'Close',
 cEmpty: 'Turn things you do often into buttons and time them with one tap (walk, chores, reading…).', cErr: 'Could not save. Please try again.',
 cLimit: function (n) { return 'The free plan has up to ' + n + ' buttons. Premium allows up to 30.'; }, cPlans: 'See plans',
 cIcons: { walk: 'Walk', book: 'Book', home: 'Home', child: 'Kids', cup: 'Cup', moon: 'Sleep', pc: 'Computer', gym: 'Workout', music: 'Music', pen: 'Writing', food: 'Meal', heart: 'Heart' } }
 : lang === 'es' ? { title: 'Registro de hoy', total: function (d) { return d; }, empty: 'Aún no hay registros hoy. Usa un temporizador 15 segundos o más y aparecerá aquí.', more: 'Ver detalles', noName: 'Sin nombre', others: 'Otros', hours: ['0', '6', '12', '18', '24'], aria: 'Registro de hoy. Ver datos',
 cStop: 'Parar', cStartOf: function (l) { return 'Empezar a contar ' + l; }, cStopOf: function (l) { return 'Parar ' + l; }, cEditOf: function (l) { return 'Editar ' + l; },
-cAdd: 'Añadir un botón', cAddShort: 'Añadir', cEdit: 'Editar', cDone: 'Listo', cName: 'Nombre', cPh: 'p. ej. Paseo', cIcon: 'Icono', cSave: 'Guardar', cCancel: 'Cancelar', cDel: 'Eliminar', cDelSure: 'Toca otra vez para eliminar', cClose: 'Cerrar',
+cFromLabels: 'De tus etiquetas', cAdd: 'Añadir un botón', cAddShort: 'Añadir', cEdit: 'Editar', cDone: 'Listo', cName: 'Nombre', cPh: 'p. ej. Paseo', cIcon: 'Icono', cSave: 'Guardar', cCancel: 'Cancelar', cDel: 'Eliminar', cDelSure: 'Toca otra vez para eliminar', cClose: 'Cerrar',
 cEmpty: 'Convierte lo que haces a menudo en botones y mide el tiempo con un toque (paseo, tareas, lectura…).', cErr: 'No se pudo guardar. Inténtalo de nuevo.',
 cLimit: function (n) { return 'El plan gratis permite hasta ' + n + ' botones. Premium, hasta 30.'; }, cPlans: 'Ver planes',
 cIcons: { walk: 'Paseo', book: 'Libro', home: 'Casa', child: 'Niños', cup: 'Taza', moon: 'Dormir', pc: 'Ordenador', gym: 'Ejercicio', music: 'Música', pen: 'Escribir', food: 'Comida', heart: 'Corazón' } }
 : { title: '今日のログ', total: function (d) { return '合計 ' + d; }, empty: 'まだ今日の記録はありません。タイマーを15秒以上動かすと、ここに残ります。', more: 'くわしく見る', noName: '名前なし', others: 'ほか', hours: ['0時', '6時', '12時', '18時', '24時'], aria: '今日のログ。データを見る',
 cStop: '止める', cStartOf: function (l) { return l + 'を計りはじめる'; }, cStopOf: function (l) { return l + 'を止める'; }, cEditOf: function (l) { return l + 'を編集'; },
-cAdd: 'ボタンを追加', cAddShort: '追加', cEdit: '編集', cDone: '完了', cName: 'なまえ', cPh: '例：散歩', cIcon: 'アイコン', cSave: '保存', cCancel: 'キャンセル', cDel: '削除', cDelSure: 'もう一度押すと削除', cClose: '閉じる',
+cFromLabels: 'これまでのラベルから', cAdd: 'ボタンを追加', cAddShort: '追加', cEdit: '編集', cDone: '完了', cName: 'なまえ', cPh: '例：散歩', cIcon: 'アイコン', cSave: '保存', cCancel: 'キャンセル', cDel: '削除', cDelSure: 'もう一度押すと削除', cClose: '閉じる',
 cEmpty: 'よくやることをボタンにすると、1タップで時間を計れます（散歩・家事・読書など）。', cErr: '保存できませんでした。もう一度お試しください。',
 cLimit: function (n) { return 'ボタンは無料プランで' + n + 'つまでです。プレミアムなら30個まで作れます。'; }, cPlans: 'プランを見る',
 cIcons: { walk: '散歩', book: '本', home: '家', child: '子ども', cup: 'カップ', moon: '睡眠', pc: 'パソコン', gym: '運動', music: '音楽', pen: '書く', food: 'ごはん', heart: 'ハート' } };
@@ -1850,8 +1850,23 @@ var f = mk('div', 'tt-cform');
 var lab = mk('label', 'tt-cform-l', TL.cName);
 var inp = mk('input', 'tt-cform-in'); inp.type = 'text'; inp.maxLength = 20; inp.id = 'tt-cform-in'; inp.placeholder = TL.cPh; inp.autocomplete = 'off';
 if (cur) inp.value = cur.label;
+if (document.getElementById('tt-labels')) inp.setAttribute('list', 'tt-labels');
 lab.htmlFor = 'tt-cform-in';
 f.appendChild(lab); f.appendChild(inp);
+// これまでのラベル（タイマーの区切り名・カウントアップ）から選べる。すでにボタンにあるものは出さない
+var have = {}; cs.btns.forEach(function (b) { have[b.label] = 1; });
+var labs = (window.__ttCount.labels ? window.__ttCount.labels() : []).map(function (l) { return l.slice(0, 20); })
+.filter(function (l, i, a) { return l && !have[l] && a.indexOf(l) === i; }).slice(0, 8);
+if (labs.length) {
+var lw = mk('div', 'tt-clabs'); lw.setAttribute('role', 'group'); lw.setAttribute('aria-label', TL.cFromLabels);
+lw.appendChild(mk('span', 'tt-clabs-t', TL.cFromLabels));
+labs.forEach(function (l) {
+var c = mk('button', 'tt-clab', l); c.type = 'button';
+c.addEventListener('click', function () { inp.value = l; lw.querySelectorAll('.tt-clab').forEach(function (x) { x.classList.toggle('on', x === c); }); });
+lw.appendChild(c);
+});
+f.appendChild(lw);
+}
 f.appendChild(mk('span', 'tt-cform-l', TL.cIcon));
 var ics = mk('div', 'tt-cform-ic'); ics.setAttribute('role', 'group'); ics.setAttribute('aria-label', TL.cIcon);
 (window.__ttCount.icons || Object.keys(CI)).forEach(function (k) {

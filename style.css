@@ -881,6 +881,10 @@ color: var(--text); text-align: left; font-variant-numeric: tabular-nums;
 .tt-cform-l { font-size: 12px; font-weight: 700; }
 .tt-cform-in { height: 44px; box-sizing: border-box; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text); font: inherit; font-size: 16px; }
 .tt-cform-in:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; }
+.tt-clabs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tt-clabs-t { width: 100%; font-size: 11px; color: var(--text2); }
+.tt-clab { max-width: 100%; min-height: 32px; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 16px; background: var(--card); color: var(--text); font: inherit; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.tt-clab.on { border-color: var(--text); font-weight: 700; }
 .tt-cform-ic { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
 .tt-cform-ib { display: flex; align-items: center; justify-content: center; height: 44px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text); cursor: pointer; }
 .tt-cform-ib.on { background: var(--text); color: var(--card); border-color: var(--text); }

@@ -448,12 +448,14 @@
     } catch (e) {}
   }
   /* ---------- ラベルの候補（一度使った区切りの名前。タイマー名の入力欄に出す） ---------- */
+  var recentLabels = []; // 最近使ったラベル（新しい順。カウントアップのボタン作成でも候補に出す）
   async function loadLabels() {
     try {
       var r = await sb.from('usage_segments').select('label').eq('product', PRODUCT).order('started_at', { ascending: false }).limit(500);
       if (r.error || !r.data) return;
       var seen = {}, out = [];
       r.data.forEach(function (x) { var l = String(x.label || '').trim().slice(0, 30); if (l && !seen[l] && out.length < 40) { seen[l] = 1; out.push(l); } });
+      recentLabels = out;
       var dl = document.getElementById('tt-labels');
       if (!dl) { dl = document.createElement('datalist'); dl.id = 'tt-labels'; document.body.appendChild(dl); }
       dl.textContent = '';
@@ -686,6 +688,7 @@
       if (ST.day === dayKey(new Date(R.start))) { ST.todayLogs[L.id] = workOf(L); putBlocks(L.id, blocksOf(L, L.id)); }
       try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {}
       showStatsNow();
+      loadLabels();
     });
   }
   function cResume() {
@@ -736,7 +739,8 @@
     if (window.__ttSetPlan) { try { window.__ttSetPlan(PREMIUM ? 'premium' : 'free'); } catch (e) {} }
     window.__ttBreaks = function () { return BREAKS; };
     window.__ttStatsRefresh = function () { loadStreak(true); };
-    window.__ttCount = { start: cStart, stop: function () { cStop(false); }, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); } };
+    window.__ttCount = { start: cStart, stop: function () { cStop(false); }, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
+      labels: function () { return recentLabels.filter(function (l) { return !isBreak(l); }); } };
     cResume();
     hookLogs();
     hookSettings();
