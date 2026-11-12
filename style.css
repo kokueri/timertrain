@@ -362,6 +362,7 @@ body.focus-mode #theme-btn { display: none; }
 /* ================= リテンション UI（最近の編成・ホーム画面追加・再訪ヒント） ================= */
 .tt-recents { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: center; margin: 0 0 20px; }
 .tt-recents-label { font-size: 12px; color: var(--text2); }
+.tt-recents .tt-chip { max-width: 34vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tt-chip {
 display: inline-block; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 font-size: 13px; color: var(--text); background: var(--card);
@@ -829,17 +830,21 @@ font: inherit; font-size: 13px; font-weight: 600; color: var(--text); font-varia
 /* 今日のログ（ホームのカード） */
 .tt-today {
 --ttd-s1: #2a78d6; --ttd-s2: #eb6834; --ttd-s3: #1baf7a; --ttd-s4: #eda100; --ttd-g: #a3a19b;
-display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 460px; box-sizing: border-box; margin: 20px auto 0;
-padding: 14px 16px 12px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--card); box-shadow: var(--shadow);
-font: inherit; color: var(--text); text-align: left; cursor: pointer; font-variant-numeric: tabular-nums;
+display: flex; flex-direction: column; width: 100%; max-width: 460px; box-sizing: border-box; margin: 20px auto 0; overflow: hidden;
+border-radius: var(--radius); border: 1px solid var(--line); background: var(--card); box-shadow: var(--shadow);
+color: var(--text); text-align: left; font-variant-numeric: tabular-nums;
 }
-.tt-today:hover { border-color: var(--text2); }
-.tt-today:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.tt-today-open { display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; padding: 14px 16px 12px; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.tt-today-open:hover { background: rgba(127,127,127,.05); }
+.tt-today button:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
+/* iPhone の Safari ではボタンの中の要素が幅0に縮むことがあるので、幅を明示する */
+.tt-today-open > span { display: block; width: 100%; box-sizing: border-box; align-self: stretch; }
+.tt-today-open > .tt-today-head, .tt-today-open > .tt-today-axis, .tt-today-open > .tt-today-legend { display: flex; }
 .tt-today-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
 .tt-today-t { font-size: 15px; font-weight: 700; }
 .tt-today-sum { font-size: 15px; font-weight: 800; }
 .tt-today-empty { font-size: 13px; color: var(--text2); line-height: 1.6; }
-.tt-today-bar { position: relative; display: block; height: 24px; border-radius: 8px; background: rgba(0,0,0,.06); overflow: hidden; }
+.tt-today-bar { position: relative; display: block; width: 100%; min-width: 0; height: 24px; border-radius: 8px; background: rgba(0,0,0,.06); overflow: hidden; }
 .tt-today-seg { position: absolute; top: 0; bottom: 0; }
 .tt-today-now { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--text); }
 .tt-today-axis { display: flex; justify-content: space-between; margin-top: -6px; font-size: 11px; color: var(--text2); }
@@ -850,7 +855,45 @@ font: inherit; color: var(--text); text-align: left; cursor: pointer; font-varia
 .tt-today-dot { width: 9px; height: 9px; border-radius: 3px; flex-shrink: 0; }
 .tt-today .s1 { background: var(--ttd-s1); } .tt-today .s2 { background: var(--ttd-s2); } .tt-today .s3 { background: var(--ttd-s3); } .tt-today .s4 { background: var(--ttd-s4); }
 .tt-today .o { background: var(--ttd-g); } .tt-today .b { background: repeating-linear-gradient(135deg, rgba(0,0,0,.22) 0 2px, transparent 2px 4px); }
-.tt-today-more { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13px; font-weight: 700; }
+.tt-today-more { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 44px; box-sizing: border-box; padding: 10px 16px; border: 0; border-top: 1px solid var(--line); background: none; font: inherit; color: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.tt-today-more:hover { background: rgba(127,127,127,.05); }
+/* 1タップのカウントアップ */
+.tt-count { display: flex; flex-direction: column; gap: 10px; padding: 0 16px 12px; }
+.tt-count[hidden] { display: none; }
+.tt-crow { display: flex; flex-wrap: wrap; gap: 10px 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+.tt-crun + .tt-crow { border-top: 0; padding-top: 0; }
+.tt-cbtn { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 62px; padding: 0; border: 0; background: none; font: inherit; color: var(--text); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.tt-cbtn-c { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--line); background: var(--card); transition: background .15s, color .15s; }
+.tt-cbtn:hover .tt-cbtn-c { border-color: var(--text2); }
+.tt-cbtn.on .tt-cbtn-c { background: var(--text); color: var(--card); border-color: var(--text); }
+.tt-cbtn.add .tt-cbtn-c, .tt-cbtn.edit .tt-cbtn-c { border-style: dashed; border-color: var(--text2); }
+.tt-cbtn.add { color: var(--text2); }
+.tt-cbtn-l { max-width: 62px; font-size: 11px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-cbtn svg, .tt-crun svg, .tt-cform-ib svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tt-crun { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 6px 6px 6px 12px; border-radius: 14px; background: var(--text); color: var(--card); }
+.tt-crun-ic { display: flex; }
+.tt-crun-n { flex: 1; min-width: 0; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-crun-t { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.tt-crun-stop { height: 40px; padding: 0 16px; border: 0; border-radius: 20px; background: var(--card); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; }
+.tt-cedit { align-self: flex-end; min-height: 32px; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 12px; color: var(--text2); text-decoration: underline; cursor: pointer; }
+.tt-cnote { margin: 0; font-size: 12px; line-height: 1.6; color: var(--text2); }
+.tt-cform { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: rgba(127,127,127,.08); }
+.tt-cform-l { font-size: 12px; font-weight: 700; }
+.tt-cform-in { height: 44px; box-sizing: border-box; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text); font: inherit; font-size: 16px; }
+.tt-cform-in:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; }
+.tt-clabs { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tt-clabs-t { width: 100%; font-size: 11px; color: var(--text2); }
+.tt-clab { max-width: 100%; min-height: 32px; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 16px; background: var(--card); color: var(--text); font: inherit; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.tt-clab.on { border-color: var(--text); font-weight: 700; }
+.tt-cform-ic { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.tt-cform-ib { display: flex; align-items: center; justify-content: center; height: 44px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text); cursor: pointer; }
+.tt-cform-ib.on { background: var(--text); color: var(--card); border-color: var(--text); }
+.tt-cform-a { display: flex; flex-wrap: wrap; gap: 8px; }
+.tt-cbtn2 { height: 40px; padding: 0 16px; border: 1.5px solid var(--line); border-radius: 20px; background: var(--card); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; }
+.tt-cbtn2.pri { background: var(--text); color: var(--card); border-color: var(--text); }
+.tt-cbtn2.del { margin-left: auto; }
+.tt-cbtn2:disabled { opacity: .5; cursor: default; }
+.tt-cplans { align-self: flex-start; font-size: 13px; font-weight: 700; color: var(--text); }
 .tt-today-more svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 @media (prefers-color-scheme: dark) {
 :root:where(:not([data-theme="light"])) .tt-today { --ttd-s1: #3987e5; --ttd-s2: #d95926; --ttd-s3: #199e70; --ttd-s4: #c98500; --ttd-g: #77756f; }

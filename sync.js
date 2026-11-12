@@ -382,14 +382,15 @@
   var lastShown = '';
   function showStats() {
     if (!ST || !window.__ttSetStats) return;
-    var t = 0, cur = log && log.id;
-    for (var k in ST.todayLogs) if (k !== cur) t += ST.todayLogs[k];
-    var blocks = (ST.blocks || []).filter(function (b) { return !cur || b.lid !== cur; });
+    var t = 0, cur = log && log.id, ccur = cRun && cRun.L.id;
+    for (var k in ST.todayLogs) if (k !== cur && k !== ccur) t += ST.todayLogs[k];
+    var blocks = (ST.blocks || []).filter(function (b) { return (!cur || b.lid !== cur) && (!ccur || b.lid !== ccur); });
     if (log && ST.day === dayKey(new Date(log.startedAt))) { t += workOf(log); blocks = blocks.concat(blocksOf(log, cur || 'live')); }
+    if (cRun && ST.day === dayKey(new Date(cRun.start))) { var CL = cLog(); t += workOf(CL); blocks = blocks.concat(blocksOf(CL, ccur || 'count')); }
     var key = Math.floor(t / 60) + '/' + ST.days7 + '/' + ST.n + '/' + ST.streakToday + '/' + blocks.length + '/' + Math.floor(Date.now() / 300000);
     if (key === lastShown) return;
     lastShown = key;
-    try { window.__ttSetStats({ today: t, days7: ST.days7, streak: ST.n, streakToday: ST.streakToday, blocks: blocks }); } catch (e) {}
+    try { window.__ttSetStats({ today: t, days7: ST.days7, streak: ST.n, streakToday: ST.streakToday, blocks: blocks, count: cState() }); } catch (e) {}
   }
   async function loadStreak(force) {
     try {
@@ -447,12 +448,14 @@
     } catch (e) {}
   }
   /* ---------- ラベルの候補（一度使った区切りの名前。タイマー名の入力欄に出す） ---------- */
+  var recentLabels = []; // 最近使ったラベル（新しい順。カウントアップのボタン作成でも候補に出す）
   async function loadLabels() {
     try {
       var r = await sb.from('usage_segments').select('label').eq('product', PRODUCT).order('started_at', { ascending: false }).limit(500);
       if (r.error || !r.data) return;
       var seen = {}, out = [];
       r.data.forEach(function (x) { var l = String(x.label || '').trim().slice(0, 30); if (l && !seen[l] && out.length < 40) { seen[l] = 1; out.push(l); } });
+      recentLabels = out;
       var dl = document.getElementById('tt-labels');
       if (!dl) { dl = document.createElement('datalist'); dl.id = 'tt-labels'; document.body.appendChild(dl); }
       dl.textContent = '';
@@ -467,7 +470,7 @@
         L.busy = true;
         var r = await sb.from('usage_logs').insert({
           product: PRODUCT, started_at: L.startedAt, total_secs: secs, completed: !!done,
-          ended_at: done ? new Date().toISOString() : null, config: L.timerName ? { q: L.q, name: L.timerName } : { q: L.q }, page: L.page,
+          ended_at: done ? new Date().toISOString() : null, config: Object.assign(L.timerName ? { q: L.q, name: L.timerName } : { q: L.q }, L.extra || {}), page: L.page,
           timer_id: L.timerId
         }).select('id').single();
         L.busy = false;
@@ -582,6 +585,10 @@
     var r = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
     if (r.error) return;
     var remote = (r.data && r.data.data) || {};
+    if (Array.isArray(remote.countBtns)) {
+      var rb = cleanBtns(remote.countBtns);
+      if (JSON.stringify(rb) !== JSON.stringify(cBtns)) { cBtns = rb; try { localStorage.setItem(CB_KEY, JSON.stringify(rb)); } catch (e) {} showStatsNow(); }
+    }
     remoteData = { recents: cleanRecents(remote.recents), theme: (remote.theme === 'dark' || remote.theme === 'light') ? remote.theme : null, themeAt: Number(remote.themeAt) || 0 };
     var L = readLocal();
     if (remoteData.theme && remoteData.themeAt > L.themeAt && remoteData.theme !== L.theme && window.__ttApplyTheme) {
@@ -600,6 +607,115 @@
     var prevStart2 = window.__ttOnStart;
     window.__ttOnStart = function () { if (prevStart2) { try { prevStart2(); } catch (e) {} } pushSoon(); };
   }
+
+  /* ---------- 1タップのカウントアップ ----------
+   * ボタン（名前＋アイコン）は settings.data.countBtns（端末にも控え）。押した時刻を保存して「いま − 押した時刻」で数えるので、
+   * 画面を閉じてもスマホが裏に回ってもずれない。再読み込みしても続きから。カウントアップ同士は1つずつ（別のを押すと前のは止まる）。
+   * 記録は普通の利用記録と同じ表に、区切り1つ・config.count=1 で入れる（15秒未満は残さない）。12時間で自動で止める。
+   */
+  var CB_KEY = 'tt-count-btns', CR_KEY = 'tt-count-run', C_MAX = 12 * 3600, CB_FREE = 3, CB_MAX = 30;
+  var ICONS = ['walk', 'book', 'home', 'child', 'cup', 'moon', 'pc', 'gym', 'music', 'pen', 'food', 'heart'];
+  function cleanBtns(a) {
+    if (!Array.isArray(a)) return [];
+    var out = [], seen = {};
+    a.forEach(function (b) {
+      if (!b || typeof b !== 'object' || out.length >= CB_MAX) return;
+      var id = String(b.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 16);
+      var label = String(b.label || '').replace(/[\u0000-\u001f]/g, '').trim().slice(0, 20);
+      if (!id || !label || seen[id]) return;
+      seen[id] = 1;
+      out.push({ id: id, label: label, icon: ICONS.indexOf(b.icon) >= 0 ? b.icon : 'walk' });
+    });
+    return out;
+  }
+  var cBtns = []; try { cBtns = cleanBtns(JSON.parse(localStorage.getItem(CB_KEY) || '[]')); } catch (e) {}
+  var cRun = null, cTick = null; // cRun: { id, label, icon, start, L }
+  function cMake(b, start, lid) {
+    var iso = new Date(start).toISOString();
+    return { id: b.id, label: b.label, icon: b.icon, start: start,
+      L: { startedAt: iso, secs: 0, q: null, page: 'count', id: lid || null, saved: lid ? Date.now() : 0, timerId: null, timerName: b.label,
+        extra: { count: 1, icon: b.icon }, segs: [{ seq: 0, label: b.label, secs: 0, startedAt: iso, sent: -1, closed: false }] } };
+  }
+  function cLog() {
+    var L = cRun.L;
+    L.secs = Math.max(0, Math.min(C_MAX, (Date.now() - cRun.start) / 1000));
+    L.segs[0].secs = L.secs;
+    return L;
+  }
+  function cState() {
+    return { btns: cBtns.slice(), run: cRun ? { id: cRun.id, label: cRun.label, icon: cRun.icon, start: cRun.start } : null,
+      max: PREMIUM ? CB_MAX : CB_FREE, premium: PREMIUM };
+  }
+  function cSaveRun() {
+    try {
+      if (cRun) localStorage.setItem(CR_KEY, JSON.stringify({ id: cRun.id, label: cRun.label, icon: cRun.icon, start: cRun.start, lid: cRun.L.id || null }));
+      else localStorage.removeItem(CR_KEY);
+    } catch (e) {}
+  }
+  function showStatsNow() { lastShown = ''; showStats(); }
+  function cStep() {
+    if (!cRun) return;
+    var L = cLog();
+    if (L.secs >= C_MAX) { cStop(true); return; }
+    if (!L.busy && (L.id ? Date.now() - L.saved > 60000 : L.secs >= 15)) persistLog(L, false).then(cSaveRun);
+    showStatsNow();
+  }
+  function cBegin(R) {
+    cRun = R; cSaveRun();
+    clearInterval(cTick); cTick = setInterval(cStep, 15000);
+  }
+  function cStart(id) {
+    var b = cBtns.filter(function (x) { return x.id === id; })[0];
+    if (!b) return;
+    if (cRun && cRun.id === id) { cStop(false); return; }
+    if (cRun) cStop(false);
+    cBegin(cMake(b, Date.now(), null));
+    ev('count_start', { n: cBtns.length, member: PREMIUM ? 'premium' : 'free' });
+    showStatsNow();
+  }
+  function cStop(auto) {
+    if (!cRun) return;
+    clearInterval(cTick); cTick = null;
+    var R = cRun, L = cLog(); cRun = null; cSaveRun();
+    ev('count_stop', { min: Math.round(L.secs / 60), auto: auto ? 1 : 0 });
+    if (!L.id && L.secs < 15) { showStatsNow(); return; }
+    var tmp = L.id || ('local' + Date.now());
+    if (ST && ST.day === dayKey(new Date(R.start))) { ST.todayLogs[tmp] = workOf(L); putBlocks(tmp, blocksOf(L, tmp)); }
+    showStatsNow();
+    persistLog(L, true).then(function () {
+      if (!L.id || !ST) return;
+      if (tmp !== L.id) { delete ST.todayLogs[tmp]; ST.blocks = (ST.blocks || []).filter(function (b) { return b.lid !== tmp; }); }
+      if (ST.day === dayKey(new Date(R.start))) { ST.todayLogs[L.id] = workOf(L); putBlocks(L.id, blocksOf(L, L.id)); }
+      try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {}
+      showStatsNow();
+      loadLabels();
+    });
+  }
+  function cResume() {
+    var saved = null; try { saved = JSON.parse(localStorage.getItem(CR_KEY) || 'null'); } catch (e) {}
+    if (!saved || typeof saved.start !== 'number' || !isFinite(saved.start) || saved.start > Date.now() + 60000) { cSaveRun(); return; }
+    var b = cleanBtns([{ id: saved.id, label: saved.label, icon: saved.icon }])[0];
+    if (!b) { try { localStorage.removeItem(CR_KEY); } catch (e) {} return; }
+    var lid = (typeof saved.lid === 'string' && /^[0-9a-f-]{36}$/i.test(saved.lid)) ? saved.lid : null;
+    cBegin(cMake(b, saved.start, lid));
+    cStep();
+  }
+  async function cSaveBtns(list) {
+    list = cleanBtns(list);
+    if (!PREMIUM && list.length > Math.max(CB_FREE, cBtns.length)) return false;
+    var before = cBtns;
+    cBtns = list; try { localStorage.setItem(CB_KEY, JSON.stringify(list)); } catch (e) {}
+    if (list.length > before.length) ev('count_button_create', { n: list.length });
+    showStatsNow();
+    try {
+      var cur = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
+      if (cur.error) return false;
+      var base = (cur.data && cur.data.data && typeof cur.data.data === 'object') ? cur.data.data : {};
+      var r = await sb.from('settings').upsert({ product: PRODUCT, data: Object.assign({}, base, { countBtns: list }) }, { onConflict: 'user_id,product' });
+      return !r.error;
+    } catch (e) { return false; }
+  }
+  window.addEventListener('pagehide', function () { if (cRun) { var L = cLog(); if (L.id || L.secs >= 15) persistLog(L, false); } });
 
   (async function init() {
     var s = await sb.auth.getSession();
@@ -623,6 +739,9 @@
     if (window.__ttSetPlan) { try { window.__ttSetPlan(PREMIUM ? 'premium' : 'free'); } catch (e) {} }
     window.__ttBreaks = function () { return BREAKS; };
     window.__ttStatsRefresh = function () { loadStreak(true); };
+    window.__ttCount = { start: cStart, stop: function () { cStop(false); }, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
+      labels: function () { return recentLabels.filter(function (l) { return !isBreak(l); }); } };
+    cResume();
     hookLogs();
     hookSettings();
     loadStreak(false);
