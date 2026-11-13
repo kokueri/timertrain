@@ -614,7 +614,7 @@ color: var(--text); text-align: left; font: inherit; cursor: pointer;
 .setup-toggle .st-chev svg { width: 22px; height: 22px; fill: var(--text2); display: block; transition: transform .2s; }
 .setup-toggle[aria-expanded="true"] .st-chev svg { transform: rotate(180deg); }
 .setup-toggle[aria-expanded="true"] .st-sum { display: none; }
-#setup.collapsed > :not(.setup-toggle):not(.tt-my):not(.action-row) { display: none; }
+#setup.collapsed > :not(.setup-toggle):not(.tt-my):not(.action-row):not(.tt-savebar) { display: none; }
 /* 閉じている時も共有リンクは出す（マイタイマーの下） */
 #setup.collapsed { display: flex; flex-direction: column; }
 #setup.collapsed > .action-row { order: 2; margin-top: 10px; }
@@ -1157,3 +1157,72 @@ border-radius: 999px; padding: 13px 20px; font-size: 14px; font-weight: 700; tex
 .tt-promo-card { left: auto; right: 24px; bottom: 24px; transform: none; width: 360px; animation-name: ttPcInPc; }
 @keyframes ttPcInPc { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 }
+
+/* ===== 11/13 小さな直し ===== */
+/* タイトルのリンク（押すと基本の編成へ） */
+.logo .logo-link { color: inherit; text-decoration: none; }
+.logo .logo-link:hover { opacity: .8; }
+/* 集中モードのボタンは再生ボタンの列に（マークだけ。集中モード中は右上に「解除」） */
+.run-controls #focus-btn {
+display: inline-flex; align-items: center; justify-content: center; gap: 0;
+width: 54px; height: 54px; min-height: 0; margin: 0; padding: 0; border-radius: 50%;
+background: var(--card); box-shadow: var(--shadow); border: 1.5px solid var(--line);
+font-size: 0; color: var(--text);
+}
+.run-controls #focus-btn svg { width: 20px; height: 20px; fill: currentColor; }
+.run-controls #focus-btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+body.focus-mode .run-controls #focus-btn {
+position: fixed; top: calc(12px + env(safe-area-inset-top)); right: 12px; z-index: 5;
+width: auto; height: auto; min-height: 40px; padding: 8px 14px; border-radius: 999px; gap: 6px;
+font-size: 13px; color: var(--text2);
+}
+body.focus-mode .run-controls #focus-btn svg { width: 15px; height: 15px; }
+body.focus-mode .run-controls #focus-btn span { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
+@media (min-width: 900px) { body.focus-mode .run-controls #focus-btn { top: 24px; right: 28px; } }
+@media (max-width: 380px) { .run-controls { gap: 12px; } .run-controls #focus-btn, .run-controls #reset-btn, .run-controls #skip-btn { width: 48px; height: 48px; } }
+@media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) .run-controls #focus-btn { background: #26262A; border-color: rgba(255,255,255,.14); } }
+:root[data-theme="dark"] .run-controls #focus-btn { background: #26262A; border-color: rgba(255,255,255,.14); }
+
+/* ラベルの選択肢（▾）と編集（鉛筆） */
+.lbl-dd { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 30px; height: 40px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--text2); cursor: pointer; }
+.lbl-dd[hidden] { display: none; }
+.lbl-dd svg { width: 22px; height: 22px; fill: currentColor; }
+.lbl-dd:hover, .lbl-dd[aria-expanded="true"] { color: var(--text); background: rgba(127,127,127,.1); }
+.lbl-dd:focus-visible, .lbl-pick:focus-visible, .lbl-edit:focus-visible, .lbl-btn:focus-visible, .lbl-hide:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; }
+.lbl-pop { list-style: none; margin: -4px 0 12px; padding: 6px; border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow); border: 1.5px solid var(--line); }
+.lbl-list { list-style: none; margin: 0; padding: 0; max-height: 280px; overflow-y: auto; }
+.lbl-row { display: flex; align-items: center; }
+.lbl-pick { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 10px; border: 0; border-radius: 10px; background: none; font: inherit; font-size: 15px; color: var(--text); text-align: left; cursor: pointer; }
+.lbl-pick:hover { background: rgba(127,127,127,.08); }
+.lbl-row.on .lbl-pick { font-weight: 700; background: rgba(127,127,127,.08); }
+.lbl-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lbl-sw { width: 10px; height: 10px; flex-shrink: 0; border-radius: 3px; background: var(--text2); }
+.lbl-sw.b { background: repeating-linear-gradient(135deg, var(--text2) 0 2px, transparent 2px 4px); }
+.lbl-edit { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 44px; height: 44px; border: 0; border-radius: 10px; background: none; color: var(--text2); cursor: pointer; }
+.lbl-edit:hover { color: var(--text); background: rgba(127,127,127,.08); }
+.lbl-edit svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.lbl-empty { margin: 8px 10px; font-size: 13px; line-height: 1.6; color: var(--text2); }
+.lbl-form { display: flex; flex-direction: column; gap: 8px; padding: 8px; }
+.lbl-l { font-size: 12px; font-weight: 700; }
+.lbl-in { height: 44px; box-sizing: border-box; padding: 0 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text); font: inherit; font-size: 16px; }
+.lbl-in:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; }
+.lbl-note { margin: 0; font-size: 12px; line-height: 1.6; color: var(--text2); }
+.lbl-chk { display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 14px; cursor: pointer; }
+.lbl-chk input { width: 20px; height: 20px; accent-color: var(--text); }
+.lbl-acts { display: flex; gap: 8px; }
+.lbl-btn { height: 40px; padding: 0 18px; border: 1.5px solid var(--line); border-radius: 20px; background: var(--card); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; }
+.lbl-btn.pri { background: var(--text); color: var(--card); border-color: var(--text); }
+.lbl-btn:disabled { opacity: .5; }
+.lbl-hide { align-self: flex-start; min-height: 36px; padding: 4px 0; border: 0; background: none; font: inherit; font-size: 12px; color: var(--text2); text-decoration: underline; cursor: pointer; }
+/* タイマー設定の中の保存ボタン */
+.tt-savebar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; margin: 2px 0 12px; padding: 10px 12px; border-radius: 12px; background: rgba(127,127,127,.08); }
+.tt-savebar[hidden] { display: none; }
+.tt-savebar.new { background: none; padding: 0; justify-content: flex-end; }
+.tt-sb-t { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; color: var(--text); }
+.tt-sb-acts { display: flex; gap: 8px; margin-left: auto; }
+.tt-sb-btn { min-height: 36px; padding: 0 14px; border: 1.5px solid var(--line); border-radius: 18px; background: var(--card); color: var(--text); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.tt-sb-btn.pri { background: var(--text); color: var(--card); border-color: var(--text); }
+.tt-sb-btn:disabled { opacity: .5; }
+.tt-sb-btn:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+#setup.collapsed > .tt-savebar:not(.dirty) { display: none; }
+
