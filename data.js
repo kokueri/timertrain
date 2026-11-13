@@ -126,6 +126,10 @@
     }
   }[lang];
   function pad(n) { return (n < 10 ? '0' : '') + n; }
+  /* ラベルの名前変更（settings.data.labelMap）。過去の記録は新しい名前で集計する */
+  var LM = {};
+  function setLM(sd) { LM = (sd && sd.labelMap && typeof sd.labelMap === 'object' && !Array.isArray(sd.labelMap)) ? sd.labelMap : {}; }
+  function aliasL(l) { l = String(l == null ? '' : l); for (var i = 0; i < 5 && Object.prototype.hasOwnProperty.call(LM, l) && typeof LM[l] === 'string'; i++) l = LM[l].slice(0, 30); return l; }
 
   function el(tag, attrs, kids) {
     var n = document.createElement(tag);
@@ -251,6 +255,7 @@
     var rp = await sb.from('projects').select('id,name,sort,created_at').eq('product', PRODUCT).order('sort').order('created_at').limit(100);
     var rset = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
     var sd = (!rset.error && rset.data && rset.data.data) || {};
+    setLM(sd);
     S.sb = sb;
     S.data = prepare(logs, segs, rt.error ? [] : rt.data || [], rp.error ? [] : rp.data || [], (sd.breaks && typeof sd.breaks === 'object') ? sd.breaks : {}, st);
     S.loadedFor = key;
@@ -270,7 +275,7 @@
       if (isNaN(t) || (st && t < st)) return;
       var tm = l.timer_id && tmap[l.timer_id];
       var g = (byLog[l.id] || []).slice().sort(function (a, b) { return (a.seq || 0) - (b.seq || 0); });
-      var parts = g.length ? g.map(function (x) { return { label: String(x.label || ''), secs: Math.max(0, Number(x.secs) || 0), seg: true }; })
+      var parts = g.length ? g.map(function (x) { return { label: aliasL(x.label || ''), secs: Math.max(0, Number(x.secs) || 0), seg: true }; })
         : [{ label: '\u0000', secs: Math.max(0, Number(l.total_secs) || 0), seg: false }];
       var cfg = (l.config && typeof l.config === 'object') ? l.config : {};
       list.push({ id: l.id, t: t, timerId: tm ? tm.id : null, timerName: tm ? (tm.name || '') : (typeof cfg.name === 'string' ? cfg.name : ''),
@@ -477,6 +482,7 @@
       var rp = await sb.from('projects').select('id,name,sort,created_at').eq('product', PRODUCT).order('sort').order('created_at').limit(100);
       var rset = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
       var sd = (!rset.error && rset.data && rset.data.data) || {};
+      setLM(sd);
       S.meta = { at: Date.now(), timers: rt.error ? [] : rt.data || [], projects: rp.error ? [] : rp.data || [], breaks: (sd.breaks && typeof sd.breaks === 'object') ? sd.breaks : {} };
     }
     if (S.data) S.meta.breaks = S.data.breaks; // データの窓で切り替えた休憩を反映
@@ -497,7 +503,7 @@
         var secs = Math.max(0, Number(x.secs) || 0), s = Date.parse(x.started_at);
         if (!isFinite(s)) s = at;
         at = s + secs * 1000;
-        return { label: String(x.label || '').slice(0, 30), secs: secs, s: s };
+        return { label: aliasL(x.label || '').slice(0, 30), secs: secs, s: s };
       });
       else parts = [{ label: '', secs: Math.max(0, Number(l.total_secs) || 0), s: at }];
       list.push({ t: t, timerName: tm ? (tm.name || '') : (typeof cfg.name === 'string' ? cfg.name.slice(0, 40) : ''),

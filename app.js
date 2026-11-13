@@ -181,11 +181,14 @@ return { timers, repeat };
 } catch (e) { return null; }
 }
 function load() {
+// タイトル（TimerTrain）を押して来たときは、このページの基本の編成から始める
+let fresh = false;
+try { fresh = sessionStorage.getItem('tt-fresh') === location.pathname; if (fresh) sessionStorage.removeItem('tt-fresh'); } catch (e) {}
 // 優先順: URL > このページの保存状態 > ページプリセット > 既定値
-const fromUrl = parseConfig(location.search);
+const fromUrl = fresh ? null : parseConfig(location.search);
 if (fromUrl) { state = fromUrl; return; }
 try {
-const raw = localStorage.getItem(STORE_KEY);
+const raw = fresh ? null : localStorage.getItem(STORE_KEY);
 if (raw) {
 const s = JSON.parse(raw);
 if (Array.isArray(s.timers) && s.timers.length) {
@@ -570,9 +573,18 @@ name.className = 'name-input';
 name.value = t.name;
 name.placeholder = STR.namePh;
 name.maxLength = 30;
-name.setAttribute('list', 'tt-labels');
 name.autocomplete = 'off';
 name.addEventListener('change', () => { t.name = name.value; persist(); });
+
+// ラベルの選択肢（ログイン中。これまでのラベル＋鉛筆で名前変更・休憩・選択肢から消す）
+const dd = document.createElement('button');
+dd.type = 'button';
+dd.className = 'lbl-dd';
+dd.setAttribute('aria-label', LBL.open);
+dd.setAttribute('aria-expanded', 'false');
+dd.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5z"/></svg>';
+dd.hidden = !window.__ttLabels;
+dd.addEventListener('click', e => { e.stopPropagation(); openLabelPop(li, t, name, dd); });
 
 const time = document.createElement('button');
 time.className = 'time-btn';
@@ -605,12 +617,112 @@ handle.className = 'drag-handle';
 handle.textContent = '≡';
 enableDrag(handle, li);
 
-li.append(dot, name, time, dup, del, handle);
+li.append(dot, name, dd, time, dup, del, handle);
 listEl.appendChild(li);
 });
 updateTotal();
 updateHighlight();
 }
+
+/* ---------- ラベルの選択肢（▾）と編集（鉛筆） ---------- */
+const LBL = LANG === 'en' ? { open: 'Choose a label', edit: l => 'Edit ' + l, none: 'No labels yet. Labels you use with a timer or button appear here.', name: 'Name', note: 'Renaming also renames this label in your past records.', brk: 'Treat as a break (not counted in totals)', save: 'Save', cancel: 'Cancel', hide: 'Remove from this list (records are kept)', hideSure: 'Tap again to remove', err: 'Could not save. Please try again.' }
+: LANG === 'es' ? { open: 'Elegir etiqueta', edit: l => 'Editar ' + l, none: 'Aún no hay etiquetas. Aquí aparecen las que uses en temporizadores o botones.', name: 'Nombre', note: 'Al cambiar el nombre, también cambia en tus registros anteriores.', brk: 'Tratar como descanso (no suma al total)', save: 'Guardar', cancel: 'Cancelar', hide: 'Quitar de esta lista (los registros se conservan)', hideSure: 'Toca otra vez para quitar', err: 'No se pudo guardar. Inténtalo de nuevo.' }
+: { open: 'ラベルを選ぶ', edit: l => l + 'を編集', none: 'まだラベルはありません。タイマーやボタンで使った名前がここに並びます。', name: 'なまえ', note: '変えると、これまでの記録もこの名前で集計されます。', brk: '休憩として扱う（合計に入れない）', save: '保存', cancel: 'キャンセル', hide: '選択肢から消す（記録は残ります）', hideSure: 'もう一度押すと消します', err: '保存できませんでした。もう一度お試しください。' };
+const PENCIL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+function lblEl(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function lblKey(e) { if (e.key === 'Escape') { const p = document.querySelector('.lbl-pop'); const b = p && p.__dd; closeLabelPop(); if (b) b.focus(); } }
+function lblOutside(e) { const p = document.querySelector('.lbl-pop'); if (p && !p.contains(e.target) && e.target !== p.__dd && !(p.__dd && p.__dd.contains(e.target))) closeLabelPop(); }
+function closeLabelPop() {
+const p = document.querySelector('.lbl-pop');
+if (p) { if (p.__dd) p.__dd.setAttribute('aria-expanded', 'false'); p.remove(); }
+document.removeEventListener('keydown', lblKey);
+document.removeEventListener('click', lblOutside);
+}
+function openLabelPop(li, t, name, dd) {
+const was = document.querySelector('.lbl-pop');
+const same = was && was.__dd === dd;
+closeLabelPop();
+if (same || !window.__ttLabels) return;
+const pop = lblEl('li', 'lbl-pop');
+pop.__dd = dd;
+dd.setAttribute('aria-expanded', 'true');
+renderLabelList(pop, t, name);
+li.after(pop);
+document.addEventListener('keydown', lblKey);
+setTimeout(() => document.addEventListener('click', lblOutside), 0);
+}
+function renderLabelList(pop, t, name) {
+const L = window.__ttLabels;
+pop.textContent = '';
+const labels = L.list();
+if (!labels.length) { pop.appendChild(lblEl('p', 'lbl-empty', LBL.none)); return; }
+const ul = lblEl('ul', 'lbl-list');
+ul.setAttribute('aria-label', LBL.open);
+labels.forEach(l => {
+const row = lblEl('li', 'lbl-row' + (l === name.value ? ' on' : ''));
+const pick = lblEl('button', 'lbl-pick'); pick.type = 'button';
+pick.appendChild(lblEl('span', 'lbl-sw' + (L.isBreak(l) ? ' b' : '')));
+pick.appendChild(lblEl('span', 'lbl-name', l));
+if (l === name.value) pick.setAttribute('aria-current', 'true');
+pick.addEventListener('click', () => { name.value = l; t.name = l; persist(); closeLabelPop(); name.focus(); });
+const ed = lblEl('button', 'lbl-edit'); ed.type = 'button';
+ed.setAttribute('aria-label', LBL.edit(l));
+ed.innerHTML = PENCIL;
+ed.addEventListener('click', e => { e.stopPropagation(); renderLabelEdit(pop, t, name, l); });
+row.append(pick, ed);
+ul.appendChild(row);
+});
+pop.appendChild(ul);
+}
+function renderLabelEdit(pop, t, name, l) {
+const L = window.__ttLabels;
+pop.textContent = '';
+const f = lblEl('div', 'lbl-form');
+const lab = lblEl('label', 'lbl-l', LBL.name); lab.htmlFor = 'lbl-in';
+const inp = lblEl('input', 'lbl-in'); inp.type = 'text'; inp.id = 'lbl-in'; inp.maxLength = 30; inp.value = l; inp.autocomplete = 'off';
+const note = lblEl('p', 'lbl-note', LBL.note);
+const cbl = lblEl('label', 'lbl-chk');
+const cb = lblEl('input'); cb.type = 'checkbox'; cb.checked = L.isBreak(l);
+cbl.append(cb, lblEl('span', '', LBL.brk));
+const msg = lblEl('p', 'lbl-note'); msg.setAttribute('role', 'status');
+const acts = lblEl('div', 'lbl-acts');
+const ok = lblEl('button', 'lbl-btn pri', LBL.save); ok.type = 'button';
+const cancel = lblEl('button', 'lbl-btn', LBL.cancel); cancel.type = 'button';
+const hide = lblEl('button', 'lbl-hide', LBL.hide); hide.type = 'button';
+cancel.addEventListener('click', e => { e.stopPropagation(); renderLabelList(pop, t, name); });
+ok.addEventListener('click', async e => {
+e.stopPropagation();
+const v = inp.value.trim().slice(0, 30);
+if (!v) { inp.focus(); return; }
+const patch = { name: l };
+if (v !== l) patch.rename = [l, v];
+if (cb.checked !== L.isBreak(l)) patch.brk = cb.checked ? 1 : 0;
+if (!patch.rename && patch.brk === undefined) { renderLabelList(pop, t, name); return; }
+ok.disabled = true;
+const r = await L.save(patch);
+if (!r) { ok.disabled = false; msg.textContent = LBL.err; return; }
+if (patch.rename) {
+// いまの編成の中の同じ名前も変える
+state.timers.forEach(x => { if (x.name === l) x.name = v; });
+persist(); closeLabelPop(); renderList();
+} else renderLabelList(pop, t, name);
+});
+let armed = false;
+hide.addEventListener('click', async e => {
+e.stopPropagation();
+if (!armed) { armed = true; hide.textContent = LBL.hideSure; return; }
+hide.disabled = true;
+const r = await L.save({ hide: l });
+if (!r) { hide.disabled = false; msg.textContent = LBL.err; return; }
+renderLabelList(pop, t, name);
+});
+inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); ok.click(); } });
+acts.append(ok, cancel);
+f.append(lab, inp, note, cbl, acts, hide, msg);
+pop.appendChild(f);
+setTimeout(() => { inp.focus(); inp.select(); }, 0);
+}
+window.__ttRerenderList = function () { closeLabelPop(); renderList(); };
 
 function editTime(t, btn) {
 const wrap = document.createElement('span');
@@ -659,6 +771,7 @@ handle.addEventListener('pointerdown', e => {
 e.preventDefault();
 handle.setPointerCapture(e.pointerId);
 // ドラッグ中はDOMを動かさず transform だけで表現し、離した時に一度だけ確定する
+closeLabelPop();
 const rows = [...listEl.children];
 const startIndex = rows.indexOf(li);
 const stride = li.offsetHeight + 10; // 行の高さ + margin-bottom
@@ -1403,7 +1516,8 @@ var IC_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 16h3v3h2v-
 var btn = document.createElement('button');
 btn.id = 'focus-btn';
 btn.type = 'button';
-runSec.appendChild(btn);
+var ctrls = runSec.querySelector('.run-controls');
+(ctrls || runSec).appendChild(btn);
 
 var hint = document.createElement('p');
 hint.className = 'kbd-hint';
@@ -1419,6 +1533,8 @@ function paint() {
 var on = isOn();
 btn.innerHTML = (on ? IC_OFF : IC_ON) + '<span>' + (on ? L.off : L.on) + '</span>';
 btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+btn.setAttribute('aria-label', on ? L.off : L.on);
+btn.title = on ? L.off : L.on;
 }
 function setFocus(on) {
 document.body.classList.toggle('focus-mode', on);
@@ -1543,7 +1659,7 @@ var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=4';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=5';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
@@ -1556,7 +1672,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=13'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=14'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 })();
@@ -2303,4 +2419,24 @@ paintHeader();
 
 addBanner();
 paintHeader();
+})();
+
+/* ---------- タイトル（TimerTrain）を押すと、そのページの基本の編成へ（11/13） ---------- */
+(function () {
+document.querySelectorAll('.logo').forEach(function (el) {
+var home;
+if (el.tagName === 'A') {
+try { var u = new URL(el.getAttribute('href') || '/', location.href); if (u.origin !== location.origin) return; home = u.pathname; } catch (e) { return; }
+} else {
+home = location.pathname;
+var a = document.createElement('a');
+a.href = home; a.className = 'logo-link'; a.textContent = el.textContent;
+el.textContent = ''; el.appendChild(a);
+el = a;
+}
+el.addEventListener('click', function () {
+try { sessionStorage.setItem('tt-fresh', home); } catch (e) {}
+try { if (window.gtag) gtag('event', 'logo_home', { same: home === location.pathname ? 1 : 0 }); } catch (e) {}
+});
+});
 })();

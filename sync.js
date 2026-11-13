@@ -24,7 +24,7 @@
     del: 'Delete', delQ: 'Delete?', saved: 'Saved', err: 'Could not connect. Please try again later.',
     limit: 'You have reached the limit of saved timers.', signin: 'Sign in again',
     cur: 'In use', changed: 'edited', over: 'Save changes', asNew: 'Save as new', rename: 'Rename', renameQ: 'New name',
-    overDone: 'Changes saved', renamed: 'Renamed', badge: 'My timer',
+    overDone: 'Changes saved', renamed: 'Renamed', badge: 'My timer', changedFrom: function (n) { return 'Changed from \u201c' + n + '\u201d'; }, saveMy: 'Save as My timer',
     proj: 'Project', projNone: 'No project', projNew: '+ New project…', projNamePh: 'Project name',
     full: 'The free plan saves up to 2 timers. Save changes over one you have, or delete one first. Unlimited with Premium.', plans: 'See plans'
   } : lang === 'es' ? {
@@ -33,7 +33,7 @@
     del: 'Eliminar', delQ: '¿Eliminar?', saved: 'Guardado', err: 'No se pudo conectar. Inténtalo más tarde.',
     limit: 'Has alcanzado el límite de temporizadores guardados.', signin: 'Vuelve a iniciar sesión',
     cur: 'En uso', changed: 'con cambios', over: 'Guardar cambios', asNew: 'Guardar como nuevo', rename: 'Renombrar', renameQ: 'Nuevo nombre',
-    overDone: 'Cambios guardados', renamed: 'Nombre cambiado', badge: 'Mi temporizador',
+    overDone: 'Cambios guardados', renamed: 'Nombre cambiado', badge: 'Mi temporizador', changedFrom: function (n) { return 'Cambios en \u00ab' + n + '\u00bb'; }, saveMy: 'Guardar en Mis temporizadores',
     proj: 'Proyecto', projNone: 'Sin proyecto', projNew: '+ Nuevo proyecto…', projNamePh: 'Nombre del proyecto',
     full: 'El plan gratis guarda hasta 2 temporizadores. Guarda los cambios sobre uno que ya tengas o elimina uno primero. Ilimitados con Premium.', plans: 'Ver planes'
   } : {
@@ -42,7 +42,7 @@
     del: '削除', delQ: '削除する？', saved: '保存しました', err: 'つながりませんでした。時間をおいてもう一度お試しください。',
     limit: '保存できる数の上限に達しました。', signin: 'もう一度ログイン',
     cur: '使用中', changed: '変更あり', over: '上書き保存', asNew: '別に保存', rename: '名前を変更', renameQ: '新しい名前',
-    overDone: '上書き保存しました', renamed: '名前を変更しました', badge: 'マイタイマー',
+    overDone: '上書き保存しました', renamed: '名前を変更しました', badge: 'マイタイマー', changedFrom: function (n) { return '「' + n + '」から変更あり'; }, saveMy: 'マイタイマーに保存',
     proj: 'プロジェクト', projNone: 'プロジェクトなし', projNew: '＋ 新しいプロジェクト…', projNamePh: 'プロジェクト名',
     full: '無料プランで保存できるマイタイマーは2つまでです。今あるものに上書き保存するか、1つ削除してから保存してください。プレミアムでは無制限になります。', plans: 'プランを見る'
   };
@@ -75,6 +75,15 @@
   var curRow = el('div', { cls: 'tt-my-cur', hidden: '' });
   box.appendChild(head); box.appendChild(curRow); box.appendChild(form); box.appendChild(list); box.appendChild(note);
   setup.appendChild(box);
+  // タイマー設定の白枠の中（見出しのすぐ下）に「上書き保存」「別に保存」（11/13）
+  var bar = el('div', { cls: 'tt-savebar', hidden: '' });
+  var stg = document.getElementById('setup-toggle');
+  if (stg && stg.parentNode === setup) stg.insertAdjacentElement('afterend', bar); else setup.insertBefore(bar, setup.firstChild);
+  function openSaveForm() {
+    if (setup.classList.contains('collapsed') && stg) stg.click();
+    saveBtn.click();
+    setTimeout(function () { try { (form.hidden ? box : form).scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }, 50);
+  }
   // タイマーの上に「マイタイマー：名前」
   var badge = el('p', { cls: 'tt-my-badge', hidden: '' });
   var runSec = document.getElementById('run');
@@ -137,8 +146,26 @@
     writeCur();
   }
   function isDirty() { var it = findItem(curId); return !!it && itemQ(it) !== curQ(); }
+  function renderBar(it, dirty) {
+    bar.textContent = ''; bar.classList.toggle('dirty', !!(it && dirty)); bar.classList.toggle('new', !it);
+    if (it && !dirty) { bar.hidden = true; return; }
+    bar.hidden = false;
+    if (it) {
+      bar.appendChild(el('span', { cls: 'tt-sb-t', text: T.changedFrom(it.name) }));
+      var ov = el('button', { type: 'button', cls: 'tt-sb-btn pri', text: T.over });
+      ov.addEventListener('click', function () { overwrite(it, ov); });
+      var an = el('button', { type: 'button', cls: 'tt-sb-btn', text: T.asNew });
+      an.addEventListener('click', openSaveForm);
+      bar.appendChild(el('span', { cls: 'tt-sb-acts' }, [ov, an]));
+    } else {
+      var sv = el('button', { type: 'button', cls: 'tt-sb-btn', text: '＋ ' + T.saveMy });
+      sv.addEventListener('click', openSaveForm);
+      bar.appendChild(sv);
+    }
+  }
   function renderCur() {
     var it = findItem(curId);
+    renderBar(it, isDirty());
     curRow.textContent = '';
     saveBtn.textContent = '＋ ' + T.save;
     if (!it) { curRow.hidden = true; badge.hidden = true; return; }
@@ -354,7 +381,33 @@
   var ST = null; // { n, streakToday, days7, day, at, todayLogs: {logId: 作業秒} }
   var BREAKS = {};
   var BREAK_RE = /休憩|きゅうけい|やすみ|break|rest|descanso|pausa|recreo/i;
+  /* ラベルの名前変更（settings.data.labelMap {古い名前: 新しい名前}）と、選択肢から消したもの（labelHide）。
+   * 過去の記録は書きかえず、表示と集計のときに新しい名前に読み替える（古い記録の更新が DB の制限にかからないように） */
+  var LM_KEY = 'tt-labelmeta';
+  function cleanMap(m) {
+    var o = {};
+    if (m && typeof m === 'object' && !Array.isArray(m)) Object.keys(m).slice(0, 300).forEach(function (k) {
+      var v = m[k];
+      if (typeof v !== 'string') return;
+      k = String(k).slice(0, 30); v = v.replace(/[\u0000-\u001f]/g, '').trim().slice(0, 30);
+      if (k && v && k !== v) o[k] = v;
+    });
+    return o;
+  }
+  function cleanHide(h) { var o = {}; if (Array.isArray(h)) h.slice(0, 300).forEach(function (x) { if (typeof x === 'string' && x) o[x.slice(0, 30)] = 1; }); return o; }
+  var LMAP = {}, LHIDE = {};
+  try { var lmc = JSON.parse(localStorage.getItem(LM_KEY) || 'null'); if (lmc) { LMAP = cleanMap(lmc.map); LHIDE = cleanHide(lmc.hide); } } catch (e) {}
+  function alias(l) {
+    l = String(l == null ? '' : l);
+    for (var i = 0; i < 5 && Object.prototype.hasOwnProperty.call(LMAP, l); i++) l = LMAP[l];
+    return l;
+  }
+  function setLabelMeta(map, hide) {
+    LMAP = map; LHIDE = hide;
+    try { localStorage.setItem(LM_KEY, JSON.stringify({ map: map, hide: Object.keys(hide) })); } catch (e) {}
+  }
   function isBreak(label) {
+    label = alias(label);
     if (Object.prototype.hasOwnProperty.call(BREAKS, label)) return BREAKS[label] === 1;
     return BREAK_RE.test(label);
   }
@@ -371,7 +424,7 @@
       var secs = Math.max(0, Math.round(g.secs));
       if (secs < 1) return;
       var s = Date.parse(g.startedAt); if (!isFinite(s)) return;
-      out.push({ lid: lid, s: s, secs: secs, label: String(g.label || '').slice(0, 30), brk: isBreak(g.label || '') });
+      out.push({ lid: lid, s: s, secs: secs, label: alias(g.label || '').slice(0, 30), brk: isBreak(g.label || '') });
     });
     return out;
   }
@@ -425,7 +478,7 @@
               var secs = Math.max(0, Number(z.secs) || 0);
               if (!isBreak(z.label || '')) w += secs;
               var s = Date.parse(z.started_at);
-              if (secs >= 1 && isFinite(s)) blocks.push({ lid: x.id, s: s, secs: Math.round(secs), label: String(z.label || '').slice(0, 30), brk: isBreak(z.label || '') });
+              if (secs >= 1 && isFinite(s)) blocks.push({ lid: x.id, s: s, secs: Math.round(secs), label: alias(z.label || '').slice(0, 30), brk: isBreak(z.label || '') });
             });
           } else {
             w = Math.max(0, Number(x.total_secs) || 0);
@@ -449,12 +502,45 @@
   }
   /* ---------- ラベルの候補（一度使った区切りの名前。タイマー名の入力欄に出す） ---------- */
   var recentLabels = []; // 最近使ったラベル（新しい順。カウントアップのボタン作成でも候補に出す）
+  /* ラベルの編集（選択肢の鉛筆から）。patch: { rename: [古い, 新しい], brk: 0/1, hide: 名前 } */
+  async function saveLabelMeta(patch) {
+    try {
+      var cur = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
+      if (cur.error) return false;
+      var base = (cur.data && cur.data.data && typeof cur.data.data === 'object') ? cur.data.data : {};
+      var map = cleanMap(base.labelMap), hide = cleanHide(base.labelHide);
+      var brk = (base.breaks && typeof base.breaks === 'object' && !Array.isArray(base.breaks)) ? Object.assign({}, base.breaks) : {};
+      var name = patch.name;
+      if (patch.rename) {
+        var o = String(patch.rename[0]).slice(0, 30), n = String(patch.rename[1]).replace(/[\u0000-\u001f]/g, '').trim().slice(0, 30);
+        if (!o || !n) return false;
+        if (o !== n) {
+          Object.keys(map).forEach(function (k) { if (map[k] === o) map[k] = n; });
+          map[o] = n; delete map[n];
+          if (Object.prototype.hasOwnProperty.call(brk, o) && !Object.prototype.hasOwnProperty.call(brk, n)) brk[n] = brk[o];
+          delete hide[n];
+        }
+        name = n;
+      }
+      if (name && (patch.brk === 0 || patch.brk === 1)) brk[name] = patch.brk;
+      if (patch.hide) hide[String(patch.hide).slice(0, 30)] = 1;
+      var data = Object.assign({}, base, { labelMap: map, labelHide: Object.keys(hide), breaks: brk });
+      if (JSON.stringify(data).length > 15000) return false;
+      var r = await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
+      if (r.error) return false;
+      setLabelMeta(map, hide); BREAKS = brk;
+      ev('label_edit', { rename: patch.rename ? 1 : 0, hide: patch.hide ? 1 : 0 });
+      try { sessionStorage.removeItem(STATS_KEY); } catch (e) {}
+      await loadLabels(); loadStreak(true);
+      return true;
+    } catch (e) { return false; }
+  }
   async function loadLabels() {
     try {
       var r = await sb.from('usage_segments').select('label').eq('product', PRODUCT).order('started_at', { ascending: false }).limit(500);
       if (r.error || !r.data) return;
       var seen = {}, out = [];
-      r.data.forEach(function (x) { var l = String(x.label || '').trim().slice(0, 30); if (l && !seen[l] && out.length < 40) { seen[l] = 1; out.push(l); } });
+      r.data.forEach(function (x) { var l = alias(String(x.label || '').trim()).slice(0, 30); if (l && !seen[l] && !LHIDE[l] && out.length < 40) { seen[l] = 1; out.push(l); } });
       recentLabels = out;
       var dl = document.getElementById('tt-labels');
       if (!dl) { dl = document.createElement('datalist'); dl.id = 'tt-labels'; document.body.appendChild(dl); }
@@ -585,6 +671,10 @@
     var r = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
     if (r.error) return;
     var remote = (r.data && r.data.data) || {};
+    var rmap = cleanMap(remote.labelMap), rhide = cleanHide(remote.labelHide);
+    if (JSON.stringify(rmap) !== JSON.stringify(LMAP) || JSON.stringify(Object.keys(rhide)) !== JSON.stringify(Object.keys(LHIDE))) {
+      setLabelMeta(rmap, rhide); loadLabels(); loadStreak(true);
+    }
     if (Array.isArray(remote.countBtns)) {
       var rb = cleanBtns(remote.countBtns);
       if (JSON.stringify(rb) !== JSON.stringify(cBtns)) { cBtns = rb; try { localStorage.setItem(CB_KEY, JSON.stringify(rb)); } catch (e) {} showStatsNow(); }
@@ -739,9 +829,11 @@
     if (window.__ttSetPlan) { try { window.__ttSetPlan(PREMIUM ? 'premium' : 'free'); } catch (e) {} }
     window.__ttBreaks = function () { return BREAKS; };
     window.__ttStatsRefresh = function () { loadStreak(true); };
+    window.__ttLabels = { list: function () { return recentLabels.slice(); }, isBreak: isBreak, save: saveLabelMeta };
     window.__ttCount = { start: cStart, stop: function () { cStop(false); }, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
       labels: function () { return recentLabels.filter(function (l) { return !isBreak(l); }); } };
     cResume();
+    if (window.__ttRerenderList) { try { window.__ttRerenderList(); } catch (e) {} }
     hookLogs();
     hookSettings();
     loadStreak(false);
