@@ -868,7 +868,7 @@ updateIdleView();
 function updateIdleView() {
 const t = state.timers[0];
 if (!t) return;
-if (DT) renderStations(); // DonutTimer は待機中もミニドーナツの並びを見せる
+renderStations(); // 11/15: 待機中も並びを見せる（DonutTimer と同じ）
 runName.textContent = t.name || STR.defName;
 runTime.textContent = fmt(t.secs);
 runCycle.textContent = '';
@@ -1207,10 +1207,28 @@ rail.className = 'rail';
 stationsEl.appendChild(rail);
 }
 const s = document.createElement('span');
-s.className = 'station' + (run.active ? (i < run.idx ? ' done' : i === run.idx ? ' now' : '') : '');
+s.className = 'station lab' + (run.active ? (i < run.idx ? ' done' : i === run.idx ? ' now' : '') : '');
 if (DT) s.appendChild(DT.mini(t.color)); else s.style.background = colorOf(t.color);
+// 11/15: 丸に長さ（25m・1h30m・40s）。数字は大きめ、h/m/s は小さめ
+const lab = document.createElement('span'); lab.className = 'st-lab';
+const parts = stationDur(t.secs); if (parts.length > 1) s.classList.add('long');
+parts.forEach(([n, u]) => {
+const a = document.createElement('span'); a.className = 'st-n'; a.textContent = n;
+const b = document.createElement('span'); b.className = 'st-u'; b.textContent = u;
+lab.append(a, b);
+});
+s.appendChild(lab);
 stationsEl.appendChild(s);
 });
+}
+function stationDur(secs) {
+secs = Math.max(0, Math.round(secs || 0));
+const h = Math.floor(secs / 3600), m = Math.floor(secs % 3600 / 60), s = secs % 60, p = [];
+if (h) p.push([h, 'h']);
+if (m) p.push([m, 'm']);
+if (s && !h) p.push([s, 's']);
+if (!p.length) p.push([0, 's']);
+return p;
 }
 
 /* ---------- その他UI ---------- */
@@ -1222,6 +1240,7 @@ el.classList.add('show');
 clearTimeout(toastId);
 toastId = setTimeout(() => el.classList.remove('show'), 1800);
 }
+window.__ttToast = toast;
 
 $('add-btn').addEventListener('click', () => {
 const last = state.timers[state.timers.length - 1];
@@ -1672,8 +1691,83 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=14'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=15'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
+}
+/* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
+ * マイタイマーのチップは sync.js が .mr-my に入れる。鉛筆でマイタイマーの編集欄を開く。 */
+var hdr = document.querySelector('.header');
+if (signed && hdr && document.getElementById('setup')) {
+document.documentElement.classList.add('tt-in');
+var LR = lang === 'en' ? { edit: 'Edit my timers', grp: 'My timers and quick start' }
+: lang === 'es' ? { edit: 'Editar mis temporizadores', grp: 'Mis temporizadores e inicio rápido' }
+: { edit: 'マイタイマーを編集', grp: 'マイタイマーとすぐ始める' };
+var row = document.createElement('div'); row.id = 'tt-myrow'; row.className = 'tt-myrow';
+row.setAttribute('role', 'group'); row.setAttribute('aria-label', LR.grp);
+var sc = document.createElement('div'); sc.className = 'mr-scroll';
+['mr-my', 'mr-rec', 'mr-quick'].forEach(function (c) { var d = document.createElement('div'); d.className = c; sc.appendChild(d); });
+var ed = document.createElement('button'); ed.type = 'button'; ed.className = 'mr-edit';
+ed.setAttribute('aria-label', LR.edit); ed.title = LR.edit;
+ed.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
+ed.addEventListener('click', function () { if (window.__ttMyEdit) window.__ttMyEdit(); });
+// 11/15: 鉛筆はマイタイマーのすぐ右。行は横にスライド（PC は ‹ › とホイール・ドラッグでも）
+sc.insertBefore(ed, sc.querySelector('.mr-rec'));
+var LA = lang === 'en' ? ['Scroll left', 'Scroll right'] : lang === 'es' ? ['Desplazar a la izquierda', 'Desplazar a la derecha'] : ['左へ', '右へ'];
+function arrow(dir) {
+var b = document.createElement('button'); b.type = 'button'; b.className = 'mr-arrow ' + (dir < 0 ? 'l' : 'r'); b.hidden = true;
+b.setAttribute('aria-label', LA[dir < 0 ? 0 : 1]); b.textContent = dir < 0 ? '‹' : '›';
+b.addEventListener('click', function () { sc.scrollBy({ left: dir * Math.max(120, sc.clientWidth * 0.7), behavior: 'smooth' }); });
+return b;
+}
+var al = arrow(-1), ar = arrow(1);
+row.appendChild(al); row.appendChild(sc); row.appendChild(ar);
+function syncArrows() {
+var over = sc.scrollWidth > sc.clientWidth + 2;
+al.hidden = !over || sc.scrollLeft <= 2;
+ar.hidden = !over || sc.scrollLeft + sc.clientWidth >= sc.scrollWidth - 2;
+row.classList.toggle('mr-over', over);
+row.classList.toggle('mr-atend', over && ar.hidden);
+}
+sc.addEventListener('scroll', syncArrows, { passive: true });
+window.addEventListener('resize', syncArrows);
+try { new MutationObserver(function () { setTimeout(syncArrows, 0); }).observe(sc, { childList: true, subtree: true }); } catch (e) {}
+setTimeout(syncArrows, 0);
+// マウスのホイール（縦）で横に動かす
+sc.addEventListener('wheel', function (e) {
+if (sc.scrollWidth <= sc.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+var before = sc.scrollLeft; sc.scrollLeft += e.deltaY;
+if (sc.scrollLeft !== before) e.preventDefault();
+}, { passive: false });
+// マウスでつかんで横に動かす（少し動かしたらリンクを押したことにしない）
+var drag = null;
+sc.addEventListener('pointerdown', function (e) {
+if (e.pointerType !== 'mouse' || e.button !== 0) return;
+drag = { x: e.clientX, left: sc.scrollLeft, moved: false };
+});
+window.addEventListener('pointermove', function (e) {
+if (!drag) return;
+var dx = e.clientX - drag.x;
+if (Math.abs(dx) > 5) drag.moved = true;
+if (drag.moved) { sc.scrollLeft = drag.left - dx; sc.classList.add('dragging'); }
+});
+window.addEventListener('pointerup', function () {
+if (!drag) return;
+var moved = drag.moved; drag = null; sc.classList.remove('dragging');
+if (moved) { var stop = function (ev) { ev.preventDefault(); ev.stopPropagation(); }; sc.addEventListener('click', stop, { capture: true, once: true }); setTimeout(function () { sc.removeEventListener('click', stop, true); }, 50); }
+});
+hdr.insertAdjacentElement('afterend', row);
+// すぐ始める: 再生ボタンの下のチップ（#tt-quick）を短い名前でこの行に。押したら元のチップと同じ動き（その場で開始）
+var SHORT = { pomo: 'ポモドーロ', workout: '運動40/20', chain: '3つ連続' };
+var qd = sc.querySelector('.mr-quick');
+Array.prototype.forEach.call(document.querySelectorAll('#tt-quick a.tt-quick-chip'), function (a0) {
+var full = (a0.textContent || '').replace(/^\s*▶\s*/, '').trim();
+var a = document.createElement('a'); a.className = 'tt-chip mr-chip mr-q'; a.href = a0.getAttribute('href'); a.title = full;
+var ic = document.createElement('span'); ic.className = 'mr-play'; ic.setAttribute('aria-hidden', 'true'); ic.textContent = '▶';
+a.appendChild(ic); a.appendChild(document.createTextNode((lang === 'ja' && SHORT[a0.dataset.q]) || full));
+a.setAttribute('aria-label', full);
+a.addEventListener('click', function (e) { e.preventDefault(); a0.click(); });
+qd.appendChild(a);
+});
 }
 })();
 
@@ -1746,13 +1840,15 @@ box.appendChild(theme);
 
 // ホーム: ⏱ 今日 · 📅 7日中n日 · 🔥 n日連続（sync.js がログイン中に呼ぶ。押すとデータの窓）
 window.__ttSetStats = function (st) {
-var row = document.getElementById('tt-stats');
+// 11/13 v2: 帯（⏱今日・📅7日中・🔥連続）はやめて、左上のマイページのボタンに「🔥n」だけ。くわしくはマイページとデータの窓で
+var acct = document.getElementById('acct-link');
+var row = acct && acct.querySelector('.tt-streak');
 if (!st) { if (row) row.remove(); renderToday(null); return; }
+if (!acct) { renderToday(st); return; }
 if (!row) {
-row = document.createElement('button'); row.type = 'button'; row.id = 'tt-stats'; row.className = 'tt-stats';
-row.addEventListener('click', function () { if (window.__ttOpenData) window.__ttOpenData('stats'); });
-var tag = header.querySelector('.tagline');
-if (tag) tag.insertAdjacentElement('afterend', row); else header.appendChild(row);
+row = document.createElement('span'); row.className = 'tt-streak'; row.setAttribute('aria-hidden', 'true');
+acct.appendChild(row);
+if (!acct.dataset.base) acct.dataset.base = acct.getAttribute('aria-label') || '';
 }
 var m = Math.floor((st.today || 0) / 60), h = Math.floor(m / 60), mm = m % 60;
 var dur = lang === 'ja' ? (h ? h + '時間' + mm + '分' : m + '分') : lang === 'es' ? (h ? h + ' h ' + mm + ' min' : m + ' min') : (h ? h + 'h ' + mm + 'm' : m + 'm');
@@ -1760,12 +1856,12 @@ var n = st.streak || 0, d7 = st.days7 || 0;
 var parts = lang === 'en' ? ['⏱ Today ' + dur, '📅 ' + d7 + ' of 7 days', '🔥 ' + n + '-day streak']
 : lang === 'es' ? ['⏱ Hoy ' + dur, '📅 ' + d7 + ' de 7 días', '🔥 Racha de ' + n + (n === 1 ? ' día' : ' días')]
 : ['⏱ 今日 ' + dur, '📅 7日中 ' + d7 + '日', '🔥 ' + n + '日連続'];
-row.textContent = '';
-parts.forEach(function (t, i) { var s = document.createElement('span'); s.textContent = t; if (i === 2 && n > 0 && !st.streakToday) s.className = 'keep'; row.appendChild(s); });
-var hint = lang === 'en' ? (st.streakToday || !n ? '' : ' Use it today to make it ' + (n + 1) + '.') : lang === 'es' ? (st.streakToday || !n ? '' : ' Úsalo hoy para llegar a ' + (n + 1) + '.') : (st.streakToday || !n ? '' : '今日も使うと' + (n + 1) + '日になります。');
-var open = lang === 'en' ? 'Open data' : lang === 'es' ? 'Ver datos' : 'データを見る';
-row.title = parts.join(' · ') + (hint ? ' — ' + hint : '');
-row.setAttribute('aria-label', open + ': ' + parts.join('、') + (hint ? '。' + hint : ''));
+row.textContent = '🔥' + n + ' 📅' + d7 + '/7';
+row.classList.toggle('keep', n > 0 && !st.streakToday);
+var hint =lang === 'en' ? (st.streakToday || !n ? '' : ' Use it today to make it ' + (n + 1) + '.') : lang === 'es' ? (st.streakToday || !n ? '' : ' Úsalo hoy para llegar a ' + (n + 1) + '.') : (st.streakToday || !n ? '' : '今日も使うと' + (n + 1) + '日になります。');
+var base = acct.dataset.base;
+acct.title = base + ' · ' + parts.join(' · ') + (hint ? ' — ' + hint : '');
+acct.setAttribute('aria-label', lang === 'ja' ? base + '（' + parts.join('、') + '）' + hint : base + ' (' + parts.join(', ') + ')' + hint);
 renderToday(st);
 };
 
@@ -1800,7 +1896,7 @@ function mk(tag, cls, text) { var e = document.createElement(tag); if (cls) e.cl
 function renderToday(st) {
 var card = document.getElementById('tt-today');
 var ctr = document.querySelector('#run .run-controls');
-if (!st || !ctr) { if (card) card.remove(); stopTicker(); return; }
+if (!st || !ctr) { if (card) card.remove(); document.documentElement.classList.remove('tt-has-log'); stopTicker(); return; }
 if (!card) {
 card = mk('div', 'tt-today'); card.id = 'tt-today';
 var open = mk('button', 'tt-today-open'); open.type = 'button';
@@ -1811,7 +1907,15 @@ more.appendChild(mk('span', '', TL.more));
 more.appendChild(svgIcon('M9 6l6 6-6 6'));
 more.addEventListener('click', openData);
 card.appendChild(open); card.appendChild(cnt); card.appendChild(more);
-ctr.insertAdjacentElement('afterend', card);
+// 11/13 v2: タイマーの外の列に置く（スマホは今までどおり再生ボタンの下、PC の広い画面は左の列）
+var col = document.getElementById('tt-logcol'), runSec = document.getElementById('run');
+if (!col && runSec) {
+col = document.createElement('section'); col.id = 'tt-logcol'; col.className = 'tt-logcol';
+col.setAttribute('aria-label', TL.title || 'Today');
+runSec.insertAdjacentElement('afterend', col);
+}
+if (col) { col.appendChild(card); document.documentElement.classList.add('tt-has-log'); }
+else ctr.insertAdjacentElement('afterend', card);
 }
 renderTodayOpen(card.querySelector('.tt-today-open'), st);
 renderCount(card.querySelector('.tt-count'), st.count);
@@ -2080,6 +2184,17 @@ if (!app || !header) return;
 var old = document.getElementById('tt-recents'); if (old) old.remove();
 var cq = curQuery();
 var list = readRecents().filter(function (e) { return !(e.p === location.pathname && e.q === cq); });
+// ログイン中は「マイタイマー＋すぐ始める」の行の中に（11/13 v2）
+var mr = document.querySelector('#tt-myrow .mr-rec');
+if (mr) {
+mr.textContent = '';
+list.slice(0, 2).forEach(function (e) {
+var a = document.createElement('a'); a.className = 'tt-chip mr-chip mr-r'; a.href = e.p + e.q;
+a.textContent = e.l; a.title = L.recent + ': ' + e.l; a.setAttribute('aria-label', L.recent + ': ' + e.l);
+mr.appendChild(a);
+});
+return;
+}
 if (!list.length) return;
 var wrap = document.createElement('div'); wrap.id = 'tt-recents'; wrap.className = 'tt-recents';
 var lab = document.createElement('span'); lab.className = 'tt-recents-label'; lab.textContent = L.recent; wrap.appendChild(lab);

@@ -24,7 +24,7 @@
     del: 'Delete', delQ: 'Delete?', saved: 'Saved', err: 'Could not connect. Please try again later.',
     limit: 'You have reached the limit of saved timers.', signin: 'Sign in again',
     cur: 'In use', changed: 'edited', over: 'Save changes', asNew: 'Save as new', rename: 'Rename', renameQ: 'New name',
-    overDone: 'Changes saved', renamed: 'Renamed', badge: 'My timer', changedFrom: function (n) { return 'Changed from \u201c' + n + '\u201d'; }, saveMy: 'Save as My timer',
+    overDone: 'Changes saved', renamed: 'Renamed', badge: 'My timer', changedFrom: function (n) { return 'Changed from \u201c' + n + '\u201d'; }, saveMy: 'Save as My timer', done: 'Done',
     proj: 'Project', projNone: 'No project', projNew: '+ New project…', projNamePh: 'Project name',
     full: 'The free plan saves up to 2 timers. Save changes over one you have, or delete one first. Unlimited with Premium.', plans: 'See plans'
   } : lang === 'es' ? {
@@ -33,7 +33,7 @@
     del: 'Eliminar', delQ: '¿Eliminar?', saved: 'Guardado', err: 'No se pudo conectar. Inténtalo más tarde.',
     limit: 'Has alcanzado el límite de temporizadores guardados.', signin: 'Vuelve a iniciar sesión',
     cur: 'En uso', changed: 'con cambios', over: 'Guardar cambios', asNew: 'Guardar como nuevo', rename: 'Renombrar', renameQ: 'Nuevo nombre',
-    overDone: 'Cambios guardados', renamed: 'Nombre cambiado', badge: 'Mi temporizador', changedFrom: function (n) { return 'Cambios en \u00ab' + n + '\u00bb'; }, saveMy: 'Guardar en Mis temporizadores',
+    overDone: 'Cambios guardados', renamed: 'Nombre cambiado', badge: 'Mi temporizador', changedFrom: function (n) { return 'Cambios en \u00ab' + n + '\u00bb'; }, saveMy: 'Guardar en Mis temporizadores', done: 'Listo',
     proj: 'Proyecto', projNone: 'Sin proyecto', projNew: '+ Nuevo proyecto…', projNamePh: 'Nombre del proyecto',
     full: 'El plan gratis guarda hasta 2 temporizadores. Guarda los cambios sobre uno que ya tengas o elimina uno primero. Ilimitados con Premium.', plans: 'Ver planes'
   } : {
@@ -42,7 +42,7 @@
     del: '削除', delQ: '削除する？', saved: '保存しました', err: 'つながりませんでした。時間をおいてもう一度お試しください。',
     limit: '保存できる数の上限に達しました。', signin: 'もう一度ログイン',
     cur: '使用中', changed: '変更あり', over: '上書き保存', asNew: '別に保存', rename: '名前を変更', renameQ: '新しい名前',
-    overDone: '上書き保存しました', renamed: '名前を変更しました', badge: 'マイタイマー', changedFrom: function (n) { return '「' + n + '」から変更あり'; }, saveMy: 'マイタイマーに保存',
+    overDone: '上書き保存しました', renamed: '名前を変更しました', badge: 'マイタイマー', changedFrom: function (n) { return '「' + n + '」から変更あり'; }, saveMy: 'マイタイマーに保存', done: '完了',
     proj: 'プロジェクト', projNone: 'プロジェクトなし', projNew: '＋ 新しいプロジェクト…', projNamePh: 'プロジェクト名',
     full: '無料プランで保存できるマイタイマーは2つまでです。今あるものに上書き保存するか、1つ削除してから保存してください。プレミアムでは無制限になります。', plans: 'プランを見る'
   };
@@ -75,6 +75,29 @@
   var curRow = el('div', { cls: 'tt-my-cur', hidden: '' });
   box.appendChild(head); box.appendChild(curRow); box.appendChild(form); box.appendChild(list); box.appendChild(note);
   setup.appendChild(box);
+  /* 11/13 v2: マイタイマーの欄はふだん隠す。上の行の鉛筆（編集）・保存の入力・エラーのときだけ出す */
+  var myRow = document.querySelector('#tt-myrow .mr-my');
+  var editing = false;
+  var doneBtn = el('button', { type: 'button', cls: 'tt-my-done', text: T.done });
+  doneBtn.addEventListener('click', function () { setEditing(false); });
+  var doneWrap = el('div', { cls: 'tt-my-donerow' }, [doneBtn]);
+  if (myRow) { box.appendChild(doneWrap); box.hidden = true; }
+  function syncBox() {
+    if (!myRow) return;
+    box.hidden = !(editing || !form.hidden || note.classList.contains('err'));
+    doneWrap.hidden = !editing;
+  }
+  function setEditing(on) {
+    editing = !!on; syncBox();
+    var eb = document.querySelector('#tt-myrow .mr-edit'); if (eb) eb.setAttribute('aria-expanded', editing ? 'true' : 'false');
+    // 編集中は上の行のすぐ下に出す。終わったらタイマー設定の中へ戻す
+    var rowEl = document.getElementById('tt-myrow');
+    if (editing && rowEl) { rowEl.appendChild(box); box.classList.add('in-row'); }
+    else if (box.classList.contains('in-row')) { box.classList.remove('in-row'); setup.appendChild(box); }
+    syncBox();
+  }
+  window.__ttMyEdit = function () { setEditing(!editing); };
+  try { new MutationObserver(syncBox).observe(form, { attributes: true, attributeFilter: ['hidden'] }); } catch (e) {}
   // タイマー設定の白枠の中（見出しのすぐ下）に「上書き保存」「別に保存」（11/13）
   var bar = el('div', { cls: 'tt-savebar', hidden: '' });
   var stg = document.getElementById('setup-toggle');
@@ -236,7 +259,7 @@
     form.hidden = false; saveBtn.disabled = true;
     input.focus(); input.select();
   }
-  function flash(t) { setNote(t); setTimeout(function () { if (note.textContent === t) setNote(''); }, 2500); }
+  function flash(t) { setNote(t); if (box.hidden && window.__ttToast) window.__ttToast(t); setTimeout(function () { if (note.textContent === t) setNote(''); }, 2500); }
   // 編成を変えたとき（app.js の persist から）
   var prevCfg = window.__ttOnConfig;
   window.__ttOnConfig = function () {
@@ -244,7 +267,7 @@
     if (curId) writeCur();
     renderCur();
   };
-  function setNote(t, isErr) { note.textContent = t || ''; note.classList.toggle('err', !!isErr); }
+  function setNote(t, isErr) { note.textContent = t || ''; note.classList.toggle('err', !!isErr); syncBox(); }
 
   function defaultName() {
     try {
@@ -254,7 +277,26 @@
     } catch (e) { return T.title; }
   }
 
+  function loadHandler(it, q) {
+    return function () {
+      ev('timer_load');
+      try { sessionStorage.setItem(CUR_KEY, JSON.stringify({ id: it.id, path: location.pathname, q: q })); } catch (e) {}
+    };
+  }
+  function renderRow() {
+    if (!myRow) return;
+    myRow.textContent = '';
+    items.forEach(function (it) {
+      var q = it.config && it.config.q;
+      if (typeof q !== 'string' || !Q_RE.test(q)) return;
+      var a = el('a', { cls: 'tt-chip mr-chip mr-m' + (it.id === curId ? ' current' : ''), href: location.pathname + q, text: it.name, title: it.name });
+      if (it.id === curId) a.setAttribute('aria-current', 'true');
+      a.addEventListener('click', loadHandler(it, q));
+      myRow.appendChild(a);
+    });
+  }
   function render() {
+    renderRow();
     list.textContent = '';
     title.textContent = T.title + ' ' + items.length + (PREMIUM ? '' : '/' + FREE_MAX);
     renderCur();
@@ -265,10 +307,7 @@
       var row = el('div', { cls: 'tt-my-item' + (it.id === curId ? ' current' : '') });
       var a = el('a', { cls: 'tt-chip tt-my-chip', href: location.pathname + q, text: it.name });
       if (it.id === curId) a.setAttribute('aria-current', 'true');
-      a.addEventListener('click', function () {
-        ev('timer_load');
-        try { sessionStorage.setItem(CUR_KEY, JSON.stringify({ id: it.id, path: location.pathname, q: q })); } catch (e) {}
-      });
+      a.addEventListener('click', loadHandler(it, q));
       var x = el('button', { type: 'button', cls: 'tt-my-x', 'aria-label': T.del + ': ' + it.name, text: '×' });
       x.addEventListener('click', function () {
         if (row.classList.contains('confirm')) return;
@@ -816,6 +855,11 @@
       window.__ttSb = null; window.__ttSignedOut = true;
       head.removeChild(saveBtn);
       list.appendChild(el('a', { cls: 'tt-chip', href: acctHref, text: T.signin }));
+      // ログイン中の見た目（説明文を隠す・上の行）を元に戻す
+      document.documentElement.classList.remove('tt-in');
+      var mr = document.getElementById('tt-myrow'); if (mr) mr.remove();
+      myRow = null; doneWrap.remove(); box.hidden = false; bar.hidden = true;
+      if (window.__ttRenderRecents) { try { window.__ttRenderRecents(); } catch (e) {} }
       return;
     }
     var test = document.getElementById('tt-sync'); if (test) test.remove(); // ログイン中は「準備中」の需要テストを出さない
