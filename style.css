@@ -1365,3 +1365,28 @@ body.focus-mode .tt-adj { margin-bottom: 18px; }
 @media (prefers-reduced-motion: reduce) { .tt-undo { transition: none; } }
 .tt-undo { width: max-content; max-width: min(460px, calc(100vw - 32px)); }
 .tt-undo-t { flex: 1; min-width: 0; }
+
+/* 11/15: ラベルの色・白抜きの絵・並び替え */
+.ttd .lc0, .tt-today .lc0 { background: #2A6FC4; } .ttd .lc1, .tt-today .lc1 { background: #C4521C; } .ttd .lc2, .tt-today .lc2 { background: #12825C; } .ttd .lc3, .tt-today .lc3 { background: #A86F00; } .ttd .lc4, .tt-today .lc4 { background: #B8457A; } .ttd .lc5, .tt-today .lc5 { background: #6A4BC4; } .ttd .lc6, .tt-today .lc6 { background: #1E7A8C; } .ttd .lc7, .tt-today .lc7 { background: #7A5A40; }
+.ttd-pie-s.lc0 { stroke: #2A6FC4; } .ttd-pie-s.lc1 { stroke: #C4521C; } .ttd-pie-s.lc2 { stroke: #12825C; } .ttd-pie-s.lc3 { stroke: #A86F00; } .ttd-pie-s.lc4 { stroke: #B8457A; } .ttd-pie-s.lc5 { stroke: #6A4BC4; } .ttd-pie-s.lc6 { stroke: #1E7A8C; } .ttd-pie-s.lc7 { stroke: #7A5A40; }
+.tt-ej { display: inline-block; width: 24px; height: 24px; background: currentColor; -webkit-mask: var(--ej) center / contain no-repeat; mask: var(--ej) center / contain no-repeat; flex-shrink: 0; }
+.tt-cbtn-c { color: #fff; border: 0; }
+.tt-cbtn-c .tt-ej { width: 25px; height: 25px; }
+.tt-cbtn.on .tt-cbtn-c { color: #fff; border: 0; box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--text); }
+.tt-cbtn.add .tt-cbtn-c { color: var(--text2); background: var(--card); border: 1.5px dashed var(--line); }
+.tt-crun { color: #fff; }
+.tt-crun .tt-ej { width: 22px; height: 22px; }
+.tt-crun-stop { background: #fff; color: #1C1C1E; }
+.tt-ccell { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.tt-cmove { display: flex; gap: 4px; }
+.tt-cmove-b { width: 30px; height: 26px; padding: 0 0 2px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
+.tt-cmove-b:disabled { opacity: .3; cursor: default; }
+.tt-colors { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 8px; }
+.tt-color { width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 0; cursor: pointer; box-shadow: inset 0 0 0 1px rgba(0,0,0,.08); }
+.tt-color.on { box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--text); }
+.tt-cform-icw { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto; padding: 2px 2px 6px; margin-bottom: 6px; }
+.tt-cform-cat { font-size: 11.5px; color: var(--text2); font-weight: 700; margin-top: 6px; }
+.tt-cform-ic { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 6px; }
+.tt-cform-ib { height: 42px; color: var(--lc, var(--text)); }
+.tt-cform-ib.on { background: var(--lc, var(--text)); color: #fff; border-color: var(--lc, var(--text)); }
+.lbl-form .tt-colors { margin-bottom: 10px; }
