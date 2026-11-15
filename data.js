@@ -19,6 +19,7 @@
       title: 'データ', close: '閉じる', loading: '読み込み中…', err: 'つながりませんでした。時間をおいてもう一度お試しください。',
       periods: [['7d', '7日'], ['30d', '30日'], ['12m', '12か月'], ['all', '全期間']],
       pjAll: 'すべて', pjNone: 'プロジェクトなし', pjOther: 'マイタイマー以外', filter: '表示するプロジェクト',
+      lblBtn: function (n) { return n ? 'ラベル：' + n + 'つ' : 'ラベル：すべて'; }, lblFilter: '表示するラベル（複数選べます）', lblClear: 'すべて表示', pieOf: function (t) { return t + 'の割合'; },
       work: '作業の時間', workSub: '休憩を除く', days: '使った日数', runs: '回数', streak: '連続',
       daysV: function (n, of) { return of ? n + ' / ' + of + '日' : n + '日'; }, runsV: function (n) { return n + '回'; }, streakV: function (n) { return '🔥 ' + n + '日'; },
       chart: function (p) { return p === '12m' || p === 'all' ? '月ごとの作業の時間' : '日ごとの作業の時間'; },
@@ -44,6 +45,7 @@
       title: 'Data', close: 'Close', loading: 'Loading…', err: 'Could not connect. Please try again later.',
       periods: [['7d', '7 days'], ['30d', '30 days'], ['12m', '12 months'], ['all', 'All time']],
       pjAll: 'All', pjNone: 'No project', pjOther: 'Not a saved timer', filter: 'Project to show',
+      lblBtn: function (n) { return n ? 'Labels: ' + n : 'Labels: all'; }, lblFilter: 'Labels to show (choose any)', lblClear: 'Show all', pieOf: function (t) { return t + ' — share'; },
       work: 'Work time', workSub: 'excluding breaks', days: 'Days used', runs: 'Sessions', streak: 'Streak',
       daysV: function (n, of) { return of ? n + ' / ' + of : String(n); }, runsV: function (n) { return String(n); }, streakV: function (n) { return '🔥 ' + n; },
       chart: function (p) { return p === '12m' || p === 'all' ? 'Work time per month' : 'Work time per day'; },
@@ -69,6 +71,7 @@
       title: 'Datos', close: 'Cerrar', loading: 'Cargando…', err: 'No se pudo conectar. Inténtalo más tarde.',
       periods: [['7d', '7 días'], ['30d', '30 días'], ['12m', '12 meses'], ['all', 'Todo']],
       pjAll: 'Todos', pjNone: 'Sin proyecto', pjOther: 'Sin temporizador guardado', filter: 'Proyecto',
+      lblBtn: function (n) { return n ? 'Etiquetas: ' + n : 'Etiquetas: todas'; }, lblFilter: 'Etiquetas a mostrar (puedes elegir varias)', lblClear: 'Mostrar todas', pieOf: function (t) { return t + ' — proporción'; },
       work: 'Tiempo de trabajo', workSub: 'sin descansos', days: 'Días de uso', runs: 'Sesiones', streak: 'Racha',
       daysV: function (n, of) { return of ? n + ' / ' + of : String(n); }, runsV: function (n) { return String(n); }, streakV: function (n) { return '🔥 ' + n; },
       chart: function (p) { return p === '12m' || p === 'all' ? 'Tiempo de trabajo por mes' : 'Tiempo de trabajo por día'; },
@@ -189,7 +192,7 @@
   }
 
   /* ---------- 状態 ---------- */
-  var S = { period: '7d', filter: 'all', data: null, loadedFor: null, more: 10, sel: -1 };
+  var S = { period: '7d', filter: 'all', labels: [], lblOpen: false, data: null, loadedFor: null, more: 10, sel: -1 };
   function signedLocal() { try { return !!localStorage.getItem('sb-arsfocfjfwtlykfdkiea-auth-token'); } catch (e) { return false; } }
   async function waitSb() {
     for (var i = 0; i < 60; i++) {
@@ -314,8 +317,14 @@
   function dayKey(d) { return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); }
   function compute(D) {
     var F = S.filter;
-    var mode = (F === 'all' && D.projects.length) ? 'pj' : 'label';
-    var rows = D.list.filter(function (e) { return F === 'all' || e.pj === F; });
+    // 11/15: ラベルでもしぼれる（複数）。選んだラベルの区切りだけを数える
+    var LS = null;
+    if (S.labels && S.labels.length) { LS = {}; S.labels.forEach(function (l) { LS[l] = 1; }); }
+    var mode = (F === 'all' && D.projects.length && !LS) ? 'pj' : 'label';
+    var rows = D.list.filter(function (e) {
+      if (F !== 'all' && e.pj !== F) return false;
+      return !LS || e.parts.some(function (p) { return LS[p.label]; });
+    });
     var B = buckets(D);
     B.forEach(function (b) { b.v = {}; b.total = 0; });
     var tot = {}, labels = {}, brkL = {}, timers = {}, work = 0, brk = 0, days = {};
@@ -324,6 +333,7 @@
       days[dayKey(e.t)] = 1;
       e.work = 0; e.brk = 0;
       e.parts.forEach(function (p) {
+        if (LS && !LS[p.label]) return;
         if (isBreak(D, p.label)) { e.brk += p.secs; brk += p.secs; brkL[p.label] = (brkL[p.label] || 0) + p.secs; return; }
         e.work += p.secs; work += p.secs;
         labels[p.label] = (labels[p.label] || 0) + p.secs;
@@ -378,9 +388,9 @@
     // 積み上げ縦棒
     wrap.appendChild(chart(C));
     // 合計の表
-    if (C.mode === 'pj') wrap.appendChild(table(T.byPj, C.series.map(function (s) { return { name: s.name, cls: s.cls, secs: C.tot[s.k] }; }), C.work));
+    if (C.mode === 'pj') wrap.appendChild(pieTable(T.byPj, C.series.map(function (s) { return { name: s.name, cls: s.cls, secs: C.tot[s.k] }; }), C.work));
     var lrows = Object.keys(C.labels).sort(function (a, b) { return C.labels[b] - C.labels[a]; });
-    var lsec = table(T.byLabel, lrows.map(function (l) {
+    var lsec = pieTable(T.byLabel, lrows.map(function (l) {
       var s = C.mode === 'label' ? C.series.filter(function (x) { return x.k === l; })[0] : null;
       return { name: l === '\u0000' ? T.noSeg : (l || T.noLabel), cls: s ? s.cls : (C.mode === 'label' ? 'g' : ''), secs: C.labels[l], label: l, brk: false };
     }), C.work, sample);
@@ -391,7 +401,7 @@
     }
     wrap.appendChild(lsec);
     var tids = Object.keys(C.timers).filter(function (id) { return D.tmap[id] && C.timers[id] > 0; }).sort(function (a, b) { return C.timers[b] - C.timers[a]; });
-    if (tids.length) wrap.appendChild(table(T.byTimer, tids.map(function (id) { return { name: D.tmap[id].name || '', secs: C.timers[id], sub: D.pjNames[D.tmap[id].project_id] || '' }; }), C.work));
+    if (tids.length) wrap.appendChild(pieTable(T.byTimer, tids.map(function (id) { return { name: D.tmap[id].name || '', secs: C.timers[id], sub: D.pjNames[D.tmap[id].project_id] || '' }; }), C.work));
     wrap.appendChild(details(C, D));
   }
 
@@ -423,10 +433,45 @@
       sel.addEventListener('change', function () { S.filter = sel.value; S.more = 10; S.sel = -1; ev('data_filter'); render(false); var s2 = body.querySelector('.ttd-sel'); if (s2) s2.focus(); });
       right.appendChild(sel);
     }
+    // 11/15: ラベルでしぼる（複数選べる）
+    var lt = {}; D.list.forEach(function (e) { if (S.filter !== 'all' && e.pj !== S.filter) return; e.parts.forEach(function (p) { lt[p.label] = (lt[p.label] || 0) + p.secs; }); });
+    S.labels.forEach(function (l) { if (!(l in lt)) lt[l] = 0; });
+    var lopts = Object.keys(lt).sort(function (a, b) { return lt[b] - lt[a]; });
+    var lpanel = null;
+    if (lopts.length > 1) {
+      var lb = el('button', { type: 'button', cls: 'ttd-csv ttd-lblbtn' + (S.labels.length ? ' on' : ''), 'aria-expanded': S.lblOpen ? 'true' : 'false', text: T.lblBtn(S.labels.length) + ' ▾' });
+      lpanel = el('div', { cls: 'ttd-lblpanel', role: 'group', 'aria-label': T.lblFilter });
+      if (!S.lblOpen) lpanel.hidden = true;
+      lpanel.appendChild(el('p', { cls: 'ttd-lblpanel-t', text: T.lblFilter }));
+      var chips = el('div', { cls: 'ttd-lblchips' });
+      var allB = el('button', { type: 'button', cls: 'ttd-lchip' + (S.labels.length ? '' : ' on'), 'aria-pressed': S.labels.length ? 'false' : 'true', text: T.lblClear });
+      allB.addEventListener('click', function () { S.labels = []; afterLbl(); });
+      chips.appendChild(allB);
+      lopts.forEach(function (l) {
+        var on = S.labels.indexOf(l) >= 0;
+        var c = el('button', { type: 'button', cls: 'ttd-lchip' + (on ? ' on' : '') + (isBreak(D, l) ? ' brk' : ''), 'aria-pressed': on ? 'true' : 'false', text: l === '\u0000' ? T.noSeg : (l || T.noLabel) });
+        c.addEventListener('click', function () {
+          var i = S.labels.indexOf(l);
+          if (i >= 0) S.labels.splice(i, 1); else S.labels.push(l);
+          afterLbl(l);
+        });
+        chips.appendChild(c);
+      });
+      lpanel.appendChild(chips);
+      lb.addEventListener('click', function () { S.lblOpen = !S.lblOpen; lpanel.hidden = !S.lblOpen; lb.setAttribute('aria-expanded', S.lblOpen ? 'true' : 'false'); });
+      right.appendChild(lb);
+    }
+    function afterLbl(focusLabel) {
+      S.more = 10; S.sel = -1; ev('data_label_filter', { n: S.labels.length });
+      render(false);
+      var cs = body.querySelectorAll('.ttd-lchip'), idx = focusLabel === undefined ? 0 : lopts.indexOf(focusLabel) + 1;
+      if (cs[idx]) cs[idx].focus();
+    }
     var csv = el('button', { type: 'button', cls: 'ttd-csv' + (prem ? '' : ' lock'), text: prem ? T.csv : '🔒 ' + T.csvLock });
     csv.addEventListener('click', function () { if (!prem) { showLock(); ev('data_locked', { period: 'csv' }); return; } saveCsv(); });
     right.appendChild(csv);
     bar.appendChild(right);
+    if (lpanel) bar.appendChild(lpanel);
     var lock = el('div', { cls: 'ttd-lock', hidden: '', role: 'status' });
     bar.appendChild(lock);
     return bar;
@@ -674,6 +719,53 @@
     sec.appendChild(el('h3', { text: title }));
     sec.appendChild(tableRows(rows, total, sample));
     return sec;
+  }
+  /* 11/15: 割合は円グラフ（ドーナツ型）＋表（時間と％はそのまま） */
+  function pieTable(title, rows, total, sample, pieTotal) {
+    var slot = 0;
+    rows.forEach(function (r) { if (!r.cls) r.cls = slot < 7 ? 's' + (++slot) : 'g'; else if (/^s\d$/.test(r.cls)) slot = Math.max(slot, Number(r.cls.slice(1))); });
+    var sec = el('section', { cls: 'ttd-sec' });
+    sec.appendChild(el('h3', { text: title }));
+    var box = el('div', { cls: 'ttd-piebox' });
+    if (rows.length > 1) box.appendChild(pie(rows, pieTotal || total, title));
+    box.appendChild(tableRows(rows, total, sample));
+    sec.appendChild(box);
+    return sec;
+  }
+  function pie(rows, total, title) {
+    var NS = 'http://www.w3.org/2000/svg';
+    function mk(tag, a) { var n = document.createElementNS(NS, tag); for (var k in a) n.setAttribute(k, a[k]); return n; }
+    var R0 = 50, W = 20, CIRC = 2 * Math.PI * R0;
+    var sum = 0; rows.forEach(function (r) { sum += r.secs; });
+    var base = Math.max(total || 0, sum, 1); // 表の％と同じ分母（マイタイマーごとは、マイタイマー以外の分が薄い輪のまま残る）
+    var svg = mk('svg', { viewBox: '0 0 140 140', class: 'ttd-pie', role: 'img' });
+    var parts = [], gray = 0;
+    rows.forEach(function (r) { if (r.cls === 'g') gray += r.secs; else parts.push({ cls: r.cls, secs: r.secs, name: r.name }); });
+    if (gray) parts.push({ cls: 'g', secs: gray });
+    svg.setAttribute('aria-label', T.pieOf(title) + ': ' + rows.slice(0, 8).map(function (r) { return r.name + ' ' + Math.round(r.secs / base * 100) + '%'; }).join('、'));
+    svg.appendChild(mk('circle', { cx: 70, cy: 70, r: R0, class: 'ttd-pie-track', fill: 'none', 'stroke-width': W }));
+    var off = 0, labels = [];
+    parts.forEach(function (p) {
+      var len = p.secs / base * CIRC;
+      if (len <= 0) return;
+      var gap = parts.length > 1 && len > 2 ? 1.2 : 0;
+      svg.appendChild(mk('circle', { cx: 70, cy: 70, r: R0, fill: 'none', 'stroke-width': W, class: 'ttd-pie-s ' + p.cls,
+        'stroke-dasharray': Math.max(0, len - gap) + ' ' + (CIRC - Math.max(0, len - gap)), 'stroke-dashoffset': String(-off), transform: 'rotate(-90 70 70)' }));
+      // 10％以上の切れ目には％を直接書く（時間と％は右の表にも残す）
+      var pct = Math.round(p.secs / base * 100);
+      if (pct >= 10) {
+        var ang = (off + len / 2) / CIRC * 2 * Math.PI - Math.PI / 2;
+        var tx = mk('text', { x: (70 + R0 * Math.cos(ang)).toFixed(1), y: (70 + R0 * Math.sin(ang) + 3.5).toFixed(1), 'text-anchor': 'middle', class: 'ttd-pie-pct', 'aria-hidden': 'true' });
+        tx.textContent = pct + '%';
+        labels.push(tx);
+      }
+      off += len;
+    });
+    labels.forEach(function (t) { svg.appendChild(t); });
+    var t1 = mk('text', { x: 70, y: 66, 'text-anchor': 'middle', class: 'ttd-pie-c1' }); t1.textContent = T.total;
+    var t2 = mk('text', { x: 70, y: 84, 'text-anchor': 'middle', class: 'ttd-pie-c2' }); t2.textContent = T.dur(sum);
+    svg.appendChild(t1); svg.appendChild(t2);
+    return svg;
   }
   function tableRows(rows, total, sample) {
     var ul = el('ul', { cls: 'ttd-rows' });

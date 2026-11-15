@@ -1328,3 +1328,22 @@ body.dt .station.lab .st-lab { text-box: normal; top: 0; }
 .station.lab.now { transform: none; box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--line); }
 .stations { padding: 7px 8px; }
 body.dt .station.lab { width: auto; height: auto; border-radius: 0; color: var(--text); text-shadow: none; }
+/* 11/15: データの割合を円グラフで・ラベルでしぼる */
+.ttd-piebox { display: flex; align-items: center; gap: 18px; }
+.ttd-piebox > .ttd-rows { flex: 1; min-width: 0; }
+.ttd-pie { width: 132px; height: 132px; flex-shrink: 0; }
+.ttd-pie-track { stroke: var(--line); }
+.ttd-pie-s.s1 { stroke: var(--ttd-s1); } .ttd-pie-s.s2 { stroke: var(--ttd-s2); } .ttd-pie-s.s3 { stroke: var(--ttd-s3); } .ttd-pie-s.s4 { stroke: var(--ttd-s4); }
+.ttd-pie-s.s5 { stroke: var(--ttd-s5); } .ttd-pie-s.s6 { stroke: var(--ttd-s6); } .ttd-pie-s.s7 { stroke: var(--ttd-s7); } .ttd-pie-s.s8 { stroke: var(--ttd-s8); } .ttd-pie-s.g { stroke: var(--ttd-g); }
+.ttd-pie-c1 { font-size: 11px; fill: var(--text2); }
+.ttd-pie-c2 { font-size: 15px; font-weight: 700; fill: var(--text); }
+@media (max-width: 520px) { .ttd-piebox { flex-direction: column; align-items: stretch; } .ttd-pie { align-self: center; width: 150px; height: 150px; } }
+.ttd-lblbtn.on { border-color: var(--text); }
+.ttd-lblpanel { flex-basis: 100%; background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 12px 12px; }
+.ttd-lblpanel[hidden] { display: none; }
+.ttd-lblpanel-t { margin: 0 0 8px; font-size: 12px; color: var(--text2); }
+.ttd-lblchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ttd-lchip { min-height: 32px; padding: 0 12px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--bg); color: var(--text); font: inherit; font-size: 13px; cursor: pointer; max-width: 14em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ttd-lchip.brk { color: var(--text2); }
+.ttd-lchip.on { background: var(--text); border-color: var(--text); color: var(--bg); }
+.ttd-pie-pct { font-size: 10px; font-weight: 800; fill: #fff; paint-order: stroke; stroke: rgba(0,0,0,.25); stroke-width: 1.5px; }
