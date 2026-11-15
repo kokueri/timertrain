@@ -820,6 +820,14 @@
       loadLabels();
     });
   }
+  // 11/15: 「元に戻す」用。まだ記録していなければ記録せずに止める
+  function cCancel() {
+    if (!cRun) return;
+    if (cRun.L.id || cRun.L.busy) { cStop(false); return; }
+    clearInterval(cTick); cTick = null; cRun = null; cSaveRun();
+    ev('count_undo', {});
+    showStatsNow();
+  }
   function cResume() {
     var saved = null; try { saved = JSON.parse(localStorage.getItem(CR_KEY) || 'null'); } catch (e) {}
     if (!saved || typeof saved.start !== 'number' || !isFinite(saved.start) || saved.start > Date.now() + 60000) { cSaveRun(); return; }
@@ -874,7 +882,7 @@
     window.__ttBreaks = function () { return BREAKS; };
     window.__ttStatsRefresh = function () { loadStreak(true); };
     window.__ttLabels = { list: function () { return recentLabels.slice(); }, isBreak: isBreak, save: saveLabelMeta };
-    window.__ttCount = { start: cStart, stop: function () { cStop(false); }, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
+    window.__ttCount = { start: cStart, stop: function () { cStop(false); }, cancel: cCancel, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
       labels: function () { return recentLabels.filter(function (l) { return !isBreak(l); }); } };
     cResume();
     if (window.__ttRerenderList) { try { window.__ttRerenderList(); } catch (e) {} }
