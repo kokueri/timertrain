@@ -1207,10 +1207,27 @@ rail.className = 'rail';
 stationsEl.appendChild(rail);
 }
 const s = document.createElement('span');
-s.className = 'station' + (run.active ? (i < run.idx ? ' done' : i === run.idx ? ' now' : '') : '');
+s.className = 'station lab' + (run.active ? (i < run.idx ? ' done' : i === run.idx ? ' now' : '') : '');
 if (DT) s.appendChild(DT.mini(t.color)); else s.style.background = colorOf(t.color);
+// 11/15: 丸に長さ（25m・1h30m・40s）。数字は大きめ、h/m/s は小さめ
+const lab = document.createElement('span'); lab.className = 'st-lab';
+stationDur(t.secs).forEach(([n, u]) => {
+const a = document.createElement('span'); a.className = 'st-n'; a.textContent = n;
+const b = document.createElement('span'); b.className = 'st-u'; b.textContent = u;
+lab.append(a, b);
+});
+s.appendChild(lab);
 stationsEl.appendChild(s);
 });
+}
+function stationDur(secs) {
+secs = Math.max(0, Math.round(secs || 0));
+const h = Math.floor(secs / 3600), m = Math.floor(secs % 3600 / 60), s = secs % 60, p = [];
+if (h) p.push([h, 'h']);
+if (m) p.push([m, 'm']);
+if (s && !h) p.push([s, 's']);
+if (!p.length) p.push([0, 's']);
+return p;
 }
 
 /* ---------- その他UI ---------- */
@@ -1692,7 +1709,51 @@ var ed = document.createElement('button'); ed.type = 'button'; ed.className = 'm
 ed.setAttribute('aria-label', LR.edit); ed.title = LR.edit;
 ed.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
 ed.addEventListener('click', function () { if (window.__ttMyEdit) window.__ttMyEdit(); });
-row.appendChild(sc); row.appendChild(ed);
+// 11/15: 鉛筆はマイタイマーのすぐ右。行は横にスライド（PC は ‹ › とホイール・ドラッグでも）
+sc.insertBefore(ed, sc.querySelector('.mr-rec'));
+var LA = lang === 'en' ? ['Scroll left', 'Scroll right'] : lang === 'es' ? ['Desplazar a la izquierda', 'Desplazar a la derecha'] : ['左へ', '右へ'];
+function arrow(dir) {
+var b = document.createElement('button'); b.type = 'button'; b.className = 'mr-arrow ' + (dir < 0 ? 'l' : 'r'); b.hidden = true;
+b.setAttribute('aria-label', LA[dir < 0 ? 0 : 1]); b.textContent = dir < 0 ? '‹' : '›';
+b.addEventListener('click', function () { sc.scrollBy({ left: dir * Math.max(120, sc.clientWidth * 0.7), behavior: 'smooth' }); });
+return b;
+}
+var al = arrow(-1), ar = arrow(1);
+row.appendChild(al); row.appendChild(sc); row.appendChild(ar);
+function syncArrows() {
+var over = sc.scrollWidth > sc.clientWidth + 2;
+al.hidden = !over || sc.scrollLeft <= 2;
+ar.hidden = !over || sc.scrollLeft + sc.clientWidth >= sc.scrollWidth - 2;
+row.classList.toggle('mr-over', over);
+row.classList.toggle('mr-atend', over && ar.hidden);
+}
+sc.addEventListener('scroll', syncArrows, { passive: true });
+window.addEventListener('resize', syncArrows);
+try { new MutationObserver(function () { setTimeout(syncArrows, 0); }).observe(sc, { childList: true, subtree: true }); } catch (e) {}
+setTimeout(syncArrows, 0);
+// マウスのホイール（縦）で横に動かす
+sc.addEventListener('wheel', function (e) {
+if (sc.scrollWidth <= sc.clientWidth || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+var before = sc.scrollLeft; sc.scrollLeft += e.deltaY;
+if (sc.scrollLeft !== before) e.preventDefault();
+}, { passive: false });
+// マウスでつかんで横に動かす（少し動かしたらリンクを押したことにしない）
+var drag = null;
+sc.addEventListener('pointerdown', function (e) {
+if (e.pointerType !== 'mouse' || e.button !== 0) return;
+drag = { x: e.clientX, left: sc.scrollLeft, moved: false };
+});
+window.addEventListener('pointermove', function (e) {
+if (!drag) return;
+var dx = e.clientX - drag.x;
+if (Math.abs(dx) > 5) drag.moved = true;
+if (drag.moved) { sc.scrollLeft = drag.left - dx; sc.classList.add('dragging'); }
+});
+window.addEventListener('pointerup', function () {
+if (!drag) return;
+var moved = drag.moved; drag = null; sc.classList.remove('dragging');
+if (moved) { var stop = function (ev) { ev.preventDefault(); ev.stopPropagation(); }; sc.addEventListener('click', stop, { capture: true, once: true }); setTimeout(function () { sc.removeEventListener('click', stop, true); }, 50); }
+});
 hdr.insertAdjacentElement('afterend', row);
 // すぐ始める: 再生ボタンの下のチップ（#tt-quick）を短い名前でこの行に。押したら元のチップと同じ動き（その場で開始）
 var SHORT = { pomo: 'ポモドーロ', workout: '運動40/20', chain: '3つ連続' };
@@ -1794,7 +1855,7 @@ var n = st.streak || 0, d7 = st.days7 || 0;
 var parts = lang === 'en' ? ['⏱ Today ' + dur, '📅 ' + d7 + ' of 7 days', '🔥 ' + n + '-day streak']
 : lang === 'es' ? ['⏱ Hoy ' + dur, '📅 ' + d7 + ' de 7 días', '🔥 Racha de ' + n + (n === 1 ? ' día' : ' días')]
 : ['⏱ 今日 ' + dur, '📅 7日中 ' + d7 + '日', '🔥 ' + n + '日連続'];
-row.textContent = '🔥' + n;
+row.textContent = '🔥' + n + ' 📅' + d7 + '/7';
 row.classList.toggle('keep', n > 0 && !st.streakToday);
 var hint =lang === 'en' ? (st.streakToday || !n ? '' : ' Use it today to make it ' + (n + 1) + '.') : lang === 'es' ? (st.streakToday || !n ? '' : ' Úsalo hoy para llegar a ' + (n + 1) + '.') : (st.streakToday || !n ? '' : '今日も使うと' + (n + 1) + '日になります。');
 var base = acct.dataset.base;

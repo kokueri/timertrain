@@ -1278,3 +1278,40 @@ html.tt-in #acct-link > span.tt-streak { display: inline; }
 .tt-my.in-row { flex: 0 0 100%; box-sizing: border-box; margin-top: 4px; text-align: left; }
 .tt-my-donerow { display: flex; justify-content: flex-end; margin-top: 12px; }
 .tt-my-donerow[hidden] { display: none; }
+/* 11/15: 行のスライド（はみ出すときだけ右端をぼかす・PC は ‹ ›） */
+.mr-scroll { -webkit-mask-image: none; mask-image: none; }
+.tt-myrow.mr-over:not(.mr-atend) .mr-scroll { -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 22px), transparent); }
+.mr-scroll.dragging { cursor: grabbing; user-select: none; -webkit-user-select: none; }
+.mr-arrow { flex-shrink: 0; width: 30px; height: 30px; padding: 0 0 2px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--text);
+  font: inherit; font-size: 18px; line-height: 1; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.mr-arrow:hover { border-color: var(--text2); }
+.mr-arrow[hidden] { display: none; }
+@media (hover: none) { .mr-arrow { display: none !important; } }
+.mr-scroll > .mr-edit { width: 34px; height: 34px; align-self: center; }
+html.tt-in #acct-link > span.tt-streak { white-space: nowrap; }
+/* 11/15: 下の丸に長さ（25m・1h30m）。数字は大きめ、単位は小さめ。文字は濃い色（明るい色の丸でも読める） */
+.stations { max-width: 100%; overflow-x: auto; justify-content: safe center; padding: 6px 4px; box-sizing: border-box; scrollbar-width: none; }
+.stations::-webkit-scrollbar { display: none; }
+.station.lab { width: auto; height: 22px; min-width: 22px; padding: 0 7px; border-radius: 11px; box-sizing: border-box;
+  display: inline-flex; align-items: baseline; justify-content: center; line-height: 22px; color: #1C1C1E; font-weight: 800; white-space: nowrap; }
+.st-n { font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.st-u { font-size: 9px; font-weight: 700; margin: 0 1px 0 1px; opacity: .8; }
+.station.lab.now { transform: scale(1.15); box-shadow: 0 0 0 3px var(--line); }
+.station.lab + .rail, .rail + .station.lab { margin: 0; }
+.stations .rail { width: 10px; }
+body.dt .station.lab { height: auto; padding: 0; border-radius: 0; background: none; flex-direction: column; align-items: center; line-height: 1; color: var(--text); box-shadow: none; transform: none; }
+body.dt .station.lab .donut-mini { width: 30px; height: 30px; border-radius: 50%; }
+body.dt .station.lab.now .donut-mini { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--text); }
+body.dt .station.lab .st-lab { margin-top: 4px; }
+body.dt .stations { align-items: flex-start; }
+body.dt .stations .rail { margin-top: 15px; }
+.mr-scroll { max-width: calc(100% - 76px); }
+.stations { padding: 6px 8px; }
+body.dt .station.lab.now { box-shadow: none; transform: none; }
+/* スマホ: 矢印は出ないので行いっぱいに。狭い画面のログイン中は上の段を少し詰める */
+@media (hover: none) { .mr-scroll { max-width: none; } }
+@media (max-width: 400px) {
+  html.tt-in #tt-prem-link .tt-pl-short { display: none; }
+  html.tt-in #tt-prem-link { padding: 8px 9px; }
+  html.tt-in #acct-link { padding: 8px 9px; gap: 3px; }
+}
