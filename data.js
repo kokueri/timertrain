@@ -129,6 +129,8 @@
     }
   }[lang];
   function pad(n) { return (n < 10 ? '0' : '') + n; }
+  // 11/15: ラベルの色（タイマー画面と同じ8色）。クラス lc0〜lc7
+  function lcOf(l) { return l === '\u0000' ? 'g' : 'lc' + (window.__ttLabelColorIdx ? window.__ttLabelColorIdx(l) : 0); }
   /* ラベルの名前変更（settings.data.labelMap）。過去の記録は新しい名前で集計する */
   var LM = {};
   function setLM(sd) { LM = (sd && sd.labelMap && typeof sd.labelMap === 'object' && !Array.isArray(sd.labelMap)) ? sd.labelMap : {}; }
@@ -363,7 +365,7 @@
       shown.push(o);
     }
     var slot = 0;
-    shown.forEach(function (s) { if (s.gray || s.k === '\u0000' || s.k === '__other') s.cls = 'g'; else s.cls = 's' + (++slot); });
+    shown.forEach(function (s) { if (s.gray || s.k === '\u0000' || s.k === '__other') s.cls = 'g'; else s.cls = mode === 'label' ? lcOf(s.k) : 's' + (++slot); });
     return { mode: mode, rows: rows, B: B, series: shown, tot: tot, labels: labels, brkL: brkL, timers: timers, work: work, brk: brk, days: Object.keys(days).length };
   }
 
@@ -392,7 +394,7 @@
     var lrows = Object.keys(C.labels).sort(function (a, b) { return C.labels[b] - C.labels[a]; });
     var lsec = pieTable(T.byLabel, lrows.map(function (l) {
       var s = C.mode === 'label' ? C.series.filter(function (x) { return x.k === l; })[0] : null;
-      return { name: l === '\u0000' ? T.noSeg : (l || T.noLabel), cls: s ? s.cls : (C.mode === 'label' ? 'g' : ''), secs: C.labels[l], label: l, brk: false };
+      return { name: l === '\u0000' ? T.noSeg : (l || T.noLabel), cls: s ? s.cls : (C.mode === 'label' ? 'g' : lcOf(l)), secs: C.labels[l], label: l, brk: false };
     }), C.work, sample);
     var bl = Object.keys(C.brkL).sort(function (a, b) { return C.brkL[b] - C.brkL[a]; });
     if (bl.length) {
@@ -589,7 +591,7 @@
     var tot = {}, work = 0;
     D.list.forEach(function (e) { e.work = 0; e.brk = 0; e.parts.forEach(function (p) { if (isBreak(D, p.label)) { e.brk += p.secs; return; } e.work += p.secs; work += p.secs; tot[p.label] = (tot[p.label] || 0) + p.secs; }); });
     var keys = Object.keys(tot).sort(function (a, b) { return tot[b] - tot[a]; });
-    var cls = {}; keys.forEach(function (k, i) { cls[k] = i < 7 ? 's' + (i + 1) : 'g'; });
+    var cls = {}; keys.forEach(function (k, i) { cls[k] = i < 7 ? lcOf(k) : 'g'; });
     function nm(l) { return l || T.noLabel; }
     function clsOf(p) { return isBreak(D, p.label) ? 'b' : cls[p.label]; }
     if (!D.list.length) {

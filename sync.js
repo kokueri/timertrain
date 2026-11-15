@@ -434,16 +434,27 @@
     return o;
   }
   function cleanHide(h) { var o = {}; if (Array.isArray(h)) h.slice(0, 300).forEach(function (x) { if (typeof x === 'string' && x) o[x.slice(0, 30)] = 1; }); return o; }
-  var LMAP = {}, LHIDE = {};
-  try { var lmc = JSON.parse(localStorage.getItem(LM_KEY) || 'null'); if (lmc) { LMAP = cleanMap(lmc.map); LHIDE = cleanHide(lmc.hide); } } catch (e) {}
+  // 11/15: ラベルの色（8色の番号 0〜7）。settings.data.labelColor {ラベル: 番号}
+  function cleanCol(c) {
+    var o = {};
+    if (c && typeof c === 'object' && !Array.isArray(c)) Object.keys(c).slice(0, 300).forEach(function (k) {
+      var v = c[k]; if (typeof v === 'number' && v >= 0 && v <= 7 && Math.floor(v) === v && k) o[String(k).slice(0, 30)] = v;
+    });
+    return o;
+  }
+  var LMAP = {}, LHIDE = {}, LCOL = {};
+  try { var lmc = JSON.parse(localStorage.getItem(LM_KEY) || 'null'); if (lmc) { LMAP = cleanMap(lmc.map); LHIDE = cleanHide(lmc.hide); LCOL = cleanCol(lmc.col); } } catch (e) {}
+  window.__ttLC = LCOL;
   function alias(l) {
     l = String(l == null ? '' : l);
     for (var i = 0; i < 5 && Object.prototype.hasOwnProperty.call(LMAP, l); i++) l = LMAP[l];
     return l;
   }
-  function setLabelMeta(map, hide) {
-    LMAP = map; LHIDE = hide;
-    try { localStorage.setItem(LM_KEY, JSON.stringify({ map: map, hide: Object.keys(hide) })); } catch (e) {}
+  function setLabelMeta(map, hide, col) {
+    LMAP = map; LHIDE = hide; if (col) LCOL = col;
+    window.__ttLC = LCOL;
+    try { localStorage.setItem(LM_KEY, JSON.stringify({ map: map, hide: Object.keys(hide), col: LCOL })); } catch (e) {}
+    if (window.__ttOnLabelColors) { try { window.__ttOnLabelColors(); } catch (e) {} }
   }
   function isBreak(label) {
     label = alias(label);
@@ -547,7 +558,7 @@
       var cur = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
       if (cur.error) return false;
       var base = (cur.data && cur.data.data && typeof cur.data.data === 'object') ? cur.data.data : {};
-      var map = cleanMap(base.labelMap), hide = cleanHide(base.labelHide);
+      var map = cleanMap(base.labelMap), hide = cleanHide(base.labelHide), col = cleanCol(base.labelColor);
       var brk = (base.breaks && typeof base.breaks === 'object' && !Array.isArray(base.breaks)) ? Object.assign({}, base.breaks) : {};
       var name = patch.name;
       if (patch.rename) {
@@ -557,18 +568,20 @@
           Object.keys(map).forEach(function (k) { if (map[k] === o) map[k] = n; });
           map[o] = n; delete map[n];
           if (Object.prototype.hasOwnProperty.call(brk, o) && !Object.prototype.hasOwnProperty.call(brk, n)) brk[n] = brk[o];
+          if (Object.prototype.hasOwnProperty.call(col, o) && !Object.prototype.hasOwnProperty.call(col, n)) col[n] = col[o];
           delete hide[n];
         }
         name = n;
       }
       if (name && (patch.brk === 0 || patch.brk === 1)) brk[name] = patch.brk;
       if (patch.hide) hide[String(patch.hide).slice(0, 30)] = 1;
-      var data = Object.assign({}, base, { labelMap: map, labelHide: Object.keys(hide), breaks: brk });
+      if (name && typeof patch.color === 'number' && patch.color >= 0 && patch.color <= 7) col[String(name).slice(0, 30)] = Math.floor(patch.color);
+      var data = Object.assign({}, base, { labelMap: map, labelHide: Object.keys(hide), breaks: brk, labelColor: col });
       if (JSON.stringify(data).length > 15000) return false;
       var r = await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
       if (r.error) return false;
-      setLabelMeta(map, hide); BREAKS = brk;
-      ev('label_edit', { rename: patch.rename ? 1 : 0, hide: patch.hide ? 1 : 0 });
+      setLabelMeta(map, hide, col); BREAKS = brk;
+      ev('label_edit', { rename: patch.rename ? 1 : 0, hide: patch.hide ? 1 : 0, color: typeof patch.color === 'number' ? 1 : 0 });
       try { sessionStorage.removeItem(STATS_KEY); } catch (e) {}
       await loadLabels(); loadStreak(true);
       return true;
@@ -710,10 +723,10 @@
     var r = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
     if (r.error) return;
     var remote = (r.data && r.data.data) || {};
-    var rmap = cleanMap(remote.labelMap), rhide = cleanHide(remote.labelHide);
+    var rmap = cleanMap(remote.labelMap), rhide = cleanHide(remote.labelHide), rcol = cleanCol(remote.labelColor);
     if (JSON.stringify(rmap) !== JSON.stringify(LMAP) || JSON.stringify(Object.keys(rhide)) !== JSON.stringify(Object.keys(LHIDE))) {
-      setLabelMeta(rmap, rhide); loadLabels(); loadStreak(true);
-    }
+      setLabelMeta(rmap, rhide, rcol); loadLabels(); loadStreak(true);
+    } else if (JSON.stringify(rcol) !== JSON.stringify(LCOL)) setLabelMeta(rmap, rhide, rcol);
     if (Array.isArray(remote.countBtns)) {
       var rb = cleanBtns(remote.countBtns);
       if (JSON.stringify(rb) !== JSON.stringify(cBtns)) { cBtns = rb; try { localStorage.setItem(CB_KEY, JSON.stringify(rb)); } catch (e) {} showStatsNow(); }
@@ -743,7 +756,14 @@
    * 記録は普通の利用記録と同じ表に、区切り1つ・config.count=1 で入れる（15秒未満は残さない）。12時間で自動で止める。
    */
   var CB_KEY = 'tt-count-btns', CR_KEY = 'tt-count-run', C_MAX = 12 * 3600, CB_FREE = 3, CB_MAX = 30;
-  var ICONS = ['walk', 'book', 'home', 'child', 'cup', 'moon', 'pc', 'gym', 'music', 'pen', 'food', 'heart'];
+  // 11/15: アイコンは Microsoft Fluent Emoji（MIT）の単色版を白抜きで。前の線のアイコンの名前は近い絵に置きかえる
+  var ICONS = ['house', 'broom', 'basket', 'bathtub', 'sponge', 'bed', 'sleeping_face', 'shopping_cart', 'automobile', 'train', 'bicycle', 'dog_face', 'potted_plant', 'pill', 'mobile_phone', 'television',
+    'open_book', 'books', 'pencil', 'memo', 'graduation_cap', 'light_bulb', 'globe_with_meridians', 'microscope', 'abacus', 'speaking_head',
+    'person_running', 'person_walking', 'person_in_lotus_position', 'flexed_biceps', 'person_biking', 'person_swimming', 'soccer_ball', 'person_cartwheeling',
+    'laptop', 'briefcase', 'spiral_calendar', 'envelope', 'telephone_receiver', 'bar_chart', 'artist_palette', 'musical_note', 'video_game', 'camera',
+    'baby', 'baby_bottle', 'child', 'teddy_bear', 'backpack', 'balloon', 'kite', 'crayon',
+    'cooking', 'rice_ball', 'fork_and_knife_with_plate', 'hot_beverage', 'shortcake', 'bento_box', 'green_salad', 'steaming_bowl', 'red_heart', 'crescent_moon'];
+  var ICON_OLD = { walk: 'person_walking', book: 'open_book', home: 'house', cup: 'hot_beverage', moon: 'crescent_moon', pc: 'laptop', gym: 'flexed_biceps', music: 'musical_note', pen: 'pencil', food: 'fork_and_knife_with_plate', heart: 'red_heart' };
   function cleanBtns(a) {
     if (!Array.isArray(a)) return [];
     var out = [], seen = {};
@@ -753,7 +773,8 @@
       var label = String(b.label || '').replace(/[\u0000-\u001f]/g, '').trim().slice(0, 20);
       if (!id || !label || seen[id]) return;
       seen[id] = 1;
-      out.push({ id: id, label: label, icon: ICONS.indexOf(b.icon) >= 0 ? b.icon : 'walk' });
+      var ic = ICON_OLD[b.icon] || b.icon;
+      out.push({ id: id, label: label, icon: ICONS.indexOf(ic) >= 0 ? ic : 'person_walking' });
     });
     return out;
   }

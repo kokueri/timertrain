@@ -625,6 +625,40 @@ updateHighlight();
 }
 
 /* ---------- ラベルの選択肢（▾）と編集（鉛筆） ---------- */
+/* ---------- 11/15: ラベルの色（8色・濃いめで白い絵が読める）と、白抜きの絵（Fluent Emoji・MIT） ---------- */
+const LCOLORS = ['#2A6FC4', '#C4521C', '#12825C', '#A86F00', '#B8457A', '#6A4BC4', '#1E7A8C', '#7A5A40'];
+function labelColorIdx(l) {
+  l = String(l == null ? '' : l);
+  const m = window.__ttLC || {};
+  if (Object.prototype.hasOwnProperty.call(m, l) && m[l] >= 0 && m[l] <= 7) return m[l];
+  let h = 0; for (const ch of l) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+  return h % 8;
+}
+function labelColor(l) { return LCOLORS[labelColorIdx(l)]; }
+window.__ttLabelColor = labelColor;
+window.__ttLabelColorIdx = labelColorIdx;
+function emojiIcon(slug, cls) {
+  const s = document.createElement('span');
+  s.className = 'tt-ej' + (cls ? ' ' + cls : ''); s.setAttribute('aria-hidden', 'true');
+  if (/^[a-z_]{2,40}$/.test(String(slug || ''))) s.style.setProperty('--ej', 'url(/emoji/' + slug + '.svg)');
+  return s;
+}
+const LCOL_L = LANG === 'en' ? { t: 'Color', c: (i) => 'Color ' + (i + 1) } : LANG === 'es' ? { t: 'Color', c: (i) => 'Color ' + (i + 1) } : { t: '色', c: (i) => '色' + (i + 1) };
+function colorPicker(sel, onPick) {
+  const w = document.createElement('div'); w.className = 'tt-colors'; w.setAttribute('role', 'group'); w.setAttribute('aria-label', LCOL_L.t);
+  LCOLORS.forEach((c, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'tt-color' + (i === sel ? ' on' : '');
+    b.style.background = c; b.setAttribute('aria-label', LCOL_L.c(i)); b.setAttribute('aria-pressed', i === sel ? 'true' : 'false');
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      w.querySelectorAll('.tt-color').forEach(x => { const on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+      onPick(i);
+    });
+    w.appendChild(b);
+  });
+  w.select = (i) => w.querySelectorAll('.tt-color').forEach((x, j) => { x.classList.toggle('on', j === i); x.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
+  return w;
+}
 const LBL = LANG === 'en' ? { open: 'Choose a label', edit: l => 'Edit ' + l, none: 'No labels yet. Labels you use with a timer or button appear here.', name: 'Name', note: 'Renaming also renames this label in your past records.', brk: 'Treat as a break (not counted in totals)', save: 'Save', cancel: 'Cancel', hide: 'Remove from this list (records are kept)', hideSure: 'Tap again to remove', err: 'Could not save. Please try again.' }
 : LANG === 'es' ? { open: 'Elegir etiqueta', edit: l => 'Editar ' + l, none: 'Aún no hay etiquetas. Aquí aparecen las que uses en temporizadores o botones.', name: 'Nombre', note: 'Al cambiar el nombre, también cambia en tus registros anteriores.', brk: 'Tratar como descanso (no suma al total)', save: 'Guardar', cancel: 'Cancelar', hide: 'Quitar de esta lista (los registros se conservan)', hideSure: 'Toca otra vez para quitar', err: 'No se pudo guardar. Inténtalo de nuevo.' }
 : { open: 'ラベルを選ぶ', edit: l => l + 'を編集', none: 'まだラベルはありません。タイマーやボタンで使った名前がここに並びます。', name: 'なまえ', note: '変えると、これまでの記録もこの名前で集計されます。', brk: '休憩として扱う（合計に入れない）', save: '保存', cancel: 'キャンセル', hide: '選択肢から消す（記録は残ります）', hideSure: 'もう一度押すと消します', err: '保存できませんでした。もう一度お試しください。' };
@@ -684,6 +718,8 @@ const note = lblEl('p', 'lbl-note', LBL.note);
 const cbl = lblEl('label', 'lbl-chk');
 const cb = lblEl('input'); cb.type = 'checkbox'; cb.checked = L.isBreak(l);
 cbl.append(cb, lblEl('span', '', LBL.brk));
+const col0 = labelColorIdx(l); let colSel = col0;
+const colW = colorPicker(col0, i => { colSel = i; });
 const msg = lblEl('p', 'lbl-note'); msg.setAttribute('role', 'status');
 const acts = lblEl('div', 'lbl-acts');
 const ok = lblEl('button', 'lbl-btn pri', LBL.save); ok.type = 'button';
@@ -697,7 +733,8 @@ if (!v) { inp.focus(); return; }
 const patch = { name: l };
 if (v !== l) patch.rename = [l, v];
 if (cb.checked !== L.isBreak(l)) patch.brk = cb.checked ? 1 : 0;
-if (!patch.rename && patch.brk === undefined) { renderLabelList(pop, t, name); return; }
+if (colSel !== col0) patch.color = colSel;
+if (!patch.rename && patch.brk === undefined && patch.color === undefined) { renderLabelList(pop, t, name); return; }
 ok.disabled = true;
 const r = await L.save(patch);
 if (!r) { ok.disabled = false; msg.textContent = LBL.err; return; }
@@ -718,7 +755,7 @@ renderLabelList(pop, t, name);
 });
 inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); ok.click(); } });
 acts.append(ok, cancel);
-f.append(lab, inp, note, cbl, acts, hide, msg);
+f.append(lab, inp, note, lblEl('span', 'lbl-l', LCOL_L.t), colW, cbl, acts, hide, msg);
 pop.appendChild(f);
 setTimeout(() => { inp.focus(); inp.select(); }, 0);
 }
@@ -1763,7 +1800,7 @@ var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=6';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=7';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
@@ -1776,7 +1813,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=16'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=17'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -1954,19 +1991,19 @@ renderToday(st);
  * blocks: sync.js が渡す区切りごとの { s: 開始ms, secs, label, brk }。名前は textContent でだけ表示する */
 var TL = lang === 'en' ? { title: "Today's log", total: function (d) { return d; }, empty: 'No record yet today. Run a timer for 15 seconds or more and it shows up here.', more: 'See details', noName: 'No name', others: 'Others', hours: ['0', '6', '12', '18', '24'], aria: "Today's log. Open data",
 cStop: 'Stop', cStartOf: function (l) { return 'Start timing ' + l; }, cStopOf: function (l) { return 'Stop timing ' + l; }, cEditOf: function (l) { return 'Edit ' + l; },
-cFromLabels: 'From your labels', cAdd: 'Add a button', cAddShort: 'Add', cEdit: 'Edit', cDone: 'Done', cName: 'Name', cPh: 'e.g. Walk', cIcon: 'Icon', cSave: 'Save', cCancel: 'Cancel', cDel: 'Delete', cDelSure: 'Tap again to delete', cClose: 'Close',
+cFromLabels: 'From your labels', cLeft: function (l) { return 'Move ' + l + ' left'; }, cRight: function (l) { return 'Move ' + l + ' right'; }, cAdd: 'Add a button', cAddShort: 'Add', cEdit: 'Edit', cDone: 'Done', cName: 'Name', cPh: 'e.g. Walk', cIcon: 'Icon', cSave: 'Save', cCancel: 'Cancel', cDel: 'Delete', cDelSure: 'Tap again to delete', cClose: 'Close',
 cEmpty: 'Turn things you do often into buttons and time them with one tap (walk, chores, reading…).', cErr: 'Could not save. Please try again.',
 cLimit: function (n) { return 'The free plan has up to ' + n + ' buttons. Premium allows up to 30.'; }, cPlans: 'See plans',
 cIcons: { walk: 'Walk', book: 'Book', home: 'Home', child: 'Kids', cup: 'Cup', moon: 'Sleep', pc: 'Computer', gym: 'Workout', music: 'Music', pen: 'Writing', food: 'Meal', heart: 'Heart' } }
 : lang === 'es' ? { title: 'Registro de hoy', total: function (d) { return d; }, empty: 'Aún no hay registros hoy. Usa un temporizador 15 segundos o más y aparecerá aquí.', more: 'Ver detalles', noName: 'Sin nombre', others: 'Otros', hours: ['0', '6', '12', '18', '24'], aria: 'Registro de hoy. Ver datos',
 cStop: 'Parar', cStartOf: function (l) { return 'Empezar a contar ' + l; }, cStopOf: function (l) { return 'Parar ' + l; }, cEditOf: function (l) { return 'Editar ' + l; },
-cFromLabels: 'De tus etiquetas', cAdd: 'Añadir un botón', cAddShort: 'Añadir', cEdit: 'Editar', cDone: 'Listo', cName: 'Nombre', cPh: 'p. ej. Paseo', cIcon: 'Icono', cSave: 'Guardar', cCancel: 'Cancelar', cDel: 'Eliminar', cDelSure: 'Toca otra vez para eliminar', cClose: 'Cerrar',
+cFromLabels: 'De tus etiquetas', cLeft: function (l) { return 'Mover ' + l + ' a la izquierda'; }, cRight: function (l) { return 'Mover ' + l + ' a la derecha'; }, cAdd: 'Añadir un botón', cAddShort: 'Añadir', cEdit: 'Editar', cDone: 'Listo', cName: 'Nombre', cPh: 'p. ej. Paseo', cIcon: 'Icono', cSave: 'Guardar', cCancel: 'Cancelar', cDel: 'Eliminar', cDelSure: 'Toca otra vez para eliminar', cClose: 'Cerrar',
 cEmpty: 'Convierte lo que haces a menudo en botones y mide el tiempo con un toque (paseo, tareas, lectura…).', cErr: 'No se pudo guardar. Inténtalo de nuevo.',
 cLimit: function (n) { return 'El plan gratis permite hasta ' + n + ' botones. Premium, hasta 30.'; }, cPlans: 'Ver planes',
 cIcons: { walk: 'Paseo', book: 'Libro', home: 'Casa', child: 'Niños', cup: 'Taza', moon: 'Dormir', pc: 'Ordenador', gym: 'Ejercicio', music: 'Música', pen: 'Escribir', food: 'Comida', heart: 'Corazón' } }
 : { title: '今日のログ', total: function (d) { return '合計 ' + d; }, empty: 'まだ今日の記録はありません。タイマーを15秒以上動かすと、ここに残ります。', more: 'くわしく見る', noName: '名前なし', others: 'ほか', hours: ['0時', '6時', '12時', '18時', '24時'], aria: '今日のログ。データを見る',
 cStop: '止める', cStartOf: function (l) { return l + 'を計りはじめる'; }, cStopOf: function (l) { return l + 'を止める'; }, cEditOf: function (l) { return l + 'を編集'; },
-cFromLabels: 'これまでのラベルから', cAdd: 'ボタンを追加', cAddShort: '追加', cEdit: '編集', cDone: '完了', cName: 'なまえ', cPh: '例：散歩', cIcon: 'アイコン', cSave: '保存', cCancel: 'キャンセル', cDel: '削除', cDelSure: 'もう一度押すと削除', cClose: '閉じる',
+cFromLabels: 'これまでのラベルから', cLeft: function (l) { return l + 'を左へ'; }, cRight: function (l) { return l + 'を右へ'; }, cAdd: 'ボタンを追加', cAddShort: '追加', cEdit: '編集', cDone: '完了', cName: 'なまえ', cPh: '例：散歩', cIcon: 'アイコン', cSave: '保存', cCancel: 'キャンセル', cDel: '削除', cDelSure: 'もう一度押すと削除', cClose: '閉じる',
 cEmpty: 'よくやることをボタンにすると、1タップで時間を計れます（散歩・家事・読書など）。', cErr: '保存できませんでした。もう一度お試しください。',
 cLimit: function (n) { return 'ボタンは無料プランで' + n + 'つまでです。プレミアムなら30個まで作れます。'; }, cPlans: 'プランを見る',
 cIcons: { walk: '散歩', book: '本', home: '家', child: '子ども', cup: 'カップ', moon: '睡眠', pc: 'パソコン', gym: '運動', music: '音楽', pen: '書く', food: 'ごはん', heart: 'ハート' } };
@@ -2012,7 +2049,13 @@ var s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 24 2
 var p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); s.appendChild(p);
 return s;
 }
+var lastTodaySt = null;
+window.__ttOnLabelColors = function () {
+if (lastTodaySt) { var o = document.querySelector('#tt-today .tt-today-open'); if (o) renderTodayOpen(o, lastTodaySt); }
+var bx = document.querySelector('#tt-today .tt-count'); if (bx && window.__ttCount) { CU.key = ''; renderCount(bx, window.__ttCount.state()); }
+};
 function renderTodayOpen(open, st) {
+lastTodaySt = st;
 var day0 = new Date(); day0.setHours(0, 0, 0, 0);
 var t0 = day0.getTime(), t1 = t0 + 86400000, now = Date.now();
 var bl = (st.blocks || []).filter(function (b) { return b && b.s + b.secs * 1000 > t0 && b.s < t1 && b.secs >= 1; })
@@ -2021,7 +2064,8 @@ var bl = (st.blocks || []).filter(function (b) { return b && b.s + b.secs * 1000
 var tot = {};
 bl.forEach(function (b) { if (!b.brk) tot[b.label] = (tot[b.label] || 0) + b.secs; });
 var keys = Object.keys(tot).sort(function (a, b) { return tot[b] - tot[a]; });
-var cls = {}; keys.forEach(function (k, i) { cls[k] = i < 4 ? 's' + (i + 1) : 'o'; });
+// 11/15: 色はラベルの色（ボタン・1日の流れ・データと同じ）。5つ目以降は「ほか」の灰色
+var cls = {}; keys.forEach(function (k, i) { cls[k] = i < 4 ? 'lc' : 'o'; });
 open.textContent = '';
 open.setAttribute('aria-label', TL.aria + ': ' + fmtDur(st.today || 0));
 var head = mk('span', 'tt-today-head');
@@ -2037,6 +2081,7 @@ bl.forEach(function (b) {
 var s = Math.max(b.s, a), e = Math.min(b.s + b.secs * 1000, t1);
 if (e <= s) return;
 var seg = mk('span', 'tt-today-seg ' + (b.brk ? 'b' : cls[b.label]));
+if (!b.brk && cls[b.label] === 'lc') seg.style.background = labelColor(b.label);
 seg.style.left = ((s - a) / span * 100).toFixed(2) + '%';
 seg.style.width = Math.max(0.5, (e - s) / span * 100).toFixed(2) + '%';
 bar.appendChild(seg);
@@ -2051,7 +2096,7 @@ var other = 0;
 keys.forEach(function (k, i) {
 if (i >= 4) { other += tot[k]; return; }
 var it = mk('span', 'tt-today-item');
-it.appendChild(mk('span', 'tt-today-dot ' + cls[k]));
+var dt = mk('span', 'tt-today-dot lc'); dt.style.background = labelColor(k); it.appendChild(dt);
 it.appendChild(mk('span', 'tt-today-name', k || TL.noName));
 it.appendChild(mk('span', 'tt-today-v', fmtDur(tot[k])));
 lg.appendChild(it);
@@ -2061,28 +2106,33 @@ if (lg.childNodes.length) open.appendChild(lg);
 }
 
 /* ---- 1タップのカウントアップ（ログイン中。中身は sync.js の window.__ttCount） ---- */
-var CI = { // アイコン（線だけ。用意した絵柄から選ぶ）
-walk: 'M13 4.5a1.5 1.5 0 1 0 0-.01M10 21l2-6 3 3v4M8 12l3-4 4 2 2 3M7 21l3-6',
-book: 'M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5V5.5M20 18v3H6.5',
-home: 'M3 11l9-7 9 7M5 9.5V20h5v-6h4v6h5V9.5',
-child: 'M12 8m-4 0a4 4 0 1 0 8 0a4 4 0 1 0-8 0M5 21c1-4 4-6 7-6s6 2 7 6',
-cup: 'M4 8h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5zM17 9.5h1.5a2.5 2.5 0 0 1 0 5H17M8 2.5v2.5M12 2.5v2.5',
-moon: 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z',
-pc: 'M5 4h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM8 20h8M12 16v4',
-gym: 'M6.5 6.5v11M17.5 6.5v11M3.5 9.5v5M20.5 9.5v5M6.5 12h11',
-music: 'M9 18V5l11-2v13M9 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0M20 16m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0',
-pen: 'M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4',
-food: 'M3 12h18a9 9 0 0 1-18 0zM8.5 8c0-2 2-2 2-4.5M13.5 8c0-2 2-2 2-4.5',
-heart: 'M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z'
-};
-var CU = { editing: false, form: null, icon: 'walk', key: '' };
+// 11/15: アイコンは Microsoft Fluent Emoji（MIT）の単色版。ボタンの上ではラベルの色の丸に白抜きで出す（/emoji/*.svg）
+var ICAT = [
+['life', ['house', 'broom', 'basket', 'bathtub', 'sponge', 'bed', 'sleeping_face', 'crescent_moon', 'shopping_cart', 'automobile', 'train', 'bicycle', 'dog_face', 'potted_plant', 'pill', 'mobile_phone', 'television', 'red_heart']],
+['study', ['open_book', 'books', 'pencil', 'memo', 'graduation_cap', 'light_bulb', 'globe_with_meridians', 'microscope', 'abacus', 'speaking_head']],
+['move', ['person_walking', 'person_running', 'person_in_lotus_position', 'flexed_biceps', 'person_biking', 'person_swimming', 'soccer_ball', 'person_cartwheeling']],
+['work', ['laptop', 'briefcase', 'spiral_calendar', 'envelope', 'telephone_receiver', 'bar_chart', 'artist_palette', 'musical_note', 'video_game', 'camera']],
+['kids', ['baby', 'baby_bottle', 'child', 'teddy_bear', 'backpack', 'balloon', 'kite', 'crayon']],
+['food', ['cooking', 'rice_ball', 'fork_and_knife_with_plate', 'bento_box', 'steaming_bowl', 'green_salad', 'hot_beverage', 'shortcake']]
+];
+var ICAT_L = LANG === 'en' ? { life: 'Home & life', study: 'Study', move: 'Exercise', work: 'Work & hobbies', kids: 'Kids', food: 'Food' }
+: LANG === 'es' ? { life: 'Casa y vida', study: 'Estudio', move: 'Ejercicio', work: 'Trabajo y ocio', kids: 'Niños', food: 'Comida' }
+: { life: 'くらし', study: 'まなび', move: 'うんどう', work: 'しごと・しゅみ', kids: 'こども', food: 'たべもの' };
+var IC_JA = { house: '家', broom: 'そうじ', basket: '洗濯', bathtub: 'お風呂', sponge: '洗い物', bed: 'ベッド', sleeping_face: '睡眠', crescent_moon: '夜', shopping_cart: '買い物', automobile: '車', train: '電車', bicycle: '自転車', dog_face: 'ペット', potted_plant: '植物', pill: '薬', mobile_phone: 'スマホ', television: 'テレビ', red_heart: 'ハート',
+open_book: '本', books: '勉強', pencil: '書く', memo: 'メモ', graduation_cap: '学校', light_bulb: 'アイデア', globe_with_meridians: '語学', microscope: '研究', abacus: '計算', speaking_head: '話す',
+person_walking: '散歩', person_running: 'ランニング', person_in_lotus_position: 'ヨガ', flexed_biceps: '筋トレ', person_biking: 'サイクリング', person_swimming: '水泳', soccer_ball: 'スポーツ', person_cartwheeling: 'ストレッチ',
+laptop: 'パソコン', briefcase: '仕事', spiral_calendar: '予定', envelope: 'メール', telephone_receiver: '電話', bar_chart: '分析', artist_palette: '絵', musical_note: '音楽', video_game: 'ゲーム', camera: '写真',
+baby: '赤ちゃん', baby_bottle: 'ミルク', child: '子ども', teddy_bear: '遊び', backpack: '登園・通学', balloon: 'おでかけ', kite: '外遊び', crayon: 'おえかき',
+cooking: '料理', rice_ball: 'ごはん', fork_and_knife_with_plate: '食事', bento_box: 'お弁当', steaming_bowl: '麺', green_salad: 'サラダ', hot_beverage: 'お茶', shortcake: 'おやつ' };
+function icName(k) { return LANG === 'ja' ? (IC_JA[k] || k) : k.replace(/_/g, ' '); }
+var CU = { editing: false, form: null, icon: 'person_walking', color: null, key: '' };
 var tick = null;
 function stopTicker() { clearInterval(tick); tick = null; }
 function clock(sec) { sec = Math.floor(sec); var h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60; return (h ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (s < 10 ? '0' : '') + s; }
 function renderCount(box, cs) {
 if (!cs || !window.__ttCount) { box.hidden = true; stopTicker(); return; }
 box.hidden = false;
-var key = JSON.stringify([cs.btns, cs.run && cs.run.id, cs.run && cs.run.start, cs.max, CU.editing, CU.form]);
+var key = JSON.stringify([cs.btns, cs.run && cs.run.id, cs.run && cs.run.start, cs.max, CU.editing, CU.form, window.__ttLC || null]);
 if (CU.form && box.querySelector('.tt-cform')) return; // 入力中は作り直さない
 if (key === CU.key && box.childNodes.length) return;
 CU.key = key;
@@ -2091,7 +2141,8 @@ box.textContent = '';
 stopTicker();
 if (cs.run) {
 var run = mk('div', 'tt-crun'); run.setAttribute('role', 'status');
-var ic = mk('span', 'tt-crun-ic'); ic.appendChild(svgIcon(CI[cs.run.icon] || CI.walk));
+var ic = mk('span', 'tt-crun-ic'); ic.appendChild(emojiIcon(cs.run.icon));
+run.style.background = labelColor(cs.run.label);
 run.appendChild(ic);
 run.appendChild(mk('span', 'tt-crun-n', cs.run.label));
 var tt = mk('span', 'tt-crun-t', clock((Date.now() - cs.run.start) / 1000));
@@ -2109,17 +2160,41 @@ var on = cs.run && cs.run.id === b.id;
 var btn = mk('button', 'tt-cbtn' + (on ? ' on' : '') + (CU.editing ? ' edit' : '')); btn.type = 'button';
 btn.setAttribute('aria-pressed', on ? 'true' : 'false');
 btn.setAttribute('aria-label', CU.editing ? TL.cEditOf(b.label) : (on ? TL.cStopOf(b.label) : TL.cStartOf(b.label)));
-var c = mk('span', 'tt-cbtn-c'); c.appendChild(svgIcon(CI[b.icon] || CI.walk));
+var c = mk('span', 'tt-cbtn-c'); c.appendChild(emojiIcon(b.icon));
+c.style.background = labelColor(b.label);
 btn.appendChild(c);
 btn.appendChild(mk('span', 'tt-cbtn-l', b.label));
 btn.addEventListener('click', function () {
-if (CU.editing) { CU.form = b.id; CU.icon = b.icon; CU.key = ''; renderCount(box, window.__ttCount.state()); return; }
+if (CU.editing) { CU.form = b.id; CU.icon = b.icon; CU.color = null; CU.key = ''; renderCount(box, window.__ttCount.state()); return; }
 var nowRun = window.__ttCount.state().run;
 var resumeT = (!(nowRun && nowRun.id === b.id) && window.__ttOneBeforeCount) ? window.__ttOneBeforeCount(b.label) : null;
 window.__ttCount.start(b.id);
 if (resumeT && window.__ttOneUndo) window.__ttOneUndo(ONE_L.paused(b.label), function () { if (window.__ttCount.cancel) window.__ttCount.cancel(); else window.__ttCount.stop(); resumeT(); });
 });
-row.appendChild(btn);
+if (CU.editing) {
+// 11/15: 並び替え（‹ ›）。押すとすぐ保存
+var cell = mk('div', 'tt-ccell'); cell.appendChild(btn);
+var mv = mk('div', 'tt-cmove');
+[-1, 1].forEach(function (d) {
+var mb = mk('button', 'tt-cmove-b', d < 0 ? '‹' : '›'); mb.type = 'button';
+mb.setAttribute('aria-label', d < 0 ? TL.cLeft(b.label) : TL.cRight(b.label));
+var idx = cs.btns.indexOf(b), to = idx + d;
+if (to < 0 || to >= cs.btns.length) mb.disabled = true;
+mb.addEventListener('click', function () {
+var list = window.__ttCount.state().btns.slice(), k = list.findIndex(function (x) { return x.id === b.id; }), t2 = k + d;
+if (k < 0 || t2 < 0 || t2 >= list.length) return;
+var tmp = list[k]; list[k] = list[t2]; list[t2] = tmp;
+window.__ttCount.save(list).then(function () {
+CU.key = ''; renderCount(box, window.__ttCount.state());
+var f = box.querySelectorAll('.tt-cmove-b')[t2 * 2 + (d < 0 ? 0 : 1)]; if (f && !f.disabled) f.focus();
+});
+if (window.gtag) gtag('event', 'count_reorder', {});
+});
+mv.appendChild(mb);
+});
+cell.appendChild(mv);
+row.appendChild(cell);
+} else row.appendChild(btn);
 });
 var full = cs.btns.length >= cs.max;
 var add = mk('button', 'tt-cbtn add'); add.type = 'button'; add.setAttribute('aria-label', TL.cAdd);
@@ -2127,7 +2202,7 @@ var ac = mk('span', 'tt-cbtn-c'); ac.appendChild(svgIcon('M12 5v14M5 12h14')); a
 add.appendChild(mk('span', 'tt-cbtn-l', TL.cAddShort));
 add.addEventListener('click', function () {
 if (full) { CU.form = 'limit'; window.__ttCount.limitHit(); }
-else { CU.form = 'new'; CU.icon = 'walk'; }
+else { CU.form = 'new'; CU.icon = 'person_walking'; CU.color = null; }
 CU.key = ''; renderCount(box, window.__ttCount.state());
 });
 if (!CU.editing) row.appendChild(add);
@@ -2170,30 +2245,43 @@ var lw = mk('div', 'tt-clabs'); lw.setAttribute('role', 'group'); lw.setAttribut
 lw.appendChild(mk('span', 'tt-clabs-t', TL.cFromLabels));
 labs.forEach(function (l) {
 var c = mk('button', 'tt-clab', l); c.type = 'button';
-c.addEventListener('click', function () { inp.value = l; lw.querySelectorAll('.tt-clab').forEach(function (x) { x.classList.toggle('on', x === c); }); });
+c.addEventListener('click', function () { inp.value = l; lw.querySelectorAll('.tt-clab').forEach(function (x) { x.classList.toggle('on', x === c); }); inp.dispatchEvent(new Event('input')); });
 lw.appendChild(c);
 });
 f.appendChild(lw);
 }
+// 11/15: 色（ラベルに付く。同じラベルのタイマーの記録・1日の流れも同じ色になる）
+f.appendChild(mk('span', 'tt-cform-l', LCOL_L.t));
+var colW = colorPicker(CU.color != null ? CU.color : labelColorIdx(inp.value || (cur ? cur.label : '')), function (i) { CU.color = i; paintIcons(); });
+f.appendChild(colW);
+function curColor() { return LCOLORS[CU.color != null ? CU.color : labelColorIdx(inp.value.trim())]; }
+inp.addEventListener('input', function () { if (CU.color == null) { colW.select(labelColorIdx(inp.value.trim())); paintIcons(); } });
 f.appendChild(mk('span', 'tt-cform-l', TL.cIcon));
-var ics = mk('div', 'tt-cform-ic'); ics.setAttribute('role', 'group'); ics.setAttribute('aria-label', TL.cIcon);
-(window.__ttCount.icons || Object.keys(CI)).forEach(function (k) {
-if (!CI[k]) return;
+var ics = mk('div', 'tt-cform-icw');
+var allIb = [];
+function paintIcons() { var c = curColor(); allIb.forEach(function (x) { x.style.setProperty('--lc', c); }); }
+ICAT.forEach(function (cat) {
+ics.appendChild(mk('span', 'tt-cform-cat', ICAT_L[cat[0]]));
+var g = mk('div', 'tt-cform-ic'); g.setAttribute('role', 'group'); g.setAttribute('aria-label', ICAT_L[cat[0]]);
+cat[1].forEach(function (k) {
 var ib = mk('button', 'tt-cform-ib' + (CU.icon === k ? ' on' : '')); ib.type = 'button';
-ib.setAttribute('aria-pressed', CU.icon === k ? 'true' : 'false'); ib.setAttribute('aria-label', TL.cIcons[k] || k);
-ib.appendChild(svgIcon(CI[k]));
+ib.setAttribute('aria-pressed', CU.icon === k ? 'true' : 'false'); ib.setAttribute('aria-label', icName(k)); ib.title = icName(k);
+ib.appendChild(emojiIcon(k));
 ib.addEventListener('click', function () {
 CU.icon = k;
-ics.querySelectorAll('.tt-cform-ib').forEach(function (x) { var y = x === ib; x.classList.toggle('on', y); x.setAttribute('aria-pressed', y ? 'true' : 'false'); });
+allIb.forEach(function (x) { var y = x === ib; x.classList.toggle('on', y); x.setAttribute('aria-pressed', y ? 'true' : 'false'); });
 });
-ics.appendChild(ib);
+allIb.push(ib); g.appendChild(ib);
 });
+ics.appendChild(g);
+});
+paintIcons();
 f.appendChild(ics);
 var msg = mk('p', 'tt-cnote'); msg.setAttribute('role', 'status');
 var acts = mk('div', 'tt-cform-a');
 var ok = mk('button', 'tt-cbtn2 pri', TL.cSave); ok.type = 'button';
 var cancel = mk('button', 'tt-cbtn2', TL.cCancel); cancel.type = 'button';
-function close() { CU.form = null; CU.key = ''; renderCount(box, window.__ttCount.state()); }
+function close() { CU.form = null; CU.color = null; CU.key = ''; renderCount(box, window.__ttCount.state()); }
 cancel.addEventListener('click', close);
 ok.addEventListener('click', function () {
 var v = inp.value.trim();
@@ -2202,7 +2290,13 @@ var list = window.__ttCount.state().btns;
 if (cur) list = list.map(function (b) { return b.id === cur.id ? { id: b.id, label: v, icon: CU.icon } : b; });
 else list.push({ id: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), label: v, icon: CU.icon });
 ok.disabled = true;
-window.__ttCount.save(list).then(function (r) { if (r === false) { msg.textContent = TL.cErr; ok.disabled = false; return; } CU.editing = false; close(); });
+var colPick = CU.color;
+window.__ttCount.save(list).then(function (r) {
+if (r === false) { msg.textContent = TL.cErr; ok.disabled = false; return; }
+// 色を選んでいたら、ラベルの色として保存（同じラベルの記録も同じ色に）
+if (colPick != null && colPick !== labelColorIdx(v) && window.__ttLabels && window.__ttLabels.save) window.__ttLabels.save({ name: v, color: colPick });
+CU.editing = false; CU.color = null; close();
+});
 });
 inp.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); ok.click(); } });
 acts.appendChild(ok); acts.appendChild(cancel);
