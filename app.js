@@ -115,7 +115,7 @@ function saveRun() {
 try {
 if (!run.active || run.finished) { sessionStorage.removeItem(RUN_KEY); return; }
 sessionStorage.setItem(RUN_KEY, JSON.stringify({ q: serialize(), paused: run.paused, idx: run.idx, cycle: run.cycle,
-endAt: run.endAt, remainMs: run.remainMs, reminded: !!run.reminded, at: Date.now() }));
+endAt: run.endAt, remainMs: run.remainMs, reminded: !!run.reminded, extra: run.extra || 0, at: Date.now() }));
 } catch (e) {}
 }
 
@@ -825,6 +825,7 @@ $('rep-inf').classList.toggle('active', state.repeat === Infinity);
 
 /* ---------- 実行 ---------- */
 function startRun() {
+stopCountForTimer();
 applySilentMode(true);
 unlockAudio();
 if (window.gtag) gtag('event', 'timer_start', { via: startVia });
@@ -866,6 +867,7 @@ updateHighlight();
 updateIdleView();
 }
 function updateIdleView() {
+syncAdj();
 const t = state.timers[0];
 if (!t) return;
 renderStations(); // 11/15: 待機中も並びを見せる（DonutTimer と同じ）
@@ -896,8 +898,9 @@ const setRemain = ms => { if (run.paused) run.remainMs = ms; else run.endAt = no
 let ni = curId ? state.timers.findIndex(t => t.id === curId) : -1;
 if (ni >= 0) {
 run.idx = ni;
-const oldMs = (snap.secs[curId] || state.timers[ni].secs) * 1000, newMs = state.timers[ni].secs * 1000;
+const oldMs = (snap.secs[curId] || state.timers[ni].secs) * 1000 + (run.extra || 0), newMs = state.timers[ni].secs * 1000;
 if (oldMs !== newMs) {
+run.extra = 0;
 const left = newMs - (oldMs - remainOf());
 if (left > 0) setRemain(left);
 else setRemain(0); // もう過ぎた → 次の tick で次のタイマーへ（音あり）
@@ -912,7 +915,7 @@ if (i >= n) {
 if (state.repeat === Infinity || run.cycle < state.repeat) { run.cycle++; i = 0; }
 else { snapRun(); finish(); return; }
 }
-run.idx = i; run.lastSec = -1; run.reminded = false;
+run.idx = i; run.lastSec = -1; run.reminded = false; run.extra = 0;
 setRemain(state.timers[i].secs * 1000);
 }
 if (state.repeat !== Infinity && run.cycle > state.repeat) run.cycle = state.repeat;
@@ -934,6 +937,7 @@ if (!run.active || run.finished) return;
 // 一時停止・再開の直前に知らせる（利用記録が、止まっていた時間を数えないように）
 if (window.__ttOnPause) { try { window.__ttOnPause(); } catch (e) {} }
 if (run.paused) {
+stopCountForTimer();
 applySilentMode(true);
 unlockAudio();
 run.endAt = Date.now() + run.remainMs;
@@ -963,7 +967,7 @@ function resetRun() { resetToIdle(); }
 /* 細かい早送り・巻き戻し（いまの区切りの中だけ）。利用記録は実際に動いた時間で数えるので、ここでは変わらない */
 function seekTo(remMs) {
 if (!run.active || run.finished) return;
-const full = state.timers[run.idx].secs * 1000;
+const full = state.timers[run.idx].secs * 1000 + (run.extra || 0);
 if (remMs <= 0) { skip(); return; }
 remMs = Math.min(full, remMs);
 if (run.paused) run.remainMs = remMs; else run.endAt = Date.now() + remMs;
@@ -975,6 +979,83 @@ if (!run.paused) scheduleAhead();
 saveRun();
 }
 function curRemain() { return run.paused ? run.remainMs : Math.max(0, run.endAt - Date.now()); }
+/* ---------- 11/15: 残り時間を ±10秒・30秒・1分（動いている間と一時停止中だけ）。足した分は今の区切りだけ長くなる ---------- */
+const ADJ_L = LANG === 'en' ? { m: 'm', s: 's', more: (t) => 'Add ' + t, less: (t) => 'Take off ' + t, g: 'Adjust time left' }
+  : LANG === 'es' ? { m: ' min', s: ' s', more: (t) => 'Sumar ' + t, less: (t) => 'Quitar ' + t, g: 'Ajustar el tiempo restante' }
+  : { m: '分', s: '秒', more: (t) => t + '足す', less: (t) => t + '減らす', g: '残り時間を調整' };
+let adjRow = null;
+function buildAdj() {
+  const rc = document.querySelector('.run-controls');
+  if (!rc || adjRow) return;
+  adjRow = document.createElement('div'); adjRow.className = 'tt-adj'; adjRow.hidden = true;
+  adjRow.setAttribute('role', 'group'); adjRow.setAttribute('aria-label', ADJ_L.g);
+  [-60, -30, -10, 10, 30, 60].forEach((v, i) => {
+    if (i === 3) { const sp = document.createElement('span'); sp.className = 'tt-adj-sep'; sp.setAttribute('aria-hidden', 'true'); adjRow.appendChild(sp); }
+    const a = Math.abs(v), t = a >= 60 ? (a / 60) + ADJ_L.m : a + ADJ_L.s;
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'tt-adj-b' + (v > 0 ? ' plus' : '');
+    b.textContent = (v > 0 ? '+' : '−') + t;
+    b.setAttribute('aria-label', v > 0 ? ADJ_L.more(t) : ADJ_L.less(t));
+    b.addEventListener('click', () => addTime(v));
+    adjRow.appendChild(b);
+  });
+  rc.parentNode.insertBefore(adjRow, rc);
+}
+function syncAdj() {
+  if (!adjRow) buildAdj();
+  if (adjRow) adjRow.hidden = !(run.active && !run.finished);
+}
+function addTime(sec) {
+  if (!run.active || run.finished) return;
+  const full = state.timers[run.idx].secs * 1000 + (run.extra || 0);
+  const rem = curRemain() + sec * 1000;
+  if (rem < 1000) { skip(); return; }
+  if (rem > full) run.extra = (run.extra || 0) + (rem - full);
+  if (run.paused) run.remainMs = rem; else run.endAt = Date.now() + rem;
+  run.lastSec = -1;
+  if (opts.remind && rem > opts.remind * 60000) run.reminded = false;
+  updateRunView();
+  updateEta();
+  if (!run.paused) scheduleAhead();
+  saveRun();
+  if (window.gtag) gtag('event', 'time_adjust', { sec: sec });
+}
+/* ---------- 11/15: いまやっていることは1つ（連続タイマーとカウントのボタンは同時に動かさない） ---------- */
+const ONE_L = LANG === 'en' ? { short: (l) => 'Stopped "' + l + '" (under 15 s, not saved).', stopped: (l, m) => 'Stopped "' + l + '" and saved it (' + m + ' min).', paused: (l) => 'Paused the timer and started "' + l + '".', undo: 'Undo' }
+  : LANG === 'es' ? { short: (l) => 'Se detuvo «' + l + '» (menos de 15 s, no se guardó).', stopped: (l, m) => 'Se detuvo «' + l + '» y se guardó (' + m + ' min).', paused: (l) => 'Se pausó el temporizador y empezó «' + l + '».', undo: 'Deshacer' }
+  : { short: (l) => '「' + l + '」を止めました（15秒未満なので記録なし）', stopped: (l, m) => '「' + l + '」を止めて記録しました（' + m + '分）', paused: (l) => 'タイマーを一時停止して「' + l + '」を計り始めました', undo: '元に戻す' };
+let undoEl = null, undoTimer = 0;
+function undoToast(msg, onUndo) {
+  if (!undoEl) {
+    undoEl = document.createElement('div'); undoEl.className = 'tt-undo'; undoEl.setAttribute('role', 'status'); undoEl.setAttribute('aria-live', 'polite');
+    document.body.appendChild(undoEl);
+  }
+  undoEl.textContent = '';
+  const tx = document.createElement('span'); tx.className = 'tt-undo-t'; tx.textContent = msg; undoEl.appendChild(tx);
+  if (onUndo) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'tt-undo-b'; b.textContent = ONE_L.undo;
+    b.addEventListener('click', () => { hideUndo(); try { onUndo(); } catch (e) {} if (window.gtag) gtag('event', 'one_undo', {}); });
+    undoEl.appendChild(b);
+  }
+  undoEl.classList.add('show');
+  clearTimeout(undoTimer); undoTimer = setTimeout(hideUndo, onUndo ? 6000 : 3500);
+}
+function hideUndo() { clearTimeout(undoTimer); if (undoEl) undoEl.classList.remove('show'); }
+function stopCountForTimer() {
+  let r = null;
+  try { r = window.__ttCount && window.__ttCount.state().run; } catch (e) {}
+  if (!r) return;
+  const secs = (Date.now() - r.start) / 1000;
+  window.__ttCount.stop();
+  undoToast(secs < 15 ? ONE_L.short(r.label) : ONE_L.stopped(r.label, Math.max(1, Math.round(secs / 60))), null);
+  if (window.gtag) gtag('event', 'one_switch', { to: 'timer' });
+}
+window.__ttOneBeforeCount = function (label) {
+  if (!(run.active && !run.paused && !run.finished)) return null;
+  pauseToggle();
+  if (window.gtag) gtag('event', 'one_switch', { to: 'count' });
+  return function () { if (run.active && run.paused && !run.finished) pauseToggle(); };
+};
+window.__ttOneUndo = undoToast;
 function seek(ms) {
 if (!run.active || run.finished) return;
 seekTo(curRemain() - ms);
@@ -1008,6 +1089,7 @@ toast(STR.pausedNext(nx.name || STR.defName));
 }
 run.lastSec = -1;
 run.reminded = false;
+run.extra = 0;
 if (run.paused) run.remainMs = state.timers[run.idx].secs * 1000;
 else run.endAt = base + state.timers[run.idx].secs * 1000;
 renderStations();
@@ -1029,6 +1111,7 @@ runTime.textContent = STR.done;
 runName.textContent = '';
 runCycle.textContent = '';
 pauseBtn.innerHTML = ICONS.replay;
+syncAdj();
 if (DT) { DT.done(); DT.fit(runTime); } else setRing(1, '#34C759');
 document.title = STR.doneTitle;
 updateEta();
@@ -1174,7 +1257,7 @@ const remain = run.endAt - Date.now();
 if (remain <= 0) tick(); // 区切りはすぐに切り替える（200ms 待たない）
 if (run.active && !run.paused && !run.finished) {
 const t = state.timers[run.idx];
-setRing(Math.max(0, run.endAt - Date.now()) / (t.secs * 1000), colorOf(t.color));
+setRing(Math.max(0, run.endAt - Date.now()) / (t.secs * 1000 + (run.extra || 0)), colorOf(t.color));
 }
 rafId = requestAnimationFrame(frame);
 }
@@ -1192,7 +1275,8 @@ runName.textContent = t.name || STR.defName;
 runCycle.textContent = state.repeat === Infinity
 ? STR.cycleInf(run.cycle)
 : STR.cycle(run.cycle, state.repeat);
-setRing(remainMs / (t.secs * 1000), colorOf(t.color));
+setRing(remainMs / (t.secs * 1000 + (run.extra || 0)), colorOf(t.color));
+syncAdj();
 document.title = `${disp} ${t.name} — ${BRAND}`;
 if (sec !== run.etaSec) { run.etaSec = sec; updateEta(); }
 }
@@ -1497,7 +1581,8 @@ if (!s || s.q !== serialize()) return;
 const n = state.timers.length;
 if (!(s.idx >= 0 && s.idx < n) || !(s.cycle >= 1) || Date.now() - s.at > 12 * 3600e3) { try { sessionStorage.removeItem(RUN_KEY); } catch (e) {} return; }
 run = { active: true, paused: !!s.paused, finished: false, idx: s.idx, cycle: s.cycle,
-endAt: s.paused ? 0 : s.endAt, remainMs: s.paused ? Math.max(0, s.remainMs) : 0, lastSec: -1, reminded: !!s.reminded };
+endAt: s.paused ? 0 : s.endAt, remainMs: s.paused ? Math.max(0, s.remainMs) : 0, lastSec: -1, reminded: !!s.reminded,
+extra: (typeof s.extra === 'number' && s.extra > 0 && s.extra < 864e5) ? s.extra : 0 };
 snapRun();
 pauseBtn.innerHTML = run.paused ? ICONS.play : ICONS.pause;
 renderStations(); updateHighlight();
@@ -1691,7 +1776,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=15'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=16'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -2029,7 +2114,10 @@ btn.appendChild(c);
 btn.appendChild(mk('span', 'tt-cbtn-l', b.label));
 btn.addEventListener('click', function () {
 if (CU.editing) { CU.form = b.id; CU.icon = b.icon; CU.key = ''; renderCount(box, window.__ttCount.state()); return; }
+var nowRun = window.__ttCount.state().run;
+var resumeT = (!(nowRun && nowRun.id === b.id) && window.__ttOneBeforeCount) ? window.__ttOneBeforeCount(b.label) : null;
 window.__ttCount.start(b.id);
+if (resumeT && window.__ttOneUndo) window.__ttOneUndo(ONE_L.paused(b.label), function () { if (window.__ttCount.cancel) window.__ttCount.cancel(); else window.__ttCount.stop(); resumeT(); });
 });
 row.appendChild(btn);
 });
