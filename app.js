@@ -868,7 +868,7 @@ updateIdleView();
 function updateIdleView() {
 const t = state.timers[0];
 if (!t) return;
-if (DT) renderStations(); // DonutTimer は待機中もミニドーナツの並びを見せる
+renderStations(); // 11/15: 待機中も並びを見せる（DonutTimer と同じ）
 runName.textContent = t.name || STR.defName;
 runTime.textContent = fmt(t.secs);
 runCycle.textContent = '';
@@ -1211,7 +1211,8 @@ s.className = 'station lab' + (run.active ? (i < run.idx ? ' done' : i === run.i
 if (DT) s.appendChild(DT.mini(t.color)); else s.style.background = colorOf(t.color);
 // 11/15: 丸に長さ（25m・1h30m・40s）。数字は大きめ、h/m/s は小さめ
 const lab = document.createElement('span'); lab.className = 'st-lab';
-stationDur(t.secs).forEach(([n, u]) => {
+const parts = stationDur(t.secs); if (parts.length > 1) s.classList.add('long');
+parts.forEach(([n, u]) => {
 const a = document.createElement('span'); a.className = 'st-n'; a.textContent = n;
 const b = document.createElement('span'); b.className = 'st-u'; b.textContent = u;
 lab.append(a, b);

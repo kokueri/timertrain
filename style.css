@@ -1315,3 +1315,16 @@ body.dt .station.lab.now { box-shadow: none; transform: none; }
   html.tt-in #tt-prem-link { padding: 8px 9px; }
   html.tt-in #acct-link { padding: 8px 9px; gap: 3px; }
 }
+/* 11/15: 丸の中の文字を上下まん中に（数字には下の出っ張りがないので、文字の高さで切りそろえる） */
+.station.lab { align-items: center; line-height: 1; }
+.station.lab .st-lab { display: inline-flex; align-items: baseline; line-height: 1; text-box: trim-both cap alphabetic; }
+@supports not (text-box: trim-both cap alphabetic) { .station.lab .st-lab { position: relative; top: -1px; } }
+body.dt .station.lab .st-lab { text-box: normal; top: 0; }
+/* 11/15: 丸は正円・白抜き（C 案）。長い時間（1h30m など）は文字を少し小さく */
+.station.lab { width: 36px; height: 36px; min-width: 0; padding: 0; border-radius: 50%; color: #fff; text-shadow: 0 1px 1.5px rgba(0,0,0,.28); }
+.station.lab .st-n { font-size: 12.5px; }
+.station.lab.long .st-n { font-size: 10.5px; }
+.station.lab.long .st-u { font-size: 7.5px; margin: 0; }
+.station.lab.now { transform: none; box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--line); }
+.stations { padding: 7px 8px; }
+body.dt .station.lab { width: auto; height: auto; border-radius: 0; color: var(--text); text-shadow: none; }
