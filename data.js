@@ -105,7 +105,7 @@
       lockL: function (n) { return '無料プランは直近' + n + '日間の1日の流れを見られます。記録はそれより前の分もずっと残っているので、プレミアムにすると最初からさかのぼって見られます。'; },
       note: function (n) { return '無料プランは直近' + n + '日間を見られます。'; },
       hours: ['0時', '6時', '12時', '18時', '24時'],
-      cal: { month: function (d) { return d.getFullYear() + '年' + (d.getMonth() + 1) + '月'; }, prev: '前の月', next: '次の月', wd: ['日', '月', '火', '水', '木', '金', '土'], mon: false, total: '休憩をのぞく合計', days: function (n) { return '記録した日 ' + n + '日'; }, best: function (n) { return '最長 ' + n + '日連続'; }, short: '短い', long: '長い', lockT: 'それより前の月はプレミアム', open: function (d, v) { return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + v + '（1日の流れを開く）'; }, none: '記録なし', locked: 'プレミアムで見られます' },
+      cal: { month: function (d) { return d.getFullYear() + '年' + (d.getMonth() + 1) + '月'; }, prev: '前の月', next: '次の月', wd: ['日', '月', '火', '水', '木', '金', '土'], mon: false, total: '休憩をのぞく合計', days: function (n) { return '記録した日 ' + n + '日'; }, best: function (n) { return '最長 ' + n + '日連続'; }, short: '短い', long: '長い', lockT: 'それより前の月はプレミアム', open: function (d, v) { return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + v + '（1日の流れを開く）'; }, pp: ['（', '）', '、'], none: '記録なし', locked: 'プレミアムで見られます' },
       tinyShow: function (n) { return '1分未満の記録 ' + n + '件を表示'; }, tinyHide: '1分未満の記録をかくす',
       ed: { btn: '時間を変える', start: '始めた時刻', len: '分', sum: '合計', save: '保存', cancel: 'やめる', del: 'この記録を消す', delSure: 'もう一度押すと消えます', running: '動いている記録は、止めてから変えられます。', recent: 'ほかの画面で動いているかもしれません。止めてから1〜2分たってから変えてください。', saved: '記録を変えました', deleted: '記録を消しました', errEnd: '終わりが今より後になっています', errLen: '長さは合わせて1分〜12時間にしてください', errSave: '保存できませんでした。時間をおいてもう一度お試しください。', errDel: '消せませんでした。時間をおいてもう一度お試しください。' },
       date: function (d) { return (d.getMonth() + 1) + '月' + d.getDate() + '日（' + '日月火水木金土'.charAt(d.getDay()) + '）'; }
@@ -118,7 +118,7 @@
       lockL: function (n) { return 'The free plan shows your day for the last ' + n + ' days. Older records are kept for good, so with Premium you can look back to day one.'; },
       note: function (n) { return 'The free plan shows the last ' + n + ' days.'; },
       hours: ['0', '6', '12', '18', '24'],
-      cal: { month: function (d) { return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][d.getMonth()] + ' ' + d.getFullYear(); }, prev: 'Previous month', next: 'Next month', wd: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], mon: false, total: 'Total, excluding breaks', days: function (n) { return n + ' day' + (n === 1 ? '' : 's') + ' recorded'; }, best: function (n) { return 'Longest streak ' + n + ' day' + (n === 1 ? '' : 's'); }, short: 'Short', long: 'Long', lockT: 'Earlier months are Premium', open: function (d, v) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate() + ', ' + v + ' (open your day)'; }, none: 'No record', locked: 'Available with Premium' },
+      cal: { month: function (d) { return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][d.getMonth()] + ' ' + d.getFullYear(); }, prev: 'Previous month', next: 'Next month', wd: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], mon: false, total: 'Total, excluding breaks', days: function (n) { return n + ' day' + (n === 1 ? '' : 's') + ' recorded'; }, best: function (n) { return 'Longest streak ' + n + ' day' + (n === 1 ? '' : 's'); }, short: 'Short', long: 'Long', lockT: 'Earlier months are Premium', open: function (d, v) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate() + ', ' + v + ' (open your day)'; }, pp: [' (', ')', ', '], none: 'No record', locked: 'Available with Premium' },
       tinyShow: function (n) { return 'Show ' + n + ' record' + (n > 1 ? 's' : '') + ' under 1 min'; }, tinyHide: 'Hide records under 1 min',
       ed: { btn: 'Change times', start: 'Started at', len: 'min', sum: 'Total', save: 'Save', cancel: 'Cancel', del: 'Delete this record', delSure: 'Tap again to delete', running: 'Stop this record before changing it.', recent: 'This may still be running on another screen. Stop it, wait a minute or two, then change it.', saved: 'Record updated', deleted: 'Record deleted', errEnd: 'The end is later than now', errLen: 'Keep the total between 1 minute and 12 hours', errSave: 'Could not save. Please try again in a moment.', errDel: 'Could not delete. Please try again in a moment.' },
       date: function (d) { return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()] + ', ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate(); }
@@ -131,7 +131,7 @@
       lockL: function (n) { return 'El plan gratis muestra tu día de los últimos ' + n + ' días. Los registros anteriores se guardan siempre, así que con Premium puedes verlos desde el primer día.'; },
       note: function (n) { return 'El plan gratis muestra los últimos ' + n + ' días.'; },
       hours: ['0', '6', '12', '18', '24'],
-      cal: { month: function (d) { return ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ' de ' + d.getFullYear(); }, prev: 'Mes anterior', next: 'Mes siguiente', wd: ['L', 'M', 'X', 'J', 'V', 'S', 'D'], mon: true, total: 'Total sin descansos', days: function (n) { return n + ' día' + (n === 1 ? '' : 's') + ' con registro'; }, best: function (n) { return 'Racha más larga: ' + n + ' día' + (n === 1 ? '' : 's'); }, short: 'Poco', long: 'Mucho', lockT: 'Los meses anteriores son Premium', open: function (d, v) { return d.getDate() + ' de ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ', ' + v + ' (abrir tu día)'; }, none: 'Sin registro', locked: 'Disponible con Premium' },
+      cal: { month: function (d) { return ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ' de ' + d.getFullYear(); }, prev: 'Mes anterior', next: 'Mes siguiente', wd: ['L', 'M', 'X', 'J', 'V', 'S', 'D'], mon: true, total: 'Total sin descansos', days: function (n) { return n + ' día' + (n === 1 ? '' : 's') + ' con registro'; }, best: function (n) { return 'Racha más larga: ' + n + ' día' + (n === 1 ? '' : 's'); }, short: 'Poco', long: 'Mucho', lockT: 'Los meses anteriores son Premium', open: function (d, v) { return d.getDate() + ' de ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ', ' + v + ' (abrir tu día)'; }, pp: [' (', ')', ', '], none: 'Sin registro', locked: 'Disponible con Premium' },
       tinyShow: function (n) { return 'Mostrar ' + n + ' registro' + (n > 1 ? 's' : '') + ' de menos de 1 min'; }, tinyHide: 'Ocultar registros de menos de 1 min',
       ed: { btn: 'Cambiar tiempos', start: 'Empezó a las', len: 'min', sum: 'Total', save: 'Guardar', cancel: 'Cancelar', del: 'Borrar este registro', delSure: 'Toca otra vez para borrar', running: 'Detén este registro antes de cambiarlo.', recent: 'Puede que siga en marcha en otra pantalla. Detenlo, espera uno o dos minutos y cámbialo.', saved: 'Registro cambiado', deleted: 'Registro borrado', errEnd: 'El final es posterior a ahora', errLen: 'El total debe estar entre 1 minuto y 12 horas', errSave: 'No se pudo guardar. Inténtalo de nuevo en un momento.', errDel: 'No se pudo borrar. Inténtalo de nuevo en un momento.' },
       date: function (d) { return ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'][d.getDay()] + ' ' + d.getDate() + ' ' + ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][d.getMonth()]; }
@@ -517,8 +517,13 @@
     if (!S.month) S.month = monthStart(new Date());
     var m0 = new Date(S.month), m1 = new Date(m0.getFullYear(), m0.getMonth() + 1, 1), key = m0.getTime();
     if (S.cd && S.cd.key === key && Date.now() - S.cd.at < 30000) return;
-    var lim = freeLimit(), q0 = lim && lim > m0 ? lim : m0, days = {};
-    function add(t, secs) { if (isNaN(t) || t < m0 || t >= m1 || !(secs > 0)) return; var k = t.getDate(); days[k] = (days[k] || 0) + secs; }
+    var lim = freeLimit(), q0 = lim && lim > m0 ? lim : m0, days = {}, byL = {};
+    // 日ごとの合計と、ラベルごとの内訳（11/16）
+    function add(t, secs, lb) {
+      if (isNaN(t) || t < m0 || t >= m1 || !(secs > 0)) return;
+      var k = t.getDate(); days[k] = (days[k] || 0) + secs;
+      byL[k] = byL[k] || {}; byL[k][lb] = (byL[k][lb] || 0) + secs;
+    }
     if (q0 < m1) {
       var logs = await all(function (a, b) {
         return sb.from('usage_logs').select('id,started_at,total_secs').eq('product', PRODUCT).gte('started_at', q0.toISOString()).lt('started_at', m1.toISOString()).order('started_at', { ascending: true }).range(a, b);
@@ -533,14 +538,15 @@
       logs.forEach(function (l) {
         var g = byLog[l.id];
         if (g && g.length) g.forEach(function (x) {
-          if (isBreak(D, aliasL(x.label || '').slice(0, 30))) return;
+          var lb = aliasL(x.label || '').slice(0, 30);
+          if (isBreak(D, lb)) return;
           var ms = Date.parse(x.started_at); if (!isFinite(ms)) ms = Date.parse(l.started_at);
-          add(new Date(ms), Number(x.secs) || 0);
+          add(new Date(ms), Number(x.secs) || 0, lb);
         });
-        else add(new Date(l.started_at), Number(l.total_secs) || 0);
+        else add(new Date(l.started_at), Number(l.total_secs) || 0, '');
       });
     }
-    S.cd = { key: key, at: Date.now(), days: days, lim: lim };
+    S.cd = { key: key, at: Date.now(), days: days, byL: byL, lim: lim };
   }
   function shortDur(s) { var m = Math.round(s / 60); if (m < 60) return m + 'm'; var h = Math.floor(m / 60), r = m % 60; return h + 'h' + (r ? (r < 10 ? '0' : '') + r : ''); }
   function heat(s) { return s < 60 ? 0 : s < 1800 ? 1 : s < 3600 ? 2 : s < 7200 ? 3 : 4; }
@@ -573,8 +579,10 @@
     body.appendChild(wrap);
     // 合計・記録した日・最長連続
     var total = 0, nRec = 0, best = 0, run = 0;
+    var maxDay = 0, labTot = {};
+    Object.keys(cd.byL || {}).forEach(function (k) { var o = cd.byL[k]; Object.keys(o).forEach(function (lb) { labTot[lb] = (labTot[lb] || 0) + o[lb]; }); });
     for (var d = 1; d <= nDays; d++) {
-      var v = cd.days[d] || 0; total += v;
+      var v = cd.days[d] || 0; total += v; if (v > maxDay) maxDay = v;
       if (v >= 60) { nRec++; run++; if (run > best) best = run; } else run = 0;
     }
     var sec = el('section', { cls: 'ttd-sec' });
@@ -592,12 +600,24 @@
       (function (day) {
         var date = new Date(y, mo, day), secs = cd.days[day] || 0, lv = heat(secs);
         var future = date > t0, locked = cd.lim && date < cd.lim;
-        var cls = 'ttd-cal-c h' + lv + (date.getTime() === t0.getTime() ? ' today' : '') + (future ? ' future' : '') + (locked ? ' lock' : '');
-        var kids = [el('span', { cls: 'ttd-cal-n', text: String(day) }), lv ? el('span', { cls: 'ttd-cal-v', text: shortDur(secs) }) : null];
+        var cls = 'ttd-cal-c' + (lv ? ' rec' : '') + (date.getTime() === t0.getTime() ? ' today' : '') + (future ? ' future' : '') + (locked ? ' lock' : '');
+        var bar = null;
+        if (lv && cd.byL && cd.byL[day]) {
+          // ラベルごとの帯。長さはその月でいちばん長い日を100%にした割合
+          var o = cd.byL[day], ks = Object.keys(o).sort(function (a, b) { return o[b] - o[a]; });
+          bar = el('span', { cls: 'ttd-cal-bar', 'aria-hidden': 'true' });
+          var inner = el('span', { cls: 'ttd-cal-bar-in' });
+          inner.style.width = Math.max(14, Math.round(secs / Math.max(1, maxDay) * 100)) + '%';
+          ks.forEach(function (lb) { var sg = el('i', { cls: lcOf(lb || T.noLabel) }); sg.style.flexGrow = String(o[lb]); inner.appendChild(sg); });
+          bar.appendChild(inner);
+        }
+        var kids = [el('span', { cls: 'ttd-cal-n', text: String(day) }), lv ? el('span', { cls: 'ttd-cal-v', text: shortDur(secs) }) : null, bar];
         var c;
         if (future || locked) c = el('span', Object.assign({ cls: cls, role: 'gridcell' }, locked ? { title: C.locked } : {}), kids);
         else {
-          c = el('button', { type: 'button', cls: cls, role: 'gridcell', 'aria-label': C.open(date, secs >= 60 ? T.dur(secs) : C.none) }, kids);
+          var det = secs >= 60 ? T.dur(secs) : C.none;
+          if (secs >= 60 && cd.byL && cd.byL[day]) { var oo = cd.byL[day]; det += C.pp[0] + Object.keys(oo).sort(function (a, b) { return oo[b] - oo[a]; }).slice(0, 4).map(function (lb) { return (lb || T.noLabel) + ' ' + T.dur(oo[lb]); }).join(C.pp[2]) + C.pp[1]; }
+          c = el('button', { type: 'button', cls: cls, role: 'gridcell', 'aria-label': C.open(date, det) }, kids);
           c.addEventListener('click', function () {
             S.day = date; S.view = 'day'; S.more = 10; S.sel = -1;
             ev('cal_day', { back: daysBack(date), lv: lv }); ev('day_view', { from: 'cal', member: member() });
@@ -611,10 +631,13 @@
     }
     if (col) { while (col < 7) { row.appendChild(el('span', { cls: 'ttd-cal-c empty', role: 'gridcell' })); col++; } grid.appendChild(row); }
     sec.appendChild(grid);
-    var lg = el('div', { cls: 'ttd-cal-lg', 'aria-hidden': 'true' }, [el('span', { text: C.short })]);
-    [1, 2, 3, 4].forEach(function (k) { lg.appendChild(el('i', { cls: 'h' + k })); });
-    lg.appendChild(el('span', { text: C.long }));
-    sec.appendChild(lg);
+    var labs = Object.keys(labTot).sort(function (a, b) { return labTot[b] - labTot[a]; });
+    if (labs.length) {
+      var lg = el('ul', { cls: 'ttd-cal-lg' });
+      labs.slice(0, 8).forEach(function (lb) { lg.appendChild(el('li', null, [el('i', { cls: lcOf(lb || T.noLabel), 'aria-hidden': 'true' }), el('span', { text: lb || T.noLabel }), el('b', { text: T.dur(labTot[lb]) })])); });
+      if (labs.length > 8) { var rest = 0; labs.slice(8).forEach(function (lb) { rest += labTot[lb]; }); lg.appendChild(el('li', { cls: 'rest' }, [el('span', { text: T.other || 'ほか' }), el('b', { text: T.dur(rest) })])); }
+      sec.appendChild(lg);
+    }
     wrap.appendChild(sec);
     if (cd.lim) wrap.appendChild(el('p', { cls: 'ttd-hint', text: TD.note(FREE_DAYS) }));
   }

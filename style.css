@@ -1437,27 +1437,27 @@ body.focus-mode .tt-adj { margin-bottom: 18px; }
 .ttd-flow li.tiny { display: block; padding: 8px 0; }
 .ttd-flow-tiny { background: none; border: 0; padding: 4px 0; font: inherit; font-size: 13px; color: var(--text2); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .ttd-flow-tiny:hover { color: var(--text); }
-/* 11/16: データのカレンダー */
-:root { --heat: 42, 111, 196; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --heat: 110, 160, 230; } }
-:root[data-theme="dark"] { --heat: 110, 160, 230; }
+/* 11/16: データのカレンダー（日ごとにラベルの帯） */
 .ttd-cal-stat { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 4px 0 12px; font-size: 13px; color: var(--text2); font-weight: 700; }
-.ttd-cal { display: flex; flex-direction: column; gap: 4px; max-width: 460px; margin: 0 auto; }
+.ttd-cal { display: flex; flex-direction: column; gap: 4px; max-width: 640px; margin: 0 auto; }
 .ttd-cal-row { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
 .ttd-cal-wd span { text-align: center; font-size: 11px; font-weight: 700; color: var(--text2); padding: 2px 0; }
-.ttd-cal-c { aspect-ratio: 1 / 1; min-height: 38px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 1px; overflow: hidden; }
+.ttd-cal-c { min-height: 72px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text); font: inherit; padding: 5px 4px 6px; display: flex; flex-direction: column; align-items: stretch; gap: 2px; overflow: hidden; text-align: left; }
 button.ttd-cal-c { cursor: pointer; }
 button.ttd-cal-c:hover { border-color: var(--text2); }
 .ttd-cal-c.empty { border: 0; background: none; }
 .ttd-cal-c.future, .ttd-cal-c.lock { opacity: .4; }
 .ttd-cal-c.lock { background: repeating-linear-gradient(135deg, transparent 0 5px, var(--line) 5px 6px); }
 .ttd-cal-c.today { outline: 2px solid var(--text); outline-offset: 1px; }
+.ttd-cal-c.rec { border-color: var(--text2); }
 .ttd-cal-n { font-size: 12px; font-weight: 700; line-height: 1.2; }
-.ttd-cal-v { font-size: 10px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.ttd-cal-c.h1 { background: rgba(var(--heat), .18); border-color: transparent; }
-.ttd-cal-c.h2 { background: rgba(var(--heat), .4); border-color: transparent; }
-.ttd-cal-c.h3 { background: rgba(var(--heat), .7); border-color: transparent; color: #fff; }
-.ttd-cal-c.h4 { background: rgb(var(--heat)); border-color: transparent; color: #fff; }
-.ttd-cal-lg { max-width: 460px; margin-left: auto; margin-right: auto; display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 10px; font-size: 11px; color: var(--text2); }
-.ttd-cal-lg i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
-.ttd-cal-lg i.h1 { background: rgba(var(--heat), .18); } .ttd-cal-lg i.h2 { background: rgba(var(--heat), .4); } .ttd-cal-lg i.h3 { background: rgba(var(--heat), .7); } .ttd-cal-lg i.h4 { background: rgb(var(--heat)); }
+.ttd-cal-v { font-size: 11px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ttd-cal-bar { margin-top: auto; height: 10px; display: block; }
+.ttd-cal-bar-in { display: flex; height: 100%; border-radius: 3px; overflow: hidden; gap: 1px; }
+.ttd-cal-bar-in i { display: block; min-width: 2px; height: 100%; }
+.ttd-cal-lg { list-style: none; margin: 14px auto 0; padding: 0; max-width: 640px; display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; }
+.ttd-cal-lg li { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+.ttd-cal-lg li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 9em; }
+.ttd-cal-lg li b { font-weight: 700; color: var(--text2); font-variant-numeric: tabular-nums; }
+.ttd-cal-lg i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+@media (min-width: 700px) { .ttd-cal-c { min-height: 84px; padding: 6px 7px 8px; } .ttd-cal-n { font-size: 13px; } .ttd-cal-v { font-size: 12px; } .ttd-cal-bar { height: 12px; } }
