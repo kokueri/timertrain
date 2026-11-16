@@ -2,7 +2,7 @@
 /* TimerTrain データの窓（ヘッダーの「データ」・ホームの ⏱📅🔥 を押したときだけ読み込む）
  * - ログイン前: 見本をぼかして表示し、ログインの案内
  * - ログイン中: sync.js と同じ接続（window.__ttSb）で、本人の記録だけを読む（RLS）
- * - 無料は直近7日。30日・12か月・全期間・CSV はプレミアム
+ * - 無料は直近30日（11/16 から。記録はずっと保存）。12か月・全期間・CSV はプレミアム
  * - 表示はすべて textContent（記録の名前をHTMLとして扱わない）
  */
 (function () {
@@ -27,11 +27,11 @@
       noSeg: '区切りの記録なし', noLabel: '名前なし', other: 'その他', brk: '休憩', brkNote: '休憩は作業の時間に入れません。',
       toBreak: '休憩にする', toWork: '作業に戻す', more: 'もっと見る', done: '完了', total: '合計',
       empty: 'この期間の記録はまだありません。ログインした状態でタイマーを15秒以上動かすと、ここに記録されます。',
-      lockTitle: '30日・12か月・全期間のデータとCSVはプレミアム',
-      lockLead: BILLING_ON ? '無料プランは直近7日間を見られます。それより前の記録も残っているので、プレミアムにするとすぐに見られます。' : '無料プランは直近7日間を見られます。それより前の記録も残っています（プレミアムは準備中です）。',
+      lockTitle: '12か月・全期間のデータとCSVはプレミアム',
+      lockLead: BILLING_ON ? '無料プランは直近30日間を見られます。記録はそれより前の分もずっと残っているので、プレミアムにすると最初からさかのぼって見られます。' : '無料プランは直近30日間を見られます。それより前の記録も残っています（プレミアムは準備中です）。',
       plans: 'プランを見る', csv: 'CSVで保存', csvLock: 'CSVで保存（プレミアム）',
       outTitle: 'ログインすると、あなたのデータが見られます',
-      outLead: '無料ログインで、直近7日間の作業の時間・使った日数・連続日数と、プロジェクトやラベルごとのグラフが見られます。',
+      outLead: '無料ログインで、記録はずっと保存。直近30日間の作業の時間・使った日数・連続日数と、プロジェクトやラベルごとのグラフが見られます。',
       outBtn: 'Googleで無料ログイン', reBtn: 'もう一度ログイン', sample: '見本',
       dayFmt: function (d) { return (d.getMonth() + 1) + '/' + d.getDate(); },
       monFmt: function (d) { return (d.getMonth() + 1) + '月'; },
@@ -53,11 +53,11 @@
       noSeg: 'No segment record', noLabel: 'No name', other: 'Other', brk: 'Breaks', brkNote: 'Breaks are not counted as work time.',
       toBreak: 'Mark as break', toWork: 'Count as work', more: 'Show more', done: 'Done', total: 'Total',
       empty: 'No records in this period yet. Run a timer for 15 seconds or more while signed in and it will show up here.',
-      lockTitle: '30 days, 12 months, all time and CSV are Premium',
-      lockLead: BILLING_ON ? 'The free plan shows the last 7 days. Older records are kept, so they appear as soon as you upgrade.' : 'The free plan shows the last 7 days. Older records are kept (Premium is coming soon).',
+      lockTitle: '12 months, all time and CSV are Premium',
+      lockLead: BILLING_ON ? 'The free plan shows the last 30 days. Older records are kept for good, so with Premium you can look back to day one.' : 'The free plan shows the last 30 days. Older records are kept (Premium is coming soon).',
       plans: 'See plans', csv: 'Save as CSV', csvLock: 'Save as CSV (Premium)',
       outTitle: 'Sign in to see your data',
-      outLead: 'With a free account you can see the last 7 days: work time, days used, your streak, and charts by project and label.',
+      outLead: 'With a free account your records are kept for good, and you can see the last 30 days: work time, days used, your streak, and charts by project and label.',
       outBtn: 'Sign in free with Google', reBtn: 'Sign in again', sample: 'Sample',
       dayFmt: function (d) { return (d.getMonth() + 1) + '/' + d.getDate(); },
       monFmt: function (d) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()]; },
@@ -79,11 +79,11 @@
       noSeg: 'Sin registro de tramos', noLabel: 'Sin nombre', other: 'Otros', brk: 'Descansos', brkNote: 'Los descansos no cuentan como trabajo.',
       toBreak: 'Marcar como descanso', toWork: 'Contar como trabajo', more: 'Ver más', done: 'Completado', total: 'Total',
       empty: 'Aún no hay registros en este periodo. Usa un temporizador 15 segundos o más con la sesión iniciada y aparecerá aquí.',
-      lockTitle: '30 días, 12 meses, todo y CSV son Premium',
-      lockLead: BILLING_ON ? 'El plan gratis muestra los últimos 7 días. Los registros anteriores se guardan y aparecen al pasar a Premium.' : 'El plan gratis muestra los últimos 7 días. Los registros anteriores se guardan (Premium llegará pronto).',
+      lockTitle: '12 meses, todo y CSV son Premium',
+      lockLead: BILLING_ON ? 'El plan gratis muestra los últimos 30 días. Los registros anteriores se guardan siempre, así que con Premium puedes verlos desde el primer día.' : 'El plan gratis muestra los últimos 30 días. Los registros anteriores se guardan (Premium llegará pronto).',
       plans: 'Ver planes', csv: 'Guardar como CSV', csvLock: 'Guardar como CSV (Premium)',
       outTitle: 'Inicia sesión para ver tus datos',
-      outLead: 'Con una cuenta gratis ves los últimos 7 días: tiempo de trabajo, días de uso, tu racha y gráficos por proyecto y etiqueta.',
+      outLead: 'Con una cuenta gratis tus registros se guardan siempre y ves los últimos 30 días: tiempo de trabajo, días de uso, tu racha y gráficos por proyecto y etiqueta.',
       outBtn: 'Entrar gratis con Google', reBtn: 'Vuelve a iniciar sesión', sample: 'Ejemplo',
       dayFmt: function (d) { return d.getDate() + '/' + (d.getMonth() + 1); },
       monFmt: function (d) { return ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][d.getMonth()]; },
@@ -95,14 +95,14 @@
     }
   }[lang];
   /* 1日の流れ（ホームの「今日のログ」から開く）。無料で見られるのは今日を含めて FREE_DAYS 日 */
-  var FREE_DAYS = 7;
+  var FREE_DAYS = 30; // 11/16: 7日→30日
   var TD = {
     ja: {
       views: [['day', '1日'], ['period', '期間']], today: '今日', yday: '昨日', prev: '前の日', next: '次の日',
       total: '休憩をのぞく合計', flow: '1日の流れ', now: 'いま', other: 'ほか', brk: '休憩',
       empty: 'この日の記録はありません。', emptyToday: 'まだ今日の記録はありません。ログインした状態でタイマーを15秒以上動かすと、ここに残ります。',
       lockT: 'それより前の日はプレミアム',
-      lockL: function (n) { return '無料プランは直近' + n + '日間の1日の流れを見られます。それより前の記録も残っているので、プレミアムにするとすぐに見られます。'; },
+      lockL: function (n) { return '無料プランは直近' + n + '日間の1日の流れを見られます。記録はそれより前の分もずっと残っているので、プレミアムにすると最初からさかのぼって見られます。'; },
       note: function (n) { return '無料プランは直近' + n + '日間を見られます。'; },
       hours: ['0時', '6時', '12時', '18時', '24時'],
       date: function (d) { return (d.getMonth() + 1) + '月' + d.getDate() + '日（' + '日月火水木金土'.charAt(d.getDay()) + '）'; }
@@ -112,7 +112,7 @@
       total: 'Total, excluding breaks', flow: 'Your day', now: 'Now', other: 'Others', brk: 'Break',
       empty: 'No records on this day.', emptyToday: 'No record yet today. Run a timer for 15 seconds or more while signed in and it shows up here.',
       lockT: 'Earlier days are Premium',
-      lockL: function (n) { return 'The free plan shows your day for the last ' + n + ' days. Older records are kept, so they appear as soon as you upgrade.'; },
+      lockL: function (n) { return 'The free plan shows your day for the last ' + n + ' days. Older records are kept for good, so with Premium you can look back to day one.'; },
       note: function (n) { return 'The free plan shows the last ' + n + ' days.'; },
       hours: ['0', '6', '12', '18', '24'],
       date: function (d) { return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()] + ', ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate(); }
@@ -122,7 +122,7 @@
       total: 'Total sin descansos', flow: 'Tu día', now: 'Ahora', other: 'Otros', brk: 'Descanso',
       empty: 'No hay registros este día.', emptyToday: 'Aún no hay registros hoy. Usa un temporizador 15 segundos o más con la sesión iniciada y aparecerá aquí.',
       lockT: 'Los días anteriores son Premium',
-      lockL: function (n) { return 'El plan gratis muestra tu día de los últimos ' + n + ' días. Los registros anteriores se guardan y aparecen en cuanto te pasas a Premium.'; },
+      lockL: function (n) { return 'El plan gratis muestra tu día de los últimos ' + n + ' días. Los registros anteriores se guardan siempre, así que con Premium puedes verlos desde el primer día.'; },
       note: function (n) { return 'El plan gratis muestra los últimos ' + n + ' días.'; },
       hours: ['0', '6', '12', '18', '24'],
       date: function (d) { return ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'][d.getDay()] + ' ' + d.getDate() + ' ' + ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][d.getMonth()]; }
@@ -211,7 +211,7 @@
     var sb = await waitSb();
     if (!sb) { renderOut(true); return; }
     S.sb = sb;
-    if (!window.__ttPremium && S.period !== '7d') S.period = '7d';
+    if (!window.__ttPremium && S.period !== '7d' && S.period !== '30d') S.period = '7d';
     if (S.view === 'day') ev('day_view', { from: S.from, member: member() });
     await show();
   }
@@ -412,7 +412,7 @@
     var tabs = el('div', { cls: 'ttd-tabs', role: 'group', 'aria-label': T.title });
     var prem = !!window.__ttPremium;
     T.periods.forEach(function (p) {
-      var locked = !prem && p[0] !== '7d';
+      var locked = !prem && p[0] !== '7d' && p[0] !== '30d';
       var b = el('button', { type: 'button', cls: 'ttd-tab' + (S.period === p[0] ? ' on' : '') + (locked ? ' lock' : ''), 'aria-pressed': S.period === p[0] ? 'true' : 'false', text: (locked ? '🔒 ' : '') + p[1] });
       b.addEventListener('click', async function () {
         if (locked) { showLock(); ev('data_locked', { period: p[0] }); return; }
