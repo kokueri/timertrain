@@ -608,13 +608,13 @@
         L.busy = true;
         var r = await sb.from('usage_logs').insert({
           product: PRODUCT, started_at: L.startedAt, total_secs: secs, completed: !!done,
-          ended_at: done ? new Date().toISOString() : null, config: Object.assign(L.timerName ? { q: L.q, name: L.timerName } : { q: L.q }, L.extra || {}), page: L.page,
+          ended_at: done ? (L.endedAt || new Date().toISOString()) : null, config: Object.assign(L.timerName ? { q: L.q, name: L.timerName } : { q: L.q }, L.extra || {}), page: L.page,
           timer_id: L.timerId
         }).select('id').single();
         L.busy = false;
         if (!r.error && r.data) { L.id = r.data.id; if (!streakToday) loadStreak(true); } // 今日の1回目で🔥を更新
       } else {
-        await sb.from('usage_logs').update({ total_secs: secs, completed: !!done, ended_at: new Date().toISOString() }).eq('id', L.id);
+        await sb.from('usage_logs').update({ total_secs: secs, completed: !!done, ended_at: L.endedAt || new Date().toISOString() }).eq('id', L.id);
       }
       L.saved = Date.now();
       if (L.id && !L.noSegs) {
@@ -841,6 +841,27 @@
       loadLabels();
     });
   }
+  // 11/16: あとから記録。サーバーは「始まりが直近2日」の区切りしか受け付けないので、今日と昨日（48時間−5分）まで
+  function cManual(o) {
+    var now = Date.now();
+    var label = String((o && o.label) || '').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 20);
+    var start = Math.floor(Number(o && o.start)), secs = Math.round(Number(o && o.secs));
+    if (!label || !isFinite(start) || !isFinite(secs)) return Promise.resolve({ ok: false, why: 'bad' });
+    if (secs < 60 || secs > C_MAX) return Promise.resolve({ ok: false, why: 'len' });
+    if (start < now - (48 * 3600 - 300) * 1000) return Promise.resolve({ ok: false, why: 'old' });
+    if (start + secs * 1000 > now + 60000) return Promise.resolve({ ok: false, why: 'future' });
+    var hit = cBtns.filter(function (b) { return b.label === label; })[0];
+    var icon = hit ? hit.icon : 'pencil';
+    var L = cMake({ id: 'manual', label: label, icon: icon }, start).L;
+    L.secs = secs; L.segs[0].secs = secs; L.extra = { count: 1, icon: icon, manual: 1 };
+    L.endedAt = new Date(start + secs * 1000).toISOString();
+    return persistLog(L, true).then(function () {
+      if (!L.id) return { ok: false, why: 'net' };
+      ev('log_manual', { min: Math.round(secs / 60) });
+      loadStreak(true);
+      return { ok: true };
+    });
+  }
   // 11/15: 「元に戻す」用。まだ記録していなければ記録せずに止める
   function cCancel() {
     if (!cRun) return;
@@ -903,7 +924,7 @@
     window.__ttBreaks = function () { return BREAKS; };
     window.__ttStatsRefresh = function () { loadStreak(true); };
     window.__ttLabels = { list: function () { return recentLabels.slice(); }, isBreak: isBreak, save: saveLabelMeta };
-    window.__ttCount = { start: cStart, stop: function () { cStop(false); }, cancel: cCancel, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
+    window.__ttCount = { start: cStart, stop: function () { cStop(false); }, cancel: cCancel, manual: cManual, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
       labels: function () { return recentLabels.filter(function (l) { return !isBreak(l); }); } };
     cResume();
     if (window.__ttRerenderList) { try { window.__ttRerenderList(); } catch (e) {} }

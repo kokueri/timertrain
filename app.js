@@ -1813,7 +1813,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=17'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=18'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -1991,19 +1991,19 @@ renderToday(st);
  * blocks: sync.js が渡す区切りごとの { s: 開始ms, secs, label, brk }。名前は textContent でだけ表示する */
 var TL = lang === 'en' ? { title: "Today's log", total: function (d) { return d; }, empty: 'No record yet today. Run a timer for 15 seconds or more and it shows up here.', more: 'See details', noName: 'No name', others: 'Others', hours: ['0', '6', '12', '18', '24'], aria: "Today's log. Open data",
 cStop: 'Stop', cStartOf: function (l) { return 'Start timing ' + l; }, cStopOf: function (l) { return 'Stop timing ' + l; }, cEditOf: function (l) { return 'Edit ' + l; },
-cFromLabels: 'From your labels', cLeft: function (l) { return 'Move ' + l + ' left'; }, cRight: function (l) { return 'Move ' + l + ' right'; }, cAdd: 'Add a button', cAddShort: 'Add', cEdit: 'Edit', cDone: 'Done', cName: 'Name', cPh: 'e.g. Walk', cIcon: 'Icon', cSave: 'Save', cCancel: 'Cancel', cDel: 'Delete', cDelSure: 'Tap again to delete', cClose: 'Close',
+cFromLabels: 'From your labels', mLater: 'Log past time', mTitle: 'Log past time', mWhat: 'What', mWhen: 'Start', mLen: 'Length', mToday: 'Today', mYest: 'Yesterday', mMin: 'min', mH: 'h', mSaved: function (l, a, b) { return 'Logged "' + l + '" ' + a + '–' + b + '.'; }, mErr: { bad: 'Enter a name and a start time.', len: 'Choose between 1 minute and 12 hours.', old: 'You can log today and yesterday only.', future: 'That would end in the future.', net: 'Could not save. Please try again.' }, mNote: 'Today and yesterday only.', cLeft: function (l) { return 'Move ' + l + ' left'; }, cRight: function (l) { return 'Move ' + l + ' right'; }, cAdd: 'Add a button', cAddShort: 'Add', cEdit: 'Edit', cDone: 'Done', cName: 'Name', cPh: 'e.g. Walk', cIcon: 'Icon', cSave: 'Save', cCancel: 'Cancel', cDel: 'Delete', cDelSure: 'Tap again to delete', cClose: 'Close',
 cEmpty: 'Turn things you do often into buttons and time them with one tap (walk, chores, reading…).', cErr: 'Could not save. Please try again.',
 cLimit: function (n) { return 'The free plan has up to ' + n + ' buttons. Premium allows up to 30.'; }, cPlans: 'See plans',
 cIcons: { walk: 'Walk', book: 'Book', home: 'Home', child: 'Kids', cup: 'Cup', moon: 'Sleep', pc: 'Computer', gym: 'Workout', music: 'Music', pen: 'Writing', food: 'Meal', heart: 'Heart' } }
 : lang === 'es' ? { title: 'Registro de hoy', total: function (d) { return d; }, empty: 'Aún no hay registros hoy. Usa un temporizador 15 segundos o más y aparecerá aquí.', more: 'Ver detalles', noName: 'Sin nombre', others: 'Otros', hours: ['0', '6', '12', '18', '24'], aria: 'Registro de hoy. Ver datos',
 cStop: 'Parar', cStartOf: function (l) { return 'Empezar a contar ' + l; }, cStopOf: function (l) { return 'Parar ' + l; }, cEditOf: function (l) { return 'Editar ' + l; },
-cFromLabels: 'De tus etiquetas', cLeft: function (l) { return 'Mover ' + l + ' a la izquierda'; }, cRight: function (l) { return 'Mover ' + l + ' a la derecha'; }, cAdd: 'Añadir un botón', cAddShort: 'Añadir', cEdit: 'Editar', cDone: 'Listo', cName: 'Nombre', cPh: 'p. ej. Paseo', cIcon: 'Icono', cSave: 'Guardar', cCancel: 'Cancelar', cDel: 'Eliminar', cDelSure: 'Toca otra vez para eliminar', cClose: 'Cerrar',
+cFromLabels: 'De tus etiquetas', mLater: 'Añadir tiempo pasado', mTitle: 'Añadir tiempo pasado', mWhat: 'Qué', mWhen: 'Inicio', mLen: 'Duración', mToday: 'Hoy', mYest: 'Ayer', mMin: 'min', mH: 'h', mSaved: function (l, a, b) { return 'Se registró «' + l + '» ' + a + '–' + b + '.'; }, mErr: { bad: 'Escribe un nombre y la hora de inicio.', len: 'Elige entre 1 minuto y 12 horas.', old: 'Solo puedes registrar hoy y ayer.', future: 'Terminaría en el futuro.', net: 'No se pudo guardar. Inténtalo de nuevo.' }, mNote: 'Solo hoy y ayer.', cLeft: function (l) { return 'Mover ' + l + ' a la izquierda'; }, cRight: function (l) { return 'Mover ' + l + ' a la derecha'; }, cAdd: 'Añadir un botón', cAddShort: 'Añadir', cEdit: 'Editar', cDone: 'Listo', cName: 'Nombre', cPh: 'p. ej. Paseo', cIcon: 'Icono', cSave: 'Guardar', cCancel: 'Cancelar', cDel: 'Eliminar', cDelSure: 'Toca otra vez para eliminar', cClose: 'Cerrar',
 cEmpty: 'Convierte lo que haces a menudo en botones y mide el tiempo con un toque (paseo, tareas, lectura…).', cErr: 'No se pudo guardar. Inténtalo de nuevo.',
 cLimit: function (n) { return 'El plan gratis permite hasta ' + n + ' botones. Premium, hasta 30.'; }, cPlans: 'Ver planes',
 cIcons: { walk: 'Paseo', book: 'Libro', home: 'Casa', child: 'Niños', cup: 'Taza', moon: 'Dormir', pc: 'Ordenador', gym: 'Ejercicio', music: 'Música', pen: 'Escribir', food: 'Comida', heart: 'Corazón' } }
 : { title: '今日のログ', total: function (d) { return '合計 ' + d; }, empty: 'まだ今日の記録はありません。タイマーを15秒以上動かすと、ここに残ります。', more: 'くわしく見る', noName: '名前なし', others: 'ほか', hours: ['0時', '6時', '12時', '18時', '24時'], aria: '今日のログ。データを見る',
 cStop: '止める', cStartOf: function (l) { return l + 'を計りはじめる'; }, cStopOf: function (l) { return l + 'を止める'; }, cEditOf: function (l) { return l + 'を編集'; },
-cFromLabels: 'これまでのラベルから', cLeft: function (l) { return l + 'を左へ'; }, cRight: function (l) { return l + 'を右へ'; }, cAdd: 'ボタンを追加', cAddShort: '追加', cEdit: '編集', cDone: '完了', cName: 'なまえ', cPh: '例：散歩', cIcon: 'アイコン', cSave: '保存', cCancel: 'キャンセル', cDel: '削除', cDelSure: 'もう一度押すと削除', cClose: '閉じる',
+cFromLabels: 'これまでのラベルから', mLater: 'あとから記録', mTitle: 'あとから記録', mWhat: 'なにをした？', mWhen: '始めた時刻', mLen: '長さ', mToday: '今日', mYest: '昨日', mMin: '分', mH: '時間', mSaved: function (l, a, b) { return '「' + l + '」' + a + '〜' + b + ' を記録しました'; }, mErr: { bad: 'なまえと始めた時刻を入れてください', len: '1分〜12時間で選んでください', old: '記録できるのは今日と昨日の分です', future: '終わりが今より後になっています', net: '保存できませんでした。もう一度お試しください' }, mNote: '今日と昨日の分を記録できます', cLeft: function (l) { return l + 'を左へ'; }, cRight: function (l) { return l + 'を右へ'; }, cAdd: 'ボタンを追加', cAddShort: '追加', cEdit: '編集', cDone: '完了', cName: 'なまえ', cPh: '例：散歩', cIcon: 'アイコン', cSave: '保存', cCancel: 'キャンセル', cDel: '削除', cDelSure: 'もう一度押すと削除', cClose: '閉じる',
 cEmpty: 'よくやることをボタンにすると、1タップで時間を計れます（散歩・家事・読書など）。', cErr: '保存できませんでした。もう一度お試しください。',
 cLimit: function (n) { return 'ボタンは無料プランで' + n + 'つまでです。プレミアムなら30個まで作れます。'; }, cPlans: 'プランを見る',
 cIcons: { walk: '散歩', book: '本', home: '家', child: '子ども', cup: 'カップ', moon: '睡眠', pc: 'パソコン', gym: '運動', music: '音楽', pen: '書く', food: 'ごはん', heart: 'ハート' } };
@@ -2082,11 +2082,11 @@ var s = Math.max(b.s, a), e = Math.min(b.s + b.secs * 1000, t1);
 if (e <= s) return;
 var seg = mk('span', 'tt-today-seg ' + (b.brk ? 'b' : cls[b.label]));
 if (!b.brk && cls[b.label] === 'lc') seg.style.background = labelColor(b.label);
-seg.style.left = ((s - a) / span * 100).toFixed(2) + '%';
-seg.style.width = Math.max(0.5, (e - s) / span * 100).toFixed(2) + '%';
+seg.style.setProperty('--p', ((s - a) / span * 100).toFixed(2) + '%');
+seg.style.setProperty('--w', Math.max(0.5, (e - s) / span * 100).toFixed(2) + '%');
 bar.appendChild(seg);
 });
-if (now > a && now < t1) { var nw = mk('span', 'tt-today-now'); nw.style.left = ((now - a) / span * 100).toFixed(2) + '%'; bar.appendChild(nw); }
+if (now > a && now < t1) { var nw = mk('span', 'tt-today-now'); nw.style.setProperty('--p', ((now - a) / span * 100).toFixed(2) + '%'); bar.appendChild(nw); }
 open.appendChild(bar);
 var ax = mk('span', 'tt-today-axis'); ax.setAttribute('aria-hidden', 'true');
 (startH ? TL.hours.slice(1) : TL.hours.filter(function (x, i) { return i % 2 === 0; })).forEach(function (hh) { ax.appendChild(mk('span', '', hh)); });
@@ -2208,6 +2208,12 @@ CU.key = ''; renderCount(box, window.__ttCount.state());
 if (!CU.editing) row.appendChild(add);
 box.appendChild(row);
 if (!cs.btns.length && !CU.form) box.appendChild(mk('p', 'tt-cnote', TL.cEmpty));
+if (!CU.form && !CU.editing && window.__ttCount.manual) {
+// 11/16: ホームから「あとから記録」
+var ml = mk('button', 'tt-clater', '＋ ' + TL.mLater); ml.type = 'button';
+ml.addEventListener('click', function () { CU.form = 'manual'; CU.key = ''; renderCount(box, window.__ttCount.state()); });
+box.appendChild(ml);
+}
 if (cs.btns.length && !CU.form) {
 var ed = mk('button', 'tt-cedit', CU.editing ? TL.cDone : TL.cEdit); ed.type = 'button';
 ed.addEventListener('click', function () { CU.editing = !CU.editing; CU.key = ''; renderCount(box, window.__ttCount.state()); });
@@ -2221,9 +2227,95 @@ var lc = mk('button', 'tt-cbtn2', TL.cClose); lc.type = 'button';
 lc.addEventListener('click', function () { CU.form = null; CU.key = ''; renderCount(box, window.__ttCount.state()); });
 lim.appendChild(lc);
 box.appendChild(lim);
+} else if (CU.form === 'manual') {
+box.appendChild(manualForm(box, cs));
 } else if (CU.form) {
 box.appendChild(countForm(box, cs));
 }
+}
+function manualForm(box, cs) {
+var f = mk('div', 'tt-cform tt-mform'); f.setAttribute('role', 'group'); f.setAttribute('aria-label', TL.mTitle);
+f.appendChild(mk('p', 'tt-mform-t', TL.mTitle));
+var idn = 'tt-mname-' + Date.now();
+var lab = mk('label', 'tt-cform-l', TL.mWhat); lab.htmlFor = idn; f.appendChild(lab);
+var inp = mk('input', 'tt-cform-in'); inp.id = idn; inp.type = 'text'; inp.maxLength = 20; inp.autocomplete = 'off'; inp.placeholder = TL.cPh;
+f.appendChild(inp);
+var seen = {}, opts = [];
+cs.btns.forEach(function (b) { if (!seen[b.label]) { seen[b.label] = 1; opts.push(b.label); } });
+(window.__ttCount.labels ? window.__ttCount.labels() : []).forEach(function (l) { l = String(l).slice(0, 20); if (l && !seen[l]) { seen[l] = 1; opts.push(l); } });
+if (opts.length) {
+var lw = mk('div', 'tt-clabs');
+opts.slice(0, 12).forEach(function (l) {
+var c = mk('button', 'tt-clab', l); c.type = 'button';
+c.addEventListener('click', function () { inp.value = l; lw.querySelectorAll('.tt-clab').forEach(function (x) { x.classList.toggle('on', x === c); }); });
+lw.appendChild(c);
+});
+f.appendChild(lw);
+}
+// いつ
+var now = new Date(), dayOff = 0, lenMin = 30;
+var st0 = new Date(now.getTime() - lenMin * 60000); st0.setMinutes(Math.floor(st0.getMinutes() / 5) * 5, 0, 0);
+if (st0.getDate() !== now.getDate()) { st0 = new Date(now); st0.setHours(0, 0, 0, 0); }
+f.appendChild(mk('span', 'tt-cform-l', TL.mWhen));
+var whenRow = mk('div', 'tt-mform-when');
+var seg = mk('div', 'tt-mseg'); seg.setAttribute('role', 'group');
+[[0, TL.mToday], [1, TL.mYest]].forEach(function (d) {
+var b = mk('button', 'tt-mseg-b' + (d[0] === 0 ? ' on' : ''), d[1]); b.type = 'button'; b.setAttribute('aria-pressed', d[0] === 0 ? 'true' : 'false');
+b.addEventListener('click', function () { dayOff = d[0]; seg.querySelectorAll('.tt-mseg-b').forEach(function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); }); upd(); });
+seg.appendChild(b);
+});
+var tm = mk('input', 'tt-cform-in tt-mtime'); tm.type = 'time'; tm.step = 60;
+tm.value = String(st0.getHours()).padStart(2, '0') + ':' + String(st0.getMinutes()).padStart(2, '0');
+tm.setAttribute('aria-label', TL.mWhen);
+whenRow.append(seg, tm); f.appendChild(whenRow);
+// 長さ
+f.appendChild(mk('span', 'tt-cform-l', TL.mLen));
+var lens = mk('div', 'tt-clabs');
+function lenTxt(m) { return m >= 60 ? (Math.floor(m / 60) + TL.mH + (m % 60 ? (m % 60) + TL.mMin : '')) : m + TL.mMin; }
+var mins = mk('input', 'tt-cform-in tt-mmin'); mins.type = 'number'; mins.min = '1'; mins.max = '720'; mins.step = '1'; mins.value = String(lenMin); mins.inputMode = 'numeric';
+[15, 30, 45, 60, 90, 120].forEach(function (m) {
+var c = mk('button', 'tt-clab' + (m === lenMin ? ' on' : ''), lenTxt(m)); c.type = 'button';
+c.addEventListener('click', function () { mins.value = String(m); lens.querySelectorAll('.tt-clab').forEach(function (x) { x.classList.toggle('on', x === c); }); upd(); });
+lens.appendChild(c);
+});
+f.appendChild(lens);
+var minRow = mk('div', 'tt-mform-min'); minRow.append(mins, mk('span', '', TL.mMin));
+var prev = mk('span', 'tt-mprev'); prev.setAttribute('aria-live', 'polite');
+minRow.appendChild(prev);
+f.appendChild(minRow);
+f.appendChild(mk('p', 'tt-cnote', TL.mNote));
+function startMs() {
+var mm = /^(\d{1,2}):(\d{2})$/.exec(tm.value || ''); if (!mm) return NaN;
+var d = new Date(); d.setDate(d.getDate() - dayOff); d.setHours(Number(mm[1]), Number(mm[2]), 0, 0);
+return d.getTime();
+}
+function hm(t) { var d = new Date(t); return d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function upd() {
+var s0 = startMs(), m = Math.round(Number(mins.value));
+prev.textContent = isFinite(s0) && m > 0 ? hm(s0) + '〜' + hm(s0 + m * 60000) : '';
+lens.querySelectorAll('.tt-clab').forEach(function (x, i) { x.classList.toggle('on', [15, 30, 45, 60, 90, 120][i] === m); });
+}
+tm.addEventListener('input', upd); mins.addEventListener('input', upd); upd();
+var msg = mk('p', 'tt-cnote tt-merr'); msg.setAttribute('role', 'status');
+var acts = mk('div', 'tt-cform-a');
+var ok = mk('button', 'tt-cbtn2 pri', TL.cSave); ok.type = 'button';
+var cancel = mk('button', 'tt-cbtn2', TL.cCancel); cancel.type = 'button';
+function close() { CU.form = null; CU.key = ''; renderCount(box, window.__ttCount.state()); }
+cancel.addEventListener('click', close);
+ok.addEventListener('click', function () {
+var v = inp.value.trim(), s0 = startMs(), m = Math.round(Number(mins.value));
+if (!v || !isFinite(s0)) { msg.textContent = TL.mErr.bad; return; }
+ok.disabled = true; msg.textContent = '';
+window.__ttCount.manual({ label: v, start: s0, secs: m * 60 }).then(function (r) {
+if (!r || !r.ok) { msg.textContent = TL.mErr[(r && r.why) || 'net'] || TL.mErr.net; ok.disabled = false; return; }
+close();
+if (window.__ttOneUndo) window.__ttOneUndo(TL.mSaved(v, hm(s0), hm(s0 + m * 60000)), null);
+});
+});
+acts.append(ok, cancel);
+f.append(msg, acts);
+setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (e) {} }, 0);
+return f;
 }
 function countForm(box, cs) {
 var editing = CU.form !== 'new';

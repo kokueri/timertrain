@@ -1390,3 +1390,30 @@ body.focus-mode .tt-adj { margin-bottom: 18px; }
 .tt-cform-ib { height: 42px; color: var(--lc, var(--text)); }
 .tt-cform-ib.on { background: var(--lc, var(--text)); color: #fff; border-color: var(--lc, var(--text)); }
 .lbl-form .tt-colors { margin-bottom: 10px; }
+/* 11/16: ホームから「あとから記録」 */
+.tt-clater { align-self: flex-start; min-height: 36px; padding: 0 14px; border: 1.5px dashed var(--line); border-radius: 18px; background: none; color: var(--text); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.tt-clater:hover { border-color: var(--text2); }
+.tt-mform-t { margin: 0 0 2px; font-weight: 800; font-size: 15px; }
+.tt-mform-when { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tt-mseg { display: inline-flex; border: 1.5px solid var(--line); border-radius: 22px; padding: 2px; background: var(--card); }
+.tt-mseg-b { min-height: 36px; padding: 0 14px; border: 0; border-radius: 18px; background: none; color: var(--text2); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.tt-mseg-b.on { background: var(--text); color: var(--card); }
+.tt-mtime { width: 136px; }
+.tt-mform-min { display: flex; align-items: center; gap: 8px; }
+.tt-mmin { width: 90px; }
+.tt-mprev { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tt-merr:empty { display: none; }
+/* 11/16: PC の広い画面（3列）は今日のログを縦の1日グラフに。左に時刻、まん中に帯、右にラベルと時間 */
+.tt-today-seg { left: var(--p); width: var(--w); }
+.tt-today-now { left: var(--p); }
+@media (min-width: 1200px) {
+  html.tt-in .tt-logcol .tt-today-open { display: grid; grid-template-columns: auto 22px minmax(0, 1fr); grid-template-rows: auto auto; column-gap: 10px; row-gap: 12px; align-items: stretch; }
+  html.tt-in .tt-logcol .tt-today-head, html.tt-in .tt-logcol .tt-today-empty { grid-column: 1 / -1; }
+  html.tt-in .tt-logcol .tt-today-axis { grid-column: 1; grid-row: 2; flex-direction: column; justify-content: space-between; margin: 0; height: 340px; text-align: right; line-height: 1; }
+  html.tt-in .tt-logcol .tt-today-bar { grid-column: 2; grid-row: 2; height: 340px; width: 22px; border-radius: 8px; }
+  html.tt-in .tt-logcol .tt-today-seg { left: 0; right: 0; width: auto; top: var(--p); height: var(--w); bottom: auto; }
+  html.tt-in .tt-logcol .tt-today-now { left: -4px; right: -4px; width: auto; top: var(--p); height: 2px; bottom: auto; margin: -1px 0 0; }
+  html.tt-in .tt-logcol .tt-today-legend { grid-column: 3; grid-row: 2; flex-direction: column; flex-wrap: nowrap; align-content: stretch; justify-content: flex-start; gap: 10px; }
+  html.tt-in .tt-logcol .tt-today-item { display: flex; align-items: center; gap: 6px; }
+  html.tt-in .tt-logcol .tt-today-v { margin-left: auto; }
+}
