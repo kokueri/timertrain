@@ -12,14 +12,14 @@ gtag('config', 'G-GSFVNEDCGN', (function(){try{var m=/[?&]tt_internal=([01])/.ex
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>複数タイマーをWebで連続・くり返し再生｜共有できる無料タイマー - TimerTrain</title>
-<meta name="description" content="複数のタイマーを連結して順番に自動再生。リンクひとつで設定を共有でき、くり返し・色分けにも対応。かわいくておしゃれな無料Webタイマー。インストール不要、開いて3秒で使えます。">
+<meta name="description" content="複数のタイマーを連結して順番に自動再生。リンクひとつで設定を共有でき、くり返し・色分けにも対応。かわいくておしゃれな無料Webタイマー。インストール不要、開いて3秒で使えます。無料ログインで、回した時間が自動で記録に（ずっと保存）。">
 <link rel="canonical" href="https://timertrain.com/">
 <link rel="alternate" hreflang="ja" href="https://timertrain.com/">
 <link rel="alternate" hreflang="en" href="https://timertrain.com/en">
 <link rel="alternate" hreflang="es" href="https://timertrain.com/es">
 <link rel="alternate" hreflang="x-default" href="https://timertrain.com/en">
 <meta property="og:title" content="複数タイマーを連続再生・共有 - TimerTrain">
-<meta property="og:description" content="複数のタイマーを連結して順番に自動再生。リンクひとつで共有できる、かわいい無料Webタイマー。">
+<meta property="og:description" content="複数のタイマーを連結して順番に自動再生。リンクひとつで共有でき、回した時間はそのまま記録に。かわいい無料Webタイマー。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://timertrain.com/">
 <meta property="og:image" content="https://timertrain.com/ogp.png">
@@ -99,6 +99,14 @@ gtag('config', 'G-GSFVNEDCGN', (function(){try{var m=/[?&]tt_internal=([01])/.ex
   },
   {
    "@type": "Question",
+   "name": "記録はいつまで残りますか？",
+   "acceptedAnswer": {
+    "@type": "Answer",
+    "text": "無料のままずっと保存されます。データ画面では直近30日を表示し、プレミアムにすると最初の記録までさかのぼって見られます。"
+   }
+  },
+  {
+   "@type": "Question",
    "name": "画面を消したり、別のタブを開いていても正確ですか？",
    "acceptedAnswer": {
     "@type": "Answer",
@@ -115,7 +123,7 @@ gtag('config', 'G-GSFVNEDCGN', (function(){try{var m=/[?&]tt_internal=([01])/.ex
 <main class="app">
 <header class="header">
 <h1 class="logo">TimerTrain</h1>
-<p class="tagline">タイマーを並べて自動で切り替え。リンクひとつで共有</p>
+<p class="tagline"><span style="display:inline-block">タイマーを並べて自動で切り替え。</span><span style="display:inline-block">回した時間は、そのまま1日の記録に</span></p>
 <nav class="nav" aria-label="用途別タイマー">
 <a href="/pomodoro">ポモドーロ</a>
 <a href="/interval-timer">インターバル</a>
@@ -201,6 +209,7 @@ gtag('config', 'G-GSFVNEDCGN', (function(){try{var m=/[?&]tt_internal=([01])/.ex
 <p style="margin-top:10px"><strong>作ったタイマーを保存・共有できますか？</strong><br>できます。設定はURLに入っているので、「共有リンク」でコピーしたURLを開けば同じタイマーが再現されます。ブックマークすれば保存に、URLを送れば共有になります。無料ログインすると、名前を付けて「マイタイマー」に保存し、スマホとPCのどちらからでも呼び出せます。</p>
 <p style="margin-top:10px"><strong>無料ですか？登録やインストールは必要ですか？</strong><br>無料で、登録もインストールも不要です。スマホ・タブレット・PCのブラウザで動き、ホーム画面に追加してアプリのように使うこともできます。タイマーの保存・端末間の同期・利用記録を使いたいときだけ、Googleアカウントで無料ログインできます。</p>
 <p style="margin-top:10px"><strong>勉強や作業の時間を記録できますか？</strong><br>できます。無料ログインした状態でタイマーを使うと、動かした時間が自動で記録され、画面の「データ」で直近30日間の合計時間・1日の流れ・グラフを見られます（記録はずっと保存）。一時停止していた時間は数えません。</p>
+<p style="margin-top:10px"><strong>記録はいつまで残りますか？</strong><br>無料のままずっと保存されます。データ画面では直近30日を表示し、プレミアムにすると最初の記録までさかのぼって見られます。</p>
 <p style="margin-top:10px"><strong>画面を消したり、別のタブを開いていても正確ですか？</strong><br>残り時間は時刻の差分で計算しているため、別のタブを開いていてもずれません。再生中は画面が自動で消えないようにし、切り替えと終了は音でお知らせします。</p>
 <h2>用途別タイマー</h2>
 <p><a href="/pomodoro">ポモドーロタイマー</a> · <a href="/interval-timer">インターバルタイマー</a> · <a href="/tabata">タバタ式タイマー</a> · <a href="/hiit">HIITタイマー</a> · <a href="/study">勉強タイマー</a> · <a href="/kitchen">キッチンタイマー</a> · <a href="/multi-timer">複数タイマー</a> · <a href="/repeat-timer">繰り返しタイマー</a> · <a href="/pomodoro-50-10">ポモドーロ50分＋10分</a> · <a href="/donut/">ドーナツタイマー（かわいい見た目）</a></p>
@@ -210,7 +219,7 @@ gtag('config', 'G-GSFVNEDCGN', (function(){try{var m=/[?&]tt_internal=([01])/.ex
 <footer class="footer">© 2026 TimerTrain · <a href="/en" class="lang-link">English</a> · <a href="/es" class="lang-link">Español</a> · <a href="/privacy">プライバシー</a> · <a href="/terms">利用規約</a> · <a href="/pricing">料金</a> · <a href="/legal">特定商取引法に基づく表記</a> · <a href="/about">運営者情報</a></footer>
 </main>
 
-<script src="/app.js?v=57"></script>
+<script src="/app.js?v=58"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',function(){navigator.serviceWorker.register('/sw.js').catch(function(){});});}</script>
 </body>
 </html>
