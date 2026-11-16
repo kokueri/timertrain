@@ -1406,3 +1406,31 @@ body.focus-mode .tt-adj { margin-bottom: 18px; }
 /* 11/16: 帯の位置（PC の縦グラフはやめて横のまま） */
 .tt-today-seg { left: var(--p); width: var(--w); }
 .tt-today-now { left: var(--p); }
+/* 11/16: 1日の流れ — 終わりの時刻と、記録の時間を変える */
+.ttd-flow-t > span { display: block; }
+.ttd-flow-end { font-size: 11px; font-weight: 600; margin-top: 2px; opacity: .85; }
+.ttd-flow li { grid-template-columns: 50px 4px minmax(0, 1fr) auto; }
+.ttd-flow-v { display: flex; align-items: center; gap: 8px; margin-top: -4px; }
+.ttd-flow-e { width: 32px; height: 32px; padding: 0; border-radius: 50%; border: 1px solid var(--line); background: var(--card); color: var(--text2); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.ttd-flow-e:hover { color: var(--text); border-color: var(--text2); }
+.ttd-flow-e svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.ttd-flow-e[aria-expanded="true"] { background: var(--text); border-color: var(--text); color: var(--card); }
+.ttd-edit { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 10px; margin-top: 4px; padding: 14px; border-radius: 14px; background: var(--bg); border: 1px solid var(--line); }
+.ttd-edit input { font: inherit; font-size: 16px; color: var(--text); background: var(--card); border: 1.5px solid var(--line); border-radius: 10px; min-height: 40px; padding: 0 10px; }
+.ttd-edit-st { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; }
+.ttd-edit-st input { width: 130px; }
+.ttd-edit-parts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ttd-flow .ttd-edit-parts li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0; border: 0; }
+.ttd-edit-n { font-size: 14px; overflow-wrap: anywhere; min-width: 0; }
+.ttd-edit-v { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text2); flex-shrink: 0; }
+.ttd-edit-v input { width: 76px; text-align: right; }
+.ttd-edit-sum { margin: 0; font-size: 14px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.ttd-edit-btns { display: flex; gap: 8px; }
+.ttd-edit-btns button, .ttd-edit-del { min-height: 40px; padding: 0 16px; border-radius: 20px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.ttd-edit-save { background: var(--text); color: var(--card); border: 1.5px solid var(--text); }
+.ttd-edit-cancel { background: none; color: var(--text); border: 1.5px solid var(--line); }
+.ttd-edit-del { align-self: flex-start; background: none; border: 0; color: #D93025; padding: 0 2px; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+.ttd-edit-del.sure { background: #D93025; color: #fff; text-decoration: none; padding: 0 14px; }
+.ttd-edit button:disabled { opacity: .5; cursor: default; }
+.ttd-edit-m { margin: 0; font-size: 13px; color: #D93025; line-height: 1.6; }
+.ttd-ok { color: var(--text); font-weight: 700; padding: 8px 2px 0; outline: none; }
