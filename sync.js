@@ -392,6 +392,7 @@
    * 15秒未満でやめたものは保存しない。保存は「15秒たったら作成 → 1分ごとに更新 → 完了/リセット/ページを閉じる時に確定」。
    */
   var log = null, logTick = null, last = 0;
+  var endedHere = []; // この画面で止めた記録（すぐ時間を変えてよい）
   function isRunning() { try { return run.active && !run.paused && !run.finished; } catch (e) { return false; } }
   /* 区切りごとの記録: 今動いている区切り（タイマー名＝ラベル）に、動いた秒数を足していく */
   function curSeg(L) {
@@ -641,6 +642,7 @@
     if (ST && ST.day === dayKey(new Date(L.startedAt)) && L.secs >= 15) { ST.todayLogs[tmpId] = workOf(L); putBlocks(tmpId, blocksOf(L, tmpId)); try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {} }
     showStats();
     persistLog(L, done).then(function () {
+      if (L.id) { endedHere.push(L.id); if (endedHere.length > 50) endedHere.shift(); }
       if (L.id && ST) {
         var k; for (k in ST.todayLogs) if (/^local/.test(k)) delete ST.todayLogs[k];
         ST.blocks = (ST.blocks || []).filter(function (b) { return !/^local/.test(String(b.lid)); });
@@ -932,6 +934,9 @@
     if (window.__ttSetPlan) { try { window.__ttSetPlan(PREMIUM ? 'premium' : 'free'); } catch (e) {} }
     window.__ttBreaks = function () { return BREAKS; };
     window.__ttStatsRefresh = function () { loadStreak(true); };
+    // 11/16: データの窓で時間を変えるとき、動いている記録は変えない
+    window.__ttActiveLogs = function () { return [log && log.id, cRun && cRun.L && cRun.L.id].filter(Boolean); };
+    window.__ttEndedHere = function () { return endedHere.slice(); };
     window.__ttLabels = { list: function () { return recentLabels.slice(); }, isBreak: isBreak, save: saveLabelMeta };
     window.__ttCount = { start: cStart, stop: function () { cStop(false); }, cancel: cCancel, manual: cManual, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
       labels: function () { return recentLabels.filter(function (l) { return !isBreak(l); }); } };
