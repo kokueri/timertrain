@@ -46,7 +46,7 @@
       perksTitle: '無料ログインでできること',
       perks: [
         ['マイタイマー', '「勉強」「HIIT」など、よく使う編成に名前を付けて2つまで保存。スマホでもPCでも、ワンタップで呼び出せます'],
-        ['7日間のデータ（グラフ）', 'タイマーを動かした時間を自動で記録。合計時間・回数・日ごとのグラフで振り返れます（一時停止中は数えません）'],
+        ['30日間のデータ（グラフ）', 'タイマーを動かした時間を自動で記録して、ずっと保存。直近30日を1日の流れやグラフで振り返れます（一時停止中は数えません）'],
         ['連続日数', '何日続けて使っているかが分かります'],
         ['いつでも退会', 'アカウントと保存したデータは、このページからいつでも削除できます']
       ],
@@ -84,7 +84,7 @@
       perksTitle: 'What a free account adds',
       perks: [
         ['My timers', 'Save up to 2 setups you use often, like "Study" or "HIIT", under a name and open them in one tap on any device'],
-        ['7-day stats and charts', 'The time your timer runs is logged automatically: total time, sessions and a daily chart (paused time is not counted)'],
+        ['30 days of stats and charts', 'The time your timer runs is logged automatically and kept for good. Look back on the last 30 days with your daily flow and charts (paused time is not counted)'],
         ['Streaks', 'See how many days in a row you have used it'],
         ['Leave any time', 'Delete your account and everything you saved from this page whenever you like']
       ],
@@ -122,7 +122,7 @@
       perksTitle: 'Lo que añade una cuenta gratis',
       perks: [
         ['Mis temporizadores', 'Guarda con nombre hasta 2 configuraciones que más usas, como «Estudio» o «HIIT», y ábrelas con un toque en cualquier dispositivo'],
-        ['Datos y gráficos de 7 días', 'Se registra automáticamente el tiempo de uso: tiempo total, sesiones y un gráfico por día (las pausas no cuentan)'],
+        ['Datos y gráficos de 30 días', 'El tiempo de uso se registra solo y se guarda siempre. Repasa los últimos 30 días con el flujo del día y gráficos (las pausas no cuentan)'],
         ['Rachas', 'Mira cuántos días seguidos lo has usado'],
         ['Baja cuando quieras', 'Puedes eliminar tu cuenta y todo lo guardado desde esta página en cualquier momento']
       ],
@@ -161,13 +161,13 @@
   var D2 = {
     ja: { pjTitle: 'プロジェクト', pjEmpty: 'マイタイマーをプロジェクトにまとめると、「データ」でプロジェクトごと・ラベル（区切りの名前）ごとの時間が見られます。下の「使い方の例」も参考にしてください。',
       pjTimers: 'マイタイマー: ', pjNoTimers: 'まだマイタイマーが入っていません（上の「マイタイマー」でプロジェクトを選べます）', pjNote: '「休憩」などの名前は自動で休憩として作業の時間から外します。切り替えは「データ」のラベルごとの表でできます。',
-      dataTitle: 'データ（記録とグラフ）', dataLead: 'タイマー画面の「データ」で、作業の時間・使った日数・🔥連続日数と、プロジェクトやラベルごとのグラフが見られます。無料プランは直近7日間です。', dataBtn: 'データを見る' },
+      dataTitle: 'データ（記録とグラフ）', dataLead: 'タイマー画面の「データ」で、作業の時間・使った日数・🔥連続日数と、プロジェクトやラベルごとのグラフが見られます。無料プランは直近30日間です（記録はずっと保存）。', dataBtn: 'データを見る' },
     en: { pjTitle: 'Projects', pjEmpty: 'Group your saved timers into projects to see time per project and per label (segment name) in Data. See "How it works" below for an example.',
       pjTimers: 'Saved timers: ', pjNoTimers: 'No saved timers in it yet (pick a project for a timer under "My timers" above)', pjNote: 'Names like "Break" are left out of work time automatically. You can change this in the label table in Data.',
-      dataTitle: 'Data (history and charts)', dataLead: 'Open "Data" on the timer screen to see work time, days used, your 🔥 streak, and charts by project and label. The free plan shows the last 7 days.', dataBtn: 'Open Data' },
+      dataTitle: 'Data (history and charts)', dataLead: 'Open "Data" on the timer screen to see work time, days used, your 🔥 streak, and charts by project and label. The free plan shows the last 30 days (records are kept for good).', dataBtn: 'Open Data' },
     es: { pjTitle: 'Proyectos', pjEmpty: 'Agrupa tus temporizadores en proyectos para ver en Datos el tiempo por proyecto y por etiqueta (nombre del tramo). Mira el ejemplo de abajo.',
       pjTimers: 'Temporizadores: ', pjNoTimers: 'Aún no tiene temporizadores (elige un proyecto para cada uno en «Mis temporizadores»)', pjNote: 'Los nombres como «Descanso» no cuentan como trabajo. Puedes cambiarlo en la tabla de etiquetas de Datos.',
-      dataTitle: 'Datos (historial y gráficos)', dataLead: 'Abre «Datos» en la pantalla del temporizador para ver el tiempo de trabajo, los días de uso, tu racha 🔥 y gráficos por proyecto y etiqueta. El plan gratis muestra los últimos 7 días.', dataBtn: 'Ver datos' }
+      dataTitle: 'Datos (historial y gráficos)', dataLead: 'Abre «Datos» en la pantalla del temporizador para ver el tiempo de trabajo, los días de uso, tu racha 🔥 y gráficos por proyecto y etiqueta. El plan gratis muestra los últimos 30 días (los registros se guardan siempre).', dataBtn: 'Ver datos' }
   }[lang];
   var HOW = {
     ja: {
@@ -235,7 +235,7 @@
       rows: [
         ['タイマーを使う（並べる・くり返し・共有）', true, true, true],
         ['マイタイマーの保存', false, '2つ', '無制限'],
-        ['利用記録・グラフ（データ）', false, '7日間', '全期間・月／年のグラフ'],
+        ['利用記録・グラフ（データ）', false, '30日間（記録はずっと保存）', '全期間・月／年のグラフ'],
         ['連続日数', false, true, true],
         ['マイプロジェクト（勉強・仕事などに分けて集計）', false, '1つ', '無制限'],
         ['記録のCSVダウンロード', false, false, true]
@@ -249,7 +249,7 @@
       rows: [
         ['Use the timer (chain, repeat, share)', true, true, true],
         ['Saved timers', false, '2', 'No limit'],
-        ['History and charts', false, '7 days', 'All time + charts'],
+        ['History and charts', false, '30 days (kept for good)', 'All time + charts'],
         ['Streaks', false, true, true],
         ['Projects (track study, work, etc. separately)', false, '1', 'No limit'],
         ['Download history as CSV', false, false, true]
@@ -263,7 +263,7 @@
       rows: [
         ['Usar el temporizador (encadenar, repetir, compartir)', true, true, true],
         ['Temporizadores guardados', false, '2', 'Sin límite'],
-        ['Historial y gráficos', false, '7 días', 'Todo + gráficos'],
+        ['Historial y gráficos', false, '30 días (se guardan siempre)', 'Todo + gráficos'],
         ['Rachas', false, true, true],
         ['Proyectos (estudio, trabajo, etc. por separado)', false, '1', 'Sin límite'],
         ['Descargar el historial en CSV', false, false, true]

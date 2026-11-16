@@ -812,7 +812,15 @@
   }
   function cBegin(R) {
     cRun = R; cSaveRun();
-    clearInterval(cTick); cTick = setInterval(cStep, 15000);
+    clearInterval(cTick); cTick = setInterval(function () { if (!cConflict()) cStep(); }, 15000);
+  }
+  // 11/16: タイマーとカウントが同時に動いていたら（再読み込み・別のタブなど）カウントを止めて記録する
+  function cConflict() {
+    if (!cRun || !window.__ttTimerRunning || !window.__ttOneStopCount) return false;
+    var on = false; try { on = window.__ttTimerRunning(); } catch (e) {}
+    if (!on) return false;
+    window.__ttOneStopCount('both');
+    return true;
   }
   function cStart(id) {
     var b = cBtns.filter(function (x) { return x.id === id; })[0];
@@ -878,6 +886,7 @@
     var lid = (typeof saved.lid === 'string' && /^[0-9a-f-]{36}$/i.test(saved.lid)) ? saved.lid : null;
     cBegin(cMake(b, saved.start, lid));
     cStep();
+    setTimeout(cConflict, 0);
   }
   async function cSaveBtns(list) {
     list = cleanBtns(list);

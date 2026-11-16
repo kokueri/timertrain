@@ -1057,9 +1057,9 @@ function addTime(sec) {
   if (window.gtag) gtag('event', 'time_adjust', { sec: sec });
 }
 /* ---------- 11/15: いまやっていることは1つ（連続タイマーとカウントのボタンは同時に動かさない） ---------- */
-const ONE_L = LANG === 'en' ? { short: (l) => 'Stopped "' + l + '" (under 15 s, not saved).', stopped: (l, m) => 'Stopped "' + l + '" and saved it (' + m + ' min).', paused: (l) => 'Paused the timer and started "' + l + '".', undo: 'Undo' }
-  : LANG === 'es' ? { short: (l) => 'Se detuvo «' + l + '» (menos de 15 s, no se guardó).', stopped: (l, m) => 'Se detuvo «' + l + '» y se guardó (' + m + ' min).', paused: (l) => 'Se pausó el temporizador y empezó «' + l + '».', undo: 'Deshacer' }
-  : { short: (l) => '「' + l + '」を止めました（15秒未満なので記録なし）', stopped: (l, m) => '「' + l + '」を止めて記録しました（' + m + '分）', paused: (l) => 'タイマーを一時停止して「' + l + '」を計り始めました', undo: '元に戻す' };
+const ONE_L = LANG === 'en' ? { both: 'The timer was also running. ', short: (l) => 'Stopped "' + l + '" (under 15 s, not saved).', stopped: (l, m) => 'Stopped "' + l + '" and saved it (' + m + ' min).', paused: (l) => 'Paused the timer and started "' + l + '".', undo: 'Undo' }
+  : LANG === 'es' ? { both: 'El temporizador también estaba en marcha. ', short: (l) => 'Se detuvo «' + l + '» (menos de 15 s, no se guardó).', stopped: (l, m) => 'Se detuvo «' + l + '» y se guardó (' + m + ' min).', paused: (l) => 'Se pausó el temporizador y empezó «' + l + '».', undo: 'Deshacer' }
+  : { both: 'タイマーと同時に動いていたので、', short: (l) => '「' + l + '」を止めました（15秒未満なので記録なし）', stopped: (l, m) => '「' + l + '」を止めて記録しました（' + m + '分）', paused: (l) => 'タイマーを一時停止して「' + l + '」を計り始めました', undo: '元に戻す' };
 let undoEl = null, undoTimer = 0;
 function undoToast(msg, onUndo) {
   if (!undoEl) {
@@ -1077,15 +1077,17 @@ function undoToast(msg, onUndo) {
   clearTimeout(undoTimer); undoTimer = setTimeout(hideUndo, onUndo ? 6000 : 3500);
 }
 function hideUndo() { clearTimeout(undoTimer); if (undoEl) undoEl.classList.remove('show'); }
-function stopCountForTimer() {
+window.__ttTimerRunning = function () { return !!(run.active && !run.paused && !run.finished); };
+function stopCountForTimer(why) {
   let r = null;
   try { r = window.__ttCount && window.__ttCount.state().run; } catch (e) {}
   if (!r) return;
   const secs = (Date.now() - r.start) / 1000;
   window.__ttCount.stop();
-  undoToast(secs < 15 ? ONE_L.short(r.label) : ONE_L.stopped(r.label, Math.max(1, Math.round(secs / 60))), null);
-  if (window.gtag) gtag('event', 'one_switch', { to: 'timer' });
+  undoToast((why === 'both' ? ONE_L.both : '') + (secs < 15 ? ONE_L.short(r.label) : ONE_L.stopped(r.label, Math.max(1, Math.round(secs / 60)))), null);
+  if (window.gtag) gtag('event', why === 'both' ? 'one_conflict' : 'one_switch', { to: 'timer' });
 }
+window.__ttOneStopCount = function (why) { stopCountForTimer(why); };
 window.__ttOneBeforeCount = function (label) {
   if (!(run.active && !run.paused && !run.finished)) return null;
   pauseToggle();
@@ -1800,7 +1802,7 @@ var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=7';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=9';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
@@ -1813,7 +1815,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=18'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=19'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -2625,7 +2627,7 @@ head: '広告なし・先着100名までずっと月250円', headShort: 'ずっ�
 guest: [
 ['このタイマー、保存しておきませんか？', '無料ログインで、次からワンタップで呼び出せます。', '無料でログインして保存'],
 ['スマホでもPCでも、同じタイマーを。', '無料ログインで、作ったタイマーと記録が端末をまたいで同期されます。', '無料でログイン'],
-['今日の集中、記録に残しませんか？', '無料ログインで、直近7日の時間と連続日数が見られます。', '無料で記録をはじめる']],
+['今日の集中、記録に残しませんか？', '無料ログインで記録はずっと保存。直近30日の時間と連続日数が見られます。', '無料で記録をはじめる']],
 free: [
 ['続けてきた時間を、ぜんぶ見返そう。', 'プレミアムなら全期間の記録と月・年のグラフ。初めての方は最初の7日間無料です。', '7日間無料で試す'],
 ['お気に入りのタイマーを、好きなだけ。', 'プレミアムならマイタイマーもマイプロジェクトも上限なし。勉強・仕事・運動を分けて集計できます。', '7日間無料で試す'],
@@ -2638,7 +2640,7 @@ head: 'No ads · first 100 keep US$1.99/mo', headShort: 'US$1.99/mo for good', h
 guest: [
 ['Save this timer?', 'Sign in free and bring it back with one tap next time.', 'Sign in free to save'],
 ['Same timers on phone and computer.', 'Sign in free to sync your timers and history across devices.', 'Sign in free'],
-['Keep a record of today’s focus?', 'Sign in free to see your last 7 days and your streak.', 'Start tracking free']],
+['Keep a record of today’s focus?', 'Sign in free: your records are kept for good, and you can see the last 30 days and your streak.', 'Start tracking free']],
 free: [
 ['Look back on all the time you’ve put in.', 'Premium keeps your full history with monthly and yearly charts. 7 days free for new subscribers.', 'Try 7 days free'],
 ['Save as many timers as you like.', 'Premium removes the limits on timers and projects, so you can track study, work and workouts separately.', 'Try 7 days free'],
@@ -2651,7 +2653,7 @@ head: 'Sin anuncios · primeros 100: MXN 29/mes', headShort: 'MXN 29/mes siempre
 guest: [
 ['¿Guardar este temporizador?', 'Inicia sesión gratis y recupéralo con un toque la próxima vez.', 'Iniciar sesión y guardar'],
 ['Los mismos temporizadores en el móvil y el ordenador.', 'Inicia sesión gratis para sincronizar tus temporizadores y tu historial.', 'Iniciar sesión gratis'],
-['¿Guardar un registro de tu concentración de hoy?', 'Inicia sesión gratis para ver tus últimos 7 días y tu racha.', 'Empezar a registrar gratis']],
+['¿Guardar un registro de tu concentración de hoy?', 'Inicia sesión gratis: tus registros se guardan siempre y ves los últimos 30 días y tu racha.', 'Empezar a registrar gratis']],
 free: [
 ['Revisa todo el tiempo que has dedicado.', 'Premium guarda todo tu historial con gráficos mensuales y anuales. 7 días gratis si eres nuevo.', 'Prueba 7 días gratis'],
 ['Guarda todos los temporizadores que quieras.', 'Premium quita los límites de temporizadores y proyectos para que registres estudio, trabajo y ejercicio por separado.', 'Prueba 7 días gratis'],
