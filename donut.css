@@ -113,3 +113,22 @@ body.focus-mode .ring-wrap { width: min(62vh, 46vw); width: min(62dvh, 46vw); }
 @media (prefers-reduced-motion: reduce) {
 body.dt .station { transition: none; }
 }
+
+/* ---- 11/18: データの窓・今日のログをドーナツに（生地＋アイシング＋スプリンクル） ---- */
+body.dt .ttd-dough { stroke: #DCA04E; }
+body.dt .ttd-pie.dn { width: 150px; height: 150px; overflow: visible; }
+body.dt .ttd-pie.dn .ttd-pie-c1 { font-family: 'M PLUS Rounded 1c', sans-serif; }
+body.dt .ttd-pie.dn .ttd-pie-c2 { font-family: Nunito, 'M PLUS Rounded 1c', sans-serif; font-weight: 800; font-size: 16px; }
+body.dt .ttd-cal-pie.dn circle.ttd-pie-s { stroke-width: 8.5; }
+body.dt .ttd-cal-pie.dn { overflow: visible; }
+body.dt .ttd-sw, body.dt .ttd-cal-lg i, body.dt .ttd-lchip-c { border-radius: 50%; box-shadow: 0 0 0 2px #DCA04E; }
+body.dt .ttd-lrow-bar.dn { height: 38px; display: flex; align-items: center; }
+body.dt .ttd-lrow-bar.dn svg { display: block; flex: none; }
+body.dt .ttd-lrow-memo { background: var(--bg); border-radius: 12px; padding: 5px 10px; margin: 6px 6px 2px; }
+body.dt .tt-today-dot { box-shadow: 0 0 0 2px #DCA04E; border-radius: 50%; }
+body.dt .tt-today-dn { flex: none; width: 34px; height: 34px; border-radius: 50%; background: #DCA04E; position: relative; align-self: center; }
+body.dt .tt-today-dn::before { content: ""; position: absolute; inset: 3px; border-radius: 50%; background: var(--dn, var(--line)); }
+body.dt .tt-today-dn::after { content: ""; position: absolute; inset: 11px; border-radius: 50%; background: var(--card); box-shadow: inset 0 1px 2px rgba(0,0,0,.15); }
+body.dt .tt-today-head { align-items: center; }
+body.dt .tt-today-head .tt-today-t { flex: 1; }
+body.dt .ttd-cal-pie.dn.empty { opacity: .45; }

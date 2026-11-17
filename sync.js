@@ -439,7 +439,7 @@
   function cleanCol(c) {
     var o = {};
     if (c && typeof c === 'object' && !Array.isArray(c)) Object.keys(c).slice(0, 300).forEach(function (k) {
-      var v = c[k]; if (typeof v === 'number' && v >= 0 && v <= 15 && Math.floor(v) === v && k) o[String(k).slice(0, 30)] = v;
+      var v = c[k]; if (typeof v === 'number' && v >= 0 && v <= 23 && Math.floor(v) === v && k) o[String(k).slice(0, 30)] = v;
     });
     return o;
   }
