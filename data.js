@@ -106,6 +106,7 @@
       note: function (n) { return '無料プランは直近' + n + '日間を見られます。'; },
       hours: ['0時', '6時', '12時', '18時', '24時'],
       lg: { later: '＋ あとから記録', more: 'もっと見る', none: '記録なし', open: function (d, v) { return d + ' ' + v + '（くわしく見る）'; }, memo: 'メモ', memoPh: '例：3章まで終わった', lockMore: 'それより前の日はプレミアムで見られます' },
+      yr: { m: '月', y: '年', range: '表示する範囲', title: function (y) { return y + '年'; }, prev: '前の年', next: '次の年', lockT: '1年分のカレンダーはプレミアム', lockL: '1年の積み上げを1枚で見渡せます。日を押すとその日のログへ。', mon: function (m) { return (m + 1) + '月'; } },
       fl: { lbl: 'ラベル', pj: 'プロジェクト', all: 'すべて' },
       cm: { bar: '帯', pie: '円', mode: '表示' },
       promo: {
@@ -127,6 +128,7 @@
       note: function (n) { return 'The free plan shows the last ' + n + ' days.'; },
       hours: ['0', '6', '12', '18', '24'],
       lg: { later: '+ Log past time', more: 'Show more', none: 'No record', open: function (d, v) { return d + ', ' + v + ' (show details)'; }, memo: 'Note', memoPh: 'e.g. finished chapter 3', lockMore: 'Earlier days are available with Premium' },
+      yr: { m: 'Month', y: 'Year', range: 'Range', title: function (y) { return String(y); }, prev: 'Previous year', next: 'Next year', lockT: 'The year calendar is Premium', lockL: 'See a whole year of effort on one page. Tap a day to open its log.', mon: function (m) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m]; } },
       fl: { lbl: 'Labels', pj: 'Project', all: 'All' },
       cm: { bar: 'Bars', pie: 'Pies', mode: 'View' },
       promo: {
@@ -148,6 +150,7 @@
       note: function (n) { return 'El plan gratis muestra los últimos ' + n + ' días.'; },
       hours: ['0', '6', '12', '18', '24'],
       lg: { later: '+ Añadir tiempo pasado', more: 'Ver más', none: 'Sin registro', open: function (d, v) { return d + ', ' + v + ' (ver detalles)'; }, memo: 'Nota', memoPh: 'p. ej. terminé el capítulo 3', lockMore: 'Los días anteriores están en Premium' },
+      yr: { m: 'Mes', y: 'Año', range: 'Rango', title: function (y) { return String(y); }, prev: 'Año anterior', next: 'Año siguiente', lockT: 'El calendario anual es Premium', lockL: 'Mira todo un año de esfuerzo en una página. Toca un día para abrir su registro.', mon: function (m) { return ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][m]; } },
       fl: { lbl: 'Etiquetas', pj: 'Proyecto', all: 'Todo' },
       cm: { bar: 'Barras', pie: 'Círculos', mode: 'Vista' },
       promo: {
@@ -211,7 +214,7 @@
     document.documentElement.classList.add('ttd-open');
     box.querySelector('.ttd-x').focus();
     S.dayEv = 0;
-    S.view = src === 'today' ? 'day' : 'period';
+    S.view = src === 'today' ? 'day' : src === 'cal' ? 'cal' : 'period';
     if (src === 'today') { S.day = today0(); S.dayOpen = true; }
     S.from = src || '';
     ev('data_open', { from: src || '', member: member() });
@@ -535,6 +538,85 @@
     }
     if (S.data) S.meta.breaks = S.data.breaks; // データの窓で切り替えた休憩を反映
   }
+  /* ---------- 1年分のカレンダー（11/17、プレミアム） ---------- */
+  function rangeSeg() {
+    var seg = el('div', { cls: 'ttd-tabs ttd-crange', role: 'group', 'aria-label': TD.yr.range });
+    [[false, TD.yr.m], [true, (window.__ttPremium ? '' : '🔒 ') + TD.yr.y]].forEach(function (m) {
+      var on = !!S.calYear === m[0];
+      var b = el('button', { type: 'button', cls: 'ttd-tab' + (on ? ' on' : '') + (m[0] && !window.__ttPremium ? ' lock' : ''), 'aria-pressed': on ? 'true' : 'false', text: m[1] });
+      b.addEventListener('click', function () {
+        if (on) return;
+        if (m[0] && !window.__ttPremium) { showLock(TD.yr.lockT, TD.yr.lockL); ev('data_locked', { period: 'year' }); return; }
+        S.calYear = m[0]; S.cd = null; ev('cal_range', { year: m[0] ? 1 : 0 });
+        body.querySelectorAll('.ttd-crange button').forEach(function (x) { x.disabled = true; });
+        show().then(function () { var f = body.querySelector('.ttd-crange .on'); if (f) f.focus(); });
+      });
+      seg.appendChild(b);
+    });
+    return seg;
+  }
+  function heatLv(s) { return s < 60 ? 0 : s < 1800 ? 1 : s < 3600 ? 2 : s < 7200 ? 3 : 4; }
+  function renderYear() {
+    var C = TD.cal, Y = TD.yr, cd = S.cd, y = S.year, t0 = today0(), A = byDay(cd.pieces, true);
+    body.textContent = '';
+    body.appendChild(viewTabs());
+    var nav = el('div', { cls: 'ttd-daynav' });
+    var prev = el('button', { type: 'button', 'aria-label': Y.prev, text: '‹' });
+    var next = el('button', { type: 'button', 'aria-label': Y.next, text: '›' });
+    if (y >= new Date().getFullYear()) next.disabled = true;
+    nav.appendChild(prev); nav.appendChild(el('p', { cls: 'ttd-daynav-d', 'aria-live': 'polite' }, [el('b', { text: Y.title(y) })])); nav.appendChild(next);
+    function move(dir) { S.year = y + dir; ev('cal_move', { dir: dir < 0 ? 'prev' : 'next', year: 1 }); nav.querySelectorAll('button').forEach(function (x) { x.disabled = true; }); show().then(function () { var b = body.querySelectorAll('.ttd-daynav button')[dir < 0 ? 0 : 1]; if (b && !b.disabled) b.focus(); }); }
+    prev.addEventListener('click', function () { move(-1); });
+    next.addEventListener('click', function () { move(1); });
+    body.appendChild(nav);
+    body.appendChild(el('div', { cls: 'ttd-lock', hidden: '', role: 'status' }));
+    var wrap = el('div', { cls: 'ttd-main' });
+    body.appendChild(wrap);
+    var tools = el('div', { cls: 'ttd-ctools' });
+    tools.appendChild(rangeSeg());
+    var fb = filterBar(cd.pieces, renderCal); if (fb) tools.appendChild(fb);
+    wrap.appendChild(tools);
+    var total = 0, nRec = 0, best = 0, run = 0;
+    for (var d = new Date(y, 0, 1); d.getFullYear() === y && d <= t0; d = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1)) {
+      var v = A.days[dayKey(d)] || 0; total += v;
+      if (v >= 60) { nRec++; run++; if (run > best) best = run; } else run = 0;
+    }
+    var sec = el('section', { cls: 'ttd-sec' });
+    sec.appendChild(el('div', { cls: 'ttd-dsum' }, [el('h3', { text: C.total }), el('p', { cls: 'ttd-dsum-v', text: T.dur(total) })]));
+    sec.appendChild(el('p', { cls: 'ttd-cal-stat' }, [el('span', { text: C.days(nRec) }), best >= 2 ? el('span', { text: C.best(best) }) : null]));
+    var ys = el('div', { cls: 'ttd-year' });
+    for (var mo = 0; mo < 12; mo++) {
+      var mt = 0, nd = new Date(y, mo + 1, 0).getDate();
+      var box = el('div', { cls: 'ttd-ym' });
+      var g = el('div', { cls: 'ttd-ym-g', role: 'grid', 'aria-label': Y.mon(mo) });
+      var first = new Date(y, mo, 1).getDay(); if (C.mon) first = (first + 6) % 7;
+      for (var i = 0; i < first; i++) g.appendChild(el('span', { cls: 'ttd-yd empty', 'aria-hidden': 'true' }));
+      for (var dd = 1; dd <= nd; dd++) {
+        (function (date) {
+          var k = dayKey(date), secs = A.days[k] || 0, lv = heatLv(secs); mt += secs;
+          var cls = 'ttd-yd h' + lv + (date.getTime() === t0.getTime() ? ' today' : '');
+          if (date > t0) { g.appendChild(el('span', { cls: cls + ' future', 'aria-hidden': 'true' })); return; }
+          var b = el('button', { type: 'button', cls: cls, 'aria-label': C.open(date, secs >= 60 ? T.dur(secs) : C.none), title: (date.getMonth() + 1) + '/' + date.getDate() + (secs >= 60 ? ' ' + T.dur(secs) : '') });
+          b.addEventListener('click', function () {
+            S.day = date; S.dayOpen = true; S.view = 'day';
+            var nb = daysBack(date) + 1; if (!S.logDays || S.logDays < nb) { S.logDays = nb; S.ld = null; }
+            S.scrollDay = true; ev('cal_day', { back: daysBack(date), year: 1 }); show();
+          });
+          g.appendChild(b);
+        })(new Date(y, mo, dd));
+      }
+      box.appendChild(el('p', { cls: 'ttd-ym-h' }, [el('b', { text: Y.mon(mo) }), el('span', { text: mt >= 60 ? T.dur(mt) : '' })]));
+      box.appendChild(g);
+      ys.appendChild(box);
+    }
+    sec.appendChild(ys);
+    var lg = el('div', { cls: 'ttd-ylg', 'aria-hidden': 'true' }, [el('span', { text: C.short })]);
+    [1, 2, 3, 4].forEach(function (k) { lg.appendChild(el('i', { cls: 'ttd-yd h' + k })); });
+    lg.appendChild(el('span', { text: C.long }));
+    sec.appendChild(lg);
+    wrap.appendChild(sec);
+  }
+
   /* ---------- 日ごとの集計（カレンダーとログで共通、11/17） ---------- */
   // q0〜q1 の記録を「日・ラベル・プロジェクト」ごとのかけらにする。メモ（config.note）も日ごとに
   async function loadRange(sb, q0, q1) {
@@ -669,6 +751,16 @@
   function monthStart(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
   function freeLimit() { return window.__ttPremium ? null : new Date(today0().getTime() - (FREE_DAYS - 1) * 86400000); }
   async function loadCal(sb) {
+    if (S.calYear && window.__ttPremium) {
+      if (!S.year) S.year = new Date().getFullYear();
+      var y0 = new Date(S.year, 0, 1), y1 = new Date(S.year + 1, 0, 1), yk = 'y' + S.year;
+      if (y1 > new Date(today0().getTime() + 86400000)) y1 = new Date(today0().getTime() + 86400000);
+      if (S.cd && S.cd.key === yk && Date.now() - S.cd.at < 30000) return;
+      var RY = y0 < y1 ? await loadRange(sb, y0, y1) : { pieces: [], notes: {} };
+      S.cd = { key: yk, at: Date.now(), pieces: RY.pieces, notes: RY.notes, lim: null };
+      return;
+    }
+    S.calYear = false;
     if (!S.month) S.month = monthStart(new Date());
     var m0 = new Date(S.month), m1 = new Date(m0.getFullYear(), m0.getMonth() + 1, 1), key = m0.getTime();
     if (S.cd && S.cd.key === key && Date.now() - S.cd.at < 30000) return;
@@ -677,8 +769,10 @@
     S.cd = { key: key, at: Date.now(), pieces: R.pieces, notes: R.notes, lim: lim };
   }
   function shortDur(s) { var m = Math.round(s / 60); if (m < 60) return m + 'm'; var h = Math.floor(m / 60), r = m % 60; return h + 'h' + (r ? (r < 10 ? '0' : '') + r : ''); }
-  function calMode() { try { return localStorage.getItem('tt-cal-mode') === 'pie' ? 'pie' : 'bar'; } catch (e) { return 'bar'; } }
+  // 11/17: 最初は円グラフ。帯を選んだ人だけ帯
+  function calMode() { try { return localStorage.getItem('tt-cal-mode') === 'bar' ? 'bar' : 'pie'; } catch (e) { return 'pie'; } }
   function renderCal() {
+    if (S.calYear) { renderYear(); return; }
     var C = TD.cal, cd = S.cd, m0 = new Date(S.month), y = m0.getFullYear(), mo = m0.getMonth();
     var nDays = new Date(y, mo + 1, 0).getDate(), t0 = today0(), thisMonth = monthStart(new Date()).getTime() === m0.getTime();
     var A = byDay(cd.pieces, true), mode = calMode();
@@ -716,6 +810,7 @@
       seg.appendChild(b);
     });
     tools.appendChild(seg);
+    tools.insertBefore(rangeSeg(), seg);
     var fb = filterBar(cd.pieces, renderCal);
     if (fb) tools.appendChild(fb);
     wrap.appendChild(tools);

@@ -1510,3 +1510,44 @@ button.ttd-cal-c:hover { border-color: var(--text2); }
 .tt-note-r input { flex: 1 1 auto; min-width: 0; }
 @media (max-width: 420px) { .ttd-lrow { grid-template-columns: 6.6em minmax(0, 1fr) auto 12px; gap: 8px; padding: 8px 10px; } }
 .ttd-cal.pie .ttd-cal-memo { align-self: stretch; text-align: left; }
+/* 11/17: PC の中心をそろえる。左（今日のログ）と右（設定）の列を同じ幅にして、タイマーの列を画面の真ん中に。
+   再生ボタンが真ん中に来るよう、集中モードのボタンは並びの外（右）に置く */
+@media (min-width: 1200px) {
+  html.tt-in.tt-has-log .app, html.tt-in.tt-has-log body.setup-closed .app { grid-template-columns: 340px minmax(0, 1fr) 340px; }
+  html.tt-in.tt-has-log body.setup-closed #setup { justify-self: end; width: 210px; max-width: 100%; }
+}
+@media (min-width: 900px) {
+  body:not(.focus-mode) .run-controls { position: relative; }
+  body:not(.focus-mode) .run-controls #focus-btn { position: absolute; left: calc(100% + 22px); top: 50%; transform: translateY(-50%); margin: 0; }
+}
+/* 11/17: 下の説明は1列のまま、行を画面の幅いっぱいに */
+@media (min-width: 900px) {
+  .about { max-width: none; justify-self: stretch; }
+  .about > .about-perks { max-width: 760px; }
+}
+@media (min-width: 1200px) { html.tt-in.tt-has-log .kbd-hint { white-space: nowrap; } }
+/* 11/17: 1年分のカレンダー（プレミアム） */
+:root { --heat: 42, 111, 196; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --heat: 110, 160, 230; } }
+:root[data-theme="dark"] { --heat: 110, 160, 230; }
+.ttd-crange { flex: none; }
+.ttd-year { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 18px 16px; margin-top: 4px; }
+.ttd-ym-h { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 6px; font-size: 13px; }
+.ttd-ym-h span { font-size: 11px; font-weight: 700; color: var(--text2); font-variant-numeric: tabular-nums; }
+.ttd-ym-g { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.ttd-yd { aspect-ratio: 1 / 1; border-radius: 4px; background: var(--line); border: 0; padding: 0; min-width: 0; cursor: pointer; opacity: .55; }
+.ttd-yd.empty { background: none; }
+.ttd-yd.future { opacity: .2; cursor: default; }
+.ttd-yd.h1 { background: rgba(var(--heat), .25); opacity: 1; } .ttd-yd.h2 { background: rgba(var(--heat), .5); opacity: 1; } .ttd-yd.h3 { background: rgba(var(--heat), .75); opacity: 1; } .ttd-yd.h4 { background: rgb(var(--heat)); opacity: 1; }
+.ttd-yd.today { outline: 2px solid var(--text); outline-offset: 1px; }
+button.ttd-yd:hover { outline: 2px solid var(--text2); outline-offset: 1px; }
+.ttd-ylg { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin-top: 12px; font-size: 11px; color: var(--text2); }
+.ttd-ylg i { display: inline-block; width: 12px; height: 12px; aspect-ratio: auto; cursor: default; }
+/* 11/17: ヘッダーのカレンダーボタン（データの横） */
+#cal-btn { display: inline-flex; align-items: center; justify-content: center; cursor: pointer; background: var(--card); color: var(--text2); border: 1.5px solid var(--line); border-radius: 999px; padding: 9px; min-height: 34px; box-shadow: var(--shadow); line-height: 1; }
+#cal-btn:hover { color: var(--text); }
+#cal-btn svg { width: 16px; height: 16px; fill: currentColor; }
+body.focus-mode #cal-btn { display: none; }
+/* 11/17: あとから記録の「日付を選ぶ」 */
+.tt-mdate { width: auto; min-width: 150px; }
+.tt-mprem a { color: inherit; font-weight: 700; }

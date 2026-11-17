@@ -921,7 +921,8 @@
     var start = Math.floor(Number(o && o.start)), secs = Math.round(Number(o && o.secs));
     if (!label || !isFinite(start) || !isFinite(secs)) return Promise.resolve({ ok: false, why: 'bad' });
     if (secs < 60 || secs > C_MAX) return Promise.resolve({ ok: false, why: 'len' });
-    if (start < now - (48 * 3600 - 300) * 1000) return Promise.resolve({ ok: false, why: 'old' });
+    // 11/17: 3日以上前（1年前まで）はプレミアムだけ。サーバー側も同じ決まり
+    if (start < now - (PREMIUM ? 365 * 86400 : 48 * 3600 - 300) * 1000) return Promise.resolve({ ok: false, why: PREMIUM ? 'year' : 'old' });
     if (start + secs * 1000 > now + 60000) return Promise.resolve({ ok: false, why: 'future' });
     var hit = cBtns.filter(function (b) { return b.label === label; })[0];
     var icon = hit ? hit.icon : 'pencil';
