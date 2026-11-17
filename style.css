@@ -1551,3 +1551,13 @@ body.focus-mode #cal-btn { display: none; }
 /* 11/17: あとから記録の「日付を選ぶ」 */
 .tt-mdate { width: auto; min-width: 150px; }
 .tt-mprem a { color: inherit; font-weight: 700; }
+
+/* 11/18: 明るい8色（lc16〜lc23）。上に乗る絵・文字は濃い色に */
+.ttd .lc16, .tt-today .lc16 { background: #F19DBA; } .ttd .lc17, .tt-today .lc17 { background: #8ED1BC; } .ttd .lc18, .tt-today .lc18 { background: #F6D365; } .ttd .lc19, .tt-today .lc19 { background: #BCA3DE; } .ttd .lc20, .tt-today .lc20 { background: #8FC8F0; } .ttd .lc21, .tt-today .lc21 { background: #F7B57A; } .ttd .lc22, .tt-today .lc22 { background: #B5D88A; } .ttd .lc23, .tt-today .lc23 { background: #DCC0A3; }
+.ttd-pie-s.lc16 { stroke: #F19DBA; } .ttd-pie-s.lc17 { stroke: #8ED1BC; } .ttd-pie-s.lc18 { stroke: #F6D365; } .ttd-pie-s.lc19 { stroke: #BCA3DE; } .ttd-pie-s.lc20 { stroke: #8FC8F0; } .ttd-pie-s.lc21 { stroke: #F7B57A; } .ttd-pie-s.lc22 { stroke: #B5D88A; } .ttd-pie-s.lc23 { stroke: #DCC0A3; }
+.tt-cbtn-c.lt, .tt-cbtn.on .tt-cbtn-c.lt { color: #2B2420; }
+.tt-crun.lt { color: #2B2420; }
+.tt-crun.lt .tt-crun-stop { background: #2B2420; color: #fff; }
+.tt-cform-ib.lt { color: #2B2420; }
+.ttd-pie-pct.dk { fill: #2B2420; stroke: rgba(255,255,255,.45); }
+.tt-cform-ib.on.lt { color: #2B2420; }

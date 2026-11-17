@@ -167,6 +167,21 @@
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   // 11/15: ラベルの色（タイマー画面と同じ。11/17 から16色）。クラス lc0〜lc15
   function lcOf(l) { return l === '\u0000' ? 'g' : 'lc' + (window.__ttLabelColorIdx ? window.__ttLabelColorIdx(l) : 0); }
+  function isLt(cls) { var m = /^lc(\d+)$/.exec(cls || ''); return !!m && Number(m[1]) >= 16; }
+  // 11/18: ドーナツ版（window.DT）では、円グラフを生地＋アイシング＋スプリンクルのドーナツにする
+  var DTM = !!window.DT;
+  var SPR = ['#A5DDEB', '#F8DE7E', '#FFFDF5', '#C6B0E8', '#F1A9BD'];
+  function svgN(tag, a) { var n = document.createElementNS('http://www.w3.org/2000/svg', tag); for (var k in a) n.setAttribute(k, a[k]); return n; }
+  function dough(svg, cx, cy, r, w) { svg.appendChild(svgN('circle', { cx: cx, cy: cy, r: r, fill: 'none', 'stroke-width': w, class: 'ttd-dough' })); }
+  function sprinkles(svg, cx, cy, r, band, n, len, wid) {
+    var g = svgN('g', { class: 'ttd-spr', 'aria-hidden': 'true' });
+    for (var i = 0; i < n; i++) {
+      var a = (i * 360 / n + (i % 2 ? 360 / n * 0.45 : 0)) * Math.PI / 180, rr = r + ((i % 3) - 1) * band * 0.28;
+      var x = cx + rr * Math.cos(a), y = cy + rr * Math.sin(a), rot = (i * 67) % 180;
+      g.appendChild(svgN('rect', { x: (x - wid / 2).toFixed(2), y: (y - len / 2).toFixed(2), width: wid, height: len, rx: wid / 2, fill: SPR[i % SPR.length], transform: 'rotate(' + rot + ' ' + x.toFixed(2) + ' ' + y.toFixed(2) + ')' }));
+    }
+    svg.appendChild(g);
+  }
   /* ラベルの名前変更（settings.data.labelMap）。過去の記録は新しい名前で集計する */
   var LM = {};
   function setLM(sd) { LM = (sd && sd.labelMap && typeof sd.labelMap === 'object' && !Array.isArray(sd.labelMap)) ? sd.labelMap : {}; }
@@ -683,6 +698,7 @@
     var sc = 0.55 + 0.45 * Math.sqrt(Math.min(1, secs / Math.max(1, max)));
     var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 42 42'); svg.setAttribute('class', 'ttd-cal-pie'); svg.setAttribute('aria-hidden', 'true');
     svg.style.width = svg.style.height = Math.round(sc * 100) + '%';
+    if (DTM) { svg.setAttribute('class', 'ttd-cal-pie dn'); dough(svg, 21, 21, r, 15); }
     var off = 25;
     Object.keys(o).sort(function (a, b) { return o[b] - o[a]; }).forEach(function (lb) {
       var pc = o[lb] / Math.max(1, tot) * 100;
@@ -693,6 +709,7 @@
       c.setAttribute('stroke-dashoffset', String(off));
       svg.appendChild(c); off -= pc;
     });
+    if (DTM && sc > 0.7) sprinkles(svg, 21, 21, r, 9, 8, 3.6, 1.3);
     return svg;
   }
   // プレミアムの案内（無料の人だけ。その場所で何が増えるかを書く）
@@ -945,6 +962,17 @@
     var R = await loadRange(sb, q0, q1);
     S.ld = { days: S.logDays, at: Date.now(), pieces: R.pieces, notes: R.notes };
   }
+  // ドーナツ版のログの行: 大きさ＝その日の量のミニドーナツ
+  function lrowDonut(o, secs, max) {
+    var svg = miniPie(o, secs, max), sc = 0.55 + 0.45 * Math.sqrt(Math.min(1, secs / Math.max(1, max)));
+    svg.style.width = svg.style.height = Math.round(38 * sc) + 'px';
+    return el('span', { cls: 'ttd-lrow-bar dn', 'aria-hidden': 'true' }, [svg]);
+  }
+  function lrowEmpty() { // 記録のない日は、まだアイシングのない生地だけ
+    var svg = svgN('svg', { viewBox: '0 0 42 42', class: 'ttd-cal-pie dn empty', 'aria-hidden': 'true' });
+    dough(svg, 21, 21, 15.9155, 15); svg.style.width = svg.style.height = '20px';
+    return el('span', { cls: 'ttd-lrow-bar dn', 'aria-hidden': 'true' }, [svg]);
+  }
   function renderLog() {
     var prem = !!window.__ttPremium, A = byDay(S.ld.pieces, false), t0 = today0();
     body.textContent = '';
@@ -983,12 +1011,12 @@
       var btn = el('button', { type: 'button', cls: 'ttd-lrow' + (open ? ' on' : ''), 'aria-expanded': open ? 'true' : 'false',
         'aria-label': TD.lg.open(TD.date(x.d) + (sub ? ' ' + sub : ''), x.v >= 60 ? T.dur(x.v) : TD.lg.none) }, [
         el('span', { cls: 'ttd-lrow-d' }, [el('b', { text: TD.date(x.d) }), sub ? el('span', { text: sub }) : null]),
-        x.v >= 60 ? miniBar(A.byL[x.k] || {}, x.v, max, 'ttd-lrow-bar') : el('span', { cls: 'ttd-lrow-bar empty' }),
+        x.v >= 60 ? (DTM ? lrowDonut(A.byL[x.k] || {}, x.v, max) : miniBar(A.byL[x.k] || {}, x.v, max, 'ttd-lrow-bar')) : (DTM ? lrowEmpty() : el('span', { cls: 'ttd-lrow-bar empty' })),
         el('span', { cls: 'ttd-lrow-v', text: x.v >= 60 ? T.dur(x.v) : '—' }),
         el('span', { cls: 'ttd-lrow-ar', 'aria-hidden': 'true', text: open ? '▴' : '▾' })
       ]);
       var li = el('li', { cls: 'ttd-lrow-li' }, [btn]);
-      if (nt.length && !open) li.appendChild(el('p', { cls: 'ttd-lrow-memo', text: '📝 ' + nt.join(' / ') }));
+      if (nt.length && !open) li.appendChild(el('p', { cls: 'ttd-lrow-memo', text: (DTM ? '🍩 ' : '📝 ') + nt.join(' / ') }));
       btn.addEventListener('click', function () {
         if (open) { S.dayOpen = false; renderLog(); var b = body.querySelectorAll('.ttd-lrow')[keys.indexOf(x)]; if (b) b.focus(); return; }
         S.day = x.d; S.dayOpen = true; S.showTiny = false;
@@ -1032,14 +1060,20 @@
       var sum = el('section', { cls: 'ttd-sec' });
       sum.appendChild(el('div', { cls: 'ttd-dsum' }, [el('h3', { text: TD.total }), el('p', { cls: 'ttd-dsum-v', text: T.dur(work) })]));
       if (work) {
-        var sbar = el('div', { cls: 'ttd-dbar', 'aria-hidden': 'true' });
         var other = 0;
-        keys.forEach(function (k, i) { if (i >= 7) { other += tot[k]; return; } var s = el('span', { cls: cls[k] }); s.style.flexGrow = String(tot[k]); sbar.appendChild(s); });
-        if (other) { var so = el('span', { cls: 'g' }); so.style.flexGrow = String(other); sbar.appendChild(so); }
-        sum.appendChild(sbar);
+        keys.forEach(function (k, i) { if (i >= 7) other += tot[k]; });
         var rows = keys.slice(0, 7).map(function (k) { return { name: nm(k), cls: cls[k], secs: tot[k] }; });
         if (other) rows.push({ name: TD.other, cls: 'g', secs: other });
-        sum.appendChild(tableRows(rows, work, true));
+        if (DTM) {
+          // ドーナツ版: その日の「ドーナツ」（真ん中に合計）＋表
+          sum.appendChild(el('div', { cls: 'ttd-piebox' }, [pie(rows, work, TD.total), tableRows(rows, work, true)]));
+        } else {
+          var sbar = el('div', { cls: 'ttd-dbar', 'aria-hidden': 'true' });
+          keys.forEach(function (k, i) { if (i >= 7) return; var s = el('span', { cls: cls[k] }); s.style.flexGrow = String(tot[k]); sbar.appendChild(s); });
+          if (other) { var so = el('span', { cls: 'g' }); so.style.flexGrow = String(other); sbar.appendChild(so); }
+          sum.appendChild(sbar);
+          sum.appendChild(tableRows(rows, work, true));
+        }
       }
       wrap.appendChild(sum);
       // 帯（6時〜24時。6時より前の記録がある日は0時から）
@@ -1326,7 +1360,8 @@
     rows.forEach(function (r) { if (r.cls === 'g') gray += r.secs; else parts.push({ cls: r.cls, secs: r.secs, name: r.name }); });
     if (gray) parts.push({ cls: 'g', secs: gray });
     svg.setAttribute('aria-label', T.pieOf(title) + ': ' + rows.slice(0, 8).map(function (r) { return r.name + ' ' + Math.round(r.secs / base * 100) + '%'; }).join('、'));
-    svg.appendChild(mk('circle', { cx: 70, cy: 70, r: R0, class: 'ttd-pie-track', fill: 'none', 'stroke-width': W }));
+    if (DTM) { svg.setAttribute('class', 'ttd-pie dn'); dough(svg, 70, 70, R0, W + 12); }
+    else svg.appendChild(mk('circle', { cx: 70, cy: 70, r: R0, class: 'ttd-pie-track', fill: 'none', 'stroke-width': W }));
     var off = 0, labels = [];
     parts.forEach(function (p) {
       var len = p.secs / base * CIRC;
@@ -1338,15 +1373,23 @@
       var pct = Math.round(p.secs / base * 100);
       if (pct >= 10) {
         var ang = (off + len / 2) / CIRC * 2 * Math.PI - Math.PI / 2;
-        var tx = mk('text', { x: (70 + R0 * Math.cos(ang)).toFixed(1), y: (70 + R0 * Math.sin(ang) + 3.5).toFixed(1), 'text-anchor': 'middle', class: 'ttd-pie-pct', 'aria-hidden': 'true' });
+        var tx = mk('text', { x: (70 + R0 * Math.cos(ang)).toFixed(1), y: (70 + R0 * Math.sin(ang) + 3.5).toFixed(1), 'text-anchor': 'middle', class: 'ttd-pie-pct' + (isLt(p.cls) ? ' dk' : ''), 'aria-hidden': 'true' });
         tx.textContent = pct + '%';
         labels.push(tx);
       }
       off += len;
     });
+    if (DTM) sprinkles(svg, 70, 70, R0, W, 16, 7, 2.4);
     labels.forEach(function (t) { svg.appendChild(t); });
     var t1 = mk('text', { x: 70, y: 66, 'text-anchor': 'middle', class: 'ttd-pie-c1' }); t1.textContent = T.total;
     var t2 = mk('text', { x: 70, y: 84, 'text-anchor': 'middle', class: 'ttd-pie-c2' }); t2.textContent = T.dur(sum);
+    // ドーナツ版: 穴に収まるように「12時間 / 35分」の2行に
+    var m2 = DTM ? /^(.+?時間)(.+)$/.exec(T.dur(sum)) : null;
+    if (m2) {
+      t1.setAttribute('y', '60'); t2.textContent = ''; t2.setAttribute('y', '76');
+      var a1 = mk('tspan', { x: 70 }); a1.textContent = m2[1]; var a2 = mk('tspan', { x: 70, dy: '16' }); a2.textContent = m2[2];
+      t2.appendChild(a1); t2.appendChild(a2);
+    }
     svg.appendChild(t1); svg.appendChild(t2);
     return svg;
   }

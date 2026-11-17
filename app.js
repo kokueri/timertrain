@@ -626,18 +626,22 @@ updateHighlight();
 
 /* ---------- ラベルの選択肢（▾）と編集（鉛筆） ---------- */
 /* ---------- 11/15: ラベルの色（8色・濃いめで白い絵が読める）と、白抜きの絵（Fluent Emoji・MIT） ---------- */
-// 11/17: 16色に（前の8色はそのままの番号）
-const LCOLORS = ['#2A6FC4', '#C4521C', '#12825C', '#A86F00', '#B8457A', '#6A4BC4', '#1E7A8C', '#7A5A40', '#C62828', '#5E7D14', '#2C3E8C', '#9C2D9C', '#5F6B7A', '#2E7D32', '#4E342E', '#C2405F'];
+// 11/17: 16色に（前の8色はそのままの番号）。11/18: 明るい8色（16〜23）を追加。明るい色の上の絵・文字は濃い色にする（.lt）
+const LCOLORS = ['#2A6FC4', '#C4521C', '#12825C', '#A86F00', '#B8457A', '#6A4BC4', '#1E7A8C', '#7A5A40', '#C62828', '#5E7D14', '#2C3E8C', '#9C2D9C', '#5F6B7A', '#2E7D32', '#4E342E', '#C2405F',
+  '#F19DBA', '#8ED1BC', '#F6D365', '#BCA3DE', '#8FC8F0', '#F7B57A', '#B5D88A', '#DCC0A3'];
+const LC_LIGHT = 16;
+function labelLight(l) { return labelColorIdx(l) >= LC_LIGHT; }
 function labelColorIdx(l) {
   l = String(l == null ? '' : l);
   const m = window.__ttLC || {};
   if (Object.prototype.hasOwnProperty.call(m, l) && m[l] >= 0 && m[l] < LCOLORS.length) return m[l];
   let h = 0; for (const ch of l) h = (h * 31 + ch.codePointAt(0)) >>> 0;
-  return h % LCOLORS.length;
+  return h % LC_LIGHT; // 自動で決まる色は今までどおり濃い16色から
 }
 function labelColor(l) { return LCOLORS[labelColorIdx(l)]; }
 window.__ttLabelColor = labelColor;
 window.__ttLabelColorIdx = labelColorIdx;
+window.__ttLabelLight = labelLight;
 function emojiIcon(slug, cls) {
   const s = document.createElement('span');
   s.className = 'tt-ej' + (cls ? ' ' + cls : ''); s.setAttribute('aria-hidden', 'true');
@@ -1809,7 +1813,7 @@ var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=14';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=15';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
@@ -1822,7 +1826,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=22'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=23'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -2078,6 +2082,15 @@ var cls = {}; keys.forEach(function (k, i) { cls[k] = i < 4 ? 'lc' : 'o'; });
 open.textContent = '';
 open.setAttribute('aria-label', TL.aria + ': ' + fmtDur(st.today || 0));
 var head = mk('span', 'tt-today-head');
+// 11/18: ドーナツ版は、今日の内訳を小さなドーナツで（上位4つ＋ほか）
+if (DT && keys.length) {
+var dn = mk('span', 'tt-today-dn'); dn.setAttribute('aria-hidden', 'true');
+var wsum = 0; keys.forEach(function (k) { wsum += tot[k]; });
+var acc = 0, stops = [];
+keys.forEach(function (k, i) { var c = i < 4 ? labelColor(k) : '#B9A99E'; var a0 = acc / wsum * 360; acc += tot[k]; stops.push(c + ' ' + a0.toFixed(1) + 'deg ' + (acc / wsum * 360).toFixed(1) + 'deg'); });
+dn.style.setProperty('--dn', 'conic-gradient(' + stops.join(',') + ')');
+head.appendChild(dn);
+}
 head.appendChild(mk('span', 'tt-today-t', TL.title));
 head.appendChild(mk('span', 'tt-today-sum', TL.total(fmtDur(st.today || 0))));
 open.appendChild(head);
@@ -2151,7 +2164,7 @@ stopTicker();
 if (cs.run) {
 var run = mk('div', 'tt-crun'); run.setAttribute('role', 'status');
 var ic = mk('span', 'tt-crun-ic'); ic.appendChild(emojiIcon(cs.run.icon));
-run.style.background = labelColor(cs.run.label);
+run.style.background = labelColor(cs.run.label); if (labelLight(cs.run.label)) run.classList.add('lt');
 run.appendChild(ic);
 run.appendChild(mk('span', 'tt-crun-n', cs.run.label));
 var tt = mk('span', 'tt-crun-t', clock((Date.now() - cs.run.start) / 1000));
@@ -2170,7 +2183,7 @@ var btn = mk('button', 'tt-cbtn' + (on ? ' on' : '') + (CU.editing ? ' edit' : '
 btn.setAttribute('aria-pressed', on ? 'true' : 'false');
 btn.setAttribute('aria-label', CU.editing ? TL.cEditOf(b.label) : (on ? TL.cStopOf(b.label) : TL.cStartOf(b.label)));
 var c = mk('span', 'tt-cbtn-c'); c.appendChild(emojiIcon(b.icon));
-c.style.background = labelColor(b.label);
+c.style.background = labelColor(b.label); if (labelLight(b.label)) c.classList.add('lt');
 btn.appendChild(c);
 btn.appendChild(mk('span', 'tt-cbtn-l', b.label));
 btn.addEventListener('click', function () {
@@ -2412,7 +2425,7 @@ inp.addEventListener('input', function () { if (CU.color == null) { colW.select(
 f.appendChild(mk('span', 'tt-cform-l', TL.cIcon));
 var ics = mk('div', 'tt-cform-icw');
 var allIb = [];
-function paintIcons() { var c = curColor(); allIb.forEach(function (x) { x.style.setProperty('--lc', c); }); }
+function paintIcons() { var c = curColor(), li = (CU.color != null ? CU.color : labelColorIdx(inp.value.trim())) >= LC_LIGHT; allIb.forEach(function (x) { x.style.setProperty('--lc', c); x.classList.toggle('lt', li); }); }
 ICAT.forEach(function (cat) {
 ics.appendChild(mk('span', 'tt-cform-cat', ICAT_L[cat[0]]));
 var g = mk('div', 'tt-cform-ic'); g.setAttribute('role', 'group'); g.setAttribute('aria-label', ICAT_L[cat[0]]);
