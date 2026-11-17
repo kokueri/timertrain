@@ -626,13 +626,14 @@ updateHighlight();
 
 /* ---------- ラベルの選択肢（▾）と編集（鉛筆） ---------- */
 /* ---------- 11/15: ラベルの色（8色・濃いめで白い絵が読める）と、白抜きの絵（Fluent Emoji・MIT） ---------- */
-const LCOLORS = ['#2A6FC4', '#C4521C', '#12825C', '#A86F00', '#B8457A', '#6A4BC4', '#1E7A8C', '#7A5A40'];
+// 11/17: 16色に（前の8色はそのままの番号）
+const LCOLORS = ['#2A6FC4', '#C4521C', '#12825C', '#A86F00', '#B8457A', '#6A4BC4', '#1E7A8C', '#7A5A40', '#C62828', '#5E7D14', '#2C3E8C', '#9C2D9C', '#5F6B7A', '#2E7D32', '#4E342E', '#C2405F'];
 function labelColorIdx(l) {
   l = String(l == null ? '' : l);
   const m = window.__ttLC || {};
-  if (Object.prototype.hasOwnProperty.call(m, l) && m[l] >= 0 && m[l] <= 7) return m[l];
+  if (Object.prototype.hasOwnProperty.call(m, l) && m[l] >= 0 && m[l] < LCOLORS.length) return m[l];
   let h = 0; for (const ch of l) h = (h * 31 + ch.codePointAt(0)) >>> 0;
-  return h % 8;
+  return h % LCOLORS.length;
 }
 function labelColor(l) { return LCOLORS[labelColorIdx(l)]; }
 window.__ttLabelColor = labelColor;
@@ -1796,13 +1797,19 @@ var sp2 = document.createElement('span'); sp2.textContent = LD;
 db.appendChild(ic2); db.appendChild(sp2);
 db.addEventListener('click', function () { openData('button'); });
 tl.appendChild(db);
+// 11/17: カレンダーへすぐ行くボタン（データの横）
+var LC = lang === 'en' ? 'Calendar' : lang === 'es' ? 'Calendario' : 'カレンダー';
+var cb = document.createElement('button'); cb.type = 'button'; cb.id = 'cal-btn'; cb.setAttribute('aria-label', LC); cb.title = LC;
+cb.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-2V2h-2v2H9V2H7zm-2 7h14v10H5V9zm2 2v2h2v-2H7zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2zm-8 4v2h2v-2H7zm4 0v2h2v-2h-2z"/></svg>';
+cb.addEventListener('click', function () { openData('cal'); });
+tl.appendChild(cb);
 }
 /* データの窓は押したときだけ読み込む（data.js） */
 var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=10';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=14';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
@@ -1815,7 +1822,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=20'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=22'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -1993,19 +2000,19 @@ renderToday(st);
  * blocks: sync.js が渡す区切りごとの { s: 開始ms, secs, label, brk }。名前は textContent でだけ表示する */
 var TL = lang === 'en' ? { title: "Today's log", total: function (d) { return d; }, empty: 'No record yet today. Run a timer for 15 seconds or more and it shows up here.', more: 'See details', noName: 'No name', others: 'Others', hours: ['0', '6', '12', '18', '24'], aria: "Today's log. Open data",
 cStop: 'Stop', cStartOf: function (l) { return 'Start timing ' + l; }, cStopOf: function (l) { return 'Stop timing ' + l; }, cEditOf: function (l) { return 'Edit ' + l; },
-cFromLabels: 'From your labels', mLater: 'Log past time', mTitle: 'Log past time', mWhat: 'What', mWhen: 'Start', mLen: 'Length', mToday: 'Today', mYest: 'Yesterday', mMin: 'min', mH: 'h', mSaved: function (l, a, b) { return 'Logged "' + l + '" ' + a + '–' + b + '.'; }, mErr: { bad: 'Enter a name and a start time.', len: 'Choose between 1 minute and 12 hours.', old: 'You can log today and yesterday only.', future: 'That would end in the future.', net: 'Could not save. Please try again.' }, mNote: 'Today and yesterday only.', cLeft: function (l) { return 'Move ' + l + ' left'; }, cRight: function (l) { return 'Move ' + l + ' right'; }, cAdd: 'Add a button', cAddShort: 'Add', cEdit: 'Edit', cDone: 'Done', cName: 'Name', cPh: 'e.g. Walk', cIcon: 'Icon', cSave: 'Save', cCancel: 'Cancel', cDel: 'Delete', cDelSure: 'Tap again to delete', cClose: 'Close',
+cFromLabels: 'From your labels', mLater: 'Log past time', mTitle: 'Log past time', mWhat: 'What', mWhen: 'Start', mLen: 'Length', mToday: 'Today', mYest: 'Yesterday', mMin: 'min', mH: 'h', mSaved: function (l, a, b) { return 'Logged "' + l + '" ' + a + '–' + b + '.'; }, mErr: { bad: 'Enter a name and a start time.', len: 'Choose between 1 minute and 12 hours.', old: 'You can log today and yesterday only.', future: 'That would end in the future.', year: 'You can log up to one year back.', net: 'Could not save. Please try again.' }, mNote: 'Today and yesterday only.', mPick: 'Pick a date', mPrem: 'Logging 3+ days back is a Premium feature.', mPremNote: 'Up to one year back.', mPlans: 'See plans', cLeft: function (l) { return 'Move ' + l + ' left'; }, cRight: function (l) { return 'Move ' + l + ' right'; }, cAdd: 'Add a button', cAddShort: 'Add', cEdit: 'Edit', cDone: 'Done', cName: 'Name', cPh: 'e.g. Walk', cIcon: 'Icon', cSave: 'Save', cCancel: 'Cancel', cDel: 'Delete', cDelSure: 'Tap again to delete', cClose: 'Close',
 cEmpty: 'Turn things you do often into buttons and time them with one tap (walk, chores, reading…).', cErr: 'Could not save. Please try again.',
 cLimit: function (n) { return 'The free plan has up to ' + n + ' buttons. Premium allows up to 30.'; }, cPlans: 'See plans',
 cIcons: { walk: 'Walk', book: 'Book', home: 'Home', child: 'Kids', cup: 'Cup', moon: 'Sleep', pc: 'Computer', gym: 'Workout', music: 'Music', pen: 'Writing', food: 'Meal', heart: 'Heart' } }
 : lang === 'es' ? { title: 'Registro de hoy', total: function (d) { return d; }, empty: 'Aún no hay registros hoy. Usa un temporizador 15 segundos o más y aparecerá aquí.', more: 'Ver detalles', noName: 'Sin nombre', others: 'Otros', hours: ['0', '6', '12', '18', '24'], aria: 'Registro de hoy. Ver datos',
 cStop: 'Parar', cStartOf: function (l) { return 'Empezar a contar ' + l; }, cStopOf: function (l) { return 'Parar ' + l; }, cEditOf: function (l) { return 'Editar ' + l; },
-cFromLabels: 'De tus etiquetas', mLater: 'Añadir tiempo pasado', mTitle: 'Añadir tiempo pasado', mWhat: 'Qué', mWhen: 'Inicio', mLen: 'Duración', mToday: 'Hoy', mYest: 'Ayer', mMin: 'min', mH: 'h', mSaved: function (l, a, b) { return 'Se registró «' + l + '» ' + a + '–' + b + '.'; }, mErr: { bad: 'Escribe un nombre y la hora de inicio.', len: 'Elige entre 1 minuto y 12 horas.', old: 'Solo puedes registrar hoy y ayer.', future: 'Terminaría en el futuro.', net: 'No se pudo guardar. Inténtalo de nuevo.' }, mNote: 'Solo hoy y ayer.', cLeft: function (l) { return 'Mover ' + l + ' a la izquierda'; }, cRight: function (l) { return 'Mover ' + l + ' a la derecha'; }, cAdd: 'Añadir un botón', cAddShort: 'Añadir', cEdit: 'Editar', cDone: 'Listo', cName: 'Nombre', cPh: 'p. ej. Paseo', cIcon: 'Icono', cSave: 'Guardar', cCancel: 'Cancelar', cDel: 'Eliminar', cDelSure: 'Toca otra vez para eliminar', cClose: 'Cerrar',
+cFromLabels: 'De tus etiquetas', mLater: 'Añadir tiempo pasado', mTitle: 'Añadir tiempo pasado', mWhat: 'Qué', mWhen: 'Inicio', mLen: 'Duración', mToday: 'Hoy', mYest: 'Ayer', mMin: 'min', mH: 'h', mSaved: function (l, a, b) { return 'Se registró «' + l + '» ' + a + '–' + b + '.'; }, mErr: { bad: 'Escribe un nombre y la hora de inicio.', len: 'Elige entre 1 minuto y 12 horas.', old: 'Solo puedes registrar hoy y ayer.', future: 'Terminaría en el futuro.', year: 'Puedes registrar hasta un año atrás.', net: 'No se pudo guardar. Inténtalo de nuevo.' }, mNote: 'Solo hoy y ayer.', mPick: 'Elegir fecha', mPrem: 'Registrar 3 o más días atrás es de Premium.', mPremNote: 'Hasta un año atrás.', mPlans: 'Ver planes', cLeft: function (l) { return 'Mover ' + l + ' a la izquierda'; }, cRight: function (l) { return 'Mover ' + l + ' a la derecha'; }, cAdd: 'Añadir un botón', cAddShort: 'Añadir', cEdit: 'Editar', cDone: 'Listo', cName: 'Nombre', cPh: 'p. ej. Paseo', cIcon: 'Icono', cSave: 'Guardar', cCancel: 'Cancelar', cDel: 'Eliminar', cDelSure: 'Toca otra vez para eliminar', cClose: 'Cerrar',
 cEmpty: 'Convierte lo que haces a menudo en botones y mide el tiempo con un toque (paseo, tareas, lectura…).', cErr: 'No se pudo guardar. Inténtalo de nuevo.',
 cLimit: function (n) { return 'El plan gratis permite hasta ' + n + ' botones. Premium, hasta 30.'; }, cPlans: 'Ver planes',
 cIcons: { walk: 'Paseo', book: 'Libro', home: 'Casa', child: 'Niños', cup: 'Taza', moon: 'Dormir', pc: 'Ordenador', gym: 'Ejercicio', music: 'Música', pen: 'Escribir', food: 'Comida', heart: 'Corazón' } }
 : { title: '今日のログ', total: function (d) { return '合計 ' + d; }, empty: 'まだ今日の記録はありません。タイマーを15秒以上動かすと、ここに残ります。', more: 'くわしく見る', noName: '名前なし', others: 'ほか', hours: ['0時', '6時', '12時', '18時', '24時'], aria: '今日のログ。データを見る',
 cStop: '止める', cStartOf: function (l) { return l + 'を計りはじめる'; }, cStopOf: function (l) { return l + 'を止める'; }, cEditOf: function (l) { return l + 'を編集'; },
-cFromLabels: 'これまでのラベルから', mLater: 'あとから記録', mTitle: 'あとから記録', mWhat: 'なにをした？', mWhen: '始めた時刻', mLen: '長さ', mToday: '今日', mYest: '昨日', mMin: '分', mH: '時間', mSaved: function (l, a, b) { return '「' + l + '」' + a + '〜' + b + ' を記録しました'; }, mErr: { bad: 'なまえと始めた時刻を入れてください', len: '1分〜12時間で選んでください', old: '記録できるのは今日と昨日の分です', future: '終わりが今より後になっています', net: '保存できませんでした。もう一度お試しください' }, mNote: '今日と昨日の分を記録できます', cLeft: function (l) { return l + 'を左へ'; }, cRight: function (l) { return l + 'を右へ'; }, cAdd: 'ボタンを追加', cAddShort: '追加', cEdit: '編集', cDone: '完了', cName: 'なまえ', cPh: '例：散歩', cIcon: 'アイコン', cSave: '保存', cCancel: 'キャンセル', cDel: '削除', cDelSure: 'もう一度押すと削除', cClose: '閉じる',
+cFromLabels: 'これまでのラベルから', mLater: 'あとから記録', mTitle: 'あとから記録', mWhat: 'なにをした？', mWhen: '始めた時刻', mLen: '長さ', mToday: '今日', mYest: '昨日', mMin: '分', mH: '時間', mSaved: function (l, a, b) { return '「' + l + '」' + a + '〜' + b + ' を記録しました'; }, mErr: { bad: 'なまえと始めた時刻を入れてください', len: '1分〜12時間で選んでください', old: '記録できるのは今日と昨日の分です', future: '終わりが今より後になっています', year: '1年前まで記録できます', net: '保存できませんでした。もう一度お試しください' }, mNote: '今日と昨日の分を記録できます', mPick: '日付を選ぶ', mPrem: '3日以上前の記録はプレミアムで追加できます', mPremNote: '1年前まで記録できます', mPlans: 'プランを見る', cLeft: function (l) { return l + 'を左へ'; }, cRight: function (l) { return l + 'を右へ'; }, cAdd: 'ボタンを追加', cAddShort: '追加', cEdit: '編集', cDone: '完了', cName: 'なまえ', cPh: '例：散歩', cIcon: 'アイコン', cSave: '保存', cCancel: 'キャンセル', cDel: '削除', cDelSure: 'もう一度押すと削除', cClose: '閉じる',
 cEmpty: 'よくやることをボタンにすると、1タップで時間を計れます（散歩・家事・読書など）。', cErr: '保存できませんでした。もう一度お試しください。',
 cLimit: function (n) { return 'ボタンは無料プランで' + n + 'つまでです。プレミアムなら30個まで作れます。'; }, cPlans: 'プランを見る',
 cIcons: { walk: '散歩', book: '本', home: '家', child: '子ども', cup: 'カップ', moon: '睡眠', pc: 'パソコン', gym: '運動', music: '音楽', pen: '書く', food: 'ごはん', heart: 'ハート' } };
@@ -2235,7 +2242,7 @@ box.appendChild(manualForm(box, cs));
 box.appendChild(countForm(box, cs));
 }
 }
-function manualForm(box, cs) {
+function manualForm(box, cs, opt) {
 var f = mk('div', 'tt-cform tt-mform'); f.setAttribute('role', 'group'); f.setAttribute('aria-label', TL.mTitle);
 f.appendChild(mk('p', 'tt-mform-t', TL.mTitle));
 var idn = 'tt-mname-' + Date.now();
@@ -2261,15 +2268,31 @@ if (st0.getDate() !== now.getDate()) { st0 = new Date(now); st0.setHours(0, 0, 0
 f.appendChild(mk('span', 'tt-cform-l', TL.mWhen));
 var whenRow = mk('div', 'tt-mform-when');
 var seg = mk('div', 'tt-mseg'); seg.setAttribute('role', 'group');
-[[0, TL.mToday], [1, TL.mYest]].forEach(function (d) {
+// 11/17: 「日付を選ぶ」で3日以上前（プレミアムだけ、1年前まで）
+var dIn = mk('input', 'tt-cform-in tt-mdate'); dIn.type = 'date'; dIn.hidden = true; dIn.setAttribute('aria-label', TL.mPick);
+(function () { var t = new Date(), mx = new Date(t), mn = new Date(t); mx.setDate(t.getDate() - 2); mn.setDate(t.getDate() - 365);
+function ymd(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+dIn.max = ymd(mx); dIn.min = ymd(mn); dIn.value = ymd(mx); })();
+var premMsg = mk('p', 'tt-cnote tt-mprem'); premMsg.hidden = true;
+[[0, TL.mToday], [1, TL.mYest], ['pick', (window.__ttPremium ? '' : '🔒 ') + TL.mPick]].forEach(function (d) {
 var b = mk('button', 'tt-mseg-b' + (d[0] === 0 ? ' on' : ''), d[1]); b.type = 'button'; b.setAttribute('aria-pressed', d[0] === 0 ? 'true' : 'false');
-b.addEventListener('click', function () { dayOff = d[0]; seg.querySelectorAll('.tt-mseg-b').forEach(function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); }); upd(); });
+b.addEventListener('click', function () {
+if (d[0] === 'pick' && !window.__ttPremium) {
+premMsg.textContent = ''; premMsg.append(TL.mPrem + ' ');
+var a = mk('a', '', TL.mPlans); a.href = '/account?l=' + LANG + '#acct-plans'; a.addEventListener('click', function () { try { gtag('event', 'data_see_plans', { view: 'manual', from: 'pick' }); } catch (e) {} });
+premMsg.appendChild(a); premMsg.hidden = false;
+try { gtag('event', 'data_locked', { period: 'manual' }); } catch (e) {}
+return;
+}
+dayOff = d[0]; premMsg.hidden = true; dIn.hidden = d[0] !== 'pick';
+seg.querySelectorAll('.tt-mseg-b').forEach(function (x) { var on = x === b; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); }); upd(); });
 seg.appendChild(b);
 });
+dIn.addEventListener('input', function () { upd(); });
 var tm = mk('input', 'tt-cform-in tt-mtime'); tm.type = 'time'; tm.step = 60;
 tm.value = String(st0.getHours()).padStart(2, '0') + ':' + String(st0.getMinutes()).padStart(2, '0');
 tm.setAttribute('aria-label', TL.mWhen);
-whenRow.append(seg, tm); f.appendChild(whenRow);
+whenRow.append(seg, dIn, tm); f.appendChild(whenRow); f.appendChild(premMsg);
 // 長さ
 f.appendChild(mk('span', 'tt-cform-l', TL.mLen));
 var lens = mk('div', 'tt-clabs');
@@ -2285,10 +2308,13 @@ var minRow = mk('div', 'tt-mform-min'); minRow.append(mins, mk('span', '', TL.mM
 var prev = mk('span', 'tt-mprev'); prev.setAttribute('aria-live', 'polite');
 minRow.appendChild(prev);
 f.appendChild(minRow);
-f.appendChild(mk('p', 'tt-cnote', TL.mNote));
+f.appendChild(mk('p', 'tt-cnote', window.__ttPremium ? TL.mPremNote : TL.mNote));
 function startMs() {
 var mm = /^(\d{1,2}):(\d{2})$/.exec(tm.value || ''); if (!mm) return NaN;
-var d = new Date(); d.setDate(d.getDate() - dayOff); d.setHours(Number(mm[1]), Number(mm[2]), 0, 0);
+var d = new Date();
+if (dayOff === 'pick') { var dm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dIn.value || ''); if (!dm) return NaN; d = new Date(Number(dm[1]), Number(dm[2]) - 1, Number(dm[3])); }
+else d.setDate(d.getDate() - dayOff);
+d.setHours(Number(mm[1]), Number(mm[2]), 0, 0);
 return d.getTime();
 }
 function hm(t) { var d = new Date(t); return d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); }
@@ -2302,15 +2328,15 @@ var msg = mk('p', 'tt-cnote tt-merr'); msg.setAttribute('role', 'status');
 var acts = mk('div', 'tt-cform-a');
 var ok = mk('button', 'tt-cbtn2 pri', TL.cSave); ok.type = 'button';
 var cancel = mk('button', 'tt-cbtn2', TL.cCancel); cancel.type = 'button';
-function close() { CU.form = null; CU.key = ''; renderCount(box, window.__ttCount.state()); }
-cancel.addEventListener('click', close);
+function close(saved) { if (opt && opt.onClose) { opt.onClose(!!saved); return; } CU.form = null; CU.key = ''; renderCount(box, window.__ttCount.state()); }
+cancel.addEventListener('click', function () { close(false); });
 ok.addEventListener('click', function () {
 var v = inp.value.trim(), s0 = startMs(), m = Math.round(Number(mins.value));
 if (!v || !isFinite(s0)) { msg.textContent = TL.mErr.bad; return; }
 ok.disabled = true; msg.textContent = '';
 window.__ttCount.manual({ label: v, start: s0, secs: m * 60 }).then(function (r) {
 if (!r || !r.ok) { msg.textContent = TL.mErr[(r && r.why) || 'net'] || TL.mErr.net; ok.disabled = false; return; }
-close();
+close(true);
 if (window.__ttOneUndo) window.__ttOneUndo(TL.mSaved(v, hm(s0), hm(s0 + m * 60000)), null);
 });
 });
@@ -2319,6 +2345,39 @@ f.append(msg, acts);
 setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (e) {} }, 0);
 return f;
 }
+// 11/17: データの窓（ログ）からも「あとから記録」
+window.__ttManualForm = function (container, onClose) {
+if (!window.__ttCount) return null;
+var f = manualForm(container, window.__ttCount.state(), { onClose: onClose });
+container.appendChild(f); return f;
+};
+// 11/17: 終わった記録に「ひとことメモ」（今日のログの上に小さく出す。閉じれば消える）
+var NOTE_L = LANG === 'en' ? { q: 'Add a note to this record?', ph: 'e.g. finished chapter 3', save: 'Save', no: 'Close', ok: 'Note saved', err: 'Could not save the note.' }
+: LANG === 'es' ? { q: '¿Añadir una nota a este registro?', ph: 'p. ej. terminé el capítulo 3', save: 'Guardar', no: 'Cerrar', ok: 'Nota guardada', err: 'No se pudo guardar la nota.' }
+: { q: 'いまの記録にひとことメモ', ph: '例：3章まで終わった', save: '保存', no: '閉じる', ok: 'メモを保存しました', err: 'メモを保存できませんでした' };
+window.addEventListener('tt-log-ended', function (e) {
+var d = e.detail || {}; if (!d.id || !window.__ttSetNote) return;
+var col = document.getElementById('tt-logcol'); if (!col) return;
+var old = document.getElementById('tt-note'); if (old) old.remove();
+var f = mk('form', 'tt-note'); f.id = 'tt-note'; f.setAttribute('aria-label', NOTE_L.q);
+var head = mk('p', 'tt-note-t', NOTE_L.q + (d.label ? '（' + String(d.label).slice(0, 20) + '）' : ''));
+var inp = mk('input', 'tt-cform-in'); inp.type = 'text'; inp.maxLength = 200; inp.placeholder = NOTE_L.ph; inp.autocomplete = 'off'; inp.setAttribute('aria-label', NOTE_L.q);
+var ok = mk('button', 'tt-cbtn2 pri', NOTE_L.save); ok.type = 'submit';
+var no = mk('button', 'tt-cbtn2', NOTE_L.no); no.type = 'button';
+var msg = mk('p', 'tt-cnote'); msg.setAttribute('role', 'status');
+var row = mk('div', 'tt-note-r'); row.append(inp, ok, no);
+f.append(head, row, msg);
+no.addEventListener('click', function () { f.remove(); });
+f.addEventListener('submit', function (ev2) {
+ev2.preventDefault(); var v = inp.value.trim(); if (!v) { f.remove(); return; }
+ok.disabled = true;
+window.__ttSetNote(d.id, v).then(function (good) {
+if (!good) { ok.disabled = false; msg.textContent = NOTE_L.err; return; }
+f.remove(); if (window.__ttOneUndo) window.__ttOneUndo(NOTE_L.ok, null);
+});
+});
+col.insertBefore(f, col.firstChild);
+});
 function countForm(box, cs) {
 var editing = CU.form !== 'new';
 var cur = editing ? cs.btns.filter(function (b) { return b.id === CU.form; })[0] : null;
