@@ -98,47 +98,71 @@
   var FREE_DAYS = 30; // 11/16: 7日→30日
   var TD = {
     ja: {
-      views: [['day', '1日'], ['cal', 'カレンダー'], ['period', '期間']], today: '今日', yday: '昨日', prev: '前の日', next: '次の日',
+      views: [['day', 'ログ'], ['cal', 'カレンダー'], ['period', '集計']], today: '今日', yday: '昨日', prev: '前の日', next: '次の日',
       total: '休憩をのぞく合計', flow: '1日の流れ', now: 'いま', other: 'ほか', brk: '休憩',
       empty: 'この日の記録はありません。', emptyToday: 'まだ今日の記録はありません。ログインした状態でタイマーを15秒以上動かすと、ここに残ります。',
       lockT: 'それより前の日はプレミアム',
       lockL: function (n) { return '無料プランは直近' + n + '日間の1日の流れを見られます。記録はそれより前の分もずっと残っているので、プレミアムにすると最初からさかのぼって見られます。'; },
       note: function (n) { return '無料プランは直近' + n + '日間を見られます。'; },
       hours: ['0時', '6時', '12時', '18時', '24時'],
-      cal: { month: function (d) { return d.getFullYear() + '年' + (d.getMonth() + 1) + '月'; }, prev: '前の月', next: '次の月', wd: ['日', '月', '火', '水', '木', '金', '土'], mon: false, total: '休憩をのぞく合計', days: function (n) { return '記録した日 ' + n + '日'; }, best: function (n) { return '最長 ' + n + '日連続'; }, short: '短い', long: '長い', lockT: 'それより前の月はプレミアム', open: function (d, v) { return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + v + '（1日の流れを開く）'; }, pp: ['（', '）', '、'], none: '記録なし', locked: 'プレミアムで見られます' },
+      lg: { later: '＋ あとから記録', more: 'もっと見る', none: '記録なし', open: function (d, v) { return d + ' ' + v + '（くわしく見る）'; }, memo: 'メモ', memoPh: '例：3章まで終わった', lockMore: 'それより前の日はプレミアムで見られます' },
+      fl: { lbl: 'ラベル', pj: 'プロジェクト', all: 'すべて' },
+      cm: { bar: '帯', pie: '円', mode: '表示' },
+      promo: {
+        cal: ['前の月も、始めた日からずっと見返せる', 'プレミアムなら、カレンダーを最初の記録までさかのぼれます。'],
+        log: ['30日より前のログも', '記録は無料でもずっと保存されています。プレミアムで始めた日までさかのぼれます。'],
+        data: ['12か月・全期間のグラフとCSV', 'プレミアムで、積み上げた記録をまるごと見返せます。']
+      },
+      cal: { month: function (d) { return d.getFullYear() + '年' + (d.getMonth() + 1) + '月'; }, prev: '前の月', next: '次の月', wd: ['日', '月', '火', '水', '木', '金', '土'], mon: false, total: '休憩をのぞく合計', days: function (n) { return '記録した日 ' + n + '日'; }, best: function (n) { return '最長 ' + n + '日連続'; }, short: '短い', long: '長い', lockT: 'それより前の月はプレミアム', open: function (d, v) { return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + v + '（ログで見る）'; }, pp: ['（', '）', '、'], none: '記録なし', locked: 'プレミアムで見られます' },
       tinyShow: function (n) { return '1分未満の記録 ' + n + '件を表示'; }, tinyHide: '1分未満の記録をかくす',
       ed: { btn: '時間を変える', start: '始めた時刻', len: '分', sum: '合計', save: '保存', cancel: 'やめる', del: 'この記録を消す', delSure: 'もう一度押すと消えます', running: '動いている記録は、止めてから変えられます。', recent: 'ほかの画面で動いているかもしれません。止めてから1〜2分たってから変えてください。', saved: '記録を変えました', deleted: '記録を消しました', errEnd: '終わりが今より後になっています', errLen: '長さは合わせて1分〜12時間にしてください', errSave: '保存できませんでした。時間をおいてもう一度お試しください。', errDel: '消せませんでした。時間をおいてもう一度お試しください。' },
       date: function (d) { return (d.getMonth() + 1) + '月' + d.getDate() + '日（' + '日月火水木金土'.charAt(d.getDay()) + '）'; }
     },
     en: {
-      views: [['day', 'Day'], ['cal', 'Calendar'], ['period', 'Period']], today: 'Today', yday: 'Yesterday', prev: 'Previous day', next: 'Next day',
+      views: [['day', 'Log'], ['cal', 'Calendar'], ['period', 'Stats']], today: 'Today', yday: 'Yesterday', prev: 'Previous day', next: 'Next day',
       total: 'Total, excluding breaks', flow: 'Your day', now: 'Now', other: 'Others', brk: 'Break',
       empty: 'No records on this day.', emptyToday: 'No record yet today. Run a timer for 15 seconds or more while signed in and it shows up here.',
       lockT: 'Earlier days are Premium',
       lockL: function (n) { return 'The free plan shows your day for the last ' + n + ' days. Older records are kept for good, so with Premium you can look back to day one.'; },
       note: function (n) { return 'The free plan shows the last ' + n + ' days.'; },
       hours: ['0', '6', '12', '18', '24'],
-      cal: { month: function (d) { return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][d.getMonth()] + ' ' + d.getFullYear(); }, prev: 'Previous month', next: 'Next month', wd: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], mon: false, total: 'Total, excluding breaks', days: function (n) { return n + ' day' + (n === 1 ? '' : 's') + ' recorded'; }, best: function (n) { return 'Longest streak ' + n + ' day' + (n === 1 ? '' : 's'); }, short: 'Short', long: 'Long', lockT: 'Earlier months are Premium', open: function (d, v) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate() + ', ' + v + ' (open your day)'; }, pp: [' (', ')', ', '], none: 'No record', locked: 'Available with Premium' },
+      lg: { later: '+ Log past time', more: 'Show more', none: 'No record', open: function (d, v) { return d + ', ' + v + ' (show details)'; }, memo: 'Note', memoPh: 'e.g. finished chapter 3', lockMore: 'Earlier days are available with Premium' },
+      fl: { lbl: 'Labels', pj: 'Project', all: 'All' },
+      cm: { bar: 'Bars', pie: 'Pies', mode: 'View' },
+      promo: {
+        cal: ['Look back at every month since day one', 'With Premium, the calendar goes all the way back to your first record.'],
+        log: ['Your log from more than 30 days ago', 'Your records are kept for good, even for free. Premium lets you look back to day one.'],
+        data: ['12-month and all-time charts, plus CSV', 'Premium lets you look back at everything you have built up.']
+      },
+      cal: { month: function (d) { return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][d.getMonth()] + ' ' + d.getFullYear(); }, prev: 'Previous month', next: 'Next month', wd: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], mon: false, total: 'Total, excluding breaks', days: function (n) { return n + ' day' + (n === 1 ? '' : 's') + ' recorded'; }, best: function (n) { return 'Longest streak ' + n + ' day' + (n === 1 ? '' : 's'); }, short: 'Short', long: 'Long', lockT: 'Earlier months are Premium', open: function (d, v) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate() + ', ' + v + ' (open in log)'; }, pp: [' (', ')', ', '], none: 'No record', locked: 'Available with Premium' },
       tinyShow: function (n) { return 'Show ' + n + ' record' + (n > 1 ? 's' : '') + ' under 1 min'; }, tinyHide: 'Hide records under 1 min',
       ed: { btn: 'Change times', start: 'Started at', len: 'min', sum: 'Total', save: 'Save', cancel: 'Cancel', del: 'Delete this record', delSure: 'Tap again to delete', running: 'Stop this record before changing it.', recent: 'This may still be running on another screen. Stop it, wait a minute or two, then change it.', saved: 'Record updated', deleted: 'Record deleted', errEnd: 'The end is later than now', errLen: 'Keep the total between 1 minute and 12 hours', errSave: 'Could not save. Please try again in a moment.', errDel: 'Could not delete. Please try again in a moment.' },
       date: function (d) { return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()] + ', ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate(); }
     },
     es: {
-      views: [['day', 'Día'], ['cal', 'Calendario'], ['period', 'Periodo']], today: 'Hoy', yday: 'Ayer', prev: 'Día anterior', next: 'Día siguiente',
+      views: [['day', 'Registro'], ['cal', 'Calendario'], ['period', 'Resumen']], today: 'Hoy', yday: 'Ayer', prev: 'Día anterior', next: 'Día siguiente',
       total: 'Total sin descansos', flow: 'Tu día', now: 'Ahora', other: 'Otros', brk: 'Descanso',
       empty: 'No hay registros este día.', emptyToday: 'Aún no hay registros hoy. Usa un temporizador 15 segundos o más con la sesión iniciada y aparecerá aquí.',
       lockT: 'Los días anteriores son Premium',
       lockL: function (n) { return 'El plan gratis muestra tu día de los últimos ' + n + ' días. Los registros anteriores se guardan siempre, así que con Premium puedes verlos desde el primer día.'; },
       note: function (n) { return 'El plan gratis muestra los últimos ' + n + ' días.'; },
       hours: ['0', '6', '12', '18', '24'],
-      cal: { month: function (d) { return ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ' de ' + d.getFullYear(); }, prev: 'Mes anterior', next: 'Mes siguiente', wd: ['L', 'M', 'X', 'J', 'V', 'S', 'D'], mon: true, total: 'Total sin descansos', days: function (n) { return n + ' día' + (n === 1 ? '' : 's') + ' con registro'; }, best: function (n) { return 'Racha más larga: ' + n + ' día' + (n === 1 ? '' : 's'); }, short: 'Poco', long: 'Mucho', lockT: 'Los meses anteriores son Premium', open: function (d, v) { return d.getDate() + ' de ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ', ' + v + ' (abrir tu día)'; }, pp: [' (', ')', ', '], none: 'Sin registro', locked: 'Disponible con Premium' },
+      lg: { later: '+ Añadir tiempo pasado', more: 'Ver más', none: 'Sin registro', open: function (d, v) { return d + ', ' + v + ' (ver detalles)'; }, memo: 'Nota', memoPh: 'p. ej. terminé el capítulo 3', lockMore: 'Los días anteriores están en Premium' },
+      fl: { lbl: 'Etiquetas', pj: 'Proyecto', all: 'Todo' },
+      cm: { bar: 'Barras', pie: 'Círculos', mode: 'Vista' },
+      promo: {
+        cal: ['Revisa todos los meses desde el primer día', 'Con Premium, el calendario llega hasta tu primer registro.'],
+        log: ['Tu registro de hace más de 30 días', 'Tus registros se guardan siempre, también gratis. Con Premium puedes volver al primer día.'],
+        data: ['Gráficos de 12 meses y de todo, y CSV', 'Con Premium puedes ver todo lo que has acumulado.']
+      },
+      cal: { month: function (d) { return ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ' de ' + d.getFullYear(); }, prev: 'Mes anterior', next: 'Mes siguiente', wd: ['L', 'M', 'X', 'J', 'V', 'S', 'D'], mon: true, total: 'Total sin descansos', days: function (n) { return n + ' día' + (n === 1 ? '' : 's') + ' con registro'; }, best: function (n) { return 'Racha más larga: ' + n + ' día' + (n === 1 ? '' : 's'); }, short: 'Poco', long: 'Mucho', lockT: 'Los meses anteriores son Premium', open: function (d, v) { return d.getDate() + ' de ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ', ' + v + ' (ver en el registro)'; }, pp: [' (', ')', ', '], none: 'Sin registro', locked: 'Disponible con Premium' },
       tinyShow: function (n) { return 'Mostrar ' + n + ' registro' + (n > 1 ? 's' : '') + ' de menos de 1 min'; }, tinyHide: 'Ocultar registros de menos de 1 min',
       ed: { btn: 'Cambiar tiempos', start: 'Empezó a las', len: 'min', sum: 'Total', save: 'Guardar', cancel: 'Cancelar', del: 'Borrar este registro', delSure: 'Toca otra vez para borrar', running: 'Detén este registro antes de cambiarlo.', recent: 'Puede que siga en marcha en otra pantalla. Detenlo, espera uno o dos minutos y cámbialo.', saved: 'Registro cambiado', deleted: 'Registro borrado', errEnd: 'El final es posterior a ahora', errLen: 'El total debe estar entre 1 minuto y 12 horas', errSave: 'No se pudo guardar. Inténtalo de nuevo en un momento.', errDel: 'No se pudo borrar. Inténtalo de nuevo en un momento.' },
       date: function (d) { return ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'][d.getDay()] + ' ' + d.getDate() + ' ' + ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][d.getMonth()]; }
     }
   }[lang];
   function pad(n) { return (n < 10 ? '0' : '') + n; }
-  // 11/15: ラベルの色（タイマー画面と同じ8色）。クラス lc0〜lc7
+  // 11/15: ラベルの色（タイマー画面と同じ。11/17 から16色）。クラス lc0〜lc15
   function lcOf(l) { return l === '\u0000' ? 'g' : 'lc' + (window.__ttLabelColorIdx ? window.__ttLabelColorIdx(l) : 0); }
   /* ラベルの名前変更（settings.data.labelMap）。過去の記録は新しい名前で集計する */
   var LM = {};
@@ -188,7 +212,7 @@
     box.querySelector('.ttd-x').focus();
     S.dayEv = 0;
     S.view = src === 'today' ? 'day' : 'period';
-    if (src === 'today') S.day = today0();
+    if (src === 'today') { S.day = today0(); S.dayOpen = true; }
     S.from = src || '';
     ev('data_open', { from: src || '', member: member() });
     start();
@@ -227,9 +251,9 @@
   /* いまの表示（1日／期間）を読み込んで描く */
   async function show() {
     try {
-      if (S.view === 'day') await loadDay(S.sb); else if (S.view === 'cal') await loadCal(S.sb); else await load(S.sb);
+      if (S.view === 'day') { await loadLog(S.sb); if (S.dayOpen && S.day) await loadDay(S.sb); } else if (S.view === 'cal') await loadCal(S.sb); else await load(S.sb);
     } catch (e) { body.textContent = ''; body.appendChild(el('p', { cls: 'ttd-msg err', role: 'status', text: T.err })); return; }
-    if (S.view === 'day') renderDay(); else if (S.view === 'cal') renderCal(); else render(false);
+    if (S.view === 'day') renderLog(); else if (S.view === 'cal') renderCal(); else render(false);
   }
 
   /* ---------- 読み込み（1000件ずつ） ---------- */
@@ -413,6 +437,7 @@
     wrap.appendChild(lsec);
     var tids = Object.keys(C.timers).filter(function (id) { return D.tmap[id] && C.timers[id] > 0; }).sort(function (a, b) { return C.timers[b] - C.timers[a]; });
     if (tids.length) wrap.appendChild(pieTable(T.byTimer, tids.map(function (id) { return { name: D.tmap[id].name || '', secs: C.timers[id], sub: D.pjNames[D.tmap[id].project_id] || '' }; }), C.work));
+    var prD = sample ? null : promo('data'); if (prD) wrap.appendChild(prD);
     wrap.appendChild(details(C, D));
   }
 
@@ -510,49 +535,153 @@
     }
     if (S.data) S.meta.breaks = S.data.breaks; // データの窓で切り替えた休憩を反映
   }
-  /* ---------- カレンダー（11/16）: 日ごとの作業時間を色の濃さで。押すとその日の1日の流れ ---------- */
+  /* ---------- 日ごとの集計（カレンダーとログで共通、11/17） ---------- */
+  // q0〜q1 の記録を「日・ラベル・プロジェクト」ごとのかけらにする。メモ（config.note）も日ごとに
+  async function loadRange(sb, q0, q1) {
+    var logs = await all(function (a, b) {
+      return sb.from('usage_logs').select('id,started_at,total_secs,timer_id,config').eq('product', PRODUCT).gte('started_at', q0.toISOString()).lt('started_at', q1.toISOString()).order('started_at', { ascending: true }).range(a, b);
+    }, 20000);
+    var segs = await all(function (a, b) {
+      return sb.from('usage_segments').select('log_id,label,secs,started_at').eq('product', PRODUCT).gte('started_at', new Date(q0.getTime() - 86400000).toISOString()).lt('started_at', q1.toISOString()).order('started_at', { ascending: true }).range(a, b);
+    }, 100000);
+    await ensureMeta(sb);
+    var D = { breaks: S.meta.breaks }, tmap = {}, pjOk = {}, ids = {}, byLog = {}, pieces = [], notes = {};
+    S.meta.timers.forEach(function (t) { tmap[t.id] = t; });
+    S.meta.projects.forEach(function (p) { pjOk[p.id] = 1; });
+    logs.forEach(function (l) { ids[l.id] = 1; });
+    segs.forEach(function (g) { if (ids[g.log_id]) (byLog[g.log_id] = byLog[g.log_id] || []).push(g); });
+    function put(t, secs, lb, pj) {
+      if (isNaN(t) || t < q0 || t >= q1 || !(secs > 0)) return;
+      pieces.push({ k: dayKey(t), lb: lb, secs: secs, pj: pj, brk: isBreak(D, lb) });
+    }
+    logs.forEach(function (l) {
+      var tm = l.timer_id && tmap[l.timer_id];
+      var pj = tm ? (tm.project_id && pjOk[tm.project_id] ? tm.project_id : '__none') : '__other';
+      var g = byLog[l.id];
+      if (g && g.length) g.forEach(function (x) {
+        var ms = Date.parse(x.started_at); if (!isFinite(ms)) ms = Date.parse(l.started_at);
+        put(new Date(ms), Number(x.secs) || 0, aliasL(x.label || '').slice(0, 30), pj);
+      });
+      else put(new Date(l.started_at), Number(l.total_secs) || 0, '', pj);
+      var cfg = l.config && typeof l.config === 'object' ? l.config : {};
+      if (typeof cfg.note === 'string' && cfg.note.trim()) {
+        var k = dayKey(new Date(l.started_at));
+        (notes[k] = notes[k] || []).push(cfg.note.trim().slice(0, 200));
+      }
+    });
+    return { pieces: pieces, notes: notes };
+  }
+  // かけら → 日ごとの合計とラベル別（休憩のぞく）。フィルタ（S.labels・S.filter）をかける
+  function byDay(pieces, useFilter) {
+    var LS = null; if (useFilter && S.labels.length) { LS = {}; S.labels.forEach(function (l) { LS[l] = 1; }); }
+    var days = {}, byL = {}, labTot = {};
+    pieces.forEach(function (p) {
+      if (p.brk) return;
+      if (useFilter && S.filter !== 'all' && p.pj !== S.filter) return;
+      if (LS && !LS[p.lb]) return;
+      days[p.k] = (days[p.k] || 0) + p.secs;
+      byL[p.k] = byL[p.k] || {}; byL[p.k][p.lb] = (byL[p.k][p.lb] || 0) + p.secs;
+      labTot[p.lb] = (labTot[p.lb] || 0) + p.secs;
+    });
+    return { days: days, byL: byL, labTot: labTot };
+  }
+  // 小さな帯（ラベルの色。長さは max に対する割合）
+  function miniBar(o, secs, max, cls) {
+    var bar = el('span', { cls: cls || 'ttd-cal-bar', 'aria-hidden': 'true' });
+    var inner = el('span', { cls: 'ttd-cal-bar-in' });
+    inner.style.width = Math.max(10, Math.round(secs / Math.max(1, max) * 100)) + '%';
+    Object.keys(o).sort(function (a, b) { return o[b] - o[a]; }).forEach(function (lb) { var sg = el('i', { cls: lcOf(lb || T.noLabel) }); sg.style.flexGrow = String(o[lb]); inner.appendChild(sg); });
+    bar.appendChild(inner);
+    return bar;
+  }
+  // 小さな円グラフ（ドーナツ）。大きさは max に対する割合で少し変える
+  function miniPie(o, secs, max) {
+    var NS = 'http://www.w3.org/2000/svg', r = 15.9155, tot = 0;
+    Object.keys(o).forEach(function (k) { tot += o[k]; });
+    var sc = 0.55 + 0.45 * Math.sqrt(Math.min(1, secs / Math.max(1, max)));
+    var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 42 42'); svg.setAttribute('class', 'ttd-cal-pie'); svg.setAttribute('aria-hidden', 'true');
+    svg.style.width = svg.style.height = Math.round(sc * 100) + '%';
+    var off = 25;
+    Object.keys(o).sort(function (a, b) { return o[b] - o[a]; }).forEach(function (lb) {
+      var pc = o[lb] / Math.max(1, tot) * 100;
+      var c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', '21'); c.setAttribute('cy', '21'); c.setAttribute('r', String(r));
+      c.setAttribute('class', 'ttd-pie-s ' + lcOf(lb || T.noLabel));
+      c.setAttribute('stroke-dasharray', pc.toFixed(2) + ' ' + (100 - pc).toFixed(2));
+      c.setAttribute('stroke-dashoffset', String(off));
+      svg.appendChild(c); off -= pc;
+    });
+    return svg;
+  }
+  // プレミアムの案内（無料の人だけ。その場所で何が増えるかを書く）
+  function promo(ctx) {
+    if (!signedLocal() || window.__ttPremium) return null;
+    var P = TD.promo[ctx]; if (!P) return null;
+    var a = el('a', { cls: 'ttd-btn', href: ACCT + '#acct-plans', text: T.plans });
+    a.addEventListener('click', function () { ev('data_see_plans', { view: ctx, from: 'banner' }); });
+    return el('aside', { cls: 'ttd-promo', 'aria-label': P[0] }, [el('p', { cls: 'ttd-promo-t', text: '👑 ' + P[0] }), el('p', { cls: 'ttd-promo-l', text: P[1] }), a]);
+  }
+  // フィルタ（ラベルは複数、プロジェクトは1つ）。集計の窓と同じ S.labels・S.filter を使う
+  function filterBar(pieces, rerender) {
+    var lt = {}, used = {};
+    pieces.forEach(function (p) { if (!p.brk) { lt[p.lb] = (lt[p.lb] || 0) + p.secs; used[p.pj] = 1; } });
+    S.labels.forEach(function (l) { if (!(l in lt)) lt[l] = 0; });
+    var lopts = Object.keys(lt).sort(function (a, b) { return lt[b] - lt[a]; });
+    var wrap = el('div', { cls: 'ttd-cfilter' });
+    var row = el('div', { cls: 'ttd-ctl-r' });
+    var pjs = (S.meta ? S.meta.projects : []).filter(function (p) { return used[p.id]; });
+    if (pjs.length) {
+      var sel = el('select', { cls: 'ttd-sel', 'aria-label': TD.fl.pj });
+      [['all', TD.fl.pj + '：' + TD.fl.all]].concat(pjs.map(function (p) { return [p.id, p.name]; })).forEach(function (o) { var op = el('option', { value: o[0], text: o[1] }); if (S.filter === o[0]) op.selected = true; sel.appendChild(op); });
+      if (S.filter !== 'all' && !pjs.some(function (p) { return p.id === S.filter; })) S.filter = 'all';
+      sel.addEventListener('change', function () { S.filter = sel.value; ev('cal_filter', { pj: S.filter === 'all' ? 0 : 1, n: S.labels.length }); rerender(); var s2 = body.querySelector('.ttd-cfilter .ttd-sel'); if (s2) s2.focus(); });
+      row.appendChild(sel);
+    }
+    if (lopts.length > 1) {
+      var lb = el('button', { type: 'button', cls: 'ttd-csv ttd-lblbtn' + (S.labels.length ? ' on' : ''), 'aria-expanded': S.lblOpen ? 'true' : 'false', text: T.lblBtn(S.labels.length) + ' ▾' });
+      var panel = el('div', { cls: 'ttd-lblpanel', role: 'group', 'aria-label': T.lblFilter });
+      if (!S.lblOpen) panel.hidden = true;
+      var chips = el('div', { cls: 'ttd-lblchips' });
+      var allB = el('button', { type: 'button', cls: 'ttd-lchip' + (S.labels.length ? '' : ' on'), 'aria-pressed': S.labels.length ? 'false' : 'true', text: T.lblClear });
+      allB.addEventListener('click', function () { S.labels = []; after(); });
+      chips.appendChild(allB);
+      lopts.forEach(function (l) {
+        var on = S.labels.indexOf(l) >= 0;
+        var c = el('button', { type: 'button', cls: 'ttd-lchip' + (on ? ' on' : ''), 'aria-pressed': on ? 'true' : 'false' }, [el('i', { cls: 'ttd-lchip-c ' + lcOf(l || T.noLabel), 'aria-hidden': 'true' }), el('span', { text: l || T.noLabel })]);
+        c.addEventListener('click', function () { var i = S.labels.indexOf(l); if (i >= 0) S.labels.splice(i, 1); else S.labels.push(l); after(l); });
+        chips.appendChild(c);
+      });
+      panel.appendChild(chips);
+      lb.addEventListener('click', function () { S.lblOpen = !S.lblOpen; panel.hidden = !S.lblOpen; lb.setAttribute('aria-expanded', S.lblOpen ? 'true' : 'false'); });
+      row.appendChild(lb);
+      wrap.appendChild(row); wrap.appendChild(panel);
+      function after(focusLabel) {
+        ev('cal_filter', { pj: S.filter === 'all' ? 0 : 1, n: S.labels.length });
+        rerender();
+        var cs = body.querySelectorAll('.ttd-cfilter .ttd-lchip'), idx = focusLabel === undefined ? 0 : lopts.indexOf(focusLabel) + 1;
+        if (cs[idx]) cs[idx].focus();
+      }
+    } else if (row.childNodes.length) wrap.appendChild(row);
+    return wrap.childNodes.length ? wrap : null;
+  }
+
+  /* ---------- カレンダー（11/16〜）: 日ごとにラベルの帯か円。押すとその日のログ ---------- */
   function monthStart(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
   function freeLimit() { return window.__ttPremium ? null : new Date(today0().getTime() - (FREE_DAYS - 1) * 86400000); }
   async function loadCal(sb) {
     if (!S.month) S.month = monthStart(new Date());
     var m0 = new Date(S.month), m1 = new Date(m0.getFullYear(), m0.getMonth() + 1, 1), key = m0.getTime();
     if (S.cd && S.cd.key === key && Date.now() - S.cd.at < 30000) return;
-    var lim = freeLimit(), q0 = lim && lim > m0 ? lim : m0, days = {}, byL = {};
-    // 日ごとの合計と、ラベルごとの内訳（11/16）
-    function add(t, secs, lb) {
-      if (isNaN(t) || t < m0 || t >= m1 || !(secs > 0)) return;
-      var k = t.getDate(); days[k] = (days[k] || 0) + secs;
-      byL[k] = byL[k] || {}; byL[k][lb] = (byL[k][lb] || 0) + secs;
-    }
-    if (q0 < m1) {
-      var logs = await all(function (a, b) {
-        return sb.from('usage_logs').select('id,started_at,total_secs').eq('product', PRODUCT).gte('started_at', q0.toISOString()).lt('started_at', m1.toISOString()).order('started_at', { ascending: true }).range(a, b);
-      }, 20000);
-      var segs = await all(function (a, b) {
-        return sb.from('usage_segments').select('log_id,label,secs,started_at').eq('product', PRODUCT).gte('started_at', new Date(q0.getTime() - 86400000).toISOString()).lt('started_at', m1.toISOString()).order('started_at', { ascending: true }).range(a, b);
-      }, 100000);
-      await ensureMeta(sb);
-      var D = { breaks: S.meta.breaks }, ids = {}, byLog = {};
-      logs.forEach(function (l) { ids[l.id] = 1; });
-      segs.forEach(function (g) { if (ids[g.log_id]) (byLog[g.log_id] = byLog[g.log_id] || []).push(g); });
-      logs.forEach(function (l) {
-        var g = byLog[l.id];
-        if (g && g.length) g.forEach(function (x) {
-          var lb = aliasL(x.label || '').slice(0, 30);
-          if (isBreak(D, lb)) return;
-          var ms = Date.parse(x.started_at); if (!isFinite(ms)) ms = Date.parse(l.started_at);
-          add(new Date(ms), Number(x.secs) || 0, lb);
-        });
-        else add(new Date(l.started_at), Number(l.total_secs) || 0, '');
-      });
-    }
-    S.cd = { key: key, at: Date.now(), days: days, byL: byL, lim: lim };
+    var lim = freeLimit(), q0 = lim && lim > m0 ? lim : m0, R = { pieces: [], notes: {} };
+    if (q0 < m1) R = await loadRange(sb, q0, m1);
+    S.cd = { key: key, at: Date.now(), pieces: R.pieces, notes: R.notes, lim: lim };
   }
   function shortDur(s) { var m = Math.round(s / 60); if (m < 60) return m + 'm'; var h = Math.floor(m / 60), r = m % 60; return h + 'h' + (r ? (r < 10 ? '0' : '') + r : ''); }
-  function heat(s) { return s < 60 ? 0 : s < 1800 ? 1 : s < 3600 ? 2 : s < 7200 ? 3 : 4; }
+  function calMode() { try { return localStorage.getItem('tt-cal-mode') === 'pie' ? 'pie' : 'bar'; } catch (e) { return 'bar'; } }
   function renderCal() {
     var C = TD.cal, cd = S.cd, m0 = new Date(S.month), y = m0.getFullYear(), mo = m0.getMonth();
     var nDays = new Date(y, mo + 1, 0).getDate(), t0 = today0(), thisMonth = monthStart(new Date()).getTime() === m0.getTime();
+    var A = byDay(cd.pieces, true), mode = calMode();
     body.textContent = '';
     body.appendChild(viewTabs());
     var nav = el('div', { cls: 'ttd-daynav' });
@@ -577,19 +706,29 @@
     body.appendChild(el('div', { cls: 'ttd-lock', hidden: '', role: 'status' }));
     var wrap = el('div', { cls: 'ttd-main' });
     body.appendChild(wrap);
+    // 表示の切り替え（帯／円）とフィルタ
+    var tools = el('div', { cls: 'ttd-ctools' });
+    var seg = el('div', { cls: 'ttd-tabs ttd-cmode', role: 'group', 'aria-label': TD.cm.mode });
+    [['bar', TD.cm.bar], ['pie', TD.cm.pie]].forEach(function (m) {
+      var on = mode === m[0];
+      var b = el('button', { type: 'button', cls: 'ttd-tab' + (on ? ' on' : ''), 'aria-pressed': on ? 'true' : 'false', text: m[1] });
+      b.addEventListener('click', function () { if (on) return; try { localStorage.setItem('tt-cal-mode', m[0]); } catch (e) {} ev('cal_mode', { mode: m[0] }); renderCal(); var f = body.querySelector('.ttd-cmode .on'); if (f) f.focus(); });
+      seg.appendChild(b);
+    });
+    tools.appendChild(seg);
+    var fb = filterBar(cd.pieces, renderCal);
+    if (fb) tools.appendChild(fb);
+    wrap.appendChild(tools);
     // 合計・記録した日・最長連続
-    var total = 0, nRec = 0, best = 0, run = 0;
-    var maxDay = 0, labTot = {};
-    Object.keys(cd.byL || {}).forEach(function (k) { var o = cd.byL[k]; Object.keys(o).forEach(function (lb) { labTot[lb] = (labTot[lb] || 0) + o[lb]; }); });
+    var total = 0, nRec = 0, best = 0, run = 0, maxDay = 0;
     for (var d = 1; d <= nDays; d++) {
-      var v = cd.days[d] || 0; total += v; if (v > maxDay) maxDay = v;
+      var v = A.days[dayKey(new Date(y, mo, d))] || 0; total += v; if (v > maxDay) maxDay = v;
       if (v >= 60) { nRec++; run++; if (run > best) best = run; } else run = 0;
     }
     var sec = el('section', { cls: 'ttd-sec' });
     sec.appendChild(el('div', { cls: 'ttd-dsum' }, [el('h3', { text: C.total }), el('p', { cls: 'ttd-dsum-v', text: T.dur(total) })]));
     sec.appendChild(el('p', { cls: 'ttd-cal-stat' }, [el('span', { text: C.days(nRec) }), best >= 2 ? el('span', { text: C.best(best) }) : null]));
-    // 曜日と日付のマス
-    var grid = el('div', { cls: 'ttd-cal', role: 'grid', 'aria-label': C.month(m0) });
+    var grid = el('div', { cls: 'ttd-cal' + (mode === 'pie' ? ' pie' : ''), role: 'grid', 'aria-label': C.month(m0) });
     var head = el('div', { cls: 'ttd-cal-row ttd-cal-wd', role: 'row' });
     C.wd.forEach(function (w) { head.appendChild(el('span', { role: 'columnheader', text: w })); });
     grid.appendChild(head);
@@ -598,30 +737,26 @@
     for (var i = 0; i < first; i++) { row.appendChild(el('span', { cls: 'ttd-cal-c empty', role: 'gridcell' })); col++; }
     for (var dd = 1; dd <= nDays; dd++) {
       (function (day) {
-        var date = new Date(y, mo, day), secs = cd.days[day] || 0, lv = heat(secs);
-        var future = date > t0, locked = cd.lim && date < cd.lim;
-        var cls = 'ttd-cal-c' + (lv ? ' rec' : '') + (date.getTime() === t0.getTime() ? ' today' : '') + (future ? ' future' : '') + (locked ? ' lock' : '');
-        var bar = null;
-        if (lv && cd.byL && cd.byL[day]) {
-          // ラベルごとの帯。長さはその月でいちばん長い日を100%にした割合
-          var o = cd.byL[day], ks = Object.keys(o).sort(function (a, b) { return o[b] - o[a]; });
-          bar = el('span', { cls: 'ttd-cal-bar', 'aria-hidden': 'true' });
-          var inner = el('span', { cls: 'ttd-cal-bar-in' });
-          inner.style.width = Math.max(14, Math.round(secs / Math.max(1, maxDay) * 100)) + '%';
-          ks.forEach(function (lb) { var sg = el('i', { cls: lcOf(lb || T.noLabel) }); sg.style.flexGrow = String(o[lb]); inner.appendChild(sg); });
-          bar.appendChild(inner);
-        }
-        var kids = [el('span', { cls: 'ttd-cal-n', text: String(day) }), lv ? el('span', { cls: 'ttd-cal-v', text: shortDur(secs) }) : null, bar];
+        var date = new Date(y, mo, day), k = dayKey(date), secs = A.days[k] || 0, has = secs >= 60, o = A.byL[k] || {};
+        var future = date > t0, locked = cd.lim && date < cd.lim, notes = cd.notes[k] || [];
+        var cls = 'ttd-cal-c' + (has ? ' rec' : '') + (date.getTime() === t0.getTime() ? ' today' : '') + (future ? ' future' : '') + (locked ? ' lock' : '');
+        var vis = has ? (mode === 'pie' ? el('span', { cls: 'ttd-cal-piew' }, [miniPie(o, secs, maxDay)]) : miniBar(o, secs, maxDay)) : null;
+        // メモは広い画面だけマスに出す（CSS で切り替え）
+        var memo = notes.length ? el('span', { cls: 'ttd-cal-memo', text: notes.join(' / ') }) : null;
+        var kids = [el('span', { cls: 'ttd-cal-n', text: String(day) }), has ? el('span', { cls: 'ttd-cal-v', text: shortDur(secs) }) : null, memo, vis];
         var c;
         if (future || locked) c = el('span', Object.assign({ cls: cls, role: 'gridcell' }, locked ? { title: C.locked } : {}), kids);
         else {
-          var det = secs >= 60 ? T.dur(secs) : C.none;
-          if (secs >= 60 && cd.byL && cd.byL[day]) { var oo = cd.byL[day]; det += C.pp[0] + Object.keys(oo).sort(function (a, b) { return oo[b] - oo[a]; }).slice(0, 4).map(function (lb) { return (lb || T.noLabel) + ' ' + T.dur(oo[lb]); }).join(C.pp[2]) + C.pp[1]; }
+          var det = has ? T.dur(secs) : C.none;
+          if (has) det += C.pp[0] + Object.keys(o).sort(function (a, b) { return o[b] - o[a]; }).slice(0, 4).map(function (lb) { return (lb || T.noLabel) + ' ' + T.dur(o[lb]); }).join(C.pp[2]) + C.pp[1];
+          if (notes.length) det += ' ' + TD.lg.memo + '：' + notes.join(' / ');
           c = el('button', { type: 'button', cls: cls, role: 'gridcell', 'aria-label': C.open(date, det) }, kids);
           c.addEventListener('click', function () {
-            S.day = date; S.view = 'day'; S.more = 10; S.sel = -1;
-            ev('cal_day', { back: daysBack(date), lv: lv }); ev('day_view', { from: 'cal', member: member() });
-            show().then(function () { var f = body.querySelector('.ttd-view.on'); if (f) f.focus(); });
+            S.day = date; S.dayOpen = true; S.view = 'day'; S.more = 10; S.sel = -1;
+            var nb = daysBack(date) + 1; if (!S.logDays || S.logDays < nb) { S.logDays = nb; S.ld = null; }
+            S.scrollDay = true;
+            ev('cal_day', { back: daysBack(date) }); ev('day_view', { from: 'cal', member: member() });
+            show();
           });
         }
         row.appendChild(c);
@@ -631,14 +766,15 @@
     }
     if (col) { while (col < 7) { row.appendChild(el('span', { cls: 'ttd-cal-c empty', role: 'gridcell' })); col++; } grid.appendChild(row); }
     sec.appendChild(grid);
-    var labs = Object.keys(labTot).sort(function (a, b) { return labTot[b] - labTot[a]; });
+    var labs = Object.keys(A.labTot).sort(function (a, b) { return A.labTot[b] - A.labTot[a]; });
     if (labs.length) {
       var lg = el('ul', { cls: 'ttd-cal-lg' });
-      labs.slice(0, 8).forEach(function (lb) { lg.appendChild(el('li', null, [el('i', { cls: lcOf(lb || T.noLabel), 'aria-hidden': 'true' }), el('span', { text: lb || T.noLabel }), el('b', { text: T.dur(labTot[lb]) })])); });
-      if (labs.length > 8) { var rest = 0; labs.slice(8).forEach(function (lb) { rest += labTot[lb]; }); lg.appendChild(el('li', { cls: 'rest' }, [el('span', { text: T.other || 'ほか' }), el('b', { text: T.dur(rest) })])); }
+      labs.slice(0, 8).forEach(function (lb) { lg.appendChild(el('li', null, [el('i', { cls: lcOf(lb || T.noLabel), 'aria-hidden': 'true' }), el('span', { text: lb || T.noLabel }), el('b', { text: T.dur(A.labTot[lb]) })])); });
+      if (labs.length > 8) { var rest = 0; labs.slice(8).forEach(function (lb) { rest += A.labTot[lb]; }); lg.appendChild(el('li', { cls: 'rest' }, [el('span', { text: T.other }), el('b', { text: T.dur(rest) })])); }
       sec.appendChild(lg);
     }
     wrap.appendChild(sec);
+    var pr = promo('cal'); if (pr) wrap.appendChild(pr);
     if (cd.lim) wrap.appendChild(el('p', { cls: 'ttd-hint', text: TD.note(FREE_DAYS) }));
   }
 
@@ -652,7 +788,7 @@
       b.addEventListener('click', function () {
         if (S.view === v[0]) return;
         S.view = v[0]; S.more = 10; S.sel = -1;
-        if (v[0] === 'day') { if (!S.day) S.day = today0(); ev('day_view', { from: 'tab', member: member() }); }
+        if (v[0] === 'day') { if (!S.day) { S.day = today0(); S.dayOpen = true; } ev('day_view', { from: 'tab', member: member() }); }
         if (v[0] === 'cal') ev('cal_view', { member: member() });
         body.querySelectorAll('.ttd-tab, .ttd-daynav button').forEach(function (x) { x.disabled = true; });
         show().then(function () { var f = body.querySelector('.ttd-view.on'); if (f) f.focus(); });
@@ -699,40 +835,94 @@
       });
       else parts = [{ label: '', secs: Math.max(0, Number(l.total_secs) || 0), s: at }];
       list.push({ id: l.id, endedAt: l.ended_at || null, noSegs: !g.length, t: t, timerName: tm ? (tm.name || '') : (typeof cfg.name === 'string' ? cfg.name.slice(0, 40) : ''),
-        pjName: tm && tm.project_id && pjNames[tm.project_id] ? pjNames[tm.project_id] : '', parts: parts, done: !!l.completed });
+        pjName: tm && tm.project_id && pjNames[tm.project_id] ? pjNames[tm.project_id] : '', parts: parts, done: !!l.completed,
+        note: typeof cfg.note === 'string' ? cfg.note.slice(0, 200) : '' });
     });
     return { list: list, breaks: M.breaks };
   }
-  function renderDay() {
-    var D = S.dd.D, prem = !!window.__ttPremium, isToday = daysBack(S.day) === 0;
+  /* ---------- ログ（11/17）: 新しい日から順に棒グラフ。押すとその日のくわしい流れが開く ---------- */
+  var LOG_STEP = 14;
+  async function loadLog(sb) {
+    if (!S.logDays) S.logDays = LOG_STEP;
+    if (!window.__ttPremium) S.logDays = Math.min(S.logDays, FREE_DAYS);
+    var q1 = new Date(today0().getTime() + 86400000), q0 = new Date(today0().getTime() - (S.logDays - 1) * 86400000);
+    if (S.ld && S.ld.days === S.logDays && Date.now() - S.ld.at < 30000) return;
+    var R = await loadRange(sb, q0, q1);
+    S.ld = { days: S.logDays, at: Date.now(), pieces: R.pieces, notes: R.notes };
+  }
+  function renderLog() {
+    var prem = !!window.__ttPremium, A = byDay(S.ld.pieces, false), t0 = today0();
     body.textContent = '';
     body.appendChild(viewTabs());
-    // 日付の切り替え
-    var nav = el('div', { cls: 'ttd-daynav' });
-    var prev = el('button', { type: 'button', 'aria-label': TD.prev, text: '‹' });
-    var next = el('button', { type: 'button', 'aria-label': TD.next, text: '›' });
-    if (isToday) next.disabled = true;
-    var back = daysBack(S.day);
-    var sub = back === 0 ? TD.today : back === 1 ? TD.yday : '';
-    nav.appendChild(prev);
-    nav.appendChild(el('p', { cls: 'ttd-daynav-d', 'aria-live': 'polite' }, [el('b', { text: TD.date(S.day) }), sub ? el('span', { text: sub }) : null]));
-    nav.appendChild(next);
-    function move(dir) {
-      var nb = back + (dir < 0 ? 1 : -1);
-      if (nb < 0) return;
-      if (!prem && nb > FREE_DAYS - 1) { showLock(TD.lockT, TD.lockL(FREE_DAYS)); ev('data_locked', { period: 'day', back: nb }); return; }
-      var d = new Date(S.day); d.setDate(d.getDate() + (dir < 0 ? -1 : 1)); S.day = d;
-      ev('day_move', { dir: dir < 0 ? 'prev' : 'next', back: nb });
-      nav.querySelectorAll('button').forEach(function (x) { x.disabled = true; });
-      show().then(function () { var f = body.querySelector('.ttd-daynav button:not([disabled])'); var want = body.querySelectorAll('.ttd-daynav button')[dir < 0 ? 0 : 1]; if (want && !want.disabled) want.focus(); else if (f) f.focus(); });
-    }
-    prev.addEventListener('click', function () { move(-1); });
-    next.addEventListener('click', function () { move(1); });
-    body.appendChild(nav);
     body.appendChild(el('div', { cls: 'ttd-lock', hidden: '', role: 'status' }));
     var wrap = el('div', { cls: 'ttd-main' });
     body.appendChild(wrap);
     if (S.flash) { wrap.appendChild(el('p', { cls: 'ttd-msg ttd-ok', role: 'status', text: S.flash })); S.flash = null; }
+    // あとから記録（ホームと同じ入力欄）
+    if (window.__ttManualForm) {
+      var later = el('button', { type: 'button', cls: 'ttd-csv ttd-later', 'aria-expanded': 'false', text: TD.lg.later });
+      var lbox = el('div', { cls: 'ttd-laterbox', hidden: '' });
+      later.addEventListener('click', function () {
+        if (!lbox.hidden) { lbox.hidden = true; lbox.textContent = ''; later.setAttribute('aria-expanded', 'false'); return; }
+        lbox.hidden = false; later.setAttribute('aria-expanded', 'true'); ev('log_later_open', {});
+        window.__ttManualForm(lbox, function (saved) {
+          lbox.hidden = true; lbox.textContent = ''; later.setAttribute('aria-expanded', 'false');
+          if (saved) { S.ld = null; S.dd = null; S.cd = null; S.day = today0(); S.dayOpen = true; show(); } else later.focus();
+        });
+      });
+      wrap.appendChild(el('div', { cls: 'ttd-latrow' }, [later]));
+      wrap.appendChild(lbox);
+    }
+    // 日ごとの行（記録のある日と今日）
+    var keys = [], max = 0;
+    for (var i = 0; i < S.logDays; i++) {
+      var d = new Date(t0.getTime() - i * 86400000), k = dayKey(d), v = A.days[k] || 0;
+      if (v >= 60 || i === 0 || (S.dayOpen && S.day && S.day.getTime() === d.getTime())) keys.push({ d: d, k: k, v: v });
+      if (v > max) max = v;
+    }
+    var ul = el('ul', { cls: 'ttd-lrows' }), n = 0;
+    keys.forEach(function (x) {
+      var open = S.dayOpen && S.day && S.day.getTime() === x.d.getTime();
+      var back = daysBack(x.d), sub = back === 0 ? TD.today : back === 1 ? TD.yday : '';
+      var nt = (S.ld.notes[x.k] || []);
+      var btn = el('button', { type: 'button', cls: 'ttd-lrow' + (open ? ' on' : ''), 'aria-expanded': open ? 'true' : 'false',
+        'aria-label': TD.lg.open(TD.date(x.d) + (sub ? ' ' + sub : ''), x.v >= 60 ? T.dur(x.v) : TD.lg.none) }, [
+        el('span', { cls: 'ttd-lrow-d' }, [el('b', { text: TD.date(x.d) }), sub ? el('span', { text: sub }) : null]),
+        x.v >= 60 ? miniBar(A.byL[x.k] || {}, x.v, max, 'ttd-lrow-bar') : el('span', { cls: 'ttd-lrow-bar empty' }),
+        el('span', { cls: 'ttd-lrow-v', text: x.v >= 60 ? T.dur(x.v) : '—' }),
+        el('span', { cls: 'ttd-lrow-ar', 'aria-hidden': 'true', text: open ? '▴' : '▾' })
+      ]);
+      var li = el('li', { cls: 'ttd-lrow-li' }, [btn]);
+      if (nt.length && !open) li.appendChild(el('p', { cls: 'ttd-lrow-memo', text: '📝 ' + nt.join(' / ') }));
+      btn.addEventListener('click', function () {
+        if (open) { S.dayOpen = false; renderLog(); var b = body.querySelectorAll('.ttd-lrow')[keys.indexOf(x)]; if (b) b.focus(); return; }
+        S.day = x.d; S.dayOpen = true; S.showTiny = false;
+        ev('day_view', { from: 'log', member: member(), back: back });
+        btn.disabled = true;
+        show().then(function () { var b = body.querySelector('.ttd-lrow.on'); if (b) b.focus(); });
+      });
+      if (open) { var det = el('div', { cls: 'ttd-lday' }); renderDayDetail(det); li.appendChild(det); }
+      ul.appendChild(li);
+      n++;
+      if (n === 7) { var pr = promo('log'); if (pr) ul.appendChild(el('li', { cls: 'ttd-lrow-promo' }, [pr])); }
+    });
+    wrap.appendChild(ul);
+    // もっと見る（無料は30日まで）
+    if (prem || S.logDays < FREE_DAYS) {
+      var mb = el('button', { type: 'button', cls: 'ttd-more', text: TD.lg.more });
+      mb.addEventListener('click', function () { S.logDays += LOG_STEP; ev('log_more', { days: S.logDays }); mb.disabled = true; show(); });
+      wrap.appendChild(mb);
+    } else {
+      wrap.appendChild(el('p', { cls: 'ttd-hint', text: TD.lg.lockMore }));
+    }
+    if (n < 7) { var pr2 = promo('log'); if (pr2) wrap.appendChild(pr2); }
+    if (!prem) wrap.appendChild(el('p', { cls: 'ttd-hint', text: TD.note(FREE_DAYS) }));
+    if (S.scrollDay) { S.scrollDay = false; setTimeout(function () { var b = body.querySelector('.ttd-lrow.on'); if (b) { b.scrollIntoView({ block: 'start' }); b.focus({ preventScroll: true }); } }, 0); }
+  }
+  // 開いた日のくわしい流れ（合計・ラベル別・1日の帯・1回ずつ）
+  function renderDayDetail(wrap) {
+    if (!S.dd) return;
+    var D = S.dd.D, isToday = daysBack(S.day) === 0;
     // ラベルごとの作業時間 → 多い順に色（ホームのカードと同じ順番）。8つ目以降は「ほか」
     var tot = {}, work = 0;
     D.list.forEach(function (e) { e.work = 0; e.brk = 0; e.parts.forEach(function (p) { if (isBreak(D, p.label)) { e.brk += p.secs; return; } e.work += p.secs; work += p.secs; tot[p.label] = (tot[p.label] || 0) + p.secs; }); });
@@ -803,7 +993,7 @@
         var li = el('li', null, [
           el('span', { cls: 'ttd-flow-t' }, [el('span', { text: hm(e.t) }), el('span', { cls: 'ttd-flow-end', text: '〜' + hm(endD) })]),
           el('span', { cls: 'ttd-flow-c ' + clsOf(main), 'aria-hidden': 'true' }),
-          el('span', { cls: 'ttd-flow-b' }, [el('span', { cls: 'ttd-flow-n', text: title }), el('span', { cls: 'ttd-flow-p', text: desc })]),
+          el('span', { cls: 'ttd-flow-b' }, [el('span', { cls: 'ttd-flow-n', text: title }), el('span', { cls: 'ttd-flow-p', text: desc }), e.note ? el('span', { cls: 'ttd-flow-memo', text: '📝 ' + e.note }) : null]),
           el('span', { cls: 'ttd-flow-v' }, [el('span', { text: T.dur(e.work) + (e.done ? ' ✓' : '') }), edb])
         ]);
         edb.addEventListener('click', function () { toggleEdit(li, edb, e, D); });
@@ -811,7 +1001,7 @@
       });
       if (tinyN) {
         var tb = el('button', { type: 'button', cls: 'ttd-flow-tiny', 'aria-expanded': S.showTiny ? 'true' : 'false', text: S.showTiny ? TD.tinyHide : TD.tinyShow(tinyN) });
-        tb.addEventListener('click', function () { S.showTiny = !S.showTiny; ev('day_tiny', { show: S.showTiny ? 1 : 0, n: tinyN }); renderDay(); var f = body.querySelector('.ttd-flow-tiny'); if (f) f.focus(); });
+        tb.addEventListener('click', function () { S.showTiny = !S.showTiny; ev('day_tiny', { show: S.showTiny ? 1 : 0, n: tinyN }); renderLog(); var f = body.querySelector('.ttd-flow-tiny'); if (f) f.focus(); });
         ul.appendChild(el('li', { cls: 'tiny' }, [tb]));
       }
       if (isToday) {
@@ -821,7 +1011,6 @@
       flow.appendChild(ul);
       wrap.appendChild(flow);
     }
-    if (!prem) wrap.appendChild(el('p', { cls: 'ttd-hint', text: TD.note(FREE_DAYS) }));
   }
 
   /* ---------- 1日の流れ: 記録の時間を変える・消す（11/16） ---------- */
@@ -844,6 +1033,9 @@
     var endAt = e.endedAt ? Date.parse(e.endedAt) : NaN;
     var mine = window.__ttEndedHere ? window.__ttEndedHere() : [];
     if (!e.done && mine.indexOf(e.id) < 0 && (!isFinite(endAt) || Date.now() - endAt < 75000)) { msg(E.recent); return; }
+    // 11/17: ひとことメモ（usage_logs.config.note）
+    var memoIn = el('input', { type: 'text', maxlength: '200', value: e.note || '', placeholder: TD.lg.memoPh, autocomplete: 'off', 'aria-label': TD.lg.memo });
+    if (window.__ttSetNote) box.appendChild(el('label', { cls: 'ttd-edit-st ttd-edit-memo' }, [el('span', { text: TD.lg.memo }), memoIn]));
     var stIn = el('input', { type: 'time', step: '60', value: pad(e.t.getHours()) + ':' + pad(e.t.getMinutes()), 'aria-label': E.start });
     box.appendChild(el('label', { cls: 'ttd-edit-st' }, [el('span', { text: E.start }), stIn]));
     var ins = [];
@@ -878,16 +1070,24 @@
       var secs = e.parts.map(function (p, i) { return secsOf(i); });
       if (secs.some(function (x) { return !isFinite(x); })) { msg(E.errLen); return; }
       var total = secs.reduce(function (a, b) { return a + b; }, 0);
-      if (total < 60 || total > 12 * 3600) { msg(E.errLen); return; }
+      if ((total < 60 || total > 12 * 3600) && secs.some(function (x, i) { return x !== e.parts[i].secs; })) { msg(E.errLen); return; }
       var m = /^(\d{1,2}):(\d{2})/.exec(stIn.value || '');
       if (!m) { msg(E.errSave); return; }
       var st = new Date(e.t);
       var moved = Number(m[1]) !== e.t.getHours() || Number(m[2]) !== e.t.getMinutes();
       if (moved) st.setHours(Number(m[1]), Number(m[2]), 0, 0);
       save.disabled = del.disabled = true;
-      var r = await saveEdit(e, st.getTime(), secs);
-      if (!r.ok) { save.disabled = del.disabled = false; msg(r.why === 'future' ? E.errEnd : E.errSave); return; }
-      ev('log_edit', { parts: e.parts.length, moved: moved ? 1 : 0, back: daysBack(S.day) });
+      var timeChanged = moved || secs.some(function (x, i) { return x !== e.parts[i].secs; });
+      if (timeChanged) {
+        var r = await saveEdit(e, st.getTime(), secs);
+        if (!r.ok) { save.disabled = del.disabled = false; msg(r.why === 'future' ? E.errEnd : E.errSave); return; }
+        ev('log_edit', { parts: e.parts.length, moved: moved ? 1 : 0, back: daysBack(S.day) });
+      }
+      var nv = memoIn.value.trim().slice(0, 200);
+      if (window.__ttSetNote && nv !== (e.note || '')) {
+        var okN = await window.__ttSetNote(e.id, nv);
+        if (!okN) { save.disabled = del.disabled = false; msg(E.errSave); return; }
+      }
       afterEdit(E.saved);
     });
     var sure = false;
@@ -899,10 +1099,10 @@
       ev('log_delete', { back: daysBack(S.day) });
       afterEdit(E.deleted);
     });
-    stIn.focus();
+    (window.__ttSetNote ? memoIn : stIn).focus();
   }
   function afterEdit(text) {
-    S.dd = null; S.data = null; S.cd = null; S.flash = text;
+    S.dd = null; S.data = null; S.cd = null; S.ld = null; S.flash = text;
     if (window.__ttStatsRefresh) window.__ttStatsRefresh();
     show().then(function () { var f = body.querySelector('.ttd-ok'); if (f) { f.setAttribute('tabindex', '-1'); f.focus(); } });
   }

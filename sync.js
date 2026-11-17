@@ -435,11 +435,11 @@
     return o;
   }
   function cleanHide(h) { var o = {}; if (Array.isArray(h)) h.slice(0, 300).forEach(function (x) { if (typeof x === 'string' && x) o[x.slice(0, 30)] = 1; }); return o; }
-  // 11/15: ラベルの色（8色の番号 0〜7）。settings.data.labelColor {ラベル: 番号}
+  // 11/15: ラベルの色（11/17 から16色の番号 0〜15）。settings.data.labelColor {ラベル: 番号}
   function cleanCol(c) {
     var o = {};
     if (c && typeof c === 'object' && !Array.isArray(c)) Object.keys(c).slice(0, 300).forEach(function (k) {
-      var v = c[k]; if (typeof v === 'number' && v >= 0 && v <= 7 && Math.floor(v) === v && k) o[String(k).slice(0, 30)] = v;
+      var v = c[k]; if (typeof v === 'number' && v >= 0 && v <= 15 && Math.floor(v) === v && k) o[String(k).slice(0, 30)] = v;
     });
     return o;
   }
@@ -553,6 +553,13 @@
   }
   /* ---------- ラベルの候補（一度使った区切りの名前。タイマー名の入力欄に出す） ---------- */
   var recentLabels = []; // 最近使ったラベル（新しい順。カウントアップのボタン作成でも候補に出す）
+  // 11/17: ボタンで作っただけでまだ使っていないラベルも、タイマーの選択肢に出す
+  function labelList() {
+    var out = recentLabels.slice(), seen = {};
+    out.forEach(function (l) { seen[l] = 1; });
+    (typeof cBtns !== 'undefined' ? cBtns : []).forEach(function (b) { var l = String(b.label || '').slice(0, 30); if (l && !seen[l] && !LHIDE[l]) { seen[l] = 1; out.push(l); } });
+    return out;
+  }
   /* ラベルの編集（選択肢の鉛筆から）。patch: { rename: [古い, 新しい], brk: 0/1, hide: 名前 } */
   async function saveLabelMeta(patch) {
     try {
@@ -576,7 +583,7 @@
       }
       if (name && (patch.brk === 0 || patch.brk === 1)) brk[name] = patch.brk;
       if (patch.hide) hide[String(patch.hide).slice(0, 30)] = 1;
-      if (name && typeof patch.color === 'number' && patch.color >= 0 && patch.color <= 7) col[String(name).slice(0, 30)] = Math.floor(patch.color);
+      if (name && typeof patch.color === 'number' && patch.color >= 0 && patch.color <= 15) col[String(name).slice(0, 30)] = Math.floor(patch.color);
       var data = Object.assign({}, base, { labelMap: map, labelHide: Object.keys(hide), breaks: brk, labelColor: col });
       if (JSON.stringify(data).length > 15000) return false;
       var r = await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
@@ -589,6 +596,10 @@
     } catch (e) { return false; }
   }
   async function loadLabels() {
+    await loadLabels0();
+    autoColors();
+  }
+  async function loadLabels0() {
     try {
       var r = await sb.from('usage_segments').select('label').eq('product', PRODUCT).order('started_at', { ascending: false }).limit(500);
       if (r.error || !r.data) return;
@@ -598,8 +609,38 @@
       var dl = document.getElementById('tt-labels');
       if (!dl) { dl = document.createElement('datalist'); dl.id = 'tt-labels'; document.body.appendChild(dl); }
       dl.textContent = '';
-      out.forEach(function (l) { var o = document.createElement('option'); o.value = l; dl.appendChild(o); });
+      labelList().forEach(function (l) { var o = document.createElement('option'); o.value = l; dl.appendChild(o); });
     } catch (e) {}
+  }
+  // 11/17: 色を選んでいないラベルに、なるべくほかと重ならない色を一度だけ決めて保存する
+  //（最初の候補はこれまでと同じ「名前から決まる色」。同じ色が使われていれば、使われていない色へ）
+  var autoColBusy = false;
+  async function autoColors() {
+    if (autoColBusy || !sb) return;
+    var labels = labelList().filter(function (l) { return !Object.prototype.hasOwnProperty.call(LCOL, l) && !isBreak(l); });
+    if (!labels.length) return;
+    autoColBusy = true;
+    try {
+      var cur = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
+      if (cur.error) return;
+      var base = (cur.data && cur.data.data && typeof cur.data.data === 'object') ? cur.data.data : {};
+      var col = cleanCol(base.labelColor), used = {}, n = 0;
+      labelList().forEach(function (l) { if (Object.prototype.hasOwnProperty.call(col, l)) used[col[l]] = (used[col[l]] || 0) + 1; });
+      labels.forEach(function (l) {
+        if (Object.prototype.hasOwnProperty.call(col, l) || Object.keys(col).length >= 300) return;
+        var h = 0; for (var ch of l) h = (h * 31 + ch.codePointAt(0)) >>> 0;
+        var best = h % 16, bc = 1e9;
+        for (var i = 0; i < 16; i++) { var c = (h + i) % 16, u = used[c] || 0; if (u < bc) { bc = u; best = c; } }
+        col[l] = best; used[best] = (used[best] || 0) + 1; n++;
+      });
+      if (!n) return;
+      var data = Object.assign({}, base, { labelColor: col });
+      if (JSON.stringify(data).length > 15000) return;
+      var r = await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
+      if (r.error) return;
+      setLabelMeta(cleanMap(base.labelMap), cleanHide(base.labelHide), col);
+      if (window.__ttOnLabelColors) try { window.__ttOnLabelColors(); } catch (e) {}
+    } catch (e) {} finally { autoColBusy = false; }
   }
   function persistLog(L, done) {
     L.chain = (L.chain || Promise.resolve()).then(async function () {
@@ -633,6 +674,27 @@
     }).catch(function () {});
     return L.chain;
   }
+  // 11/17: 終わった記録に「ひとことメモ」を付けられるよう、画面に知らせる（1分以上のときだけ）
+  function logEnded(L) {
+    if (!L.id || L.secs < 60) return;
+    try { window.dispatchEvent(new CustomEvent('tt-log-ended', { detail: { id: L.id, secs: Math.round(L.secs), label: (L.segs && L.segs[0] && L.segs[0].label) || L.timerName || '' } })); } catch (e) {}
+  }
+  // メモは usage_logs.config.note に入れる（列を足さない。本人の記録だけ書ける）
+  async function setNote(id, note) {
+    note = String(note == null ? '' : note).replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, '').trim().slice(0, 200);
+    if (!sb || !id) return false;
+    try {
+      var r = await sb.from('usage_logs').select('config').eq('id', id).maybeSingle();
+      if (r.error || !r.data) return false;
+      var cfg = (r.data.config && typeof r.data.config === 'object' && !Array.isArray(r.data.config)) ? Object.assign({}, r.data.config) : {};
+      if (note) cfg.note = note; else delete cfg.note;
+      var w = await sb.from('usage_logs').update({ config: cfg }).eq('id', id).select('id');
+      if (w.error || !w.data || !w.data.length) return false;
+      ev(note ? 'note_save' : 'note_clear', { len: note.length });
+      return true;
+    } catch (e) { return false; }
+  }
+  window.__ttSetNote = setNote;
   function endLog(done) {
     if (!log) return;
     step();
@@ -642,7 +704,7 @@
     if (ST && ST.day === dayKey(new Date(L.startedAt)) && L.secs >= 15) { ST.todayLogs[tmpId] = workOf(L); putBlocks(tmpId, blocksOf(L, tmpId)); try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {} }
     showStats();
     persistLog(L, done).then(function () {
-      if (L.id) { endedHere.push(L.id); if (endedHere.length > 50) endedHere.shift(); }
+      if (L.id) { endedHere.push(L.id); if (endedHere.length > 50) endedHere.shift(); logEnded(L); }
       if (L.id && ST) {
         var k; for (k in ST.todayLogs) if (/^local/.test(k)) delete ST.todayLogs[k];
         ST.blocks = (ST.blocks || []).filter(function (b) { return !/^local/.test(String(b.lid)); });
@@ -843,6 +905,7 @@
     if (ST && ST.day === dayKey(new Date(R.start))) { ST.todayLogs[tmp] = workOf(L); putBlocks(tmp, blocksOf(L, tmp)); }
     showStatsNow();
     persistLog(L, true).then(function () {
+      if (L.id) { endedHere.push(L.id); if (endedHere.length > 50) endedHere.shift(); logEnded(L); }
       if (!L.id || !ST) return;
       if (tmp !== L.id) { delete ST.todayLogs[tmp]; ST.blocks = (ST.blocks || []).filter(function (b) { return b.lid !== tmp; }); }
       if (ST.day === dayKey(new Date(R.start))) { ST.todayLogs[L.id] = workOf(L); putBlocks(L.id, blocksOf(L, L.id)); }
@@ -937,7 +1000,7 @@
     // 11/16: データの窓で時間を変えるとき、動いている記録は変えない
     window.__ttActiveLogs = function () { return [log && log.id, cRun && cRun.L && cRun.L.id].filter(Boolean); };
     window.__ttEndedHere = function () { return endedHere.slice(); };
-    window.__ttLabels = { list: function () { return recentLabels.slice(); }, isBreak: isBreak, save: saveLabelMeta };
+    window.__ttLabels = { list: labelList, isBreak: isBreak, save: saveLabelMeta };
     window.__ttCount = { start: cStart, stop: function () { cStop(false); }, cancel: cCancel, manual: cManual, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
       labels: function () { return recentLabels.filter(function (l) { return !isBreak(l); }); } };
     cResume();

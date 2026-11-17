@@ -626,13 +626,14 @@ updateHighlight();
 
 /* ---------- ラベルの選択肢（▾）と編集（鉛筆） ---------- */
 /* ---------- 11/15: ラベルの色（8色・濃いめで白い絵が読める）と、白抜きの絵（Fluent Emoji・MIT） ---------- */
-const LCOLORS = ['#2A6FC4', '#C4521C', '#12825C', '#A86F00', '#B8457A', '#6A4BC4', '#1E7A8C', '#7A5A40'];
+// 11/17: 16色に（前の8色はそのままの番号）
+const LCOLORS = ['#2A6FC4', '#C4521C', '#12825C', '#A86F00', '#B8457A', '#6A4BC4', '#1E7A8C', '#7A5A40', '#C62828', '#5E7D14', '#2C3E8C', '#9C2D9C', '#5F6B7A', '#2E7D32', '#4E342E', '#C2405F'];
 function labelColorIdx(l) {
   l = String(l == null ? '' : l);
   const m = window.__ttLC || {};
-  if (Object.prototype.hasOwnProperty.call(m, l) && m[l] >= 0 && m[l] <= 7) return m[l];
+  if (Object.prototype.hasOwnProperty.call(m, l) && m[l] >= 0 && m[l] < LCOLORS.length) return m[l];
   let h = 0; for (const ch of l) h = (h * 31 + ch.codePointAt(0)) >>> 0;
-  return h % 8;
+  return h % LCOLORS.length;
 }
 function labelColor(l) { return LCOLORS[labelColorIdx(l)]; }
 window.__ttLabelColor = labelColor;
@@ -1802,7 +1803,7 @@ var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=12';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=13';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
@@ -1815,7 +1816,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=20'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=21'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -2235,7 +2236,7 @@ box.appendChild(manualForm(box, cs));
 box.appendChild(countForm(box, cs));
 }
 }
-function manualForm(box, cs) {
+function manualForm(box, cs, opt) {
 var f = mk('div', 'tt-cform tt-mform'); f.setAttribute('role', 'group'); f.setAttribute('aria-label', TL.mTitle);
 f.appendChild(mk('p', 'tt-mform-t', TL.mTitle));
 var idn = 'tt-mname-' + Date.now();
@@ -2302,15 +2303,15 @@ var msg = mk('p', 'tt-cnote tt-merr'); msg.setAttribute('role', 'status');
 var acts = mk('div', 'tt-cform-a');
 var ok = mk('button', 'tt-cbtn2 pri', TL.cSave); ok.type = 'button';
 var cancel = mk('button', 'tt-cbtn2', TL.cCancel); cancel.type = 'button';
-function close() { CU.form = null; CU.key = ''; renderCount(box, window.__ttCount.state()); }
-cancel.addEventListener('click', close);
+function close(saved) { if (opt && opt.onClose) { opt.onClose(!!saved); return; } CU.form = null; CU.key = ''; renderCount(box, window.__ttCount.state()); }
+cancel.addEventListener('click', function () { close(false); });
 ok.addEventListener('click', function () {
 var v = inp.value.trim(), s0 = startMs(), m = Math.round(Number(mins.value));
 if (!v || !isFinite(s0)) { msg.textContent = TL.mErr.bad; return; }
 ok.disabled = true; msg.textContent = '';
 window.__ttCount.manual({ label: v, start: s0, secs: m * 60 }).then(function (r) {
 if (!r || !r.ok) { msg.textContent = TL.mErr[(r && r.why) || 'net'] || TL.mErr.net; ok.disabled = false; return; }
-close();
+close(true);
 if (window.__ttOneUndo) window.__ttOneUndo(TL.mSaved(v, hm(s0), hm(s0 + m * 60000)), null);
 });
 });
@@ -2319,6 +2320,39 @@ f.append(msg, acts);
 setTimeout(function () { try { inp.focus({ preventScroll: true }); } catch (e) {} }, 0);
 return f;
 }
+// 11/17: データの窓（ログ）からも「あとから記録」
+window.__ttManualForm = function (container, onClose) {
+if (!window.__ttCount) return null;
+var f = manualForm(container, window.__ttCount.state(), { onClose: onClose });
+container.appendChild(f); return f;
+};
+// 11/17: 終わった記録に「ひとことメモ」（今日のログの上に小さく出す。閉じれば消える）
+var NOTE_L = LANG === 'en' ? { q: 'Add a note to this record?', ph: 'e.g. finished chapter 3', save: 'Save', no: 'Close', ok: 'Note saved', err: 'Could not save the note.' }
+: LANG === 'es' ? { q: '¿Añadir una nota a este registro?', ph: 'p. ej. terminé el capítulo 3', save: 'Guardar', no: 'Cerrar', ok: 'Nota guardada', err: 'No se pudo guardar la nota.' }
+: { q: 'いまの記録にひとことメモ', ph: '例：3章まで終わった', save: '保存', no: '閉じる', ok: 'メモを保存しました', err: 'メモを保存できませんでした' };
+window.addEventListener('tt-log-ended', function (e) {
+var d = e.detail || {}; if (!d.id || !window.__ttSetNote) return;
+var col = document.getElementById('tt-logcol'); if (!col) return;
+var old = document.getElementById('tt-note'); if (old) old.remove();
+var f = mk('form', 'tt-note'); f.id = 'tt-note'; f.setAttribute('aria-label', NOTE_L.q);
+var head = mk('p', 'tt-note-t', NOTE_L.q + (d.label ? '（' + String(d.label).slice(0, 20) + '）' : ''));
+var inp = mk('input', 'tt-cform-in'); inp.type = 'text'; inp.maxLength = 200; inp.placeholder = NOTE_L.ph; inp.autocomplete = 'off'; inp.setAttribute('aria-label', NOTE_L.q);
+var ok = mk('button', 'tt-cbtn2 pri', NOTE_L.save); ok.type = 'submit';
+var no = mk('button', 'tt-cbtn2', NOTE_L.no); no.type = 'button';
+var msg = mk('p', 'tt-cnote'); msg.setAttribute('role', 'status');
+var row = mk('div', 'tt-note-r'); row.append(inp, ok, no);
+f.append(head, row, msg);
+no.addEventListener('click', function () { f.remove(); });
+f.addEventListener('submit', function (ev2) {
+ev2.preventDefault(); var v = inp.value.trim(); if (!v) { f.remove(); return; }
+ok.disabled = true;
+window.__ttSetNote(d.id, v).then(function (good) {
+if (!good) { ok.disabled = false; msg.textContent = NOTE_L.err; return; }
+f.remove(); if (window.__ttOneUndo) window.__ttOneUndo(NOTE_L.ok, null);
+});
+});
+col.insertBefore(f, col.firstChild);
+});
 function countForm(box, cs) {
 var editing = CU.form !== 'new';
 var cur = editing ? cs.btns.filter(function (b) { return b.id === CU.form; })[0] : null;
