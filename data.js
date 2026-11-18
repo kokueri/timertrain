@@ -1076,6 +1076,23 @@
         }
       }
       wrap.appendChild(sum);
+      // 11/18: その日のメモをまとめて（どのラベルのメモか、色と名前つき）
+      var withNote = D.list.filter(function (e) { return e.note; });
+      if (withNote.length) {
+        var ms = el('section', { cls: 'ttd-sec ttd-memos' });
+        ms.appendChild(el('h3', { text: TD.lg.memo + '（' + withNote.length + '）' }));
+        var mul = el('ul', { cls: 'ttd-memo-l' });
+        withNote.forEach(function (e) {
+          var main = e.parts.filter(function (p) { return !isBreak(D, p.label); })[0] || e.parts[0] || { label: '' };
+          var lb = nm(main.label);
+          mul.appendChild(el('li', null, [
+            el('span', { cls: 'ttd-memo-h' }, [el('i', { cls: 'ttd-memo-c ' + clsOf(main), 'aria-hidden': 'true' }), el('b', { text: lb }), el('span', { cls: 'ttd-memo-t', text: hm(e.t) })]),
+            el('span', { cls: 'ttd-memo-x', text: e.note })
+          ]));
+        });
+        ms.appendChild(mul);
+        wrap.appendChild(ms);
+      }
       // 帯（6時〜24時。6時より前の記録がある日は0時から）
       var d0 = S.day.getTime(), d1 = d0 + 86400000;
       var first = d1; D.list.forEach(function (e) { e.parts.forEach(function (p) { if (p.s < first) first = p.s; }); });

@@ -583,7 +583,7 @@
       }
       if (name && (patch.brk === 0 || patch.brk === 1)) brk[name] = patch.brk;
       if (patch.hide) hide[String(patch.hide).slice(0, 30)] = 1;
-      if (name && typeof patch.color === 'number' && patch.color >= 0 && patch.color <= 15) col[String(name).slice(0, 30)] = Math.floor(patch.color);
+      if (name && typeof patch.color === 'number' && patch.color >= 0 && patch.color <= 23) col[String(name).slice(0, 30)] = Math.floor(patch.color);
       var data = Object.assign({}, base, { labelMap: map, labelHide: Object.keys(hide), breaks: brk, labelColor: col });
       if (JSON.stringify(data).length > 15000) return false;
       var r = await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
