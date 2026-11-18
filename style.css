@@ -1583,3 +1583,7 @@ body.focus-mode #cal-btn { display: none; }
 .tt-today-cta { font-size: 13px; font-weight: 700; color: var(--accent, var(--text)); }
 .tt-today.sample .tt-today-head { justify-content: flex-start; align-items: center; }
 .tt-today.sample .tt-today-sum { margin-left: auto; }
+/* 11/18: プロジェクトはラベルごと（ラベルの編集・ボタンの編集） */
+.lbl-pj, .tt-cform-pj { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 8px 0 4px; }
+.lbl-pj .tt-my-proj, .tt-cform-pj .tt-my-proj { flex: 1 1 160px; max-width: 260px; }
+.lbl-pj .tt-my-projnew, .tt-cform-pj .tt-my-projnew { display: flex; gap: 6px; flex: 1 1 100%; }

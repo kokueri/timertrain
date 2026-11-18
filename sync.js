@@ -116,7 +116,7 @@
   var projects = [];
   function projName(id) { for (var i = 0; i < projects.length; i++) if (projects[i].id === id) return projects[i].name; return ''; }
   // プロジェクトの選択（なし／既存／＋新しく作る）。選んだら onPick(id or null)
-  function projPicker(cur, onPick) {
+  function projPicker(cur, onPick, from) {
     var s = el('select', { cls: 'tt-my-proj', 'aria-label': T.proj });
     s.appendChild(el('option', { value: '', text: T.projNone }));
     projects.forEach(function (p) { var o = el('option', { value: p.id, text: p.name }); if (p.id === cur) o.selected = true; s.appendChild(o); });
@@ -135,7 +135,7 @@
         ok.disabled = true;
         var r = await sb.from('projects').insert({ product: PRODUCT, name: name, sort: projects.length }).select('id,name').single();
         if (r.error || !r.data) { ok.disabled = false; setNote(T.err, true); return; }
-        projects.push(r.data); ev('project_create', { count: projects.length, from: 'timer' });
+        projects.push(r.data); ev('project_create', { count: projects.length, from: from || 'label' });
         var o = el('option', { value: r.data.id, text: r.data.name }); s.insertBefore(o, s.lastChild); s.value = r.data.id;
         if (projects.length >= PJ_FREE && s.lastChild.value === '__new') s.removeChild(s.lastChild);
         box.remove(); s.hidden = false; onPick(r.data.id);
@@ -207,15 +207,7 @@
     rn.addEventListener('click', function () { openRename(it); });
     acts.appendChild(rn);
     curRow.appendChild(acts);
-    var pl = el('label', { cls: 'tt-my-projrow' }, [el('span', { cls: 'tt-my-cur-label', text: T.proj })]);
-    pl.appendChild(projPicker(it.project_id || '', async function (pid) {
-      var r = await sb.from('timers').update({ project_id: pid }).eq('id', it.id).select('id,name,config,updated_at,project_id').single();
-      if (r.error || !r.data) { setNote(T.err, true); return; }
-      ev('project_assign', { from: 'timer' });
-      items = items.map(function (z) { return z.id === it.id ? r.data : z; });
-      render();
-    }));
-    curRow.appendChild(pl);
+    // 11/18: プロジェクトはラベルごと（ラベルの編集・ボタンの編集で決める）。マイタイマーでは選ばない
     badge.hidden = false;
     badge.textContent = T.badge + '：' + it.name + (dirty ? '（' + T.changed + '）' : '');
     badge.classList.toggle('dirty', dirty);
@@ -340,6 +332,33 @@
     projects = rp.error ? [] : (rp.data || []);
     pickCur();
     render();
+    migratePj();
+  }
+  // 11/18: 一度だけ。これまで「マイタイマーのプロジェクト」で分けていた人は、そのマイタイマーの区切りの名前（ラベル）に
+  // 同じプロジェクトを引き継ぐ（新しく更新したマイタイマーが優先・休憩は除く）。labelProject があれば何もしない
+  async function migratePj() {
+    try {
+      if (!items.some(function (it) { return it.project_id; })) return;
+      var cur = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
+      if (cur.error) return;
+      var base = (cur.data && cur.data.data && typeof cur.data.data === 'object') ? cur.data.data : {};
+      if (Object.prototype.hasOwnProperty.call(base, 'labelProject')) return;
+      var ok = {}; projects.forEach(function (p) { ok[p.id] = 1; });
+      var lpj = {};
+      items.forEach(function (it) {
+        if (!it.project_id || !ok[it.project_id] || !it.config || typeof it.config.q !== 'string') return;
+        var m = /^\?t=([^&]*)&/.exec(it.config.q); if (!m) return;
+        m[1].split(',').forEach(function (part) {
+          var i1 = part.indexOf('.'), i2 = part.indexOf('.', i1 + 1); if (i1 < 0 || i2 < 0) return;
+          var nm = ''; try { nm = alias(decodeURIComponent(part.slice(i2 + 1)).trim()).slice(0, 30); } catch (e) { return; }
+          if (nm && !isBreak(nm) && !Object.prototype.hasOwnProperty.call(lpj, nm) && Object.keys(lpj).length < 300) lpj[nm] = it.project_id;
+        });
+      });
+      var data = Object.assign({}, base, { labelProject: lpj });
+      if (JSON.stringify(data).length > 15000) return;
+      var r = await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
+      if (!r.error) { LPJ = lpj; ev('project_migrate', { n: Object.keys(lpj).length }); }
+    } catch (e) {}
   }
 
   saveBtn.addEventListener('click', function () {
@@ -358,15 +377,12 @@
     var cancel = el('button', { type: 'button', cls: 'tt-my-cancel', text: T.cancel });
     function close() { form.hidden = true; form.textContent = ''; saveBtn.disabled = false; }
     cancel.addEventListener('click', close);
-    var curIt = findItem(curId), newProj = curIt ? (curIt.project_id || null) : null;
-    var pick = projPicker(newProj || '', function (pid) { newProj = pid; });
     async function doSave() {
       var name = input.value.trim().slice(0, 60);
       var q = serialize();
       if (!name || !Q_RE.test(q)) { input.focus(); return; }
       ok.disabled = true;
       var row = { product: PRODUCT, name: name, config: { q: q, page: location.pathname } };
-      if (newProj) row.project_id = newProj;
       var r = await sb.from('timers').insert(row)
         .select('id,name,config,updated_at,project_id').single();
       if (r.error) {
@@ -382,7 +398,7 @@
     }
     ok.addEventListener('click', doSave);
     input.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); doSave(); } });
-    form.appendChild(input); form.appendChild(pick); form.appendChild(ok); form.appendChild(cancel);
+    form.appendChild(input); form.appendChild(ok); form.appendChild(cancel);
     form.hidden = false; saveBtn.disabled = true;
     input.focus(); input.select();
   });
@@ -443,7 +459,14 @@
     });
     return o;
   }
-  var LMAP = {}, LHIDE = {}, LCOL = {};
+  var LMAP = {}, LHIDE = {}, LCOL = {}, LPJ = {};
+  // 11/18: ラベル → プロジェクト（settings.data.labelProject {ラベル: プロジェクトのID}）
+  var PJ_ID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+  function cleanPj(c) {
+    var o = {};
+    if (c && typeof c === 'object' && !Array.isArray(c)) Object.keys(c).slice(0, 300).forEach(function (k) { var v = c[k]; if (k && typeof v === 'string' && PJ_ID_RE.test(v)) o[String(k).slice(0, 30)] = v; });
+    return o;
+  }
   try { var lmc = JSON.parse(localStorage.getItem(LM_KEY) || 'null'); if (lmc) { LMAP = cleanMap(lmc.map); LHIDE = cleanHide(lmc.hide); LCOL = cleanCol(lmc.col); } } catch (e) {}
   window.__ttLC = LCOL;
   function alias(l) {
@@ -566,7 +589,7 @@
       var cur = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
       if (cur.error) return false;
       var base = (cur.data && cur.data.data && typeof cur.data.data === 'object') ? cur.data.data : {};
-      var map = cleanMap(base.labelMap), hide = cleanHide(base.labelHide), col = cleanCol(base.labelColor);
+      var map = cleanMap(base.labelMap), hide = cleanHide(base.labelHide), col = cleanCol(base.labelColor), lpj = cleanPj(base.labelProject);
       var brk = (base.breaks && typeof base.breaks === 'object' && !Array.isArray(base.breaks)) ? Object.assign({}, base.breaks) : {};
       var name = patch.name;
       if (patch.rename) {
@@ -577,6 +600,7 @@
           map[o] = n; delete map[n];
           if (Object.prototype.hasOwnProperty.call(brk, o) && !Object.prototype.hasOwnProperty.call(brk, n)) brk[n] = brk[o];
           if (Object.prototype.hasOwnProperty.call(col, o) && !Object.prototype.hasOwnProperty.call(col, n)) col[n] = col[o];
+          if (Object.prototype.hasOwnProperty.call(lpj, o) && !Object.prototype.hasOwnProperty.call(lpj, n)) lpj[n] = lpj[o];
           delete hide[n];
         }
         name = n;
@@ -584,12 +608,16 @@
       if (name && (patch.brk === 0 || patch.brk === 1)) brk[name] = patch.brk;
       if (patch.hide) hide[String(patch.hide).slice(0, 30)] = 1;
       if (name && typeof patch.color === 'number' && patch.color >= 0 && patch.color <= 23) col[String(name).slice(0, 30)] = Math.floor(patch.color);
-      var data = Object.assign({}, base, { labelMap: map, labelHide: Object.keys(hide), breaks: brk, labelColor: col });
+      if (name && Object.prototype.hasOwnProperty.call(patch, 'project')) {
+        var pk = String(name).slice(0, 30);
+        if (patch.project && PJ_ID_RE.test(patch.project) && projects.some(function (p) { return p.id === patch.project; })) lpj[pk] = patch.project; else delete lpj[pk];
+      }
+      var data = Object.assign({}, base, { labelMap: map, labelHide: Object.keys(hide), breaks: brk, labelColor: col, labelProject: lpj });
       if (JSON.stringify(data).length > 15000) return false;
       var r = await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
       if (r.error) return false;
-      setLabelMeta(map, hide, col); BREAKS = brk;
-      ev('label_edit', { rename: patch.rename ? 1 : 0, hide: patch.hide ? 1 : 0, color: typeof patch.color === 'number' ? 1 : 0 });
+      setLabelMeta(map, hide, col); BREAKS = brk; LPJ = lpj;
+      ev('label_edit', { rename: patch.rename ? 1 : 0, hide: patch.hide ? 1 : 0, color: typeof patch.color === 'number' ? 1 : 0, project: Object.prototype.hasOwnProperty.call(patch, 'project') ? 1 : 0 });
       try { sessionStorage.removeItem(STATS_KEY); } catch (e) {}
       await loadLabels(); loadStreak(true);
       return true;
@@ -788,6 +816,7 @@
     if (r.error) return;
     var remote = (r.data && r.data.data) || {};
     var rmap = cleanMap(remote.labelMap), rhide = cleanHide(remote.labelHide), rcol = cleanCol(remote.labelColor);
+    LPJ = cleanPj(remote.labelProject);
     if (JSON.stringify(rmap) !== JSON.stringify(LMAP) || JSON.stringify(Object.keys(rhide)) !== JSON.stringify(Object.keys(LHIDE))) {
       setLabelMeta(rmap, rhide, rcol); loadLabels(); loadStreak(true);
     } else if (JSON.stringify(rcol) !== JSON.stringify(LCOL)) setLabelMeta(rmap, rhide, rcol);
@@ -1001,7 +1030,7 @@
     // 11/16: データの窓で時間を変えるとき、動いている記録は変えない
     window.__ttActiveLogs = function () { return [log && log.id, cRun && cRun.L && cRun.L.id].filter(Boolean); };
     window.__ttEndedHere = function () { return endedHere.slice(); };
-    window.__ttLabels = { list: labelList, isBreak: isBreak, save: saveLabelMeta };
+    window.__ttLabels = { list: labelList, isBreak: isBreak, save: saveLabelMeta, project: function (l) { return LPJ[alias(String(l || ''))] || ''; }, picker: projPicker };
     window.__ttCount = { start: cStart, stop: function () { cStop(false); }, cancel: cCancel, manual: cManual, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
       labels: function () { return recentLabels.filter(function (l) { return !isBreak(l); }); } };
     cResume();

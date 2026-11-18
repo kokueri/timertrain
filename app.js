@@ -664,9 +664,9 @@ function colorPicker(sel, onPick) {
   w.select = (i) => w.querySelectorAll('.tt-color').forEach((x, j) => { x.classList.toggle('on', j === i); x.setAttribute('aria-pressed', j === i ? 'true' : 'false'); });
   return w;
 }
-const LBL = LANG === 'en' ? { open: 'Choose a label', edit: l => 'Edit ' + l, none: 'No labels yet. Labels you use with a timer or button appear here.', name: 'Name', note: 'Renaming also renames this label in your past records.', brk: 'Treat as a break (not counted in totals)', save: 'Save', cancel: 'Cancel', hide: 'Remove from this list (records are kept)', hideSure: 'Tap again to remove', err: 'Could not save. Please try again.' }
-: LANG === 'es' ? { open: 'Elegir etiqueta', edit: l => 'Editar ' + l, none: 'Aún no hay etiquetas. Aquí aparecen las que uses en temporizadores o botones.', name: 'Nombre', note: 'Al cambiar el nombre, también cambia en tus registros anteriores.', brk: 'Tratar como descanso (no suma al total)', save: 'Guardar', cancel: 'Cancelar', hide: 'Quitar de esta lista (los registros se conservan)', hideSure: 'Toca otra vez para quitar', err: 'No se pudo guardar. Inténtalo de nuevo.' }
-: { open: 'ラベルを選ぶ', edit: l => l + 'を編集', none: 'まだラベルはありません。タイマーやボタンで使った名前がここに並びます。', name: 'なまえ', note: '変えると、これまでの記録もこの名前で集計されます。', brk: '休憩として扱う（合計に入れない）', save: '保存', cancel: 'キャンセル', hide: '選択肢から消す（記録は残ります）', hideSure: 'もう一度押すと消します', err: '保存できませんでした。もう一度お試しください。' };
+const LBL = LANG === 'en' ? { open: 'Choose a label', edit: l => 'Edit ' + l, none: 'No labels yet. Labels you use with a timer or button appear here.', name: 'Name', note: 'Renaming also renames this label in your past records.', brk: 'Treat as a break (not counted in totals)', pj: 'Project', save: 'Save', cancel: 'Cancel', hide: 'Remove from this list (records are kept)', hideSure: 'Tap again to remove', err: 'Could not save. Please try again.' }
+: LANG === 'es' ? { open: 'Elegir etiqueta', edit: l => 'Editar ' + l, none: 'Aún no hay etiquetas. Aquí aparecen las que uses en temporizadores o botones.', name: 'Nombre', note: 'Al cambiar el nombre, también cambia en tus registros anteriores.', brk: 'Tratar como descanso (no suma al total)', pj: 'Proyecto', save: 'Guardar', cancel: 'Cancelar', hide: 'Quitar de esta lista (los registros se conservan)', hideSure: 'Toca otra vez para quitar', err: 'No se pudo guardar. Inténtalo de nuevo.' }
+: { open: 'ラベルを選ぶ', edit: l => l + 'を編集', none: 'まだラベルはありません。タイマーやボタンで使った名前がここに並びます。', name: 'なまえ', note: '変えると、これまでの記録もこの名前で集計されます。', brk: '休憩として扱う（合計に入れない）', pj: 'プロジェクト', save: '保存', cancel: 'キャンセル', hide: '選択肢から消す（記録は残ります）', hideSure: 'もう一度押すと消します', err: '保存できませんでした。もう一度お試しください。' };
 const PENCIL = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>';
 function lblEl(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 function lblKey(e) { if (e.key === 'Escape') { const p = document.querySelector('.lbl-pop'); const b = p && p.__dd; closeLabelPop(); if (b) b.focus(); } }
@@ -725,6 +725,9 @@ const cb = lblEl('input'); cb.type = 'checkbox'; cb.checked = L.isBreak(l);
 cbl.append(cb, lblEl('span', '', LBL.brk));
 const col0 = labelColorIdx(l); let colSel = col0;
 const colW = colorPicker(col0, i => { colSel = i; });
+// 11/18: プロジェクトはラベルごと
+const pj0 = L.project ? L.project(l) : ''; let pjSel = pj0;
+const pjW = L.picker ? L.picker(pj0, id => { pjSel = id || ''; }, 'label') : null;
 const msg = lblEl('p', 'lbl-note'); msg.setAttribute('role', 'status');
 const acts = lblEl('div', 'lbl-acts');
 const ok = lblEl('button', 'lbl-btn pri', LBL.save); ok.type = 'button';
@@ -739,7 +742,8 @@ const patch = { name: l };
 if (v !== l) patch.rename = [l, v];
 if (cb.checked !== L.isBreak(l)) patch.brk = cb.checked ? 1 : 0;
 if (colSel !== col0) patch.color = colSel;
-if (!patch.rename && patch.brk === undefined && patch.color === undefined) { renderLabelList(pop, t, name); return; }
+if (pjSel !== pj0) patch.project = pjSel || null;
+if (!patch.rename && patch.brk === undefined && patch.color === undefined && !('project' in patch)) { renderLabelList(pop, t, name); return; }
 ok.disabled = true;
 const r = await L.save(patch);
 if (!r) { ok.disabled = false; msg.textContent = LBL.err; return; }
@@ -760,7 +764,9 @@ renderLabelList(pop, t, name);
 });
 inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); ok.click(); } });
 acts.append(ok, cancel);
-f.append(lab, inp, note, lblEl('span', 'lbl-l', LCOL_L.t), colW, cbl, acts, hide, msg);
+f.append(lab, inp, note, lblEl('span', 'lbl-l', LCOL_L.t), colW);
+if (pjW) { const pl = lblEl('label', 'lbl-pj'); pl.append(lblEl('span', 'lbl-l', LBL.pj), pjW); f.append(pl); }
+f.append(cbl, acts, hide, msg);
 pop.appendChild(f);
 setTimeout(() => { inp.focus(); inp.select(); }, 0);
 }
@@ -1822,7 +1828,7 @@ var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=16';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=17';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
@@ -1835,7 +1841,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=24'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=25'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -2472,6 +2478,13 @@ f.appendChild(lw);
 f.appendChild(mk('span', 'tt-cform-l', LCOL_L.t));
 var colW = colorPicker(CU.color != null ? CU.color : labelColorIdx(inp.value || (cur ? cur.label : '')), function (i) { CU.color = i; paintIcons(); });
 f.appendChild(colW);
+// 11/18: プロジェクト（ラベルに付く）
+var LB = window.__ttLabels, pj0 = (LB && LB.project && cur) ? LB.project(cur.label) : '', pjSel = pj0;
+if (LB && LB.picker) {
+var pjl = mk('label', 'tt-cform-pj'); pjl.appendChild(mk('span', 'tt-cform-l', LBL.pj));
+pjl.appendChild(LB.picker(pj0, function (id) { pjSel = id || ''; }, 'count'));
+f.appendChild(pjl);
+}
 function curColor() { return LCOLORS[CU.color != null ? CU.color : labelColorIdx(inp.value.trim())]; }
 inp.addEventListener('input', function () { if (CU.color == null) { colW.select(labelColorIdx(inp.value.trim())); paintIcons(); } });
 f.appendChild(mk('span', 'tt-cform-l', TL.cIcon));
@@ -2517,7 +2530,10 @@ var colPick = CU.color;
 window.__ttCount.save(list).then(function (r) {
 if (r === false) { msg.textContent = TL.cErr; ok.disabled = false; return; }
 // 色を選んでいたら、ラベルの色として保存（同じラベルの記録も同じ色に）
-if (colPick != null && colPick !== labelColorIdx(v) && window.__ttLabels && window.__ttLabels.save) window.__ttLabels.save({ name: v, color: colPick });
+var lp = { name: v };
+if (colPick != null && colPick !== labelColorIdx(v)) lp.color = colPick;
+if (LB && LB.project && pjSel !== LB.project(v)) lp.project = pjSel || null;
+if ((lp.color != null || 'project' in lp) && LB && LB.save) LB.save(lp);
 CU.editing = false; CU.color = null; close();
 });
 });
