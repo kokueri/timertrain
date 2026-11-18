@@ -1260,13 +1260,13 @@ body.focus-mode .tt-myrow { display: none; }
   .tt-myrow { grid-area: myrow; max-width: 760px; margin: -8px auto 22px; }
   html.tt-in .header { margin-bottom: 18px; }
   html.tt-in .app { grid-template-areas: "header header" "myrow myrow" "run setup" "promo promo" "about about" "footer footer"; }
-  html.tt-in.tt-has-log .app { grid-template-areas: "header header" "myrow myrow" "run setup" "log setup" "promo promo" "about about" "footer footer"; }
+  html.tt-has-log .app { grid-template-areas: "header header" "myrow myrow" "run setup" "log setup" "promo promo" "about about" "footer footer"; }
   #tt-logcol { grid-area: log; }
 }
 @media (min-width: 1200px) {
-  html.tt-in.tt-has-log .app { max-width: 1400px; grid-template-columns: 300px minmax(0, 1fr) 360px; column-gap: 40px;
+  html.tt-has-log .app { max-width: 1400px; grid-template-columns: 300px minmax(0, 1fr) 360px; column-gap: 40px;
     grid-template-areas: "header header header" "myrow myrow myrow" "log run setup" "promo promo promo" "about about about" "footer footer footer"; }
-  html.tt-in.tt-has-log body.setup-closed .app { grid-template-columns: 300px minmax(0, 1fr) 210px; }
+  html.tt-has-log body.setup-closed .app { grid-template-columns: 300px minmax(0, 1fr) 210px; }
   #tt-logcol .tt-today { margin: 4px 0 0; max-width: none; }
 }
 html.tt-in #acct-link > span.tt-streak { display: inline; }
@@ -1506,15 +1506,22 @@ button.ttd-cal-c:hover { border-color: var(--text2); }
 .ttd-lrow-promo .ttd-promo { margin: 8px 0; }
 .tt-note { margin: 0 0 10px; padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); }
 .tt-note-t { margin: 0 0 8px; font-size: 13px; font-weight: 700; }
-.tt-note-r { display: flex; gap: 6px; align-items: center; }
-.tt-note-r input { flex: 1 1 auto; min-width: 0; }
+.tt-note-r { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+/* 11/18: 狭い列（PCの左のログ）でもボタンがはみ出ないよう、入力は1行まるごと、ボタンは下に並べる */
+.tt-note-r input { flex: 1 1 100%; min-width: 0; box-sizing: border-box; }
+.tt-note-r .tt-cbtn2 { flex: 1 1 0; min-width: 0; padding: 0 10px; white-space: nowrap; box-sizing: border-box; }
+.tt-cbtn.edit.sel .tt-cbtn-c { border-style: solid; box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--text); }
+/* ×2 は丸の右に。左にも同じ幅の見えない札を置いて、丸の並びの中心をずらさない */
+.st-rep { flex: 0 0 auto; margin-left: 8px; font-size: 13px; font-weight: 700; color: var(--text2); font-variant-numeric: tabular-nums; white-space: nowrap; align-self: center; }
+.st-rep.pad { visibility: hidden; margin-left: 0; margin-right: 8px; }
+body.dt .st-rep { align-self: flex-start; margin-top: 7px; }
 @media (max-width: 420px) { .ttd-lrow { grid-template-columns: 6.6em minmax(0, 1fr) auto 12px; gap: 8px; padding: 8px 10px; } }
 .ttd-cal.pie .ttd-cal-memo { align-self: stretch; text-align: left; }
 /* 11/17: PC の中心をそろえる。左（今日のログ）と右（設定）の列を同じ幅にして、タイマーの列を画面の真ん中に。
    再生ボタンが真ん中に来るよう、集中モードのボタンは並びの外（右）に置く */
 @media (min-width: 1200px) {
-  html.tt-in.tt-has-log .app, html.tt-in.tt-has-log body.setup-closed .app { grid-template-columns: 340px minmax(0, 1fr) 340px; }
-  html.tt-in.tt-has-log body.setup-closed #setup { justify-self: end; width: 210px; max-width: 100%; }
+  html.tt-has-log .app, html.tt-has-log body.setup-closed .app { grid-template-columns: 340px minmax(0, 1fr) 340px; }
+  html.tt-has-log body.setup-closed #setup { justify-self: end; width: 210px; max-width: 100%; }
 }
 @media (min-width: 900px) {
   body:not(.focus-mode) .run-controls { position: relative; }
@@ -1525,7 +1532,7 @@ button.ttd-cal-c:hover { border-color: var(--text2); }
   .about { max-width: none; justify-self: stretch; }
   .about > .about-perks { max-width: 760px; }
 }
-@media (min-width: 1200px) { html.tt-in.tt-has-log .kbd-hint { white-space: nowrap; } }
+@media (min-width: 1200px) { html.tt-has-log .kbd-hint { white-space: nowrap; } }
 /* 11/17: 1年分のカレンダー（プレミアム） */
 :root { --heat: 42, 111, 196; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --heat: 110, 160, 230; } }
@@ -1561,3 +1568,22 @@ body.focus-mode #cal-btn { display: none; }
 .tt-cform-ib.lt { color: #2B2420; }
 .ttd-pie-pct.dk { fill: #2B2420; stroke: rgba(255,255,255,.45); }
 .tt-cform-ib.on.lt { color: #2B2420; }
+/* 11/18: 1日のメモ一覧（ラベルの色と名前つき） */
+.ttd-memo-l { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ttd-memo-l li { display: grid; gap: 3px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+.ttd-memo-h { display: flex; align-items: center; gap: 6px; font-size: 12px; min-width: 0; }
+.ttd-memo-h b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ttd-memo-c { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; display: inline-block; }
+.ttd-memo-t { margin-left: auto; color: var(--text2); font-variant-numeric: tabular-nums; }
+.ttd-memo-x { font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+/* 11/18: ログイン前の「見本」カード */
+.tt-today.sample .tt-today-open { text-decoration: none; }
+.tt-today-tag { flex: 0 0 auto; margin-left: 6px; padding: 1px 8px; border-radius: 10px; background: var(--line); color: var(--text2); font-size: 11px; font-weight: 700; }
+.tt-today.sample .tt-today-bar, .tt-today.sample .tt-today-legend { opacity: .8; }
+.tt-today-cta { font-size: 13px; font-weight: 700; color: var(--accent, var(--text)); }
+.tt-today.sample .tt-today-head { justify-content: flex-start; align-items: center; }
+.tt-today.sample .tt-today-sum { margin-left: auto; }
+/* 11/18: プロジェクトはラベルごと（ラベルの編集・ボタンの編集） */
+.lbl-pj, .tt-cform-pj { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 8px 0 4px; }
+.lbl-pj .tt-my-proj, .tt-cform-pj .tt-my-proj { flex: 1 1 160px; max-width: 260px; }
+.lbl-pj .tt-my-projnew, .tt-cform-pj .tt-my-projnew { display: flex; gap: 6px; flex: 1 1 100%; }

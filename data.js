@@ -184,7 +184,13 @@
   }
   /* ラベルの名前変更（settings.data.labelMap）。過去の記録は新しい名前で集計する */
   var LM = {};
-  function setLM(sd) { LM = (sd && sd.labelMap && typeof sd.labelMap === 'object' && !Array.isArray(sd.labelMap)) ? sd.labelMap : {}; }
+  function setLM(sd) {
+    LM = (sd && sd.labelMap && typeof sd.labelMap === 'object' && !Array.isArray(sd.labelMap)) ? sd.labelMap : {};
+    LPJ = (sd && sd.labelProject && typeof sd.labelProject === 'object' && !Array.isArray(sd.labelProject)) ? sd.labelProject : {};
+  }
+  // 11/18: プロジェクトはラベルごと（settings.data.labelProject）。なければ「プロジェクトなし」
+  var LPJ = {};
+  function pjOf(label, ok) { var id = Object.prototype.hasOwnProperty.call(LPJ, label) ? LPJ[label] : ''; return typeof id === 'string' && id && ok[id] ? id : '__none'; }
   function aliasL(l) { l = String(l == null ? '' : l); for (var i = 0; i < 5 && Object.prototype.hasOwnProperty.call(LM, l) && typeof LM[l] === 'string'; i++) l = LM[l].slice(0, 30); return l; }
 
   function el(tag, attrs, kids) {
@@ -315,7 +321,7 @@
     S.sb = sb;
     S.data = prepare(logs, segs, rt.error ? [] : rt.data || [], rp.error ? [] : rp.data || [], (sd.breaks && typeof sd.breaks === 'object') ? sd.breaks : {}, st);
     S.loadedFor = key;
-    if (S.filter !== 'all' && !S.data.pjNames[S.filter]) S.filter = 'all';
+    if (S.filter !== 'all' && S.filter !== '__none' && !S.data.pjNames[S.filter]) S.filter = 'all';
   }
 
   /* ---------- 集計 ---------- */
@@ -323,7 +329,6 @@
   function prepare(logs, segs, timers, projects, breaks, st) {
     var tmap = {}; timers.forEach(function (t) { tmap[t.id] = t; });
     var pjNames = {}; projects.forEach(function (p) { pjNames[p.id] = p.name; });
-    pjNames.__none = T.pjNone; pjNames.__other = T.pjOther;
     var byLog = {}; segs.forEach(function (g) { (byLog[g.log_id] = byLog[g.log_id] || []).push(g); });
     var list = [];
     logs.forEach(function (l) {
@@ -331,11 +336,11 @@
       if (isNaN(t) || (st && t < st)) return;
       var tm = l.timer_id && tmap[l.timer_id];
       var g = (byLog[l.id] || []).slice().sort(function (a, b) { return (a.seq || 0) - (b.seq || 0); });
-      var parts = g.length ? g.map(function (x) { return { label: aliasL(x.label || ''), secs: Math.max(0, Number(x.secs) || 0), seg: true }; })
-        : [{ label: '\u0000', secs: Math.max(0, Number(l.total_secs) || 0), seg: false }];
+      var parts = g.length ? g.map(function (x) { var lb = aliasL(x.label || ''); return { label: lb, secs: Math.max(0, Number(x.secs) || 0), seg: true, pj: pjOf(lb, pjNames) }; })
+        : [{ label: '\u0000', secs: Math.max(0, Number(l.total_secs) || 0), seg: false, pj: '__none' }];
       var cfg = (l.config && typeof l.config === 'object') ? l.config : {};
       list.push({ id: l.id, t: t, timerId: tm ? tm.id : null, timerName: tm ? (tm.name || '') : (typeof cfg.name === 'string' ? cfg.name : ''),
-        pj: tm ? (tm.project_id && pjNames[tm.project_id] ? tm.project_id : '__none') : '__other', parts: parts, done: !!l.completed });
+        parts: parts, done: !!l.completed });
     });
     return { at: Date.now(), list: list, projects: projects, pjNames: pjNames, tmap: tmap, breaks: breaks, start: st };
   }
@@ -375,8 +380,7 @@
     if (S.labels && S.labels.length) { LS = {}; S.labels.forEach(function (l) { LS[l] = 1; }); }
     var mode = (F === 'all' && D.projects.length && !LS) ? 'pj' : 'label';
     var rows = D.list.filter(function (e) {
-      if (F !== 'all' && e.pj !== F) return false;
-      return !LS || e.parts.some(function (p) { return LS[p.label]; });
+      return e.parts.some(function (p) { return (F === 'all' || p.pj === F) && (!LS || LS[p.label]); });
     });
     var B = buckets(D);
     B.forEach(function (b) { b.v = {}; b.total = 0; });
@@ -387,10 +391,11 @@
       e.work = 0; e.brk = 0;
       e.parts.forEach(function (p) {
         if (LS && !LS[p.label]) return;
+        if (F !== 'all' && p.pj !== F) return;
         if (isBreak(D, p.label)) { e.brk += p.secs; brk += p.secs; brkL[p.label] = (brkL[p.label] || 0) + p.secs; return; }
         e.work += p.secs; work += p.secs;
         labels[p.label] = (labels[p.label] || 0) + p.secs;
-        var k = mode === 'pj' ? e.pj : p.label;
+        var k = mode === 'pj' ? p.pj : p.label;
         tot[k] = (tot[k] || 0) + p.secs;
         if (i >= 0) { B[i].v[k] = (B[i].v[k] || 0) + p.secs; B[i].total += p.secs; }
       });
@@ -400,7 +405,7 @@
     var series = [];
     if (mode === 'pj') {
       D.projects.forEach(function (p) { if (tot[p.id]) series.push({ k: p.id, name: p.name }); });
-      ['__none', '__other'].forEach(function (k) { if (tot[k]) series.push({ k: k, name: D.pjNames[k] }); });
+      if (tot.__none) series.push({ k: '__none', name: T.pjNone });
     } else {
       Object.keys(tot).sort(function (a, b) { return tot[b] - tot[a]; }).forEach(function (k) {
         series.push({ k: k, name: k === '\u0000' ? T.noSeg : (k || T.noLabel) });
@@ -416,7 +421,7 @@
       shown.push(o);
     }
     var slot = 0;
-    shown.forEach(function (s) { if (s.gray || s.k === '\u0000' || s.k === '__other') s.cls = 'g'; else s.cls = mode === 'label' ? lcOf(s.k) : 's' + (++slot); });
+    shown.forEach(function (s) { if (s.gray || s.k === '\u0000' || s.k === '__none') s.cls = 'g'; else s.cls = mode === 'label' ? lcOf(s.k) : 's' + (++slot); });
     return { mode: mode, rows: rows, B: B, series: shown, tot: tot, labels: labels, brkL: brkL, timers: timers, work: work, brk: brk, days: Object.keys(days).length };
   }
 
@@ -454,7 +459,7 @@
     }
     wrap.appendChild(lsec);
     var tids = Object.keys(C.timers).filter(function (id) { return D.tmap[id] && C.timers[id] > 0; }).sort(function (a, b) { return C.timers[b] - C.timers[a]; });
-    if (tids.length) wrap.appendChild(pieTable(T.byTimer, tids.map(function (id) { return { name: D.tmap[id].name || '', secs: C.timers[id], sub: D.pjNames[D.tmap[id].project_id] || '' }; }), C.work));
+    if (tids.length) wrap.appendChild(pieTable(T.byTimer, tids.map(function (id) { return { name: D.tmap[id].name || '', secs: C.timers[id] }; }), C.work));
     var prD = sample ? null : promo('data'); if (prD) wrap.appendChild(prD);
     wrap.appendChild(details(C, D));
   }
@@ -479,16 +484,16 @@
     bar.appendChild(tabs);
     var right = el('div', { cls: 'ttd-ctl-r' });
     var keys = ['all'].concat(D.projects.map(function (p) { return p.id; }));
-    var used = {}; D.list.forEach(function (e) { used[e.pj] = 1; });
-    ['__none', '__other'].forEach(function (k) { if (used[k] && D.projects.length) keys.push(k); });
+    var used = {}; D.list.forEach(function (e) { e.parts.forEach(function (p) { if (!isBreak(D, p.label)) used[p.pj] = 1; }); });
+    if (used.__none && D.projects.length) keys.push('__none');
     if (keys.length > 1) {
       var sel = el('select', { cls: 'ttd-sel', 'aria-label': T.filter });
-      keys.forEach(function (k) { var o = el('option', { value: k, text: k === 'all' ? T.pjAll : D.pjNames[k] }); if (k === S.filter) o.selected = true; sel.appendChild(o); });
+      keys.forEach(function (k) { var o = el('option', { value: k, text: k === 'all' ? T.pjAll : k === '__none' ? T.pjNone : D.pjNames[k] }); if (k === S.filter) o.selected = true; sel.appendChild(o); });
       sel.addEventListener('change', function () { S.filter = sel.value; S.more = 10; S.sel = -1; ev('data_filter'); render(false); var s2 = body.querySelector('.ttd-sel'); if (s2) s2.focus(); });
       right.appendChild(sel);
     }
     // 11/15: ラベルでしぼる（複数選べる）
-    var lt = {}; D.list.forEach(function (e) { if (S.filter !== 'all' && e.pj !== S.filter) return; e.parts.forEach(function (p) { lt[p.label] = (lt[p.label] || 0) + p.secs; }); });
+    var lt = {}; D.list.forEach(function (e) { e.parts.forEach(function (p) { if (S.filter !== 'all' && p.pj !== S.filter) return; lt[p.label] = (lt[p.label] || 0) + p.secs; }); });
     S.labels.forEach(function (l) { if (!(l in lt)) lt[l] = 0; });
     var lopts = Object.keys(lt).sort(function (a, b) { return lt[b] - lt[a]; });
     var lpanel = null;
@@ -647,19 +652,19 @@
     S.meta.projects.forEach(function (p) { pjOk[p.id] = 1; });
     logs.forEach(function (l) { ids[l.id] = 1; });
     segs.forEach(function (g) { if (ids[g.log_id]) (byLog[g.log_id] = byLog[g.log_id] || []).push(g); });
-    function put(t, secs, lb, pj) {
+    function put(t, secs, lb) {
+      var pj = pjOf(lb, pjOk);
       if (isNaN(t) || t < q0 || t >= q1 || !(secs > 0)) return;
       pieces.push({ k: dayKey(t), lb: lb, secs: secs, pj: pj, brk: isBreak(D, lb) });
     }
     logs.forEach(function (l) {
       var tm = l.timer_id && tmap[l.timer_id];
-      var pj = tm ? (tm.project_id && pjOk[tm.project_id] ? tm.project_id : '__none') : '__other';
       var g = byLog[l.id];
       if (g && g.length) g.forEach(function (x) {
         var ms = Date.parse(x.started_at); if (!isFinite(ms)) ms = Date.parse(l.started_at);
-        put(new Date(ms), Number(x.secs) || 0, aliasL(x.label || '').slice(0, 30), pj);
+        put(new Date(ms), Number(x.secs) || 0, aliasL(x.label || '').slice(0, 30));
       });
-      else put(new Date(l.started_at), Number(l.total_secs) || 0, '', pj);
+      else put(new Date(l.started_at), Number(l.total_secs) || 0, '');
       var cfg = l.config && typeof l.config === 'object' ? l.config : {};
       if (typeof cfg.note === 'string' && cfg.note.trim()) {
         var k = dayKey(new Date(l.started_at));
@@ -947,7 +952,7 @@
       });
       else parts = [{ label: '', secs: Math.max(0, Number(l.total_secs) || 0), s: at }];
       list.push({ id: l.id, endedAt: l.ended_at || null, noSegs: !g.length, t: t, timerName: tm ? (tm.name || '') : (typeof cfg.name === 'string' ? cfg.name.slice(0, 40) : ''),
-        pjName: tm && tm.project_id && pjNames[tm.project_id] ? pjNames[tm.project_id] : '', parts: parts, done: !!l.completed,
+        pjName: (function () { var mp = parts.filter(function (p) { return !isBreak(M, p.label); })[0] || parts[0]; var id = mp ? pjOf(mp.label, pjNames) : '__none'; return id !== '__none' ? pjNames[id] : ''; })(), parts: parts, done: !!l.completed,
         note: typeof cfg.note === 'string' ? cfg.note.slice(0, 200) : '' });
     });
     return { list: list, breaks: M.breaks };
@@ -1076,6 +1081,23 @@
         }
       }
       wrap.appendChild(sum);
+      // 11/18: その日のメモをまとめて（どのラベルのメモか、色と名前つき）
+      var withNote = D.list.filter(function (e) { return e.note; });
+      if (withNote.length) {
+        var ms = el('section', { cls: 'ttd-sec ttd-memos' });
+        ms.appendChild(el('h3', { text: TD.lg.memo + '（' + withNote.length + '）' }));
+        var mul = el('ul', { cls: 'ttd-memo-l' });
+        withNote.forEach(function (e) {
+          var main = e.parts.filter(function (p) { return !isBreak(D, p.label); })[0] || e.parts[0] || { label: '' };
+          var lb = nm(main.label);
+          mul.appendChild(el('li', null, [
+            el('span', { cls: 'ttd-memo-h' }, [el('i', { cls: 'ttd-memo-c ' + clsOf(main), 'aria-hidden': 'true' }), el('b', { text: lb }), el('span', { cls: 'ttd-memo-t', text: hm(e.t) })]),
+            el('span', { cls: 'ttd-memo-x', text: e.note })
+          ]));
+        });
+        ms.appendChild(mul);
+        wrap.appendChild(ms);
+      }
       // 帯（6時〜24時。6時より前の記録がある日は0時から）
       var d0 = S.day.getTime(), d1 = d0 + 86400000;
       var first = d1; D.list.forEach(function (e) { e.parts.forEach(function (p) { if (p.s < first) first = p.s; }); });
@@ -1442,7 +1464,8 @@
     var ul = el('ul', { cls: 'ttd-log' });
     rows.slice(0, S.more).forEach(function (e) {
       var name = e.timerName || T.pjOther;
-      var pj = e.pj !== '__other' && e.pj !== '__none' ? D.pjNames[e.pj] : '';
+      var pjs = []; e.parts.forEach(function (p) { var n = p.pj !== '__none' ? D.pjNames[p.pj] : ''; if (n && pjs.indexOf(n) < 0) pjs.push(n); });
+      var pj = pjs.join('・');
       ul.appendChild(el('li', null, [
         el('span', { cls: 'ttd-log-t', text: T.timeFmt(e.t) }),
         el('span', { cls: 'ttd-log-n', text: name + (pj ? '（' + pj + '）' : '') }),
@@ -1467,11 +1490,12 @@
   function saveCsv() {
     var D = S.data, F = S.filter;
     var lines = [T.csvHead.map(cell).join(',')];
-    D.list.filter(function (e) { return F === 'all' || e.pj === F; }).forEach(function (e) {
+    D.list.forEach(function (e) {
       var date = e.t.getFullYear() + '-' + pad(e.t.getMonth() + 1) + '-' + pad(e.t.getDate());
       var time = pad(e.t.getHours()) + ':' + pad(e.t.getMinutes());
-      var pj = e.pj === '__other' ? '' : e.pj === '__none' ? '' : D.pjNames[e.pj];
       e.parts.forEach(function (p) {
+        if (F !== 'all' && p.pj !== F) return;
+        var pj = p.pj === '__none' ? '' : D.pjNames[p.pj];
         lines.push([date, time, e.timerName || '', pj || '', p.label === '\u0000' ? '' : p.label, Math.round(p.secs), (p.secs / 60).toFixed(1), isBreak(D, p.label) ? T.yes : T.no].map(cell).join(','));
       });
     });
@@ -1495,10 +1519,10 @@
     mins.forEach(function (m, i) {
       if (!m[0] && !m[1]) return;
       var t = new Date(d0); t.setDate(d0.getDate() + i); t.setHours(19, 30);
-      list.push({ id: 's' + i, t: t, timerId: 't1', timerName: tm.t1.name, pj: 'p1', done: true, parts: [{ label: L[0], secs: m[0] * 60 }, { label: L[3], secs: m[3] * 60 }, { label: L[1], secs: m[1] * 60 }, { label: L[2], secs: m[2] * 60 }].filter(function (p) { return p.secs; }) });
-      if (i % 2 === 0) { var t2 = new Date(t); t2.setHours(7, 0); list.push({ id: 'w' + i, t: t2, timerId: 't2', timerName: tm.t2.name, pj: 'p2', done: true, parts: [{ label: L[4], secs: 900 }] }); }
+      list.push({ id: 's' + i, t: t, timerId: 't1', timerName: tm.t1.name, done: true, parts: [{ label: L[0], secs: m[0] * 60, pj: 'p1' }, { label: L[3], secs: m[3] * 60, pj: '__none' }, { label: L[1], secs: m[1] * 60, pj: 'p1' }, { label: L[2], secs: m[2] * 60, pj: 'p1' }].filter(function (p) { return p.secs; }) });
+      if (i % 2 === 0) { var t2 = new Date(t); t2.setHours(7, 0); list.push({ id: 'w' + i, t: t2, timerId: 't2', timerName: tm.t2.name, done: true, parts: [{ label: L[4], secs: 900, pj: 'p2' }] }); }
     });
-    var pjNames = { p1: P[0].name, p2: P[1].name, __none: T.pjNone, __other: T.pjOther };
+    var pjNames = { p1: P[0].name, p2: P[1].name };
     return { at: Date.now(), list: list, projects: P, pjNames: pjNames, tmap: tm, breaks: {}, start: d0 };
   }
   function renderOut(again) {
