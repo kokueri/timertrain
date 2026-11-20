@@ -424,6 +424,7 @@
     var now = Date.now();
     if (isRunning()) { var d = (now - last) / 1000; log.secs += d; curSeg(log).secs += d; }
     last = now;
+    saveTLog();
     showStats();
     if (!log.id && !log.busy && log.secs >= 15) persistLog(log, false);
     else if (log.id && now - log.saved > 60000) persistLog(log, false);
@@ -514,10 +515,10 @@
     var blocks = (ST.blocks || []).filter(function (b) { return (!cur || b.lid !== cur) && (!ccur || b.lid !== ccur); });
     if (log && ST.day === dayKey(new Date(log.startedAt))) { t += workOf(log); blocks = blocks.concat(blocksOf(log, cur || 'live')); }
     if (cRun && ST.day === dayKey(new Date(cRun.start))) { var CL = cLog(); t += workOf(CL); blocks = blocks.concat(blocksOf(CL, ccur || 'count')); }
-    var key = Math.floor(t / 60) + '/' + ST.days7 + '/' + ST.n + '/' + ST.streakToday + '/' + blocks.length + '/' + Math.floor(Date.now() / 300000);
+    var key = Math.floor(t / 60) + '/' + ST.days7 + '/' + ST.n + '/' + ST.streakToday + '/' + blocks.length + '/' + Math.floor(Date.now() / 300000) + '/' + JSON.stringify(ST.notes || {}).length;
     if (key === lastShown) return;
     lastShown = key;
-    try { window.__ttSetStats({ today: t, days7: ST.days7, streak: ST.n, streakToday: ST.streakToday, blocks: blocks, count: cState() }); } catch (e) {}
+    try { window.__ttSetStats({ today: t, days7: ST.days7, streak: ST.n, streakToday: ST.streakToday, blocks: blocks, count: cState(), notes: ST.notes || {} }); } catch (e) {}
   }
   async function loadStreak(force) {
     try {
@@ -534,6 +535,10 @@
       var rs = await sb.from('usage_segments').select('log_id,seq,label,secs,started_at').eq('product', PRODUCT)
         .gte('started_at', new Date(today0.getTime() - 86400000).toISOString()).limit(1000);
       var r3 = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
+      // 11/20: 今日の記録のメモ（ホームのログにカーソルを合わせたときに出す）
+      var notes = {};
+      var rn = await sb.from('usage_logs').select('id,config').eq('product', PRODUCT).gte('started_at', new Date(today0.getTime() - 86400000).toISOString()).limit(300);
+      (rn.error ? [] : rn.data || []).forEach(function (x) { var c = x.config; if (c && typeof c.note === 'string' && c.note) notes[x.id] = c.note.slice(0, 200); });
       var sd = (!r3.error && r3.data && r3.data.data) || {};
       BREAKS = (sd.breaks && typeof sd.breaks === 'object') ? sd.breaks : {};
       var set = {}, todayLogs = {}, segs = {};
@@ -569,7 +574,7 @@
       // いま動いている記録が保存直後なら、今日に入れる
       if (log && log.id) { today = true; }
       streakToday = today;
-      ST = { n: n + (log && log.id && !set[dayKey(new Date())] ? 1 : 0), streakToday: today, days7: Object.keys(days7).length, day: dayKey(new Date()), at: Date.now(), todayLogs: todayLogs, breaks: BREAKS, blocks: blocks.slice(-400) };
+      ST = { n: n + (log && log.id && !set[dayKey(new Date())] ? 1 : 0), streakToday: today, days7: Object.keys(days7).length, day: dayKey(new Date()), at: Date.now(), todayLogs: todayLogs, notes: notes, breaks: BREAKS, blocks: blocks.slice(-400) };
       try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {}
       lastShown = ''; showStats();
     } catch (e) {}
@@ -682,7 +687,7 @@
           timer_id: L.timerId
         }).select('id').single();
         L.busy = false;
-        if (!r.error && r.data) { L.id = r.data.id; if (!streakToday) loadStreak(true); } // 今日の1回目で🔥を更新
+        if (!r.error && r.data) { L.id = r.data.id; if (L === log) saveTLog(); if (!streakToday) loadStreak(true); } // 今日の1回目で🔥を更新
       } else {
         await sb.from('usage_logs').update({ total_secs: secs, completed: !!done, ended_at: L.endedAt || new Date().toISOString() }).eq('id', L.id);
       }
@@ -719,6 +724,7 @@
       var w = await sb.from('usage_logs').update({ config: cfg }).eq('id', id).select('id');
       if (w.error || !w.data || !w.data.length) return false;
       ev(note ? 'note_save' : 'note_clear', { len: note.length });
+      if (ST) { ST.notes = ST.notes || {}; if (note) ST.notes[id] = note; else delete ST.notes[id]; try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {} lastShown = ''; showStats(); }
       return true;
     } catch (e) { return false; }
   }
@@ -727,7 +733,7 @@
     if (!log) return;
     step();
     clearInterval(logTick); logTick = null;
-    var L = log; log = null;
+    var L = log; log = null; saveTLog();
     var tmpId = L.id || ('local' + Date.now());
     if (ST && ST.day === dayKey(new Date(L.startedAt)) && L.secs >= 15) { ST.todayLogs[tmpId] = workOf(L); putBlocks(tmpId, blocksOf(L, tmpId)); try { sessionStorage.setItem(STATS_KEY, JSON.stringify(ST)); } catch (e) {} }
     showStats();
@@ -741,6 +747,28 @@
         showStats();
       }
     });
+  }
+  // 11/20: 動いているタイマーの記録をタブの中で覚えておく（再読み込み・TimerTrain⇔ドーナツの切り替えで同じ記録を続ける）
+  var TLOG_KEY = 'tt-tlog';
+  function saveTLog() {
+    try {
+      if (!log || !log.id) { if (!log) sessionStorage.removeItem(TLOG_KEY); return; }
+      sessionStorage.setItem(TLOG_KEY, JSON.stringify({ at: Date.now(), L: { id: log.id, startedAt: log.startedAt, secs: log.secs, q: log.q, timerId: log.timerId, timerName: log.timerName,
+        segs: log.segs.map(function (g) { return { seq: g.seq, label: g.label, secs: g.secs, startedAt: g.startedAt, sent: g.sent, closed: !!g.closed }; }) } }));
+    } catch (e) {}
+  }
+  function resumeLog() {
+    var sv = null; try { sv = JSON.parse(sessionStorage.getItem(TLOG_KEY) || 'null'); } catch (e) {}
+    var q = ''; try { q = serialize(); } catch (e) {}
+    var L = sv && sv.L;
+    if (!L || typeof L.id !== 'string' || !/^[0-9a-f-]{36}$/i.test(L.id) || L.q !== (Q_RE.test(q) ? q : null) || !Array.isArray(L.segs) || !(Date.now() - sv.at < 12 * 3600e3)) { startLog(); return; }
+    log = { startedAt: String(L.startedAt), secs: Number(L.secs) || 0, q: L.q, page: location.pathname.slice(0, 100), id: L.id, saved: Date.now(),
+      timerId: L.timerId || null, timerName: L.timerName ? String(L.timerName).slice(0, 60) : null,
+      segs: L.segs.slice(0, 500).map(function (g) { return { seq: Number(g.seq) || 0, label: String(g.label || '').slice(0, 30), secs: Number(g.secs) || 0, startedAt: String(g.startedAt), sent: Number(g.sent), closed: !!g.closed }; }) };
+    // 閉じていた間（10分まで）は、いまの区切りに足す。それより長いときは数えない（どの区切りだったか分からないため）
+    last = Date.now() - sv.at < 600000 ? sv.at : Date.now();
+    logTick = setInterval(step, 5000);
+    step();
   }
   function startLog() {
     endLog(false);
@@ -924,11 +952,16 @@
     ev('count_start', { n: cBtns.length, member: PREMIUM ? 'premium' : 'free' });
     showStatsNow();
   }
-  function cStop(auto) {
+  function cStop(auto, endMs) {
     if (!cRun) return;
     clearInterval(cTick); cTick = null;
     var R = cRun, L = cLog(); cRun = null; cSaveRun();
-    ev('count_stop', { min: Math.round(L.secs / 60), auto: auto ? 1 : 0 });
+    // 11/20: 「終わった時刻で止める」。始まり〜今の間だけ受け付ける
+    if (typeof endMs === 'number' && isFinite(endMs)) {
+      var e2 = Math.max(R.start, Math.min(Date.now(), endMs));
+      L.secs = Math.min(C_MAX, (e2 - R.start) / 1000); L.segs[0].secs = L.secs; L.endedAt = new Date(e2).toISOString();
+    }
+    ev('count_stop', { min: Math.round(L.secs / 60), auto: auto ? 1 : 0, at: L.endedAt ? 1 : 0 });
     if (!L.id && L.secs < 15) { showStatsNow(); return; }
     var tmp = L.id || ('local' + Date.now());
     if (ST && ST.day === dayKey(new Date(R.start))) { ST.todayLogs[tmp] = workOf(L); putBlocks(tmp, blocksOf(L, tmp)); }
@@ -1030,8 +1063,8 @@
     // 11/16: データの窓で時間を変えるとき、動いている記録は変えない
     window.__ttActiveLogs = function () { return [log && log.id, cRun && cRun.L && cRun.L.id].filter(Boolean); };
     window.__ttEndedHere = function () { return endedHere.slice(); };
-    window.__ttLabels = { list: labelList, isBreak: isBreak, save: saveLabelMeta, project: function (l) { return LPJ[alias(String(l || ''))] || ''; }, picker: projPicker };
-    window.__ttCount = { start: cStart, stop: function () { cStop(false); }, cancel: cCancel, manual: cManual, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
+    window.__ttLabels = { list: labelList, isBreak: isBreak, save: saveLabelMeta, project: function (l) { return LPJ[alias(String(l || ''))] || ''; }, projectName: function (l) { var id = LPJ[alias(String(l || ''))]; var p = id && projects.filter(function (x) { return x.id === id; })[0]; return p ? String(p.name || '') : ''; }, picker: projPicker };
+    window.__ttCount = { start: cStart, stop: function () { cStop(false); }, stopAt: function (ms) { cStop(false, Number(ms)); }, cancel: cCancel, manual: cManual, save: cSaveBtns, icons: ICONS.slice(), state: cState, limitHit: function () { ev('count_limit', {}); },
       labels: function () { return recentLabels.filter(function (l) { return !isBreak(l); }); } };
     cResume();
     if (window.__ttRerenderList) { try { window.__ttRerenderList(); } catch (e) {} }
@@ -1040,7 +1073,7 @@
     loadStreak(false);
     loadLabels();
     await load();
-    if (window.__ttRestored && isRunning() && !log) startLog();
+    if (window.__ttRestored && isRunning() && !log) resumeLog();
     syncSettings().catch(function () {});
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { load(); loadStreak(false); syncSettings().catch(function () {}); } });
   })().catch(function () { setNote(T.err, true); });

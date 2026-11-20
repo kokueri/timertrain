@@ -1828,7 +1828,7 @@ var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=17';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=18';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
@@ -1841,7 +1841,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=25'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=26'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -1983,6 +1983,11 @@ return path + q;
 a.href = target();
 // 押した時点の編成を持っていく
 a.addEventListener('pointerdown', function () { a.href = target(); });
+// 11/20: 着せ替え。動いているタイマーは行き先のページでもそのまま続く（同じタブの sessionStorage に引き継ぐ）
+a.addEventListener('click', function () {
+a.href = target();
+try { saveRun(); var v = sessionStorage.getItem(RUN_KEY); if (v) sessionStorage.setItem('tt-run:' + new URL(a.href, location.href).pathname, v); } catch (e) {}
+});
 a.addEventListener('focus', function () { a.href = target(); });
 box.appendChild(a);
 box.appendChild(theme);
@@ -2148,6 +2153,7 @@ bl.forEach(function (b) {
 var s = Math.max(b.s, a), e = Math.min(b.s + b.secs * 1000, t1);
 if (e <= s) return;
 var seg = mk('span', 'tt-today-seg ' + (b.brk ? 'b' : cls[b.label]));
+seg.__b = b;
 if (!b.brk && cls[b.label] === 'lc') seg.style.background = labelColor(b.label);
 seg.style.setProperty('--p', ((s - a) / span * 100).toFixed(2) + '%');
 seg.style.setProperty('--w', Math.max(0.5, (e - s) / span * 100).toFixed(2) + '%');
@@ -2155,6 +2161,30 @@ bar.appendChild(seg);
 });
 if (now > a && now < t1) { var nw = mk('span', 'tt-today-now'); nw.style.setProperty('--p', ((now - a) / span * 100).toFixed(2) + '%'); bar.appendChild(nw); }
 open.appendChild(bar);
+// 11/20: カーソルを合わせると「プロジェクト・ラベル・時間・メモ」（マウスのときだけ。タップはこれまでどおりデータを開く）
+var tip = mk('span', 'tt-today-tip'); tip.hidden = true; tip.setAttribute('aria-hidden', 'true');
+open.appendChild(tip);
+bar.addEventListener('pointermove', function (ev) {
+if (ev.pointerType !== 'mouse') return;
+var sg = ev.target.closest && ev.target.closest('.tt-today-seg');
+if (!sg || !sg.__b) { tip.hidden = true; return; }
+var b = sg.__b, L = window.__ttLabels, nm = b.label || TL.noName;
+var pj = (!b.brk && L && L.projectName) ? L.projectName(b.label) : '';
+var note = st.notes && b.lid ? st.notes[b.lid] : '';
+var ds = new Date(b.s), de = new Date(b.s + b.secs * 1000);
+var hm2 = function (d) { return d.getHours() + ':' + String(d.getMinutes()).padStart(2, '0'); };
+tip.textContent = '';
+if (pj) tip.appendChild(mk('span', 'tt-tip-pj', pj));
+var l1 = mk('span', 'tt-tip-l'); var dot = mk('i', 'tt-tip-c'); dot.style.background = b.brk ? '#bbb' : labelColor(b.label); l1.append(dot, mk('b', null, nm)); tip.appendChild(l1);
+tip.appendChild(mk('span', 'tt-tip-t', hm2(ds) + '–' + hm2(de) + '（' + fmtDur(b.secs) + '）'));
+if (note) tip.appendChild(mk('span', 'tt-tip-n', '📝 ' + note));
+tip.hidden = false;
+var r = bar.getBoundingClientRect(), x = ev.clientX - r.left;
+var ow = open.clientWidth, tw = tip.offsetWidth;
+tip.style.left = Math.max(4, Math.min(ow - tw - 4, bar.offsetLeft + x - tw / 2)) + 'px';
+tip.style.top = (bar.offsetTop + bar.offsetHeight + 6) + 'px';
+});
+bar.addEventListener('pointerleave', function () { tip.hidden = true; });
 var ax = mk('span', 'tt-today-axis'); ax.setAttribute('aria-hidden', 'true');
 (startH ? TL.hours.slice(1) : TL.hours.filter(function (x, i) { return i % 2 === 0; })).forEach(function (hh) { ax.appendChild(mk('span', '', hh)); });
 open.appendChild(ax);
@@ -2209,10 +2239,75 @@ var stop = mk('button', 'tt-crun-stop', TL.cStop); stop.type = 'button';
 stop.addEventListener('click', function () { window.__ttCount.stop(); });
 run.appendChild(stop);
 var start = cs.run.start;
-tick = setInterval(function () { if (!document.body.contains(tt)) { stopTicker(); return; } tt.textContent = clock(Math.min(43200, (Date.now() - start) / 1000)); }, 1000);
+function each() {
+var sec = Math.min(43200, (Date.now() - start) / 1000);
+tt.textContent = clock(sec);
+runBar(cs.run, sec);
+if (sec >= LONG_SEC && !run.querySelector('.tt-crun-ask') && !longOk(start)) run.appendChild(longAsk(start));
+}
+each();
+tick = setInterval(function () { if (!document.body.contains(tt)) { stopTicker(); return; } each(); }, 1000);
 return run;
 }
+// 11/20: 3時間をこえたら「まだ続けていますか？」。続ける／終わった時刻で止める／いま止める
+var LONG_SEC = 3 * 3600;
+var LONG_L = lang === 'en' ? { q: function (d) { return 'Still going? It has been running for ' + d + '.'; }, keep: 'Keep going', end: 'Ended at', stopAt: 'Stop at this time', bar: 'Recording' }
+: lang === 'es' ? { q: function (d) { return '¿Sigues? Lleva ' + d + ' en marcha.'; }, keep: 'Seguir', end: 'Terminó a las', stopAt: 'Detener a esta hora', bar: 'Registrando' }
+: { q: function (d) { return d + ' 計っています。まだ続けていますか？'; }, keep: '続ける', end: '終わった時刻', stopAt: 'この時刻で止める', bar: '記録中' };
+function longOk(start) { try { return sessionStorage.getItem('tt-long-ok') === String(start); } catch (e) { return false; } }
+function hmDur(sec) { var m = Math.floor(sec / 60), h = Math.floor(m / 60); return lang === 'ja' ? (h ? h + '時間' : '') + (m % 60) + '分' : (h ? h + 'h ' : '') + (m % 60) + 'm'; }
+function longAsk(start) {
+var box = mk('div', 'tt-crun-ask');
+box.appendChild(mk('p', 'tt-crun-q', LONG_L.q(hmDur((Date.now() - start) / 1000))));
+var row = mk('div', 'tt-crun-ar');
+var keep = mk('button', 'tt-crun-b', LONG_L.keep); keep.type = 'button';
+keep.addEventListener('click', function () { try { sessionStorage.setItem('tt-long-ok', String(start)); } catch (e) {} box.remove(); });
+var lab = mk('label', 'tt-crun-el'); lab.appendChild(mk('span', null, LONG_L.end));
+var inp = document.createElement('input'); inp.type = 'time'; inp.step = '60';
+var d0 = new Date(Math.min(Date.now(), start + 3600e3)); inp.value = String(d0.getHours()).padStart(2, '0') + ':' + String(d0.getMinutes()).padStart(2, '0');
+lab.appendChild(inp);
+var at = mk('button', 'tt-crun-b pri', LONG_L.stopAt); at.type = 'button';
+at.addEventListener('click', function () {
+var m = /^(\d{1,2}):(\d{2})/.exec(inp.value || ''); if (!m) return;
+var d = new Date(); d.setHours(Number(m[1]), Number(m[2]), 0, 0);
+while (d.getTime() > Date.now() + 60000) d.setDate(d.getDate() - 1); // 今より後なら前の日
+if (d.getTime() < start) d = new Date(start + 60000);
+if (window.__ttCount.stopAt) window.__ttCount.stopAt(d.getTime()); else window.__ttCount.stop();
+});
+row.appendChild(keep); row.appendChild(lab); row.appendChild(at);
+box.appendChild(row);
+return box;
+}
+// 11/20: 計っている間は、カードが見えないとき画面の下に細い帯（押すとカードへ、■で止める）
+var RB = null;
+function runBar(r, sec) {
+if (RB) RB.__on = !!r;
+if (!r) { if (RB) RB.hidden = true; return; }
+if (!RB) {
+RB = mk('div', 'tt-runbar'); RB.hidden = true; RB.__on = true;
+var go = mk('button', 'tt-runbar-go'); go.type = 'button';
+go.addEventListener('click', function () { var c = document.querySelector('.tt-crun'); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+var st = mk('button', 'tt-runbar-stop', '■'); st.type = 'button'; st.setAttribute('aria-label', TL.cStop);
+st.addEventListener('click', function () { window.__ttCount.stop(); });
+RB.appendChild(go); RB.appendChild(st);
+document.body.appendChild(RB);
+}
+var go2 = RB.firstChild;
+go2.textContent = ''; go2.appendChild(mk('span', 'tt-runbar-dot')); go2.appendChild(mk('span', 'tt-runbar-n', r.label)); go2.appendChild(mk('span', 'tt-runbar-t', clock(sec)));
+go2.setAttribute('aria-label', LONG_L.bar + ' ' + r.label + ' ' + clock(sec));
+RB.style.setProperty('--lc', labelColor(r.label));
+rbPlace();
+}
+// カードが画面より上に流れていったときだけ出す（下にあってまだ見えていないときは出さない＝再生ボタンにかぶらない）
+function rbPlace() {
+if (!RB) return;
+var card = document.querySelector('.tt-crun');
+var above = !!card && card.getBoundingClientRect().bottom < 0;
+RB.hidden = !RB.__on || !above || document.body.classList.contains('focus-mode');
+}
+window.addEventListener('scroll', rbPlace, { passive: true });
 function renderCount(box, cs) {
+if (!cs || !cs.run) runBar(null);
 if (!cs || !window.__ttCount) { box.hidden = true; stopTicker(); return; }
 box.hidden = false;
 var key = JSON.stringify([cs.btns, cs.run && cs.run.id, cs.run && cs.run.start, cs.max, CU.editing, CU.form, window.__ttLC || null]);
