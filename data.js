@@ -1236,11 +1236,17 @@
       });
       return cur;
     }
-    function showEnd() { var d = new Date(endMs()); endIn.value = pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+    function showEnd() { if (document.activeElement === endIn) return; var d = new Date(endMs()); endIn.value = pad(d.getHours()) + ':' + pad(d.getMinutes()); }
     function upd() { var t = 0; ins.forEach(function (x, i) { t += secsOf(i) || 0; }); sumEl.textContent = E.sum + ' ' + T.dur(t); }
     ins.forEach(function (x) { x.addEventListener('input', function () { upd(); showEnd(); }); });
     stIn.addEventListener('input', showEnd);
-    endIn.addEventListener('change', function () {
+    // 11/20: 打っている途中（「3」→「30」）で書きかえると入力がこわれるので、欄を離れたとき（と保存のとき）に反映する
+    var endDirty = false;
+    endIn.addEventListener('input', function () { endDirty = true; });
+    endIn.addEventListener('change', function () { endDirty = true; });
+    endIn.addEventListener('blur', applyEnd);
+    function applyEnd() {
+      if (!endDirty) return; endDirty = false;
       var m = /^(\d{1,2}):(\d{2})/.exec(endIn.value || ''); if (!m) return;
       var cur = new Date(endMs()), want = new Date(cur);
       want.setHours(Number(m[1]), Number(m[2]), 0, 0);
@@ -1252,7 +1258,7 @@
       if (nv < 0) { msg(E.errOrder); showEnd(); return; }
       ins[li].value = String(Math.round(nv / 60));
       upd(); showEnd();
-    });
+    }
     upd(); showEnd();
     var save = el('button', { type: 'button', cls: 'ttd-edit-save', text: E.save });
     var cancel = el('button', { type: 'button', cls: 'ttd-edit-cancel', text: E.cancel });
@@ -1261,6 +1267,7 @@
     box.appendChild(del);
     cancel.addEventListener('click', function () { closeEdits(); btn.focus(); });
     save.addEventListener('click', async function () {
+      applyEnd();
       var secs = e.parts.map(function (p, i) { return secsOf(i); });
       if (secs.some(function (x) { return !isFinite(x); })) { msg(E.errLen); return; }
       var total = secs.reduce(function (a, b) { return a + b; }, 0);
