@@ -174,6 +174,7 @@
   function svgN(tag, a) { var n = document.createElementNS('http://www.w3.org/2000/svg', tag); for (var k in a) n.setAttribute(k, a[k]); return n; }
   function dough(svg, cx, cy, r, w) { svg.appendChild(svgN('circle', { cx: cx, cy: cy, r: r, fill: 'none', 'stroke-width': w, class: 'ttd-dough' })); }
   function sprinkles(svg, cx, cy, r, band, n, len, wid) {
+    return; // 11/20: スプリンクルは見にくいので出さない（えりなさん）
     var g = svgN('g', { class: 'ttd-spr', 'aria-hidden': 'true' });
     for (var i = 0; i < n; i++) {
       var a = (i * 360 / n + (i % 2 ? 360 / n * 0.45 : 0)) * Math.PI / 180, rr = r + ((i % 3) - 1) * band * 0.28;
