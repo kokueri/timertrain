@@ -51,7 +51,7 @@
         ['いつでも退会', 'アカウントと保存したデータは、このページからいつでも削除できます']
       ],
       pjTitle: 'プロジェクト（この7日間）', pjNew: '＋ プロジェクトを作る', pjNamePh: 'プロジェクト名（例: 勉強）', pjOk: '作る', pjNone: 'プロジェクトなし',
-      pjEmpty: 'マイタイマーをプロジェクトにまとめると、ここにプロジェクトごと・区切り（ラベル）ごとの時間が出ます。下の「マイタイマー」で、それぞれのプロジェクトを選んでください。',
+      pjEmpty: 'ラベル（区切りの名前）ごとにプロジェクトを決めると、プロジェクトごと・ラベルごとの時間が見られます。',
       pjOther: 'マイタイマー以外', pjByTimer: 'マイタイマーごと: ', pjNoSeg: '（区切りの記録なし）', pjNoLabel: '（名前なし）', pjBreak: '休憩（合計に入れない）',
       pjToBreak: '休憩にする', pjToWork: '合計に入れる', pjRename: '名前を変更', pjDel: '削除', pjDelQ: '削除する？（マイタイマーは残ります）', pjSave: '保存',
       pjSel: 'プロジェクト', pjNewOpt: '＋ 新しいプロジェクト…', pjTotal: '合計', pjNote: '「休憩」「Break」などの名前は自動で休憩として合計から外します。違うときは「合計に入れる」を押してください。区切りごとの記録は 2026/10/25 から始まりました。',
@@ -89,7 +89,7 @@
         ['Leave any time', 'Delete your account and everything you saved from this page whenever you like']
       ],
       pjTitle: 'Projects (last 7 days)', pjNew: '+ New project', pjNamePh: 'Project name (e.g. Study)', pjOk: 'Create', pjNone: 'No project',
-      pjEmpty: 'Group your saved timers into projects to see time per project and per segment (label) here. Pick a project for each timer under "My timers" below.',
+      pjEmpty: 'Choose a project for each label (segment name) to see time per project and per label.',
       pjOther: 'Not a saved timer', pjByTimer: 'Per saved timer: ', pjNoSeg: '(no segment data)', pjNoLabel: '(no name)', pjBreak: 'Breaks (not counted)',
       pjToBreak: 'Mark as break', pjToWork: 'Count it', pjRename: 'Rename', pjDel: 'Delete', pjDelQ: 'Delete? (Timers are kept)', pjSave: 'Save',
       pjSel: 'Project', pjNewOpt: '+ New project…', pjTotal: 'Total', pjNote: 'Names like "Break" or "Rest" are treated as breaks and left out of the totals. If that is wrong, press "Count it". Segment data started on 2026-10-25.',
@@ -127,7 +127,7 @@
         ['Baja cuando quieras', 'Puedes eliminar tu cuenta y todo lo guardado desde esta página en cualquier momento']
       ],
       pjTitle: 'Proyectos (últimos 7 días)', pjNew: '+ Nuevo proyecto', pjNamePh: 'Nombre del proyecto (p. ej. Estudio)', pjOk: 'Crear', pjNone: 'Sin proyecto',
-      pjEmpty: 'Agrupa tus temporizadores en proyectos para ver aquí el tiempo por proyecto y por etapa (etiqueta). Elige un proyecto para cada temporizador en «Mis temporizadores».',
+      pjEmpty: 'Elige un proyecto para cada etiqueta (nombre del tramo) y verás el tiempo por proyecto y por etiqueta.',
       pjOther: 'No es un temporizador guardado', pjByTimer: 'Por temporizador: ', pjNoSeg: '(sin datos por etapa)', pjNoLabel: '(sin nombre)', pjBreak: 'Descansos (no cuentan)',
       pjToBreak: 'Marcar como descanso', pjToWork: 'Contarlo', pjRename: 'Renombrar', pjDel: 'Eliminar', pjDelQ: '¿Eliminar? (los temporizadores se conservan)', pjSave: 'Guardar',
       pjSel: 'Proyecto', pjNewOpt: '+ Nuevo proyecto…', pjTotal: 'Total', pjNote: 'Los nombres como «Descanso» o «Break» se toman como descansos y no cuentan en el total. Si no es así, pulsa «Contarlo». Los datos por etapa empezaron el 25/10/2026.',
@@ -159,49 +159,46 @@
 
   /* ---------- 使い方の例（プロジェクト → マイタイマー → ラベル） ---------- */
   var D2 = {
-    ja: { pjTitle: 'プロジェクト', pjEmpty: 'マイタイマーをプロジェクトにまとめると、「データ」でプロジェクトごと・ラベル（区切りの名前）ごとの時間が見られます。下の「使い方の例」も参考にしてください。',
-      pjTimers: 'マイタイマー: ', pjNoTimers: 'まだマイタイマーが入っていません（上の「マイタイマー」でプロジェクトを選べます）', pjNote: '「休憩」などの名前は自動で休憩として作業の時間から外します。切り替えは「データ」のラベルごとの表でできます。',
+    ja: { pjTitle: 'プロジェクト', pjEmpty: 'ラベル（区切りの名前）ごとにプロジェクトを決めると、「データ」でプロジェクトごと・ラベルごとの時間が見られます。プロジェクトは、タイマー設定のラベルの▾→鉛筆か、ボタンの編集で選べます。',
+      pjTimers: 'ラベル: ', pjNoTimers: 'まだラベルがありません（タイマー設定のラベルの▾→鉛筆で選べます）', pjNote: '「休憩」などの名前は自動で休憩として作業の時間から外します。切り替えは「データ」のラベルごとの表でできます。',
       dataTitle: 'データ（記録とグラフ）', dataLead: 'タイマー画面の「データ」で、作業の時間・使った日数・🔥連続日数と、プロジェクトやラベルごとのグラフが見られます。無料プランは直近30日間です（記録はずっと保存）。', dataBtn: 'データを見る' },
-    en: { pjTitle: 'Projects', pjEmpty: 'Group your saved timers into projects to see time per project and per label (segment name) in Data. See "How it works" below for an example.',
-      pjTimers: 'Saved timers: ', pjNoTimers: 'No saved timers in it yet (pick a project for a timer under "My timers" above)', pjNote: 'Names like "Break" are left out of work time automatically. You can change this in the label table in Data.',
+    en: { pjTitle: 'Projects', pjEmpty: 'Choose a project for each label (segment name) to see time per project and per label in Data. Set it from the label ▾ → pencil in the timer settings, or when editing a button.',
+      pjTimers: 'Labels: ', pjNoTimers: 'No labels yet (set it from the label ▾ → pencil in the timer settings)', pjNote: 'Names like "Break" are left out of work time automatically. You can change this in the label table in Data.',
       dataTitle: 'Data (history and charts)', dataLead: 'Open "Data" on the timer screen to see work time, days used, your 🔥 streak, and charts by project and label. The free plan shows the last 30 days (records are kept for good).', dataBtn: 'Open Data' },
-    es: { pjTitle: 'Proyectos', pjEmpty: 'Agrupa tus temporizadores en proyectos para ver en Datos el tiempo por proyecto y por etiqueta (nombre del tramo). Mira el ejemplo de abajo.',
-      pjTimers: 'Temporizadores: ', pjNoTimers: 'Aún no tiene temporizadores (elige un proyecto para cada uno en «Mis temporizadores»)', pjNote: 'Los nombres como «Descanso» no cuentan como trabajo. Puedes cambiarlo en la tabla de etiquetas de Datos.',
+    es: { pjTitle: 'Proyectos', pjEmpty: 'Elige un proyecto para cada etiqueta (nombre del tramo) y verás en Datos el tiempo por proyecto y por etiqueta. Se elige en la etiqueta ▾ → lápiz de los ajustes, o al editar un botón.',
+      pjTimers: 'Etiquetas: ', pjNoTimers: 'Aún no tiene etiquetas (elígelo en la etiqueta ▾ → lápiz de los ajustes)', pjNote: 'Los nombres como «Descanso» no cuentan como trabajo. Puedes cambiarlo en la tabla de etiquetas de Datos.',
       dataTitle: 'Datos (historial y gráficos)', dataLead: 'Abre «Datos» en la pantalla del temporizador para ver el tiempo de trabajo, los días de uso, tu racha 🔥 y gráficos por proyecto y etiqueta. El plan gratis muestra los últimos 30 días (los registros se guardan siempre).', dataBtn: 'Ver datos' }
   }[lang];
   var HOW = {
     ja: {
-      title: '使い方の例（プロジェクト・マイタイマー・ラベル）',
-      lead: '「プロジェクト」の中に「マイタイマー」を入れます。マイタイマーの中の区切りの名前（国語・数学など）が「ラベル」です。それぞれの単位で、使った時間を集計できます。',
-      kP: 'プロジェクト', kM: 'マイタイマー',
-      tree: [['📚 勉強', [['平日', '国語 25分 → 休憩 5分 → 数学 25分'], ['休日', '国語 25分 → 休憩 5分 → 社会 25分']]],
-             ['💪 筋トレ', [['朝トレ', 'スクワット 1分 → 休憩 30秒 → 腕立て 1分（×3回）']]]],
+      title: '使い方の例（プロジェクト・ラベル）',
+      lead: 'タイマーの区切りやカウントのボタンの名前（国語・数学など）が「ラベル」です。ラベルごとに「どのプロジェクトか」を決めておくと、プロジェクトごと・ラベルごとに時間を集計できます。',
+      kP: 'プロジェクト', kM: 'ラベル',
+      tree: [['📚 勉強', [['国語', ''], ['数学', ''], ['社会', '']]], ['💪 筋トレ', [['スクワット', ''], ['腕立て', '']]]],
       resT: '1週間使うと、たとえば「勉強」はこう見えます',
-      res: [['プロジェクトの合計', '勉強 6時間40分'], ['マイタイマーごと', '平日 4時間10分 ／ 休日 2時間30分'], ['ラベルごと', '国語 3時間20分 ・ 数学 2時間05分 ・ 社会 1時間15分']],
-      resNote: '平日と休日の「国語」は、同じ名前なので合わせて数えます。「休憩」は自動で合計から外します。',
-      plan: '無料ログインは、プロジェクト1つ・マイタイマー2つまで（この例なら「勉強」の平日と休日）。プレミアムでは、いくつでも作れます。'
+      res: [['プロジェクトの合計', '勉強 6時間40分'], ['ラベルごと', '国語 3時間20分 ・ 数学 2時間05分 ・ 社会 1時間15分']],
+      resNote: 'どのマイタイマーやボタンで計っても、同じラベルなら合わせて数えます。「休憩」は自動で合計から外します。',
+      plan: '無料ログインは、プロジェクト1つ・マイタイマー2つまで。プレミアムでは、いくつでも作れます。'
     },
     en: {
-      title: 'How it fits together (projects, timers, labels)',
-      lead: 'Put your saved timers into a project. The name of each segment inside a timer (Math, Reading…) is its label. Time is totaled at every level.',
-      kP: 'Project', kM: 'Saved timer',
-      tree: [['📚 Study', [['Weekdays', 'Reading 25 min → Break 5 min → Math 25 min'], ['Weekend', 'Reading 25 min → Break 5 min → Science 25 min']]],
-             ['💪 Workout', [['Morning', 'Squats 1 min → Break 30 s → Push-ups 1 min (×3)']]]],
+      title: 'How it fits together (projects and labels)',
+      lead: 'A label is the name of a timer segment or a count button (Math, Reading…). Choose a project for each label, and time is totaled per project and per label.',
+      kP: 'Project', kM: 'Label',
+      tree: [['📚 Study', [['Reading', ''], ['Math', ''], ['Science', '']]], ['💪 Workout', [['Squats', ''], ['Push-ups', '']]]],
       resT: 'After a week, "Study" might look like this',
-      res: [['Project total', 'Study 6 h 40 min'], ['Per saved timer', 'Weekdays 4 h 10 min / Weekend 2 h 30 min'], ['Per label', 'Reading 3 h 20 min · Math 2 h 05 min · Science 1 h 15 min']],
-      resNote: '"Reading" from both timers is counted together because the name is the same. Breaks are left out of the total automatically.',
-      plan: 'A free account includes 1 project and 2 saved timers (here: Study with Weekdays and Weekend). Premium has no limit.'
+      res: [['Project total', 'Study 6 h 40 min'], ['Per label', 'Reading 3 h 20 min · Math 2 h 05 min · Science 1 h 15 min']],
+      resNote: 'The same label is counted together, whichever saved timer or button you used. Breaks are left out of the total automatically.',
+      plan: 'A free account includes 1 project and 2 saved timers. Premium has no limit.'
     },
     es: {
-      title: 'Cómo se organiza (proyectos, temporizadores, etiquetas)',
-      lead: 'Agrupa tus temporizadores guardados en un proyecto. El nombre de cada etapa dentro de un temporizador (Lectura, Matemáticas…) es su etiqueta. El tiempo se suma en cada nivel.',
-      kP: 'Proyecto', kM: 'Temporizador guardado',
-      tree: [['📚 Estudio', [['Entre semana', 'Lectura 25 min → Descanso 5 min → Matemáticas 25 min'], ['Fin de semana', 'Lectura 25 min → Descanso 5 min → Ciencias 25 min']]],
-             ['💪 Ejercicio', [['Mañana', 'Sentadillas 1 min → Descanso 30 s → Flexiones 1 min (×3)']]]],
+      title: 'Cómo se organiza (proyectos y etiquetas)',
+      lead: 'Una etiqueta es el nombre de un tramo del temporizador o de un botón de conteo (Lectura, Matemáticas…). Elige un proyecto para cada etiqueta y el tiempo se suma por proyecto y por etiqueta.',
+      kP: 'Proyecto', kM: 'Etiqueta',
+      tree: [['📚 Estudio', [['Lectura', ''], ['Matemáticas', ''], ['Ciencias', '']]], ['💪 Ejercicio', [['Sentadillas', ''], ['Flexiones', '']]]],
       resT: 'Después de una semana, «Estudio» se vería así',
-      res: [['Total del proyecto', 'Estudio 6 h 40 min'], ['Por temporizador', 'Entre semana 4 h 10 min / Fin de semana 2 h 30 min'], ['Por etiqueta', 'Lectura 3 h 20 min · Matemáticas 2 h 05 min · Ciencias 1 h 15 min']],
-      resNote: '«Lectura» de los dos temporizadores se suma junta porque tiene el mismo nombre. Los descansos se quitan del total automáticamente.',
-      plan: 'La cuenta gratis incluye 1 proyecto y 2 temporizadores guardados (aquí: Estudio con Entre semana y Fin de semana). Premium no tiene límite.'
+      res: [['Total del proyecto', 'Estudio 6 h 40 min'], ['Por etiqueta', 'Lectura 3 h 20 min · Matemáticas 2 h 05 min · Ciencias 1 h 15 min']],
+      resNote: 'La misma etiqueta se suma junta, uses el temporizador o el botón que uses. Los descansos se quitan del total automáticamente.',
+      plan: 'La cuenta gratis incluye 1 proyecto y 2 temporizadores guardados. Premium no tiene límite.'
     }
   }[lang];
   function howTo(open) {
@@ -213,7 +210,7 @@
     HOW.tree.forEach(function (pj) {
       var li = el('li', { cls: 'acct-howto-pj' }, [el('span', { cls: 'acct-howto-name', text: pj[0] }), el('span', { cls: 'acct-howto-kind', text: HOW.kP })]);
       li.appendChild(el('ul', null, pj[1].map(function (m) {
-        return el('li', { cls: 'acct-howto-my' }, [el('span', { cls: 'acct-howto-name', text: m[0] }), el('span', { cls: 'acct-howto-kind', text: HOW.kM }), el('p', { cls: 'acct-howto-segs', text: m[1] })]);
+        return el('li', { cls: 'acct-howto-my' }, [el('span', { cls: 'acct-howto-name', text: m[0] }), el('span', { cls: 'acct-howto-kind', text: HOW.kM })].concat(m[1] ? [el('p', { cls: 'acct-howto-segs', text: m[1] })] : []));
       })));
       ul.appendChild(li);
     });
@@ -710,6 +707,7 @@
     DATA.projects = r2.error ? [] : (r2.data || []);
     var sd = (!r3.error && r3.data && r3.data.data) || {};
     DATA.breaks = (sd.breaks && typeof sd.breaks === 'object') ? sd.breaks : {};
+    DATA.labelProject = (sd.labelProject && typeof sd.labelProject === 'object') ? sd.labelProject : {}; // 11/18〜 プロジェクトはラベルで決める
     renderMine(mineBox, r1.error);
     loadProjects(pjBox, mineBox, r2.error);
   }
@@ -757,25 +755,8 @@
         var go = el('a', { cls: 'acct-btn acct-btn-sm acct-btn-primary', href: page + x.config.q, text: T.start });
         go.addEventListener('click', function () { ev('mytimer_start_from_account'); });
         var li = el('li');
-        var sel = projectSelect(x.project_id || '', async function (v, s) {
-          if (v === '__new') {
-            s.value = x.project_id || '';
-            nameForm(li, T.pjNamePh, '', T.pjOk, async function (name) {
-              var p = await createProject(name); if (!p) return false;
-              return await assign(p.id);
-            });
-            return;
-          }
-          await assign(v || null);
-        });
-        async function assign(pid) {
-          var r = await sb.from('timers').update({ project_id: pid }).eq('id', x.id).select('id').single();
-          if (r.error) { li.appendChild(msg(T.pjErr, 'err')); return false; }
-          x.project_id = pid; ev('project_assign');
-          refresh(); return true;
-        }
         li.appendChild(el('div', { cls: 'acct-my-info' }, [el('p', { cls: 'acct-my-name', text: x.name || '' }), el('p', { cls: 'acct-my-sum', text: summary(x.config.q) })]));
-        li.appendChild(el('div', { cls: 'acct-my-actions' }, [sel, go]));
+        li.appendChild(el('div', { cls: 'acct-my-actions' }, [go]));
         ul.appendChild(li);
       });
       box.appendChild(ul);
@@ -797,7 +778,8 @@
     DATA.projects.forEach(function (p) {
       var card = el('div', { cls: 'acct-pj' });
       card.appendChild(el('div', { cls: 'acct-pj-head' }, [el('p', { cls: 'acct-pj-name', text: p.name })]));
-      var names = DATA.timers.filter(function (t) { return t.project_id === p.id; }).map(function (t) { return t.name || ''; });
+      var lp = DATA.labelProject || {};
+      var names = Object.keys(lp).filter(function (k) { return lp[k] === p.id; });
       card.appendChild(el('p', { cls: 'acct-pj-timers' }, names.length ? [el('span', { cls: 'acct-pj-timers-k', text: D2.pjTimers }), names.join(lang === 'ja' ? '・' : ', ')] : [D2.pjNoTimers]));
       var acts = el('div', { cls: 'acct-pj-acts' });
       var rn = el('button', { type: 'button', cls: 'acct-pj-tog', text: T.pjRename });
