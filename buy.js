@@ -78,6 +78,7 @@
 
   var links = Array.prototype.slice.call(document.querySelectorAll('.plan-go a'));
   if (!links.length) return;
+  links.forEach(function (a) { a.addEventListener('click', function () { ev('pricing_cta', { pos: a.closest('.plan-go-top') ? 'top' : 'bottom', signed: session() ? 1 : 0 }); }); });
   if (!session() || cachedPlan() === 'premium') return; // これまでどおりアカウントページへ
 
   var ent = null, entP = null;
