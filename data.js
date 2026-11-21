@@ -116,7 +116,7 @@
       },
       cal: { month: function (d) { return d.getFullYear() + '年' + (d.getMonth() + 1) + '月'; }, prev: '前の月', next: '次の月', wd: ['日', '月', '火', '水', '木', '金', '土'], mon: false, total: '休憩をのぞく合計', days: function (n) { return '記録した日 ' + n + '日'; }, best: function (n) { return '最長 ' + n + '日連続'; }, short: '短い', long: '長い', lockT: 'それより前の月はプレミアム', open: function (d, v) { return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + v + '（ログで見る）'; }, pp: ['（', '）', '、'], none: '記録なし', locked: 'プレミアムで見られます' },
       tinyShow: function (n) { return '1分未満の記録 ' + n + '件を表示'; }, tinyHide: '1分未満の記録をかくす',
-      ed: { btn: '時間を変える', start: '始めた時刻', len: '分', sum: '合計', save: '保存', cancel: 'やめる', del: 'この記録を消す', delSure: 'もう一度押すと消えます', running: '動いている記録は、止めてから変えられます。', recent: 'ほかの画面で動いているかもしれません。止めてから1〜2分たってから変えてください。', saved: '記録を変えました', deleted: '記録を消しました', errEnd: '終わりが今より後になっています', errLen: '長さは合わせて1分〜12時間にしてください', errSave: '保存できませんでした。時間をおいてもう一度お試しください。', errDel: '消せませんでした。時間をおいてもう一度お試しください。' },
+      ed: { btn: '時間を変える', start: '始めた時刻', len: '分', sum: '合計', save: '保存', cancel: 'やめる', del: 'この記録を消す', delSure: 'もう一度押すと消えます', running: '動いている記録は、止めてから変えられます。', recent: 'ほかの画面で動いているかもしれません（1〜2分前まで記録が届いていました）。止めてから変えてください。', force: '動いていないので変える', end: '終わった時刻', errOrder: '終わりが始まりより前になっています', saved: '記録を変えました', deleted: '記録を消しました', errEnd: '終わりが今より後になっています', errLen: '長さは合わせて1分〜12時間にしてください', errSave: '保存できませんでした。時間をおいてもう一度お試しください。', errDel: '消せませんでした。時間をおいてもう一度お試しください。' },
       date: function (d) { return (d.getMonth() + 1) + '月' + d.getDate() + '日（' + '日月火水木金土'.charAt(d.getDay()) + '）'; }
     },
     en: {
@@ -138,7 +138,7 @@
       },
       cal: { month: function (d) { return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][d.getMonth()] + ' ' + d.getFullYear(); }, prev: 'Previous month', next: 'Next month', wd: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], mon: false, total: 'Total, excluding breaks', days: function (n) { return n + ' day' + (n === 1 ? '' : 's') + ' recorded'; }, best: function (n) { return 'Longest streak ' + n + ' day' + (n === 1 ? '' : 's'); }, short: 'Short', long: 'Long', lockT: 'Earlier months are Premium', open: function (d, v) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate() + ', ' + v + ' (open in log)'; }, pp: [' (', ')', ', '], none: 'No record', locked: 'Available with Premium' },
       tinyShow: function (n) { return 'Show ' + n + ' record' + (n > 1 ? 's' : '') + ' under 1 min'; }, tinyHide: 'Hide records under 1 min',
-      ed: { btn: 'Change times', start: 'Started at', len: 'min', sum: 'Total', save: 'Save', cancel: 'Cancel', del: 'Delete this record', delSure: 'Tap again to delete', running: 'Stop this record before changing it.', recent: 'This may still be running on another screen. Stop it, wait a minute or two, then change it.', saved: 'Record updated', deleted: 'Record deleted', errEnd: 'The end is later than now', errLen: 'Keep the total between 1 minute and 12 hours', errSave: 'Could not save. Please try again in a moment.', errDel: 'Could not delete. Please try again in a moment.' },
+      ed: { btn: 'Change times', start: 'Started at', len: 'min', sum: 'Total', save: 'Save', cancel: 'Cancel', del: 'Delete this record', delSure: 'Tap again to delete', running: 'Stop this record before changing it.', recent: 'This may still be running on another screen (it was saving a minute or two ago). Stop it, then change it.', force: 'It is not running — change it', end: 'Ended at', errOrder: 'The end is before the start', saved: 'Record updated', deleted: 'Record deleted', errEnd: 'The end is later than now', errLen: 'Keep the total between 1 minute and 12 hours', errSave: 'Could not save. Please try again in a moment.', errDel: 'Could not delete. Please try again in a moment.' },
       date: function (d) { return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()] + ', ' + ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate(); }
     },
     es: {
@@ -160,7 +160,7 @@
       },
       cal: { month: function (d) { return ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ' de ' + d.getFullYear(); }, prev: 'Mes anterior', next: 'Mes siguiente', wd: ['L', 'M', 'X', 'J', 'V', 'S', 'D'], mon: true, total: 'Total sin descansos', days: function (n) { return n + ' día' + (n === 1 ? '' : 's') + ' con registro'; }, best: function (n) { return 'Racha más larga: ' + n + ' día' + (n === 1 ? '' : 's'); }, short: 'Poco', long: 'Mucho', lockT: 'Los meses anteriores son Premium', open: function (d, v) { return d.getDate() + ' de ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ', ' + v + ' (ver en el registro)'; }, pp: [' (', ')', ', '], none: 'Sin registro', locked: 'Disponible con Premium' },
       tinyShow: function (n) { return 'Mostrar ' + n + ' registro' + (n > 1 ? 's' : '') + ' de menos de 1 min'; }, tinyHide: 'Ocultar registros de menos de 1 min',
-      ed: { btn: 'Cambiar tiempos', start: 'Empezó a las', len: 'min', sum: 'Total', save: 'Guardar', cancel: 'Cancelar', del: 'Borrar este registro', delSure: 'Toca otra vez para borrar', running: 'Detén este registro antes de cambiarlo.', recent: 'Puede que siga en marcha en otra pantalla. Detenlo, espera uno o dos minutos y cámbialo.', saved: 'Registro cambiado', deleted: 'Registro borrado', errEnd: 'El final es posterior a ahora', errLen: 'El total debe estar entre 1 minuto y 12 horas', errSave: 'No se pudo guardar. Inténtalo de nuevo en un momento.', errDel: 'No se pudo borrar. Inténtalo de nuevo en un momento.' },
+      ed: { btn: 'Cambiar tiempos', start: 'Empezó a las', len: 'min', sum: 'Total', save: 'Guardar', cancel: 'Cancelar', del: 'Borrar este registro', delSure: 'Toca otra vez para borrar', running: 'Detén este registro antes de cambiarlo.', recent: 'Puede que siga en marcha en otra pantalla (se guardaba hace uno o dos minutos). Detenlo y luego cámbialo.', force: 'No está en marcha: cambiar', end: 'Terminó a las', errOrder: 'El final es anterior al inicio', saved: 'Registro cambiado', deleted: 'Registro borrado', errEnd: 'El final es posterior a ahora', errLen: 'El total debe estar entre 1 minuto y 12 horas', errSave: 'No se pudo guardar. Inténtalo de nuevo en un momento.', errDel: 'No se pudo borrar. Inténtalo de nuevo en un momento.' },
       date: function (d) { return ['dom', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb'][d.getDay()] + ' ' + d.getDate() + ' ' + ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'][d.getMonth()]; }
     }
   }[lang];
@@ -174,6 +174,7 @@
   function svgN(tag, a) { var n = document.createElementNS('http://www.w3.org/2000/svg', tag); for (var k in a) n.setAttribute(k, a[k]); return n; }
   function dough(svg, cx, cy, r, w) { svg.appendChild(svgN('circle', { cx: cx, cy: cy, r: r, fill: 'none', 'stroke-width': w, class: 'ttd-dough' })); }
   function sprinkles(svg, cx, cy, r, band, n, len, wid) {
+    return; // 11/20: スプリンクルは見にくいので出さない（えりなさん）
     var g = svgN('g', { class: 'ttd-spr', 'aria-hidden': 'true' });
     for (var i = 0; i < n; i++) {
       var a = (i * 360 / n + (i % 2 ? 360 / n * 0.45 : 0)) * Math.PI / 180, rr = r + ((i % 3) - 1) * band * 0.28;
@@ -1181,9 +1182,20 @@
     // 動いている記録は変えない（保存のたびに上書きされるため）
     var act = window.__ttActiveLogs ? window.__ttActiveLogs() : [];
     if (act.indexOf(e.id) >= 0) { msg(E.running); return; }
-    var endAt = e.endedAt ? Date.parse(e.endedAt) : NaN;
+    // 11/20: 「最後に記録が届いた時刻」（終わった時刻か、始まり＋長さの遅い方）が2分半より前なら、もう動いていない。
+    // 終わった時刻が入っていない記録がずっと変えられなかったのを直す。それでも迷うときは「動いていないので変える」で進める
+    var endAt = e.endedAt ? Date.parse(e.endedAt) : NaN, lp = e.parts[e.parts.length - 1];
+    var seen = Math.max(isFinite(endAt) ? endAt : 0, lp ? lp.s + lp.secs * 1000 : e.t.getTime());
     var mine = window.__ttEndedHere ? window.__ttEndedHere() : [];
-    if (!e.done && mine.indexOf(e.id) < 0 && (!isFinite(endAt) || Date.now() - endAt < 75000)) { msg(E.recent); return; }
+    if (!e.done && mine.indexOf(e.id) < 0 && Date.now() - seen < 150000 && !box.__force) {
+      msg(E.recent);
+      var fb = el('button', { type: 'button', cls: 'ttd-edit-cancel ttd-edit-force', text: E.force });
+      fb.addEventListener('click', function () { box.textContent = ''; box.__force = true; build(); });
+      box.appendChild(el('div', { cls: 'ttd-edit-btns' }, [fb]));
+      return;
+    }
+    build();
+    function build() {
     // 11/17: ひとことメモ（usage_logs.config.note）
     var memoIn = el('input', { type: 'text', maxlength: '200', value: e.note || '', placeholder: TD.lg.memoPh, autocomplete: 'off', 'aria-label': TD.lg.memo });
     if (window.__ttSetNote) box.appendChild(el('label', { cls: 'ttd-edit-st ttd-edit-memo' }, [el('span', { text: TD.lg.memo }), memoIn]));
@@ -1200,6 +1212,9 @@
       list.appendChild(el('li', null, [el('span', { cls: 'ttd-edit-n', text: nm }), el('span', { cls: 'ttd-edit-v' }, [inp, el('span', { text: E.len })])]));
     });
     box.appendChild(list);
+    // 11/20: 終わった時刻からも直せる（変えると最後の区切りの長さが変わる）
+    var endIn = el('input', { type: 'time', step: '60', 'aria-label': E.end });
+    box.appendChild(el('label', { cls: 'ttd-edit-st ttd-edit-end' }, [el('span', { text: E.end }), endIn]));
     var sumEl = el('p', { cls: 'ttd-edit-sum' });
     box.appendChild(sumEl);
     function secsOf(i) {
@@ -1208,9 +1223,44 @@
       var n = Math.round(Number(v));
       return isFinite(n) && n >= 0 && n <= 720 ? n * 60 : NaN;
     }
+    // 始まり（入力中の時刻）と各区切りの長さから、終わりの時刻（ms）を出す。区切りの間のすき間はそのまま
+    function startMs() {
+      var m = /^(\d{1,2}):(\d{2})/.exec(stIn.value || ''), st = new Date(e.t);
+      if (m && (Number(m[1]) !== e.t.getHours() || Number(m[2]) !== e.t.getMinutes())) st.setHours(Number(m[1]), Number(m[2]), 0, 0);
+      return st.getTime();
+    }
+    function endMs() {
+      var cur = startMs();
+      e.parts.forEach(function (p, i) {
+        var prevEnd = i === 0 ? e.t.getTime() : e.parts[i - 1].s + e.parts[i - 1].secs * 1000;
+        cur += Math.max(0, Math.min(p.s - prevEnd, 12 * 3600000)) + (secsOf(i) || 0) * 1000;
+      });
+      return cur;
+    }
+    function showEnd() { if (document.activeElement === endIn) return; var d = new Date(endMs()); endIn.value = pad(d.getHours()) + ':' + pad(d.getMinutes()); }
     function upd() { var t = 0; ins.forEach(function (x, i) { t += secsOf(i) || 0; }); sumEl.textContent = E.sum + ' ' + T.dur(t); }
-    ins.forEach(function (x) { x.addEventListener('input', upd); });
-    upd();
+    ins.forEach(function (x) { x.addEventListener('input', function () { upd(); showEnd(); }); });
+    stIn.addEventListener('input', showEnd);
+    // 11/20: 打っている途中（「3」→「30」）で書きかえると入力がこわれるので、欄を離れたとき（と保存のとき）に反映する
+    var endDirty = false;
+    endIn.addEventListener('input', function () { endDirty = true; });
+    endIn.addEventListener('change', function () { endDirty = true; });
+    endIn.addEventListener('blur', applyEnd);
+    function applyEnd() {
+      if (!endDirty) return; endDirty = false;
+      var m = /^(\d{1,2}):(\d{2})/.exec(endIn.value || ''); if (!m) return;
+      var cur = new Date(endMs()), want = new Date(cur);
+      want.setHours(Number(m[1]), Number(m[2]), 0, 0);
+      // 日をまたぐ記録: 今の終わりから12時間より離れていたら前後の日として扱う
+      if (want - cur > 12 * 3600000) want.setDate(want.getDate() - 1); else if (cur - want > 12 * 3600000) want.setDate(want.getDate() + 1);
+      var li = -1; e.parts.forEach(function (p, i) { if (!isBreak(D, p.label) && (secsOf(i) || 0) > 0) li = i; });
+      if (li < 0) li = e.parts.length - 1;
+      var nv = (secsOf(li) || 0) + Math.round((want - cur) / 60000) * 60;
+      if (nv < 0) { msg(E.errOrder); showEnd(); return; }
+      ins[li].value = String(Math.round(nv / 60));
+      upd(); showEnd();
+    }
+    upd(); showEnd();
     var save = el('button', { type: 'button', cls: 'ttd-edit-save', text: E.save });
     var cancel = el('button', { type: 'button', cls: 'ttd-edit-cancel', text: E.cancel });
     var del = el('button', { type: 'button', cls: 'ttd-edit-del', text: E.del });
@@ -1218,6 +1268,7 @@
     box.appendChild(del);
     cancel.addEventListener('click', function () { closeEdits(); btn.focus(); });
     save.addEventListener('click', async function () {
+      applyEnd();
       var secs = e.parts.map(function (p, i) { return secsOf(i); });
       if (secs.some(function (x) { return !isFinite(x); })) { msg(E.errLen); return; }
       var total = secs.reduce(function (a, b) { return a + b; }, 0);
@@ -1251,6 +1302,7 @@
       afterEdit(E.deleted);
     });
     (window.__ttSetNote ? memoIn : stIn).focus();
+    }
   }
   function afterEdit(text) {
     S.dd = null; S.data = null; S.cd = null; S.ld = null; S.flash = text;

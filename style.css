@@ -1587,3 +1587,34 @@ body.focus-mode #cal-btn { display: none; }
 .lbl-pj, .tt-cform-pj { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 8px 0 4px; }
 .lbl-pj .tt-my-proj, .tt-cform-pj .tt-my-proj { flex: 1 1 160px; max-width: 260px; }
 .lbl-pj .tt-my-projnew, .tt-cform-pj .tt-my-projnew { display: flex; gap: 6px; flex: 1 1 100%; }
+/* 11/20: 長く計っているときの確認 */
+.tt-crun { flex-wrap: wrap; }
+.tt-crun-ask { flex: 1 1 100%; margin-top: 8px; padding: 10px; border-radius: 10px; background: var(--card); color: var(--text); }
+.tt-crun-q { margin: 0 0 8px; font-size: 14px; font-weight: 700; }
+.tt-crun-ar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tt-crun-el { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.tt-crun-el input { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--text); }
+.tt-crun-b { min-height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.tt-crun-b.pri { background: var(--text); color: var(--bg); border-color: var(--text); }
+/* 11/20: 計っている間の下の帯（カードが見えないときだけ。PCは右下の小さなカード） */
+.tt-runbar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 60; display: flex; align-items: stretch; background: var(--card); border-top: 3px solid var(--lc, var(--text)); box-shadow: 0 -2px 8px rgba(0,0,0,.12); padding-bottom: env(safe-area-inset-bottom); }
+@media (min-width: 900px) { .tt-runbar { left: auto; right: 16px; bottom: 16px; width: 320px; border-radius: 12px; border-top: 0; border-left: 4px solid var(--lc, var(--text)); padding-bottom: 0; } }
+.tt-runbar[hidden] { display: none; }
+.tt-runbar-go { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 0; background: none; color: var(--text); font: inherit; font-size: 14px; text-align: left; cursor: pointer; }
+.tt-runbar-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--lc, var(--text)); flex-shrink: 0; animation: tt-blink 1.6s ease-in-out infinite; }
+@keyframes tt-blink { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .tt-runbar-dot { animation: none; } }
+.tt-runbar-n { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-runbar-t { margin-left: auto; font-variant-numeric: tabular-nums; }
+.tt-runbar-stop { flex: 0 0 52px; border: 0; border-left: 1px solid var(--line); background: none; color: var(--text); font-size: 16px; cursor: pointer; }
+/* 11/20: ホームのログ：カーソルを合わせたときの詳細 */
+.tt-today-open { position: relative; }
+.tt-today-tip { position: absolute; z-index: 5; display: flex; flex-direction: column; gap: 2px; max-width: 260px; padding: 8px 10px; border-radius: 10px; background: var(--text); color: var(--bg); font-size: 12px; line-height: 1.45; box-shadow: 0 4px 14px rgba(0,0,0,.2); pointer-events: none; }
+.tt-today-tip[hidden] { display: none; }
+.tt-tip-pj { opacity: .8; font-size: 11px; }
+.tt-tip-l { display: flex; align-items: center; gap: 6px; }
+.tt-tip-c { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex-shrink: 0; }
+.tt-tip-t { font-variant-numeric: tabular-nums; }
+.tt-tip-n { white-space: pre-wrap; overflow-wrap: anywhere; }
+.tt-today-tip > span { display: block; }
+.tt-today-tip > .tt-tip-l { display: flex; }
