@@ -1033,6 +1033,24 @@
   }
   window.addEventListener('pagehide', function () { if (cRun) { var L = cLog(); if (L.id || L.secs >= 15) persistLog(L, false); } });
 
+  async function checkOld(uid) {
+    var KEY = 'tt-old', t0 = new Date(); t0.setHours(0, 0, 0, 0);
+    var day = dayKey(t0), o = null;
+    try { var c = JSON.parse(sessionStorage.getItem(KEY) || 'null'); if (c && c.uid === uid && c.day === day) o = c; } catch (e) {}
+    if (!o) {
+      var lim = new Date(t0.getTime() - 29 * 86400000); // 無料で見られるのは今日を含めて30日
+      var r = await sb.from('usage_logs').select('started_at,total_secs').eq('product', PRODUCT)
+        .lt('started_at', lim.toISOString()).order('started_at', { ascending: true }).limit(2000);
+      if (r.error || !r.data) return;
+      var days = {}, secs = 0;
+      r.data.forEach(function (x) { days[dayKey(new Date(x.started_at))] = 1; secs += Math.min(Math.max(0, Number(x.total_secs) || 0), 12 * 3600); });
+      o = { uid: uid, day: day, days: Object.keys(days).length, secs: Math.round(secs), first: r.data.length ? r.data[0].started_at : null };
+      try { sessionStorage.setItem(KEY, JSON.stringify(o)); } catch (e) {}
+    }
+    if (!o.days) return;
+    window.__ttOld = { days: o.days, secs: o.secs, first: o.first };
+    if (window.__ttOldRecords) { try { window.__ttOldRecords(window.__ttOld); } catch (e) {} }
+  }
   (async function init() {
     var s = await sb.auth.getSession();
     if (!s.data || !s.data.session) {
@@ -1058,6 +1076,8 @@
     } catch (e) {}
     window.__ttSb = sb; window.__ttPremium = PREMIUM;
     if (window.__ttSetPlan) { try { window.__ttSetPlan(PREMIUM ? 'premium' : 'free'); } catch (e) {} }
+    // 11/21: 無料の人で、見られる30日より前の記録があるか（あれば「保存されています・プレミアムで見られる」と出す）
+    if (!PREMIUM) checkOld(s.data.session.user && s.data.session.user.id).catch(function () {});
     window.__ttBreaks = function () { return BREAKS; };
     window.__ttStatsRefresh = function () { loadStreak(true); };
     // 11/16: データの窓で時間を変えるとき、動いている記録は変えない

@@ -1618,3 +1618,16 @@ body.focus-mode #cal-btn { display: none; }
 .tt-tip-n { white-space: pre-wrap; overflow-wrap: anywhere; }
 .tt-today-tip > span { display: block; }
 .tt-today-tip > .tt-tip-l { display: flex; }
+
+/* 11/21 30日より前の記録がある無料の人への案内（#tt-oldrec） */
+.tt-oldrec { display: flex; gap: 12px; align-items: flex-start; margin: 0 0 12px; padding: 14px 16px; border-radius: var(--radius); background: #FFF1D6; border: 1.5px solid #E8B44A; color: #3D2E00; font-family: var(--font-round); }
+.tt-oldrec-ic { width: 26px; height: 26px; flex-shrink: 0; fill: none; stroke: #B07A00; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; margin-top: 2px; }
+.tt-oldrec-tx { min-width: 0; }
+.tt-oldrec-t { font-size: 15px; font-weight: 700; margin: 0 0 4px; line-height: 1.4; word-break: auto-phrase; }
+.tt-oldrec-b { font-size: 13px; line-height: 1.6; margin: 0 0 10px; color: #5C4300; word-break: auto-phrase; }
+.tt-oldrec-go { display: inline-flex; align-items: center; min-height: 40px; padding: 8px 18px; border-radius: 999px; background: #D04A0A; color: #fff; font-weight: 700; font-size: 14px; text-decoration: none; }
+.tt-oldrec-go:hover { background: #B53F08; }
+body.focus-mode .tt-oldrec { display: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tt-oldrec { background: #3A2E10; border-color: #8A6A1E; color: #F5E3B8; } :root:not([data-theme="light"]) .tt-oldrec-b { color: #E6D3A3; } }
+:root[data-theme="dark"] .tt-oldrec { background: #3A2E10; border-color: #8A6A1E; color: #F5E3B8; }
+:root[data-theme="dark"] .tt-oldrec-b { color: #E6D3A3; }

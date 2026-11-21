@@ -1828,7 +1828,7 @@ var dataLoading = null;
 function openData(src) {
 if (window.__ttData) { window.__ttData.open(src); return; }
 if (dataLoading) return;
-dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=20';
+dataLoading = document.createElement('script'); dataLoading.src = '/data.js?v=21';
 dataLoading.onload = function () { if (window.__ttData) window.__ttData.open(src); };
 dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
@@ -1841,7 +1841,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=26'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=27'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -2840,9 +2840,9 @@ document.body.appendChild(b);
 
 /* ---------- 自社の案内（プレミアム）：常設バナー・終了時の案内・ヘッダーのボタン（2026-11-05）
  * 外部の広告は読み込まない。中身はすべてこのファイルの文言（textContent のみ）。
- * プレミアムの人には出さない（tt-plan は sync.js / account.js が確認して保存する）。ドーナツ版には出さない */
+ * プレミアムの人には出さない（tt-plan は sync.js / account.js が確認して保存する）。
+ * ドーナツ版にも出す（11/21〜。色は donut.css でドーナツ風に） */
 (function () {
-if (window.DT) return;
 var lang = document.documentElement.lang;
 var l = ['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja';
 var PRICING = { ja: '/pricing', en: '/en-pricing', es: '/es-pricing' }[l];
@@ -3039,17 +3039,44 @@ ev('promo_view', { slot: 'finish', variant: v });
 var pb = document.getElementById('pause-btn');
 if (pb) pb.addEventListener('click', function () { setTimeout(function () { if (!document.querySelector('.run-time.finished')) closeCard(); }, 0); });
 
+/* 4) 30日より前の記録がある無料の人に（11/21）。sync.js が見つけたら呼ぶ。消えていないこと＋プレミアムで見られることを伝える */
+var OLD = {
+ja: { t: function (d) { return '30日より前の記録が ' + d + '日分 あります'; }, b: function (h, f) { return '合計' + h + (f ? '（' + f + 'から）' : '') + '。記録は消えずに保存されています。プレミアムなら、始めた日から全部見返せます。初めての方は7日間無料です。'; }, go: 'プレミアムで全部見る', h: function (m) { return m >= 60 ? Math.floor(m / 60) + '時間' + (m % 60 ? m % 60 + '分' : '') : m + '分'; }, loc: 'ja-JP' },
+en: { t: function (d) { return d + (d === 1 ? ' day' : ' days') + ' of records from more than 30 days ago'; }, b: function (h, f) { return h + ' in total' + (f ? ' (since ' + f + ')' : '') + '. They are kept safe. Premium lets you look back at everything since day one — 7 days free for new subscribers.'; }, go: 'See it all with Premium', h: function (m) { return m >= 60 ? Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + m % 60 + ' min' : '') : m + ' min'; }, loc: 'en-US' },
+es: { t: function (d) { return 'Tienes ' + d + (d === 1 ? ' día' : ' días') + ' de registros de hace más de 30 días'; }, b: function (h, f) { return h + ' en total' + (f ? ' (desde el ' + f + ')' : '') + '. Están guardados. Con Premium puedes verlo todo desde el primer día; 7 días gratis si eres nuevo.'; }, go: 'Verlo todo con Premium', h: function (m) { return m >= 60 ? Math.floor(m / 60) + ' h' + (m % 60 ? ' ' + m % 60 + ' min' : '') : m + ' min'; }, loc: 'es-MX' }
+}[l];
+function addOld(o) {
+var ex = document.getElementById('tt-oldrec'); if (ex) ex.remove();
+if (isPremium() || !o || !(o.days > 0)) return;
+var anchor = document.getElementById('tt-promo'); // バナーの枠の中（一番上）に入れる（PC のグリッドで重ならないように）
+if (!anchor) return;
+var f = ''; try { if (o.first) f = new Date(o.first).toLocaleDateString(OLD.loc, { year: 'numeric', month: 'long', day: 'numeric' }); } catch (e) {}
+var box = el('aside', 'tt-oldrec'); box.id = 'tt-oldrec';
+var ic = svg([['rect', { x: 4, y: 3, width: 16, height: 18, rx: 2 }], ['path', { d: 'M8 8h8M8 12h8M8 16h5' }]], { cls: 'tt-oldrec-ic' });
+var tx = el('div', 'tt-oldrec-tx');
+tx.appendChild(el('p', 'tt-oldrec-t', OLD.t(o.days)));
+tx.appendChild(el('p', 'tt-oldrec-b', OLD.b(OLD.h(Math.max(1, Math.round((Number(o.secs) || 0) / 60))), f)));
+var a = el('a', 'tt-oldrec-go', OLD.go); a.href = PRICING + '#buy';
+a.addEventListener('click', function () { ev('promo_click', { slot: 'old', days: o.days }); });
+tx.appendChild(a);
+box.appendChild(ic); box.appendChild(tx);
+anchor.insertBefore(box, anchor.firstChild);
+ev('promo_view', { slot: 'old', days: o.days });
+}
+window.__ttOldRecords = addOld;
+
 /* sync.js / account.js がプランを確認したら呼ぶ */
 window.__ttSetPlan = function (p) {
 try { if (p) localStorage.setItem('tt-plan', p); else localStorage.removeItem('tt-plan'); } catch (e) {}
 plan = p;
-if (isPremium()) { var b = document.getElementById('tt-promo'); if (b) b.remove(); closeCard(); }
+if (isPremium()) { var b = document.getElementById('tt-promo'); if (b) b.remove(); var ob = document.getElementById('tt-oldrec'); if (ob) ob.remove(); closeCard(); }
 else addBanner();
 paintHeader();
 };
 
 addBanner();
 paintHeader();
+if (window.__ttOld) addOld(window.__ttOld);
 })();
 
 /* ---------- タイトル（TimerTrain）を押すと、そのページの基本の編成へ（11/13） ---------- */

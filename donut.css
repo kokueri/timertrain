@@ -132,3 +132,28 @@ body.dt .tt-today-dn::after { content: ""; position: absolute; inset: 11px; bord
 body.dt .tt-today-head { align-items: center; }
 body.dt .tt-today-head .tt-today-t { flex: 1; }
 body.dt .ttd-cal-pie.dn.empty { opacity: .45; }
+
+/* プレミアムの案内（11/21〜ドーナツ版にも表示）。黒×オレンジの代わりにチョコ×いちご */
+body.dt .tt-promo { --pm-gold: #FFF9EF; --pm-head: #5A3A2A; --pm-band: #FDE7EE; --pm-btn: #C03868; }
+body.dt .tt-promo-in:hover .tt-promo-cta { background: #A82E59; }
+body.dt .tt-promo-k1n, body.dt .tt-promo-num { color: #F6C77E; }
+body.dt #tt-prem-link { background: #FDE7EE; color: #7A2848; border-color: #F19DBA; }
+body.dt .tt-pc-fm { background: #5A3A2A; color: #FFF9EF; }
+body.dt .tt-pc-go-fm { background: #C03868; color: #fff; }
+body.dt .tt-pc-go-fm:hover { background: #A82E59; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body.dt .tt-promo { --pm-head: #2E1F18; --pm-band: #3D2630; }
+  :root:not([data-theme="light"]) body.dt #tt-prem-link { background: #3D2630; color: #F7C3D4; }
+  :root:not([data-theme="light"]) body.dt .tt-pc-fm { background: #2E1F18; }
+}
+:root[data-theme="dark"] body.dt .tt-promo { --pm-head: #2E1F18; --pm-band: #3D2630; }
+:root[data-theme="dark"] body.dt #tt-prem-link { background: #3D2630; color: #F7C3D4; }
+:root[data-theme="dark"] body.dt .tt-pc-fm { background: #2E1F18; }
+body.dt .tt-oldrec { background: #FDE7EE; border-color: #F19DBA; color: #4A2234; }
+body.dt .tt-oldrec-b { color: #6B3348; }
+body.dt .tt-oldrec-ic { stroke: #C03868; }
+body.dt .tt-oldrec-go { background: #C03868; }
+body.dt .tt-oldrec-go:hover { background: #A82E59; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) body.dt .tt-oldrec { background: #3D2630; border-color: #7A3A55; color: #F7DCE5; } :root:not([data-theme="light"]) body.dt .tt-oldrec-b { color: #EBC6D3; } }
+:root[data-theme="dark"] body.dt .tt-oldrec { background: #3D2630; border-color: #7A3A55; color: #F7DCE5; }
+:root[data-theme="dark"] body.dt .tt-oldrec-b { color: #EBC6D3; }
