@@ -114,6 +114,7 @@
         log: ['30日より前のログも', '記録は無料でもずっと保存されています。プレミアムで始めた日までさかのぼれます。'],
         data: ['12か月・全期間のグラフとCSV', 'プレミアムで、積み上げた記録をまるごと見返せます。']
       },
+      oldT: function (d) { return '30日より前の記録 ' + d + '日分は、消えずに保存されています'; },
       cal: { month: function (d) { return d.getFullYear() + '年' + (d.getMonth() + 1) + '月'; }, prev: '前の月', next: '次の月', wd: ['日', '月', '火', '水', '木', '金', '土'], mon: false, total: '休憩をのぞく合計', days: function (n) { return '記録した日 ' + n + '日'; }, best: function (n) { return '最長 ' + n + '日連続'; }, short: '短い', long: '長い', lockT: 'それより前の月はプレミアム', open: function (d, v) { return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + v + '（ログで見る）'; }, pp: ['（', '）', '、'], none: '記録なし', locked: 'プレミアムで見られます' },
       tinyShow: function (n) { return '1分未満の記録 ' + n + '件を表示'; }, tinyHide: '1分未満の記録をかくす',
       ed: { btn: '時間を変える', start: '始めた時刻', len: '分', sum: '合計', save: '保存', cancel: 'やめる', del: 'この記録を消す', delSure: 'もう一度押すと消えます', running: '動いている記録は、止めてから変えられます。', recent: 'ほかの画面で動いているかもしれません（1〜2分前まで記録が届いていました）。止めてから変えてください。', force: '動いていないので変える', end: '終わった時刻', errOrder: '終わりが始まりより前になっています', saved: '記録を変えました', deleted: '記録を消しました', errEnd: '終わりが今より後になっています', errLen: '長さは合わせて1分〜12時間にしてください', errSave: '保存できませんでした。時間をおいてもう一度お試しください。', errDel: '消せませんでした。時間をおいてもう一度お試しください。' },
@@ -136,6 +137,7 @@
         log: ['Your log from more than 30 days ago', 'Your records are kept for good, even for free. Premium lets you look back to day one.'],
         data: ['12-month and all-time charts, plus CSV', 'Premium lets you look back at everything you have built up.']
       },
+      oldT: function (d) { return 'Your ' + d + (d === 1 ? ' day' : ' days') + ' of records from more than 30 days ago are kept safe'; },
       cal: { month: function (d) { return ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][d.getMonth()] + ' ' + d.getFullYear(); }, prev: 'Previous month', next: 'Next month', wd: ['S', 'M', 'T', 'W', 'T', 'F', 'S'], mon: false, total: 'Total, excluding breaks', days: function (n) { return n + ' day' + (n === 1 ? '' : 's') + ' recorded'; }, best: function (n) { return 'Longest streak ' + n + ' day' + (n === 1 ? '' : 's'); }, short: 'Short', long: 'Long', lockT: 'Earlier months are Premium', open: function (d, v) { return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getMonth()] + ' ' + d.getDate() + ', ' + v + ' (open in log)'; }, pp: [' (', ')', ', '], none: 'No record', locked: 'Available with Premium' },
       tinyShow: function (n) { return 'Show ' + n + ' record' + (n > 1 ? 's' : '') + ' under 1 min'; }, tinyHide: 'Hide records under 1 min',
       ed: { btn: 'Change times', start: 'Started at', len: 'min', sum: 'Total', save: 'Save', cancel: 'Cancel', del: 'Delete this record', delSure: 'Tap again to delete', running: 'Stop this record before changing it.', recent: 'This may still be running on another screen (it was saving a minute or two ago). Stop it, then change it.', force: 'It is not running — change it', end: 'Ended at', errOrder: 'The end is before the start', saved: 'Record updated', deleted: 'Record deleted', errEnd: 'The end is later than now', errLen: 'Keep the total between 1 minute and 12 hours', errSave: 'Could not save. Please try again in a moment.', errDel: 'Could not delete. Please try again in a moment.' },
@@ -158,6 +160,7 @@
         log: ['Tu registro de hace más de 30 días', 'Tus registros se guardan siempre, también gratis. Con Premium puedes volver al primer día.'],
         data: ['Gráficos de 12 meses y de todo, y CSV', 'Con Premium puedes ver todo lo que has acumulado.']
       },
+      oldT: function (d) { return 'Tus ' + d + (d === 1 ? ' día' : ' días') + ' de registros de hace más de 30 días están guardados'; },
       cal: { month: function (d) { return ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ' de ' + d.getFullYear(); }, prev: 'Mes anterior', next: 'Mes siguiente', wd: ['L', 'M', 'X', 'J', 'V', 'S', 'D'], mon: true, total: 'Total sin descansos', days: function (n) { return n + ' día' + (n === 1 ? '' : 's') + ' con registro'; }, best: function (n) { return 'Racha más larga: ' + n + ' día' + (n === 1 ? '' : 's'); }, short: 'Poco', long: 'Mucho', lockT: 'Los meses anteriores son Premium', open: function (d, v) { return d.getDate() + ' de ' + ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'][d.getMonth()] + ', ' + v + ' (ver en el registro)'; }, pp: [' (', ')', ', '], none: 'Sin registro', locked: 'Disponible con Premium' },
       tinyShow: function (n) { return 'Mostrar ' + n + ' registro' + (n > 1 ? 's' : '') + ' de menos de 1 min'; }, tinyHide: 'Ocultar registros de menos de 1 min',
       ed: { btn: 'Cambiar tiempos', start: 'Empezó a las', len: 'min', sum: 'Total', save: 'Guardar', cancel: 'Cancelar', del: 'Borrar este registro', delSure: 'Toca otra vez para borrar', running: 'Detén este registro antes de cambiarlo.', recent: 'Puede que siga en marcha en otra pantalla (se guardaba hace uno o dos minutos). Detenlo y luego cámbialo.', force: 'No está en marcha: cambiar', end: 'Terminó a las', errOrder: 'El final es anterior al inicio', saved: 'Registro cambiado', deleted: 'Registro borrado', errEnd: 'El final es posterior a ahora', errLen: 'El total debe estar entre 1 minuto y 12 horas', errSave: 'No se pudo guardar. Inténtalo de nuevo en un momento.', errDel: 'No se pudo borrar. Inténtalo de nuevo en un momento.' },
@@ -722,6 +725,8 @@
   function promo(ctx) {
     if (!signedLocal() || window.__ttPremium) return null;
     var P = TD.promo[ctx]; if (!P) return null;
+    // 11/21: 30日より前の記録が実際にあるなら、その日数を見出しに（sync.js が window.__ttOld を入れる）
+    var O = window.__ttOld; if (O && O.days > 0 && ctx !== 'data') P = [TD.oldT(O.days), P[1]];
     var a = el('a', { cls: 'ttd-btn', href: ACCT + '#acct-plans', text: T.plans });
     a.addEventListener('click', function () { ev('data_see_plans', { view: ctx, from: 'banner' }); });
     return el('aside', { cls: 'ttd-promo', 'aria-label': P[0] }, [el('p', { cls: 'ttd-promo-t', text: '👑 ' + P[0] }), el('p', { cls: 'ttd-promo-l', text: P[1] }), a]);
