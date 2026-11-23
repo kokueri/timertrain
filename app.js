@@ -1,4 +1,5 @@
 'use strict';
+window.__ttHash0 = location.hash; // 11/23: URL を整える前の # を覚えておく（#wrap など）
 /* ===== TimerTrain core =====
 * 設計メモ:
 * - 時刻はタイムスタンプ差分で計算（バックグラウンドタブでも正確）
@@ -1834,6 +1835,33 @@ dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
 }
 window.__ttOpenData = openData;
+/* 11/23: 1年のふりかえりカード（wrap.js は押したときだけ読み込む）
+ * 入口は共有リンクの下。12/1〜1/31 に出す（#wrap で来たときはいつでも開いて、このブラウザでは出し続ける） */
+var wrapLoading = null;
+function openWrap(from) {
+if (window.__ttWrap) { window.__ttWrap.open(from); return; }
+if (wrapLoading) return;
+wrapLoading = document.createElement('script'); wrapLoading.src = '/wrap.js?v=1';
+wrapLoading.onload = function () { if (window.__ttWrap) window.__ttWrap.open(from); };
+wrapLoading.onerror = function () { wrapLoading = null; };
+document.body.appendChild(wrapLoading);
+}
+window.__ttOpenWrap = openWrap;
+(function () {
+var d = new Date(), viaHash = (window.__ttHash0 || location.hash) === '#wrap', keep = false;
+try { if (viaHash) localStorage.setItem('tt-wrap', '1'); keep = localStorage.getItem('tt-wrap') === '1'; } catch (e) {}
+var season = d.getMonth() === 11 || d.getMonth() === 0;
+var sb = document.getElementById('share-btn');
+if ((season || keep) && sb && !document.getElementById('tt-wrap-btn')) {
+if (!document.getElementById('ttw-css')) { var lk = document.createElement('link'); lk.id = 'ttw-css'; lk.rel = 'stylesheet'; lk.href = '/wrap.css?v=1'; document.head.appendChild(lk); }
+var y = d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear();
+var wb = document.createElement('button'); wb.type = 'button'; wb.id = 'tt-wrap-btn'; wb.className = 'tt-wrap-btn' + (window.DT ? ' dt' : '');
+wb.textContent = lang === 'en' ? '🎁 Make your ' + y + ' year card' : lang === 'es' ? '🎁 Crea tu tarjeta del año ' + y : '🎁 ' + y + '年のふりかえりカードを作る';
+wb.addEventListener('click', function () { openWrap('home'); });
+sb.insertAdjacentElement('afterend', wb); if (sb.parentNode) sb.parentNode.style.flexWrap = 'wrap';
+}
+if (viaHash) setTimeout(function () { openWrap('hash'); }, 300);
+})();
 // マイページの「データを見る」から来たとき
 try { if (sessionStorage.getItem('tt-open-data') && document.getElementById('setup')) { sessionStorage.removeItem('tt-open-data'); setTimeout(function () { openData('account'); }, 200); } } catch (e) {}
 // ログイン中は、説明文の「無料ログインでできること」を出さない

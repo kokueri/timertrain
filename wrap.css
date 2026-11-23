@@ -1,0 +1,49 @@
+/* 1年のふりかえりカード（wrap.js が読み込む） */
+html.ttw-open { overflow: hidden; }
+.ttw-back { position: fixed; inset: 0; z-index: 1000; background: rgba(0, 0, 0, .45); display: flex; align-items: center; justify-content: center; padding: 12px; }
+.ttw-back[hidden] { display: none; }
+.ttw { background: var(--card, #fff); color: var(--text, #1C1C1E); border-radius: 20px; width: min(560px, 100%); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; box-shadow: 0 10px 40px rgba(0, 0, 0, .25); }
+.ttw-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 6px 20px; }
+.ttw-head h2 { margin: 0; font-size: 18px; font-family: var(--font-round, inherit); }
+.ttw-x { border: none; background: transparent; color: inherit; font-size: 28px; line-height: 1; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; }
+.ttw-x:hover { background: rgba(127, 127, 127, .12); }
+.ttw-body { overflow-y: auto; padding: 4px 20px 20px; }
+.ttw-msg { margin: 24px 0; line-height: 1.7; }
+.ttw-msg.err { color: #C62828; }
+.ttw-tabs { display: flex; gap: 6px; margin: 6px 0 10px; flex-wrap: wrap; }
+.ttw-tab { flex: 1 1 auto; min-height: 40px; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(127, 127, 127, .35); background: transparent; color: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.ttw-tab.on { background: var(--accent, #1C1C1E); color: var(--accent-text, #fff); border-color: transparent; }
+.ttw-stage { position: relative; border-radius: 14px; overflow: hidden; }
+.ttw-cv { display: block; width: 100%; height: auto; aspect-ratio: 1080 / 1350; border-radius: 14px; box-shadow: 0 2px 10px rgba(0, 0, 0, .12); }
+.ttw-cv.locked { filter: blur(9px); transform: scale(1.03); }
+.ttw-lock { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 24px; background: rgba(255, 255, 255, .55); color: #1C1C1E; }
+.ttw-lock-t { margin: 0 0 8px; font-weight: 800; font-size: 17px; }
+.ttw-lock-l { margin: 0 0 16px; font-size: 14px; line-height: 1.7; max-width: 340px; }
+.ttw-opts { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 16px; margin: 14px 0 4px; }
+.ttw-opt { display: flex; align-items: center; gap: 10px; }
+.ttw-opt-l { font-size: 13px; font-weight: 700; opacity: .8; }
+.ttw-designs { display: flex; gap: 8px; }
+.ttw-sw { position: relative; width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(127, 127, 127, .35); cursor: pointer; padding: 0; }
+.ttw-sw.on { outline: 3px solid var(--text, #1C1C1E); outline-offset: 2px; }
+.ttw-sw-lock { position: absolute; right: -4px; bottom: -4px; font-size: 13px; }
+.ttw-chk { display: flex; align-items: center; gap: 8px; font-size: 14px; min-height: 40px; cursor: pointer; }
+.ttw-chk input { width: 20px; height: 20px; }
+.ttw-dnote { font-size: 13px; margin: 6px 0 0; }
+.ttw-dnote a { color: inherit; font-weight: 700; }
+.ttw-acts { display: flex; gap: 10px; margin-top: 14px; }
+.ttw-btn { flex: 1; display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 10px 18px; border-radius: 999px; border: none; background: #D04A0A; color: #fff; font-weight: 800; font-size: 15px; text-decoration: none; cursor: pointer; font-family: var(--font-round, inherit); }
+.ttw-btn.sub { background: transparent; color: inherit; border: 1.5px solid rgba(127, 127, 127, .5); }
+.ttw-lock .ttw-btn { flex: 0 0 auto; }
+.ttw-note { font-size: 12px; opacity: .7; margin: 12px 0 0; line-height: 1.6; }
+.ttw-saved { font-size: 13px; font-weight: 700; margin: 8px 0 0; }
+.ttw-out { border-radius: 14px; padding: 14px 16px; margin: 4px 0 10px; background: rgba(208, 74, 10, .08); }
+.ttw-out-t { margin: 0 0 4px; font-weight: 800; }
+.ttw-out-l { margin: 0 0 12px; font-size: 14px; line-height: 1.6; }
+.ttw-out .ttw-btn { width: 100%; }
+.ttw-back.dt .ttw-btn { background: #C03868; }
+.ttw-back.dt .ttw-out { background: #FDE7EE; color: #5A3A2A; }
+.ttw-back.dt .ttw-tab.on { background: #5A3A2A; color: #fff; }
+/* ホームの入口（共有リンクの下） */
+.tt-wrap-btn { flex: 1 1 100%; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 8px; min-height: 44px; border-radius: 999px; border: 1.5px dashed #D04A0A; background: transparent; color: var(--text, #1C1C1E); font-weight: 800; font-size: 14px; cursor: pointer; font-family: var(--font-round, inherit); }
+html.dt .tt-wrap-btn, .tt-wrap-btn.dt { border-color: #C03868; }
+@media (prefers-reduced-motion: no-preference) { .ttw { animation: ttw-in .18s ease-out; } @keyframes ttw-in { from { transform: translateY(12px); opacity: 0; } } }
