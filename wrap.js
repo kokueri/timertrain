@@ -32,7 +32,10 @@
       empty: function (y) { return y + '年の記録がまだありません。タイマーを使うと、ここに1年のまとめができます。'; },
       pages: ['まとめ', '1年カレンダー', 'ラベルと時間帯'],
       designs: ['クリーム', 'ナイト', 'ソーダ'], design: 'デザイン',
-      showLabels: 'ラベル名を入れる', share: 'シェア', save: '画像を保存', saved: '画像を保存しました',
+      showLabels: 'ラベル名を入れる',
+      longNote: function (n, h) { return '12時間を超える記録が' + n + '件（合計' + h + '時間）ありました。付けっぱなしの可能性があるので、合計から外しています。'; },
+      longOn: function (n, h) { return '12時間を超える記録' + n + '件（合計' + h + '時間）も合計に入れています。'; },
+      longChk: '長い記録も合計に入れる', share: 'シェア', save: '画像を保存', saved: '画像を保存しました',
       lockT: 'プレミアムのカード', lockL: '1年カレンダーと、ラベル・時間帯のカード、デザインの切り替えはプレミアムで使えます。記録はそのまま保存されているので、申し込むとすぐに作れます。',
       lockBtn: 'プレミアムを7日間無料で試す', designLock: 'デザインの切り替えはプレミアム',
       sample: '見本', outT: '無料ログインで、あなたの1年のカードが作れます',
@@ -62,7 +65,10 @@
       empty: function (y) { return 'No records for ' + y + ' yet. Use the timer and your year card will appear here.'; },
       pages: ['Summary', 'Year calendar', 'Labels & hours'],
       designs: ['Cream', 'Night', 'Soda'], design: 'Design',
-      showLabels: 'Show label names', share: 'Share', save: 'Save image', saved: 'Image saved',
+      showLabels: 'Show label names',
+      longNote: function (n, h) { return n + ' record' + (n > 1 ? 's' : '') + ' longer than 12 hours (' + h + ' h in total) may have been left running, so ' + (n > 1 ? 'they are' : 'it is') + ' left out of your totals.'; },
+      longOn: function (n, h) { return n + ' record' + (n > 1 ? 's' : '') + ' longer than 12 hours (' + h + ' h in total) ' + (n > 1 ? 'are' : 'is') + ' included in your totals.'; },
+      longChk: 'Include long records', share: 'Share', save: 'Save image', saved: 'Image saved',
       lockT: 'Premium cards', lockL: 'The year calendar card, the labels & hours card and extra designs are part of Premium. Your records are already saved, so you can make them right after you subscribe.',
       lockBtn: 'Try Premium free for 7 days', designLock: 'Designs are a Premium feature',
       sample: 'Example', outT: 'Sign in free to make your own year card',
@@ -91,7 +97,10 @@
       empty: function (y) { return 'Aún no hay registros de ' + y + '. Usa el temporizador y aquí aparecerá tu tarjeta del año.'; },
       pages: ['Resumen', 'Calendario anual', 'Etiquetas y horas'],
       designs: ['Crema', 'Noche', 'Soda'], design: 'Diseño',
-      showLabels: 'Mostrar etiquetas', share: 'Compartir', save: 'Guardar imagen', saved: 'Imagen guardada',
+      showLabels: 'Mostrar etiquetas',
+      longNote: function (n, h) { return 'Hay ' + n + ' registro' + (n > 1 ? 's' : '') + ' de más de 12 horas (' + h + ' h en total). Puede que el temporizador se quedara encendido, así que no se cuenta' + (n > 1 ? 'n' : '') + ' en los totales.'; },
+      longOn: function (n, h) { return 'Se incluye' + (n > 1 ? 'n' : '') + ' ' + n + ' registro' + (n > 1 ? 's' : '') + ' de más de 12 horas (' + h + ' h en total) en los totales.'; },
+      longChk: 'Incluir registros largos', share: 'Compartir', save: 'Guardar imagen', saved: 'Imagen guardada',
       lockT: 'Tarjetas Premium', lockL: 'La tarjeta del calendario anual, la de etiquetas y horas y los diseños extra son parte de Premium. Tus registros ya están guardados, así que puedes crearlas en cuanto te suscribas.',
       lockBtn: 'Prueba Premium gratis 7 días', designLock: 'Los diseños son de Premium',
       sample: 'Ejemplo', outT: 'Inicia sesión gratis para crear tu tarjeta del año',
@@ -180,11 +189,15 @@
     var ids = {}, byLog = {};
     logs.forEach(function (l) { ids[l.id] = 1; });
     segs.forEach(function (g) { if (ids[g.log_id]) (byLog[g.log_id] = byLog[g.log_id] || []).push(g); });
-    var days = {}, hours = [], labT = {};
+    var color = window.__ttLabelColor || function () { return '#2A6FC4'; };
+    // 1区切り12時間を超える記録は付けっぱなしの可能性があるので、ふだんは外す（本人が「入れる」を選べる）
+    function build(keepLong) {
+    var days = {}, hours = [], labT = {}, exN = 0, exS = 0;
     for (var h = 0; h < 24; h++) hours.push(0);
     function put(t, secs, lb) {
       if (isNaN(t) || t < q0 || t >= q1 || !(secs > 0) || secs > 86400) return;
       if (isBrk(lb)) return;
+      if (secs > LONG) { exN++; exS += secs; if (!keepLong) return; }
       days[key(t)] = (days[key(t)] || 0) + secs;
       hours[t.getHours()] += secs;
       labT[lb] = (labT[lb] || 0) + secs;
@@ -197,12 +210,18 @@
       });
       else put(new Date(l.started_at), Number(l.total_secs) || 0, '');
     });
-    var color = window.__ttLabelColor || function () { return '#2A6FC4'; };
     var labs = Object.keys(labT).sort(function (a, b) { return labT[b] - labT[a]; }).map(function (n) {
       return { n: n ? n.slice(0, 16) : T.noLabel, s: labT[n], c: n ? color(n) : '#8E8E93' };
     });
-    return finish(y, days, hours, labs, false);
+    var St = finish(y, days, hours, labs, false);
+    St.exN = exN; St.exS = exS;
+    return St;
+    }
+    var St0 = build(false);
+    if (St0.exN) St0.longSt = build(true);
+    return St0;
   }
+  var LONG = 12 * 3600;
   function finish(y, days, hours, labs, isSample) {
     var total = 0, nDays = 0, best = 0, run = 0, months = [], bestDay = null, bestDayS = 0, end = new Date(y, 11, 31);
     for (var m = 0; m < 12; m++) months.push(0);
@@ -383,7 +402,8 @@
   }
 
   /* ---------- 窓 ---------- */
-  var back, box, body, lastFocus, S = { page: 0, theme: 0, showL: true, St: null, y: 0 };
+  var back, box, body, lastFocus, S = { page: 0, theme: 0, showL: true, St: null, y: 0, keepLong: false };
+  try { S.keepLong = localStorage.getItem('tt-wrap-long') === '1'; } catch (e) {}
   function el(tag, attrs, kids) {
     var n = document.createElement(tag);
     if (attrs) for (var k in attrs) { if (k === 'text') n.textContent = attrs[k]; else if (k === 'cls') n.className = attrs[k]; else n.setAttribute(k, attrs[k]); }
@@ -439,9 +459,9 @@
     render();
   }
   function render() {
-    var St = S.St, guest = St.sample, P = prem();
+    var St0 = S.St, St = (S.keepLong && St0.longSt) ? St0.longSt : St0, guest = St.sample, P = prem();
     body.textContent = '';
-    if (!guest && St.total < 60) { body.appendChild(el('p', { cls: 'ttw-msg', text: T.empty(St.y) })); return; }
+    if (!guest && St.total < 60 && !St0.exN) { body.appendChild(el('p', { cls: 'ttw-msg', text: T.empty(St.y) })); return; }
     if (guest) {
       var a = el('a', { cls: 'ttw-btn', href: ACCT, text: T.outBtn });
       a.addEventListener('click', function () { ev('wrap_cta', { to: 'login' }); });
@@ -489,6 +509,18 @@
       opts.appendChild(el('label', { cls: 'ttw-chk', for: 'ttw-showl' }, [cb, el('span', { text: T.showLabels })]));
     }
     body.appendChild(opts);
+    if (St0.exN) {
+      var lh = Math.round(St0.exS / 360) / 10;
+      var lc = el('input', { type: 'checkbox', id: 'ttw-long' }); lc.checked = !!S.keepLong;
+      lc.addEventListener('change', function () {
+        S.keepLong = lc.checked; try { localStorage.setItem('tt-wrap-long', lc.checked ? '1' : '0'); } catch (e) {}
+        ev('wrap_long', { on: lc.checked ? 1 : 0, n: St0.exN }); render(); var t = document.getElementById('ttw-long'); if (t) t.focus();
+      });
+      body.appendChild(el('div', { cls: 'ttw-long', role: 'note' }, [
+        el('p', { text: '⏱ ' + (S.keepLong ? T.longOn(St0.exN, lh) : T.longNote(St0.exN, lh)) }),
+        el('label', { cls: 'ttw-chk', for: 'ttw-long' }, [lc, el('span', { text: T.longChk })])
+      ]));
+    }
     if (!P) {
       var dn = el('p', { cls: 'ttw-dnote', hidden: '' }, [T.designLock + ' — ']);
       var dl2 = el('a', { href: PRICING, text: T.lockBtn }); dl2.addEventListener('click', function () { ev('wrap_cta', { to: 'pricing', page: 'design' }); });
