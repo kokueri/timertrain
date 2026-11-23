@@ -2097,7 +2097,7 @@ col = document.createElement('section'); col.id = 'tt-logcol'; col.className = '
 col.setAttribute('aria-label', TL.title || 'Today');
 runSec.insertAdjacentElement('afterend', col);
 }
-if (col) { col.appendChild(card); document.documentElement.classList.add('tt-has-log'); }
+if (col) { (function (r) { if (r && r.parentNode === col) col.insertBefore(card, r); else col.appendChild(card); })(document.getElementById('tt-stk')); document.documentElement.classList.add('tt-has-log'); }
 else ctr.insertAdjacentElement('afterend', card);
 }
 renderTodayOpen(card.querySelector('.tt-today-open'), st);
@@ -2127,7 +2127,7 @@ var nw = open.querySelector('.tt-today-now'); if (nw) nw.remove();
 var cta = mk('span', 'tt-today-cta', SAMPLE_L.cta + ' →'); open.appendChild(cta);
 var col = document.getElementById('tt-logcol');
 if (!col) { col = document.createElement('section'); col.id = 'tt-logcol'; col.className = 'tt-logcol'; col.setAttribute('aria-label', TL.title); runSec.insertAdjacentElement('afterend', col); }
-col.appendChild(card); document.documentElement.classList.add('tt-has-log');
+(function (r) { if (r && r.parentNode === col) col.insertBefore(card, r); else col.appendChild(card); })(document.getElementById('tt-stk')); document.documentElement.classList.add('tt-has-log');
 open.addEventListener('click', function () { if (window.gtag) gtag('event', 'sample_log_click', {}); });
 }
 (function () {
@@ -3093,16 +3093,66 @@ ev('promo_view', { slot: 'old', days: o.days });
 }
 window.__ttOldRecords = addOld;
 
+/* 5) 作者のLINEスタンプ（11/23）。日本語・スマホ・プレミアム以外。今日のログの下（なければタイマーの下）に1行
+ * A/B: 端末ごとにランダムで A=1回目から / B=3回目から。組は GA のユーザー プロパティ stk_ab とイベントの ab に入れる
+ * ×で14日出さない。フォーカス画面・タイマー動作中は隠す。画像は自前（/sticker-line.png をCSSで切り抜き）、外部スクリプトなし */
+var STK_URL = 'https://line.me/S/sticker/37536745/?lang=ja&utm_source=timertrain&utm_medium=house&utm_campaign=sticker';
+var STK_HIDE = 14 * 864e5;
+function stkGroup() {
+var g = null;
+try { g = localStorage.getItem('tt-stk-ab'); } catch (e) {}
+if (g !== 'A' && g !== 'B') {
+g = Math.random() < 0.5 ? 'A' : 'B';
+try { localStorage.setItem('tt-stk-ab', g); } catch (e) {}
+ev('stk_ab_assign', { ab: g });
+}
+try { if (window.gtag) gtag('set', 'user_properties', { stk_ab: g }); } catch (e) {}
+return g;
+}
+function stkRunning() { var b = document.getElementById('pause-btn'); return !!(b && b.innerHTML.indexOf('M6 5h4v14H6z') >= 0); }
+function stkSync() { var s = document.getElementById('tt-stk'); if (s) s.hidden = stkRunning(); }
+function removeSticker() { var s = document.getElementById('tt-stk'); if (s) s.remove(); }
+function addSticker() {
+if (l !== 'ja' || isPremium() || document.getElementById('tt-stk')) return;
+var run = document.getElementById('run');
+if (!run || !window.matchMedia || !matchMedia('(max-width: 640px)').matches) return;
+var g = stkGroup();
+if (visits < (g === 'A' ? 1 : 3)) return;
+try { var x = Number(localStorage.getItem('tt-stk-x')) || 0; if (x && Date.now() - x < STK_HIDE) return; } catch (e) {}
+if (!document.getElementById('tt-stk-css')) { var lk = document.createElement('link'); lk.id = 'tt-stk-css'; lk.rel = 'stylesheet'; lk.href = '/sticker.css?v=1'; document.head.appendChild(lk); }
+var box = el('aside', 'tt-stk'); box.id = 'tt-stk'; box.setAttribute('aria-label', '作者のLINEスタンプ');
+var a = el('a', 'tt-stk-in'); a.href = STK_URL; a.target = '_blank'; a.rel = 'sponsored noopener';
+a.appendChild(el('span', 'tt-stk-tag', 'PR ・ 作者のLINEスタンプ'));
+a.appendChild(el('span', 'tt-stk-t', 'ゆるいまる君がひたすら断るスタンプ'));
+var faces = el('span', 'tt-stk-faces'); faces.setAttribute('role', 'img');
+faces.setAttribute('aria-label', 'スタンプの例：今日はやめとく。／ムリ。／行けたら行く。／おかまいなく。／気分じゃないかも。');
+for (var fi = 1; fi <= 5; fi++) { var fs = el('span', 'tt-stk-f'); fs.appendChild(el('i', 'f' + fi)); faces.appendChild(fs); }
+a.appendChild(faces);
+a.appendChild(el('span', 'tt-stk-go', 'LINEストアで見る ›'));
+a.addEventListener('click', function () { ev('promo_click', { slot: 'sticker', ab: g, visit: Math.min(visits, 9), signed: isSigned() ? 1 : 0 }); });
+var xb = el('button', 'tt-stk-x', '×'); xb.type = 'button'; xb.setAttribute('aria-label', T.close);
+xb.addEventListener('click', function () { removeSticker(); try { localStorage.setItem('tt-stk-x', String(Date.now())); } catch (e) {} ev('promo_close', { slot: 'sticker', ab: g }); });
+box.appendChild(a); box.appendChild(xb);
+var col = document.getElementById('tt-logcol');
+if (col) col.appendChild(box); else run.insertAdjacentElement('afterend', box);
+var pb = document.getElementById('pause-btn');
+if (pb && window.MutationObserver) new MutationObserver(stkSync).observe(pb, { childList: true });
+stkSync();
+var seen = false; try { seen = !!sessionStorage.getItem('tt-stk-seen'); } catch (e) {}
+if (!seen) { try { sessionStorage.setItem('tt-stk-seen', '1'); } catch (e) {} ev('promo_view', { slot: 'sticker', ab: g, visit: Math.min(visits, 9), signed: isSigned() ? 1 : 0 }); }
+}
+
 /* sync.js / account.js がプランを確認したら呼ぶ */
 window.__ttSetPlan = function (p) {
 try { if (p) localStorage.setItem('tt-plan', p); else localStorage.removeItem('tt-plan'); } catch (e) {}
 plan = p;
-if (isPremium()) { var b = document.getElementById('tt-promo'); if (b) b.remove(); var ob = document.getElementById('tt-oldrec'); if (ob) ob.remove(); closeCard(); }
-else addBanner();
+if (isPremium()) { var b = document.getElementById('tt-promo'); if (b) b.remove(); var ob = document.getElementById('tt-oldrec'); if (ob) ob.remove(); closeCard(); removeSticker(); }
+else { addBanner(); addSticker(); }
 paintHeader();
 };
 
 addBanner();
+addSticker();
 paintHeader();
 if (window.__ttOld) addOld(window.__ttOld);
 })();

@@ -1,0 +1,23 @@
+/* 作者のLINEスタンプ（11/23）。今日のログの下に1行。スマホだけ */
+.tt-stk { position: relative; width: 100%; max-width: 460px; box-sizing: border-box; margin: 14px auto 0;
+  border-radius: var(--radius, 20px); border: 1px solid var(--line); background: var(--card); color: var(--text); }
+.tt-stk[hidden] { display: none; }
+body.focus-mode .tt-stk { display: none; }
+.tt-stk-in { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px 12px; color: inherit; text-decoration: none; text-align: left; }
+.tt-stk-tag { font-size: 11px; opacity: .65; padding-right: 32px; }
+.tt-stk-t { font-size: 14px; font-weight: 700; line-height: 1.35; padding-right: 32px; }
+.tt-stk-faces { display: flex; gap: 2px; margin: 4px 0 2px; padding: 4px; border-radius: 12px; background: #fff; }
+.tt-stk-f { flex: 1 1 0; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; min-width: 0; }
+.tt-stk-f i { display: block; background: url(/sticker-line.png) no-repeat; }
+/* 元画像 1280x670 から顔を切り抜く（11/23） */
+.tt-stk-f .f1 { width: 69.48%; aspect-ratio: 107/154; background-size: 1196.262% auto; background-position: 37.170% 4.651%; }
+.tt-stk-f .f2 { width: 78.57%; aspect-ratio: 121/154; background-size: 1057.851% auto; background-position: 62.899% 65.116%; }
+.tt-stk-f .f3 { width: 100%; aspect-ratio: 178/153; background-size: 719.101% auto; background-position: 90.835% 65.184%; }
+.tt-stk-f .f4 { width: 100%; aspect-ratio: 182/152; background-size: 703.297% auto; background-position: 9.016% 5.019%; }
+.tt-stk-f .f5 { width: 100%; aspect-ratio: 192/154; background-size: 666.667% auto; background-position: 36.213% 34.884%; }
+.tt-stk-go { align-self: flex-end; margin-top: 4px; padding: 7px 14px; border-radius: 999px; background: #06C755; color: #fff; font-size: 13px; font-weight: 700; }
+.tt-stk-in:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; border-radius: var(--radius, 20px); }
+.tt-stk-x { position: absolute; top: 2px; right: 2px; width: 40px; height: 40px; border: 0; background: none; color: inherit; opacity: .55;
+  font: inherit; font-size: 20px; line-height: 1; cursor: pointer; border-radius: 50%; }
+.tt-stk-x:hover { opacity: .9; }
+.tt-stk-x:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
