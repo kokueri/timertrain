@@ -2929,6 +2929,45 @@ free: [
 }
 }[l];
 
+/* 創設メンバー価格の今の期（11/24）。価格は tiers.js、今の期は billing 関数が申込み数から決める */
+function tierText(v) {
+if (!v) return;
+var up = v.upto, s = v.s;
+if (l === 'en') {
+T.k1 = up ? ['First ', String(up), ''] : ['Stage ', String(s), ''];
+T.price = [v.mPre, v.mNum, v.mSuf];
+T.head = up ? 'No ads · first ' + up + ' keep ' + v.m + '/mo' : 'No ads · ' + v.m + '/mo for good';
+T.headShort = v.m + '/mo for good';
+T.headAria = up ? 'Premium: no ads. The first ' + up + ' subscribers keep ' + v.m + '/month for good' : 'Premium: no ads. Subscribe now and keep ' + v.m + '/month for good';
+T.fmCard[1] = (up ? 'The first ' + up + ' subscribers keep ' : 'Subscribe now and keep ') + v.m + '/month (' + v.y + '/year) for as long as they stay subscribed.' + (up ? ' After that, the price rises a little every 10 members.' : '') + ' The first 7 days are free.';
+} else if (l === 'es') {
+T.k1 = up ? ['Primeros ', String(up), ''] : ['Etapa ', String(s), ''];
+T.price = [v.mPre, v.mNum, v.mSuf];
+T.head = up ? 'Sin anuncios · primeros ' + up + ': ' + v.m + '/mes' : 'Sin anuncios · ' + v.m + '/mes siempre';
+T.headShort = v.m + '/mes siempre';
+T.headAria = up ? 'Premium: sin anuncios. Las primeras ' + up + ' personas mantienen ' + v.m + ' al mes para siempre' : 'Premium: sin anuncios. Si te suscribes ahora, mantienes ' + v.m + ' al mes para siempre';
+T.fmCard[1] = (up ? 'Las primeras ' + up + ' personas mantienen ' : 'Si te suscribes ahora, mantienes ') + v.m + ' al mes (' + v.y + ' al año) mientras sigan con la suscripción.' + (up ? ' Después, el precio sube un poco cada 10 personas.' : '') + ' Los primeros 7 días son gratis.';
+} else {
+T.k1 = up ? ['第' + s + '期 先着', String(up), '名'] : ['第', String(s), '期'];
+T.price = ['月', v.mNum, '円'];
+T.head = up ? '広告なし・先着' + up + '名はずっと月' + v.m : '広告なし・今ならずっと月' + v.m;
+T.headShort = 'ずっと月' + v.m;
+T.headAria = up ? 'プレミアム：広告なし。第' + s + '期の先着' + up + '名は、ずっと月' + v.m : 'プレミアム：広告なし。今お申込みなら、ずっと月' + v.m;
+T.fmCard[1] = (up ? '第' + s + '期（先着' + up + '名）は、' : '今お申込みの方は、') + '契約が続くかぎり月' + v.m + '（年' + v.y + '）のまま。' + (up ? '以降は10人ごとに少しずつ上がります。' : '') + '最初の7日間は無料です。';
+}
+}
+function tierRepaint() {
+var b = document.getElementById('tt-promo'); if (b) { b.remove(); addBanner(); }
+if (document.getElementById('tt-prem-link')) paintHeader();
+}
+(function () {
+function go() { window.TT_TIERS.ready(function (s) { var before = T.head; tierText(window.TT_TIERS.view(s, l)); if (T.head !== before) tierRepaint(); }); }
+if (window.TT_TIERS) { tierText(window.TT_TIERS.view(window.TT_TIERS.now(), l)); go(); return; }
+var sc = document.createElement('script'); sc.src = '/tiers.js?v=1'; sc.async = true;
+sc.onload = function () { if (window.TT_TIERS) { if (typeof addBanner === 'function') go(); } };
+document.head.appendChild(sc);
+})();
+
 var NS = 'http://www.w3.org/2000/svg';
 function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 function svg(d, opt) {

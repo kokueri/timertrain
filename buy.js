@@ -12,6 +12,8 @@
   var TOKEN_KEY = 'sb-arsfocfjfwtlykfdkiea-auth-token';
   var lang = document.documentElement.lang;
   var l = ['en', 'es'].indexOf(lang) >= 0 ? lang : 'ja';
+  // 料金ページの価格（data-tt）を今の期で埋める（tiers.js）
+  if (window.TT_TIERS) window.TT_TIERS.ready(function () { window.TT_TIERS.paint(document, l); });
   var BACK = { ja: '/pricing', en: '/en-pricing', es: '/es-pricing' }[l];
   var ACCT = '/account?l=' + l + '#acct-plans';
 
@@ -19,7 +21,7 @@
     ja: {
       head: 'お申込み前にご確認ください',
       terms: function (trial) { return [
-        ['料金', '年額プラン 1,500円／年、月額プラン 200円／月（税込）。創設メンバー価格・第1期（先着10名）で、契約が続くかぎりこの料金のままです。'],
+        ['料金', '年額プラン {y}／年、月額プラン {m}／月（税込）。創設メンバー価格（{stage}）で、契約が続くかぎりこの料金のままです。'],
         ['お支払い', trial ? '初めての方は最初の7日間は無料です。8日目に初回の料金を請求し、以後は解約するまで毎年（月額プランは毎月）同じ日に自動で更新・請求します。' : 'お申込みと同時に初回の料金を請求し、以後は解約するまで毎年（月額プランは毎月）同じ日に自動で更新・請求します。'],
         ['支払方法', 'クレジットカードなど（決済は Stripe／Link）'],
         ['ご利用開始', 'お申込み後すぐに使えます。'],
@@ -34,7 +36,7 @@
     en: {
       head: 'Please check before you subscribe',
       terms: function (trial) { return [
-        ['Price', 'Yearly US$11.99/year or monthly US$1.49/month (founding member price, stage 1 for the first 10, kept for as long as you stay subscribed). The price in your local currency, with any tax, is shown on the next screen.'],
+        ['Price', 'Yearly {y}/year or monthly {m}/month (founding member price, {stage}, kept for as long as you stay subscribed). The price in your local currency, with any tax, is shown on the next screen.'],
         ['Payment', trial ? 'New subscribers get the first 7 days free. You are charged on day 8, and the plan then renews and is charged automatically every year (monthly plan: every month) until you cancel.' : 'You are charged when you subscribe, and the plan then renews and is charged automatically every year (monthly plan: every month) until you cancel.'],
         ['Payment methods', 'Cards and more (processed by Stripe / Link)'],
         ['Access', 'Available right after you subscribe.'],
@@ -49,7 +51,7 @@
     es: {
       head: 'Revisa antes de suscribirte',
       terms: function (trial) { return [
-        ['Precio', 'Plan anual US$11.99 al año o mensual US$1.49 al mes (en México: MXN 179 / MXN 22). Precio fundador, etapa 1 (primeras 10 personas), mientras sigas con la suscripción. El precio en tu moneda, con impuestos, se muestra en la siguiente pantalla.'],
+        ['Precio', 'Plan anual {usdy} al año o mensual {usdm} al mes (en México: {mxny} / {mxnm}). Precio fundador ({stage}), mientras sigas con la suscripción. El precio en tu moneda, con impuestos, se muestra en la siguiente pantalla.'],
         ['Pago', trial ? 'Si es tu primera vez, los primeros 7 días son gratis. El día 8 se hace el primer cobro y después se renueva y se cobra automáticamente cada año (plan mensual: cada mes) hasta que canceles.' : 'Se cobra al suscribirte y después se renueva y se cobra automáticamente cada año (plan mensual: cada mes) hasta que canceles.'],
         ['Formas de pago', 'Tarjetas y más (procesado por Stripe / Link)'],
         ['Acceso', 'Disponible en cuanto te suscribes.'],
@@ -129,7 +131,7 @@
     var box = el('section', 'buy-panel'); box.id = 'buy-panel'; box.tabIndex = -1; box.setAttribute('aria-label', T.head);
     box.appendChild(el('p', 'buy-head', T.head));
     var dl = el('dl', 'buy-terms');
-    T.terms(trial).forEach(function (t) { dl.appendChild(el('dt', null, t[0])); dl.appendChild(el('dd', null, t[1])); });
+    T.terms(trial).forEach(function (t) { dl.appendChild(el('dt', null, t[0])); dl.appendChild(el('dd', null, window.TT_TIERS ? window.TT_TIERS.fill(t[1], l) : t[1])); });
     box.appendChild(dl);
     var by = el('button', 'buy-btn buy-btn-main', T.yearly); by.type = 'button';
     var bm = el('button', 'buy-btn', T.monthly); bm.type = 'button';
