@@ -62,7 +62,7 @@ function el(name, attrs) {
   return e;
 }
 var uid = 0;
-var SPRINKLES = false;
+var SPRINKLES = 'main'; // 'main' = 大きいドーナツだけ / true = 全部 / false = なし
 // ドーナツ1個を描く。返り値: { svg, setFlavor(f), setCut(d) }
 function drawDonut(mini, cls) {
   var id = 'dt-m' + (++uid);
@@ -83,8 +83,8 @@ function drawDonut(mini, cls) {
   ART.hl.forEach(function (d) { hl.appendChild(el('path', { d: d })); });
   art.appendChild(hl);
   var bits = [];
-  // 11/20: 上のスプレー（シュガー）は見にくいので描かない（えりなさん）。戻すときは SPRINKLES = true
-  if (SPRINKLES) ART.main.forEach(function (t, i) {
+  // 11/20: スプレー（シュガー）をなくした → 11/24: 大きいドーナツだけ戻す（えりなさん）。区切りの丸・データ画面はなし
+  if (SPRINKLES === true || (SPRINKLES === 'main' && !mini)) ART.main.forEach(function (t, i) {
     if (mini && i % 4) return;
     var p = el('path', { d: ART.sprinkle, transform: t }); art.appendChild(p); bits.push({ p: p, c: i });
   });
