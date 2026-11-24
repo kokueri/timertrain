@@ -3209,22 +3209,34 @@ paintHeader();
 if (window.__ttOld) addOld(window.__ttOld);
 })();
 /* ---------- 11/24: 新しい有料機能のお知らせ（ログイン中の人に、機能ごとに1回だけ） ----------
- * 有料機能を足したら NEWS の先頭に1つ足す（料金ページ・比較表の行も一緒に）。
+ * 有料機能を足したら /news.json の items の先頭に1つ足す（料金ページ・比較表の行も一緒に）。
  * 無料の人には「有料プランを見る」、プレミアムの人には使い方のひとことを出す。1回の表示で1つだけ。
  * タイマーが動いている間・ほかのお知らせが出ている間は出さない（次に開いたときに出る）。文言は textContent だけ */
-var NEWS = [
-{ id: 'sync1', ja: { h: '新機能：端末間でつなぐ（プレミアム）', p: 'スマホで動かしているタイマーや計測が、PCで開くと上に表示されます。「この端末で続ける」を押すと、残り時間も記録もそのままPCで続きます。計測はPCから止めることもできます。', prem: 'もう使えます。2台目の端末でもログインして、タイマーを開いてみてください。' },
-en: { h: 'New: continue across devices (Premium)', p: 'When a timer or tracking is running on your phone, it shows at the top when you open TimerTrain on your computer. Tap "Continue here" and it carries on there with the same time left and the same record. You can also stop tracking from the other device.', prem: 'It is ready to use. Sign in on a second device and open the timer.' },
-es: { h: 'Nuevo: seguir en otro dispositivo (Premium)', p: 'Si un temporizador o una medición está en marcha en el móvil, aparece arriba al abrir TimerTrain en el ordenador. Pulsa «Seguir aquí» y continúa allí con el mismo tiempo restante y el mismo registro. También puedes detener la medición desde el otro dispositivo.', prem: 'Ya puedes usarlo. Inicia sesión en un segundo dispositivo y abre el temporizador.' } }
-];
 var NEWS_KEY = 'tt-news-seen';
+// 文言は /news.json（版の番号なしで毎回確認する。お知らせを足すときに app.js の版を上げなくてよい）
+function cleanNews(j) {
+var out = [];
+(j && Array.isArray(j.items) ? j.items : []).slice(0, 20).forEach(function (n) {
+if (!n || typeof n.id !== 'string' || !/^[a-z0-9_-]{1,40}$/.test(n.id)) return;
+var o = { id: n.id };
+['ja', 'en', 'es'].forEach(function (l) {
+var m = n[l]; if (!m || typeof m.h !== 'string' || typeof m.p !== 'string') return;
+o[l] = { h: m.h.slice(0, 120), p: m.p.slice(0, 600), prem: typeof m.prem === 'string' ? m.prem.slice(0, 300) : '' };
+});
+if (o.ja || o.en || o.es) out.push(o);
+});
+return out;
+}
 function showNews(p) {
+fetch('/news.json', { cache: 'no-cache', credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { showNews2(p, cleanNews(j)); }).catch(function () {});
+}
+function showNews2(p, NEWS) {
 var seen = {}; try { seen = JSON.parse(localStorage.getItem(NEWS_KEY) || '{}') || {}; } catch (e) {}
 var it = NEWS.filter(function (n) { return !seen[n.id]; })[0];
 if (!it) return;
 var busy = false; try { busy = window.__ttRunActive && window.__ttRunActive(); } catch (e) {}
 if (busy || document.querySelector('.tt-drop, .tt-news, .ttw-back:not([hidden]), [aria-modal="true"]:not([hidden])') || document.body.classList.contains('focus-mode')) return;
-var M = it[LANG] || it.ja, prem = p === 'premium';
+var M = it[LANG] || it.ja || it.en, prem = p === 'premium';
 var A = LANG === 'en' ? { ok: 'OK', see: 'See Premium', close: 'Close', badge: 'New' } : LANG === 'es' ? { ok: 'Entendido', see: 'Ver Premium', close: 'Cerrar', badge: 'Nuevo' } : { ok: 'OK', see: '有料プランを見る', close: '閉じる', badge: 'NEW' };
 var pricing = (LANG === 'en' ? '/en-pricing' : LANG === 'es' ? '/es-pricing' : '/pricing') + '#buy';
 function mark() { seen[it.id] = 1; try { localStorage.setItem(NEWS_KEY, JSON.stringify(seen)); } catch (e) {} }
@@ -3236,7 +3248,7 @@ var bd = document.createElement('span'); bd.textContent = A.badge; bd.style.cssT
 var h = document.createElement('h2'); h.id = 'tt-news-h'; h.textContent = M.h; h.style.cssText = 'margin:0 0 8px;font-size:1.15rem';
 var tx = document.createElement('p'); tx.textContent = M.p; tx.style.cssText = 'margin:0 0 10px;font-size:.95rem';
 card.appendChild(bd); card.appendChild(h); card.appendChild(tx);
-if (prem) { var t2 = document.createElement('p'); t2.textContent = M.prem; t2.style.cssText = 'margin:0 0 14px;font-size:.9rem;opacity:.8'; card.appendChild(t2); }
+if (prem && M.prem) { var t2 = document.createElement('p'); t2.textContent = M.prem; t2.style.cssText = 'margin:0 0 14px;font-size:.9rem;opacity:.8'; card.appendChild(t2); }
 var row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:6px';
 var btnCss = 'border-radius:999px;padding:10px 20px;font-weight:800;font-size:1rem;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;min-height:44px;font-family:inherit';
 var first;
