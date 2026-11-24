@@ -1,4 +1,5 @@
 'use strict';
+window.__ttHash0 = location.hash; // 11/23: URL を整える前の # を覚えておく（#wrap など）
 /* ===== TimerTrain core =====
 * 設計メモ:
 * - 時刻はタイムスタンプ差分で計算（バックグラウンドタブでも正確）
@@ -1834,6 +1835,33 @@ dataLoading.onerror = function () { dataLoading = null; };
 document.body.appendChild(dataLoading);
 }
 window.__ttOpenData = openData;
+/* 11/23: 1年のふりかえりカード（wrap.js は押したときだけ読み込む）
+ * 入口は共有リンクの下。12/1〜1/31 に出す（#wrap で来たときはいつでも開いて、このブラウザでは出し続ける） */
+var wrapLoading = null;
+function openWrap(from) {
+if (window.__ttWrap) { window.__ttWrap.open(from); return; }
+if (wrapLoading) return;
+wrapLoading = document.createElement('script'); wrapLoading.src = '/wrap.js?v=1';
+wrapLoading.onload = function () { if (window.__ttWrap) window.__ttWrap.open(from); };
+wrapLoading.onerror = function () { wrapLoading = null; };
+document.body.appendChild(wrapLoading);
+}
+window.__ttOpenWrap = openWrap;
+(function () {
+var d = new Date(), viaHash = (window.__ttHash0 || location.hash) === '#wrap', keep = false;
+try { if (viaHash) localStorage.setItem('tt-wrap', '1'); keep = localStorage.getItem('tt-wrap') === '1'; } catch (e) {}
+var season = d.getMonth() === 11 || d.getMonth() === 0;
+var sb = document.getElementById('share-btn');
+if ((season || keep) && sb && !document.getElementById('tt-wrap-btn')) {
+if (!document.getElementById('ttw-css')) { var lk = document.createElement('link'); lk.id = 'ttw-css'; lk.rel = 'stylesheet'; lk.href = '/wrap.css?v=1'; document.head.appendChild(lk); }
+var y = d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear();
+var wb = document.createElement('button'); wb.type = 'button'; wb.id = 'tt-wrap-btn'; wb.className = 'tt-wrap-btn' + (window.DT ? ' dt' : '');
+wb.textContent = lang === 'en' ? '🎁 Make your ' + y + ' year card' : lang === 'es' ? '🎁 Crea tu tarjeta del año ' + y : '🎁 ' + y + '年のふりかえりカードを作る';
+wb.addEventListener('click', function () { openWrap('home'); });
+sb.insertAdjacentElement('afterend', wb); if (sb.parentNode) sb.parentNode.style.flexWrap = 'wrap';
+}
+if (viaHash) setTimeout(function () { openWrap('hash'); }, 300);
+})();
 // マイページの「データを見る」から来たとき
 try { if (sessionStorage.getItem('tt-open-data') && document.getElementById('setup')) { sessionStorage.removeItem('tt-open-data'); setTimeout(function () { openData('account'); }, 200); } } catch (e) {}
 // ログイン中は、説明文の「無料ログインでできること」を出さない
@@ -1841,7 +1869,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=27'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=28'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -2069,7 +2097,7 @@ col = document.createElement('section'); col.id = 'tt-logcol'; col.className = '
 col.setAttribute('aria-label', TL.title || 'Today');
 runSec.insertAdjacentElement('afterend', col);
 }
-if (col) { col.appendChild(card); document.documentElement.classList.add('tt-has-log'); }
+if (col) { (function (r) { if (r && r.parentNode === col) col.insertBefore(card, r); else col.appendChild(card); })(document.getElementById('tt-stk')); document.documentElement.classList.add('tt-has-log'); }
 else ctr.insertAdjacentElement('afterend', card);
 }
 renderTodayOpen(card.querySelector('.tt-today-open'), st);
@@ -2099,7 +2127,7 @@ var nw = open.querySelector('.tt-today-now'); if (nw) nw.remove();
 var cta = mk('span', 'tt-today-cta', SAMPLE_L.cta + ' →'); open.appendChild(cta);
 var col = document.getElementById('tt-logcol');
 if (!col) { col = document.createElement('section'); col.id = 'tt-logcol'; col.className = 'tt-logcol'; col.setAttribute('aria-label', TL.title); runSec.insertAdjacentElement('afterend', col); }
-col.appendChild(card); document.documentElement.classList.add('tt-has-log');
+(function (r) { if (r && r.parentNode === col) col.insertBefore(card, r); else col.appendChild(card); })(document.getElementById('tt-stk')); document.documentElement.classList.add('tt-has-log');
 open.addEventListener('click', function () { if (window.gtag) gtag('event', 'sample_log_click', {}); });
 }
 (function () {
@@ -2861,9 +2889,9 @@ if (!sessionStorage.getItem('tt-visit')) { visits++; localStorage.setItem('tt-vi
 
 var T = {
 ja: {
-label: 'プレミアムのご案内', cta: '7日間無料で試す', k1: ['先着', '100', '名'], k2: '創設メンバー価格', pre: 'ずっと', price: ['月', '250', '円'], brand: 'TimerTrain プレミアム', go: ['', '7日間無料', 'で試す'], fmCard: ['今なら、ずっとこの価格。', '先着100名は、今後値上げしても契約が続くかぎり月250円（年2,000円）のまま。最初の7日間は無料です。', '7日間無料で試す'], close: '閉じる',
+label: 'プレミアムのご案内', cta: '7日間無料で試す', k1: ['第1期 先着', '10', '名'], k2: '創設メンバー価格', pre: 'ずっと', price: ['月', '200', '円'], brand: 'TimerTrain プレミアム', go: ['', '7日間無料', 'で試す'], fmCard: ['今なら、ずっとこの価格。', '第1期（先着10名）は、契約が続くかぎり月200円（年1,500円）のまま。11人目からは10人ごとに上がります。最初の7日間は無料です。', '7日間無料で試す'], close: '閉じる',
 items: [['広告なし'], ['全期間の', '記録グラフ'], ['マイタイマー・', 'マイプロジェクト\u200b無制限'], ['記録を', 'CSVで保存']],
-head: '広告なし・先着100名までずっと月250円', headShort: 'ずっと月250円', headAria: 'プレミアム：広告なし。先着100名まで、ずっと月250円', crown: 'プレミアム',
+head: '広告なし・先着10名はずっと月200円', headShort: 'ずっと月200円', headAria: 'プレミアム：広告なし。第1期の先着10名は、ずっと月200円', crown: 'プレミアム',
 guest: [
 ['このタイマー、保存しておきませんか？', '無料ログインで、次からワンタップで呼び出せます。', '無料でログインして保存'],
 ['スマホでもPCでも、同じタイマーを。', '無料ログインで、作ったタイマーと記録が端末をまたいで同期されます。', '無料でログイン'],
@@ -2874,9 +2902,9 @@ free: [
 ['画面を、もっとすっきり。', 'プレミアムは広告なし。タイマーと記録だけに集中できます。初めての方は最初の7日間無料です。', '7日間無料で試す']]
 },
 en: {
-label: 'About Premium', cta: 'Try 7 days free', k1: ['First ', '100', ''], k2: 'Founding member price', pre: 'For good:', price: ['US$', '1.99', '/mo'], brand: 'TimerTrain Premium', go: ['Try', '7 days free', ''], fmCard: ['Lock in today’s price.', 'The first 100 subscribers keep US$1.99/month (US$15.99/year) for as long as they stay subscribed, even if prices go up. The first 7 days are free.', 'Try 7 days free'], close: 'Close',
+label: 'About Premium', cta: 'Try 7 days free', k1: ['First ', '10', ''], k2: 'Founding member price', pre: 'For good:', price: ['US$', '1.49', '/mo'], brand: 'TimerTrain Premium', go: ['Try', '7 days free', ''], fmCard: ['Lock in today’s price.', 'The first 10 subscribers keep US$1.49/month (US$11.99/year) for as long as they stay subscribed. After that, the price rises every 10 members. The first 7 days are free.', 'Try 7 days free'], close: 'Close',
 items: [['No ads'], ['Full history', '& charts'], ['Unlimited timers', '& projects'], ['Export', 'to CSV']],
-head: 'No ads · first 100 keep US$1.99/mo', headShort: 'US$1.99/mo for good', headAria: 'Premium: no ads. The first 100 subscribers keep US$1.99/month for good', crown: 'Premium',
+head: 'No ads · first 10 keep US$1.49/mo', headShort: 'US$1.49/mo for good', headAria: 'Premium: no ads. The first 10 subscribers keep US$1.49/month for good', crown: 'Premium',
 guest: [
 ['Save this timer?', 'Sign in free and bring it back with one tap next time.', 'Sign in free to save'],
 ['Same timers on phone and computer.', 'Sign in free to sync your timers and history across devices.', 'Sign in free'],
@@ -2887,9 +2915,9 @@ free: [
 ['A cleaner screen.', 'Premium has no ads — just your timer and your records. 7 days free for new subscribers.', 'Try 7 days free']]
 },
 es: {
-label: 'Sobre Premium', cta: 'Prueba 7 días gratis', k1: ['Primeros ', '100', ''], k2: 'Precio fundador', pre: 'Siempre:', price: ['MXN ', '29', '/mes'], brand: 'TimerTrain Premium', go: ['Prueba', '7 días gratis', ''], fmCard: ['Asegura el precio de hoy.', 'Los primeros 100 suscriptores mantienen MXN 29 al mes (MXN 229 al año) mientras sigan suscritos, aunque el precio suba. Los primeros 7 días son gratis.', 'Prueba 7 días gratis'], close: 'Cerrar',
+label: 'Sobre Premium', cta: 'Prueba 7 días gratis', k1: ['Primeros ', '10', ''], k2: 'Precio fundador', pre: 'Siempre:', price: ['MXN ', '22', '/mes'], brand: 'TimerTrain Premium', go: ['Prueba', '7 días gratis', ''], fmCard: ['Asegura el precio de hoy.', 'Las primeras 10 personas mantienen MXN 22 al mes (MXN 179 al año) mientras sigan con la suscripción. Después, el precio sube cada 10 personas. Los primeros 7 días son gratis.', 'Prueba 7 días gratis'], close: 'Cerrar',
 items: [['Sin anuncios'], ['Historial', 'y gráficos'], ['Temporizadores y', 'proyectos ilimitados'], ['Exportar', 'a CSV']],
-head: 'Sin anuncios · primeros 100: MXN 29/mes', headShort: 'MXN 29/mes siempre', headAria: 'Premium: sin anuncios. Los primeros 100 mantienen MXN 29 al mes para siempre', crown: 'Premium',
+head: 'Sin anuncios · primeros 10: MXN 22/mes', headShort: 'MXN 22/mes siempre', headAria: 'Premium: sin anuncios. Las primeras 10 personas mantienen MXN 22 al mes para siempre', crown: 'Premium',
 guest: [
 ['¿Guardar este temporizador?', 'Inicia sesión gratis y recupéralo con un toque la próxima vez.', 'Iniciar sesión y guardar'],
 ['Los mismos temporizadores en el móvil y el ordenador.', 'Inicia sesión gratis para sincronizar tus temporizadores y tu historial.', 'Iniciar sesión gratis'],
@@ -2900,6 +2928,45 @@ free: [
 ['Una pantalla más limpia.', 'Premium no tiene anuncios: solo tu temporizador y tus registros. 7 días gratis si eres nuevo.', 'Prueba 7 días gratis']]
 }
 }[l];
+
+/* 創設メンバー価格の今の期（11/24）。価格は tiers.js、今の期は billing 関数が申込み数から決める */
+function tierText(v) {
+if (!v) return;
+var up = v.upto, s = v.s;
+if (l === 'en') {
+T.k1 = up ? ['First ', String(up), ''] : ['Stage ', String(s), ''];
+T.price = [v.mPre, v.mNum, v.mSuf];
+T.head = up ? 'No ads · first ' + up + ' keep ' + v.m + '/mo' : 'No ads · ' + v.m + '/mo for good';
+T.headShort = v.m + '/mo for good';
+T.headAria = up ? 'Premium: no ads. The first ' + up + ' subscribers keep ' + v.m + '/month for good' : 'Premium: no ads. Subscribe now and keep ' + v.m + '/month for good';
+T.fmCard[1] = (up ? 'The first ' + up + ' subscribers keep ' : 'Subscribe now and keep ') + v.m + '/month (' + v.y + '/year) for as long as they stay subscribed.' + (up ? ' After that, the price rises a little every 10 members.' : '') + ' The first 7 days are free.';
+} else if (l === 'es') {
+T.k1 = up ? ['Primeros ', String(up), ''] : ['Etapa ', String(s), ''];
+T.price = [v.mPre, v.mNum, v.mSuf];
+T.head = up ? 'Sin anuncios · primeros ' + up + ': ' + v.m + '/mes' : 'Sin anuncios · ' + v.m + '/mes siempre';
+T.headShort = v.m + '/mes siempre';
+T.headAria = up ? 'Premium: sin anuncios. Las primeras ' + up + ' personas mantienen ' + v.m + ' al mes para siempre' : 'Premium: sin anuncios. Si te suscribes ahora, mantienes ' + v.m + ' al mes para siempre';
+T.fmCard[1] = (up ? 'Las primeras ' + up + ' personas mantienen ' : 'Si te suscribes ahora, mantienes ') + v.m + ' al mes (' + v.y + ' al año) mientras sigan con la suscripción.' + (up ? ' Después, el precio sube un poco cada 10 personas.' : '') + ' Los primeros 7 días son gratis.';
+} else {
+T.k1 = up ? ['第' + s + '期 先着', String(up), '名'] : ['第', String(s), '期'];
+T.price = ['月', v.mNum, '円'];
+T.head = up ? '広告なし・先着' + up + '名はずっと月' + v.m : '広告なし・今ならずっと月' + v.m;
+T.headShort = 'ずっと月' + v.m;
+T.headAria = up ? 'プレミアム：広告なし。第' + s + '期の先着' + up + '名は、ずっと月' + v.m : 'プレミアム：広告なし。今お申込みなら、ずっと月' + v.m;
+T.fmCard[1] = (up ? '第' + s + '期（先着' + up + '名）は、' : '今お申込みの方は、') + '契約が続くかぎり月' + v.m + '（年' + v.y + '）のまま。' + (up ? '以降は10人ごとに少しずつ上がります。' : '') + '最初の7日間は無料です。';
+}
+}
+function tierRepaint() {
+var b = document.getElementById('tt-promo'); if (b) { b.remove(); addBanner(); }
+if (document.getElementById('tt-prem-link')) paintHeader();
+}
+(function () {
+function go() { window.TT_TIERS.ready(function (s) { var before = T.head; tierText(window.TT_TIERS.view(s, l)); if (T.head !== before) tierRepaint(); }); }
+if (window.TT_TIERS) { tierText(window.TT_TIERS.view(window.TT_TIERS.now(), l)); go(); return; }
+var sc = document.createElement('script'); sc.src = '/tiers.js?v=1'; sc.async = true;
+sc.onload = function () { if (window.TT_TIERS) { if (typeof addBanner === 'function') go(); } };
+document.head.appendChild(sc);
+})();
 
 var NS = 'http://www.w3.org/2000/svg';
 function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
@@ -3065,16 +3132,66 @@ ev('promo_view', { slot: 'old', days: o.days });
 }
 window.__ttOldRecords = addOld;
 
+/* 5) 作者のLINEスタンプ（11/23）。日本語・スマホ・プレミアム以外。今日のログの下（なければタイマーの下）に1行
+ * A/B: 端末ごとにランダムで A=1回目から / B=3回目から。組は GA のユーザー プロパティ stk_ab とイベントの ab に入れる
+ * ×で14日出さない。フォーカス画面・タイマー動作中は隠す。画像は自前（/sticker-line.png をCSSで切り抜き）、外部スクリプトなし */
+var STK_URL = 'https://line.me/S/sticker/37536745/?lang=ja&utm_source=timertrain&utm_medium=house&utm_campaign=sticker';
+var STK_HIDE = 14 * 864e5;
+function stkGroup() {
+var g = null;
+try { g = localStorage.getItem('tt-stk-ab'); } catch (e) {}
+if (g !== 'A' && g !== 'B') {
+g = Math.random() < 0.5 ? 'A' : 'B';
+try { localStorage.setItem('tt-stk-ab', g); } catch (e) {}
+ev('stk_ab_assign', { ab: g });
+}
+try { if (window.gtag) gtag('set', 'user_properties', { stk_ab: g }); } catch (e) {}
+return g;
+}
+function stkRunning() { var b = document.getElementById('pause-btn'); return !!(b && b.innerHTML.indexOf('M6 5h4v14H6z') >= 0); }
+function stkSync() { var s = document.getElementById('tt-stk'); if (s) s.hidden = stkRunning(); }
+function removeSticker() { var s = document.getElementById('tt-stk'); if (s) s.remove(); }
+function addSticker() {
+if (l !== 'ja' || isPremium() || document.getElementById('tt-stk')) return;
+var run = document.getElementById('run');
+if (!run || !window.matchMedia || !matchMedia('(max-width: 640px)').matches) return;
+var g = stkGroup();
+if (visits < (g === 'A' ? 1 : 3)) return;
+try { var x = Number(localStorage.getItem('tt-stk-x')) || 0; if (x && Date.now() - x < STK_HIDE) return; } catch (e) {}
+if (!document.getElementById('tt-stk-css')) { var lk = document.createElement('link'); lk.id = 'tt-stk-css'; lk.rel = 'stylesheet'; lk.href = '/sticker.css?v=1'; document.head.appendChild(lk); }
+var box = el('aside', 'tt-stk'); box.id = 'tt-stk'; box.setAttribute('aria-label', '作者のLINEスタンプ');
+var a = el('a', 'tt-stk-in'); a.href = STK_URL; a.target = '_blank'; a.rel = 'sponsored noopener';
+a.appendChild(el('span', 'tt-stk-tag', 'PR ・ 作者のLINEスタンプ'));
+a.appendChild(el('span', 'tt-stk-t', 'ゆるいまる君がひたすら断るスタンプ'));
+var faces = el('span', 'tt-stk-faces'); faces.setAttribute('role', 'img');
+faces.setAttribute('aria-label', 'スタンプの例：今日はやめとく。／ムリ。／行けたら行く。／おかまいなく。／気分じゃないかも。');
+for (var fi = 1; fi <= 5; fi++) { var fs = el('span', 'tt-stk-f'); fs.appendChild(el('i', 'f' + fi)); faces.appendChild(fs); }
+a.appendChild(faces);
+a.appendChild(el('span', 'tt-stk-go', 'LINEストアで見る ›'));
+a.addEventListener('click', function () { ev('promo_click', { slot: 'sticker', ab: g, visit: Math.min(visits, 9), signed: isSigned() ? 1 : 0 }); });
+var xb = el('button', 'tt-stk-x', '×'); xb.type = 'button'; xb.setAttribute('aria-label', T.close);
+xb.addEventListener('click', function () { removeSticker(); try { localStorage.setItem('tt-stk-x', String(Date.now())); } catch (e) {} ev('promo_close', { slot: 'sticker', ab: g }); });
+box.appendChild(a); box.appendChild(xb);
+var col = document.getElementById('tt-logcol');
+if (col) col.appendChild(box); else run.insertAdjacentElement('afterend', box);
+var pb = document.getElementById('pause-btn');
+if (pb && window.MutationObserver) new MutationObserver(stkSync).observe(pb, { childList: true });
+stkSync();
+var seen = false; try { seen = !!sessionStorage.getItem('tt-stk-seen'); } catch (e) {}
+if (!seen) { try { sessionStorage.setItem('tt-stk-seen', '1'); } catch (e) {} ev('promo_view', { slot: 'sticker', ab: g, visit: Math.min(visits, 9), signed: isSigned() ? 1 : 0 }); }
+}
+
 /* sync.js / account.js がプランを確認したら呼ぶ */
 window.__ttSetPlan = function (p) {
 try { if (p) localStorage.setItem('tt-plan', p); else localStorage.removeItem('tt-plan'); } catch (e) {}
 plan = p;
-if (isPremium()) { var b = document.getElementById('tt-promo'); if (b) b.remove(); var ob = document.getElementById('tt-oldrec'); if (ob) ob.remove(); closeCard(); }
-else addBanner();
+if (isPremium()) { var b = document.getElementById('tt-promo'); if (b) b.remove(); var ob = document.getElementById('tt-oldrec'); if (ob) ob.remove(); closeCard(); removeSticker(); }
+else { addBanner(); addSticker(); }
 paintHeader();
 };
 
 addBanner();
+addSticker();
 paintHeader();
 if (window.__ttOld) addOld(window.__ttOld);
 })();

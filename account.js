@@ -237,7 +237,7 @@
         ['マイプロジェクト（勉強・仕事などに分けて集計）', false, '1つ', '無制限'],
         ['記録のCSVダウンロード', false, false, true]
       ],
-      note: 'プレミアムは月額250円・年額2,000円（税込）。初めての方は最初の7日間が無料で、いつでも解約できます。今あるタイマーの機能は、これからもログインなしで無料で使えます。', more: '料金と詳しい条件', href: '/pricing',
+      note: 'プレミアムは月額{m}・年額{y}（税込・創設メンバー価格）。初めての方は最初の7日間が無料で、いつでも解約できます。今あるタイマーの機能は、これからもログインなしで無料で使えます。', more: '料金と詳しい条件', href: '/pricing',
       quota: function (n) { return n > FREE_MAX ? '保存中のマイタイマー ' + n + '個（無料プランで新しく保存できるのは2つまで）' : 'マイタイマー ' + n + ' / ' + FREE_MAX + '（プレミアムで無制限）'; }
     },
     en: {
@@ -251,7 +251,7 @@
         ['Projects (track study, work, etc. separately)', false, '1', 'No limit'],
         ['Download history as CSV', false, false, true]
       ],
-      note: 'Premium is US$1.99/month or US$15.99/year (your local currency is shown at checkout). New subscribers get 7 days free, and you can cancel any time. Everything the timer does today stays free without an account.', more: 'Pricing and terms', href: '/en-pricing',
+      note: 'Premium is {m}/month or {y}/year (your local currency is shown at checkout). New subscribers get 7 days free, and you can cancel any time. Everything the timer does today stays free without an account.', more: 'Pricing and terms', href: '/en-pricing',
       quota: function (n) { return n > FREE_MAX ? n + ' saved timers (the free plan can save new ones up to 2)' : 'Saved timers ' + n + ' / ' + FREE_MAX + ' (unlimited with Premium)'; }
     },
     es: {
@@ -265,7 +265,7 @@
         ['Proyectos (estudio, trabajo, etc. por separado)', false, '1', 'Sin límite'],
         ['Descargar el historial en CSV', false, false, true]
       ],
-      note: 'Premium cuesta MXN 29 o US$1.99 al mes (tu moneda se muestra al pagar). Si es tu primera vez, los primeros 7 días son gratis y puedes cancelar cuando quieras. Todo lo que hace el temporizador hoy sigue siendo gratis sin cuenta.', more: 'Precios y condiciones', href: '/es-pricing',
+      note: 'Premium cuesta {mxnm} o {usdm} al mes (tu moneda se muestra al pagar). Si es tu primera vez, los primeros 7 días son gratis y puedes cancelar cuando quieras. Todo lo que hace el temporizador hoy sigue siendo gratis sin cuenta.', more: 'Precios y condiciones', href: '/es-pricing',
       quota: function (n) { return n > FREE_MAX ? n + ' temporizadores guardados (el plan gratis permite guardar nuevos hasta 2)' : 'Temporizadores ' + n + ' / ' + FREE_MAX + ' (ilimitados con Premium)'; }
     }
   }[lang];
@@ -375,10 +375,10 @@
   var ENT = null;
   var B = {
     ja: {
-      title: 'プレミアムにする', titleOn: 'プレミアム', seePlans: 'プランを確認する', soonTitle: 'プレミアム（準備中）', soonLead: 'マイタイマーとプロジェクトが無制限になり、全期間の記録・月／年のグラフ・CSVが使えるようになります。月額250円・年額2,000円、最初の7日間は無料の予定です。', badge: 'プレミアム',
+      title: 'プレミアムにする', titleOn: 'プレミアム', seePlans: 'プランを確認する', soonTitle: 'プレミアム（準備中）', soonLead: 'マイタイマーとプロジェクトが無制限になり、全期間の記録・月／年のグラフ・CSVが使えるようになります。月額{m}・年額{y}（創設メンバー価格）、最初の7日間は無料です。', badge: 'プレミアム',
       termsHead: 'お申込み前にご確認ください',
       terms: function (trial) { return [
-        ['料金', '年額プラン 2,000円／年、月額プラン 250円／月（税込）'],
+        ['料金', '年額プラン {y}／年、月額プラン {m}／月（税込。創設メンバー価格・{stage}）'],
         ['お支払い', trial ? '初めての方は最初の7日間は無料です。8日目に初回の料金を請求し、以後は解約するまで毎年（月額プランは毎月）同じ日に自動で更新・請求します。' : 'お申込みと同時に初回の料金を請求し、以後は解約するまで毎年（月額プランは毎月）同じ日に自動で更新・請求します。'],
         ['支払方法', 'クレジットカードなど（決済は Stripe／Link）'],
         ['ご利用開始', 'お申込み後すぐに使えます。'],
@@ -387,8 +387,9 @@
       ]; },
       lead: '初めての方は、最初の7日間は無料です。マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
       leadNoTrial: 'マイタイマーとプロジェクトが無制限になり、全期間の記録などが使えるようになります。',
-      fm: '先着100名の創設メンバー価格：今お申込みの方は、今後値上げしても、契約が続くかぎり月額250円・年額2,000円のままです。',
+      fm: '創設メンバー価格（{stage}）：今お申込みの方は、契約が続くかぎり月額{m}・年額{y}のままです。申込み順に10人ごとに月10円・年100円ずつ上がり、51〜100人目は月額250円・年額2,000円です。',
       fmOn: '創設メンバー価格が適用されています。契約が続くかぎり、今の料金のままです。',
+      drop: 'お知らせ：創設メンバー第1期の価格になり、月額が250円から200円に下がりました。11月30日の初回のお支払いから月200円です。契約が続くかぎり、この料金のままです。',
       monthly: '月額プランで始める', yearly: '年額プランで始める（おトク）',
       note: '金額はお住まいの地域の通貨で、次の画面（Stripe の決済画面）に表示されます。いつでも解約できます。', more: '料金と条件',
       test: '試し用の環境です。テスト用のカードでだけ購入できます。',
@@ -399,7 +400,7 @@
       active: function (d) { return '次の更新日: ' + d; },
       ending: function (d) { return d + 'で終了します（自動更新はオフです）。'; },
       pastDue: 'お支払いを確認できませんでした。「お支払い・解約の管理」からカードを更新してください。',
-      plan: { premium_monthly: '月額プラン', premium_yearly: '年額プラン' },
+      plan: { premium_monthly: '月額プラン', premium_yearly: '年額プラン' }, // _t1 などの段階は planName() で外す
       manage: 'お支払い・解約の管理', manageErr: '管理画面を開けませんでした。時間をおいてもう一度お試しください。',
       thanks: 'お申込みありがとうございます。反映まで数秒かかることがあります。',
       slow: '反映に時間がかかっています。少したってから、このページを開き直してください。',
@@ -408,10 +409,10 @@
       delSub: '有料プランが自動更新される状態のままでは削除できません。先に「お支払い・解約の管理」から解約してください。'
     },
     en: {
-      title: 'Go Premium', titleOn: 'Premium', seePlans: 'See plans', soonTitle: 'Premium (coming soon)', soonLead: 'Unlimited saved timers and projects, all-time history, monthly/yearly charts and CSV. Planned at US$1.99/month or US$15.99/year, with 7 days free.', badge: 'Premium',
+      title: 'Go Premium', titleOn: 'Premium', seePlans: 'See plans', soonTitle: 'Premium (coming soon)', soonLead: 'Unlimited saved timers and projects, all-time history, monthly/yearly charts and CSV. {m}/month or {y}/year (founding member price), with 7 days free.', badge: 'Premium',
       termsHead: 'Please check before you subscribe',
       terms: function (trial) { return [
-        ['Price', 'Yearly US$15.99/year or monthly US$1.99/month. The price in your local currency, with any tax, is shown on the next screen.'],
+        ['Price', 'Yearly {y}/year or monthly {m}/month (founding member price, {stage}). The price in your local currency, with any tax, is shown on the next screen.'],
         ['Payment', trial ? 'New subscribers get the first 7 days free. You are charged on day 8, and the plan then renews and is charged automatically every year (monthly plan: every month) until you cancel.' : 'You are charged when you subscribe, and the plan then renews and is charged automatically every year (monthly plan: every month) until you cancel.'],
         ['Payment methods', 'Cards and more (processed by Stripe / Link)'],
         ['Access', 'Available right after you subscribe.'],
@@ -420,8 +421,9 @@
       ]; },
       lead: 'New subscribers get the first 7 days free. Unlimited saved timers and projects, full history and more.',
       leadNoTrial: 'Unlimited saved timers and projects, full history and more.',
-      fm: 'Founding member price for the first 100: subscribe now and keep today’s price (US$1.99/month · US$15.99/year, or the price shown in your currency) for as long as you stay subscribed, even if prices go up later.',
+      fm: 'Founding member price ({stage}): subscribe now and keep {m}/month · {y}/year (or the price shown in your currency) for as long as you stay subscribed. The price rises a little every 10 members, in order of sign-up, up to US$1.99/month · US$15.99/year for members 51–100.',
       fmOn: 'Founding member price applied: your price stays the same for as long as you stay subscribed.',
+      drop: 'Good news: you now have the stage 1 founding member price. Your monthly price went down 20%, from ¥250 to ¥200 (charged in your currency), starting with your first payment on November 30. It stays this way for as long as you stay subscribed.',
       monthly: 'Start monthly', yearly: 'Start yearly (best value)',
       note: 'The price is shown in your local currency on the next screen (Stripe checkout). Cancel any time.', more: 'Pricing and terms',
       test: 'This is the test site. Only test cards can be used.',
@@ -441,10 +443,10 @@
       delSub: 'You cannot delete your account while a paid plan is set to renew. Please cancel it first in "Billing and cancellation".'
     },
     es: {
-      title: 'Hazte Premium', titleOn: 'Premium', seePlans: 'Ver planes', soonTitle: 'Premium (próximamente)', soonLead: 'Temporizadores y proyectos ilimitados, historial completo, gráficos mensuales/anuales y CSV. Previsto: US$1.99 o MXN 29 al mes, con 7 días gratis.', badge: 'Premium',
+      title: 'Hazte Premium', titleOn: 'Premium', seePlans: 'Ver planes', soonTitle: 'Premium (próximamente)', soonLead: 'Temporizadores y proyectos ilimitados, historial completo, gráficos mensuales/anuales y CSV. {usdm} o {mxnm} al mes (precio fundador), con 7 días gratis.', badge: 'Premium',
       termsHead: 'Revisa antes de suscribirte',
       terms: function (trial) { return [
-        ['Precio', 'Plan anual US$15.99 al año o mensual US$1.99 al mes (en México: MXN 229 / MXN 29). El precio en tu moneda, con impuestos, se muestra en la siguiente pantalla.'],
+        ['Precio', 'Plan anual {usdy} al año o mensual {usdm} al mes (en México: {mxny} / {mxnm}; precio fundador, {stage}). El precio en tu moneda, con impuestos, se muestra en la siguiente pantalla.'],
         ['Pago', trial ? 'Si es tu primera vez, los primeros 7 días son gratis. El día 8 se hace el primer cobro y después se renueva y se cobra automáticamente cada año (plan mensual: cada mes) hasta que canceles.' : 'Se cobra al suscribirte y después se renueva y se cobra automáticamente cada año (plan mensual: cada mes) hasta que canceles.'],
         ['Formas de pago', 'Tarjetas y más (procesado por Stripe / Link)'],
         ['Acceso', 'Disponible en cuanto te suscribes.'],
@@ -453,8 +455,9 @@
       ]; },
       lead: 'Si es tu primera vez, los primeros 7 días son gratis. Temporizadores y proyectos sin límite, historial completo y más.',
       leadNoTrial: 'Temporizadores y proyectos sin límite, historial completo y más.',
-      fm: 'Precio fundador para los primeros 100: si te suscribes ahora, mantienes el precio de hoy (MXN 29/mes · MXN 229/año, o el precio en tu moneda) mientras sigas suscrito, aunque el precio suba después.',
-      fmOn: 'Tienes el precio fundador: tu precio no cambia mientras sigas suscrito.',
+      fm: 'Precio fundador ({stage}): si te suscribes ahora, mantienes {m}/mes · {y}/año (o el precio en tu moneda) mientras sigas con la suscripción. El precio sube un poco cada 10 personas, por orden de suscripción, hasta MXN 29/mes · MXN 229/año para las personas 51 a 100.',
+      fmOn: 'Tienes el precio fundador: tu precio no cambia mientras sigas con la suscripción.',
+      drop: 'Buenas noticias: ahora tienes el precio fundador de la etapa 1. Tu plan mensual bajó un 20 %, de ¥250 a ¥200 (se cobra en tu moneda), desde tu primer cobro del 30 de noviembre. Se mantiene así mientras sigas con la suscripción.',
       monthly: 'Empezar plan mensual', yearly: 'Empezar plan anual (mejor precio)',
       note: 'El precio se muestra en tu moneda en la siguiente pantalla (pago con Stripe). Cancela cuando quieras.', more: 'Precios y condiciones',
       test: 'Este es el sitio de prueba. Solo se pueden usar tarjetas de prueba.',
@@ -475,6 +478,16 @@
     }
   }[lang];
   var PRICING = { ja: '/pricing', en: '/en-pricing', es: '/es-pricing' }[lang];
+  // 創設メンバー価格の今の期（tiers.js）で {m} {y} {stage} などを埋める（11/24）
+  var TPL = { pn: P.note, bs: B.soonLead, bf: B.fm }, bTerms = B.terms;
+  function tierFill() {
+    if (!window.TT_TIERS) return;
+    var f = function (x) { return window.TT_TIERS.fill(x, lang); };
+    P.note = f(TPL.pn); B.soonLead = f(TPL.bs); B.fm = f(TPL.bf);
+    B.terms = function (t) { return bTerms(t).map(function (r) { return [r[0], f(r[1])]; }); };
+  }
+  tierFill();
+  if (window.TT_TIERS) window.TT_TIERS.ready(tierFill);
   var CHECKOUT = params.get('checkout');
   function isPrem(e) {
     return !!e && e.plan === 'premium' && ['active', 'trialing', 'past_due'].indexOf(e.status) >= 0 &&
@@ -507,7 +520,7 @@
   function fillBilling(box, badge, note) {
     box.textContent = '';
     var prem = isPrem(ENT);
-    var pl = prem && ENT.price_lookup_key && B.plan[ENT.price_lookup_key];
+    var pl = prem && ENT.price_lookup_key && B.plan[String(ENT.price_lookup_key).replace(/_t\d{1,2}$/, '')];
     badge.textContent = prem ? B.badge + (pl ? (lang === 'ja' ? '（' + pl + '）' : ' (' + pl + ')') : '') : P.now;
     function seePlans() {
       var b = el('button', { type: 'button', cls: 'acct-btn acct-btn-sm acct-see-plans', text: B.seePlans });
@@ -539,8 +552,13 @@
         : ENT.status === 'trialing' ? (ENT.cancel_at_period_end ? B.trialEnd(d) : B.trial(d))
         : (ENT.cancel_at_period_end ? B.ending(d) : B.active(d));
       box.appendChild(el('p', { cls: 'acct-small', text: line }));
-      // 創設メンバー価格（今の価格 ID = premium_monthly / premium_yearly で申し込んだ人。値上げ時は新しい lookup_key にする）
-      if (B.fmOn && ENT.status !== 'past_due' && ['premium_monthly', 'premium_yearly'].indexOf(ENT.price_lookup_key) >= 0) box.appendChild(el('p', { cls: 'acct-fm', text: B.fmOn }));
+      // 創設メンバー価格（premium_monthly / premium_yearly と段階 _t1〜_t5。101人目からの通常価格は別の lookup_key にする）
+      if (B.fmOn && ENT.status !== 'past_due' && /^premium_(monthly|yearly)(_t\d{1,2})?$/.test(String(ENT.price_lookup_key || ''))) box.appendChild(el('p', { cls: 'acct-fm', text: B.fmOn }));
+      // 11/24: 1人目（11/23 に月250円で申込み → 第1期の月200円へ切り替え）へのお知らせ。第1期で、無料期間が12/1より前に終わる人 = その1人だけ
+      if (B.drop && ENT.price_lookup_key === 'premium_monthly_t1' && ENT.trial_end && new Date(ENT.trial_end).getTime() < Date.UTC(2026, 11, 1)) {
+        box.appendChild(el('p', { cls: 'acct-fm acct-drop', text: B.drop }));
+        try { localStorage.setItem('tt-drop-t1', '1'); } catch (e) {}
+      }
       var mg = el('button', { type: 'button', cls: 'acct-btn', text: B.manage });
       mg.addEventListener('click', async function () {
         mg.disabled = true; err.hidden = true;
