@@ -1,0 +1,18 @@
+/* 11/24 端末間の同期（プレミアム）: ほかの端末で動いているタイマー・計測の帯（sync.js が読み込む） */
+.tt-live { width: 100%; max-width: 640px; margin: 12px auto 0; box-sizing: border-box; text-align: left; display: flex; flex-direction: column; gap: 8px; }
+.tt-live-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 12px 10px 14px; border-radius: 16px; background: var(--card, #fff); color: var(--text, #1C1C1E); border: 1.5px solid #D04A0A; box-shadow: 0 2px 10px rgba(0, 0, 0, .08); }
+.tt-live-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tt-live-who { font-size: 12px; font-weight: 700; opacity: .75; }
+.tt-live-what { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; min-width: 0; }
+.tt-live-dot { width: 12px; height: 12px; border-radius: 50%; background: #D04A0A; flex: 0 0 auto; }
+.tt-live-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 46vw; }
+.tt-live-time { font-variant-numeric: tabular-nums; font-weight: 700; opacity: .85; white-space: nowrap; }
+.tt-live-acts { display: flex; gap: 8px; flex: 0 0 auto; }
+.tt-live-take, .tt-live-stop { min-height: 40px; padding: 6px 14px; border-radius: 999px; font-weight: 800; font-size: 14px; cursor: pointer; font-family: inherit; }
+.tt-live-take { border: none; background: #D04A0A; color: #fff; }
+.tt-live-stop { border: 1.5px solid rgba(127, 127, 127, .5); background: transparent; color: inherit; }
+.tt-live-take:disabled, .tt-live-stop:disabled { opacity: .5; cursor: default; }
+.tt-live.dt .tt-live-row { border-color: #C03868; }
+.tt-live.dt .tt-live-take { background: #C03868; }
+.tt-live.dt .tt-live-dot { background: #C03868; }
+@media (prefers-reduced-motion: no-preference) { .tt-live-row { animation: tt-live-in .2s ease-out; } @keyframes tt-live-in { from { transform: translateY(-6px); opacity: 0; } } }

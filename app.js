@@ -113,8 +113,10 @@ let schedOff = 0, schedNodes = [], wakeNode = null, bgSched = false; // 裏の�
 function uid() { return Math.random().toString(36).slice(2, 9); }
 const RUN_KEY = 'tt-run:' + location.pathname;
 function saveRun() {
+// 11/24: 端末間の同期（sync.js・プレミアム）に、動き方が変わったことを知らせる（中で少し待ってから読む）
+if (window.__ttOnRunSave) { try { window.__ttOnRunSave(); } catch (e) {} }
 try {
-if (!run.active || run.finished) { sessionStorage.removeItem(RUN_KEY); return; }
+if (!run.active || run.finished) { if (!window.__ttKeepRun) sessionStorage.removeItem(RUN_KEY); return; } // __ttKeepRun: ほかの端末のタイマーを引き継いで開き直す直前（11/24）
 sessionStorage.setItem(RUN_KEY, JSON.stringify({ q: serialize(), paused: run.paused, idx: run.idx, cycle: run.cycle,
 endAt: run.endAt, remainMs: run.remainMs, reminded: !!run.reminded, extra: run.extra || 0, at: Date.now() }));
 } catch (e) {}
@@ -1090,6 +1092,16 @@ function undoToast(msg, onUndo) {
 }
 function hideUndo() { clearTimeout(undoTimer); if (undoEl) undoEl.classList.remove('show'); }
 window.__ttTimerRunning = function () { return !!(run.active && !run.paused && !run.finished); };
+/* 11/24: 端末間の同期。ほかの端末に引き継いだとき、記録を確定させずにこの画面のタイマーだけ止める（記録は引き継いだ端末が続ける） */
+window.__ttRelease = function () {
+if (!run.active) return;
+const onStop = window.__ttOnStop, onSave = window.__ttOnRunSave;
+window.__ttOnStop = null; window.__ttOnRunSave = null;
+try { resetToIdle(); } finally { window.__ttOnStop = onStop; window.__ttOnRunSave = onSave; }
+};
+// ほかの端末のタイマーをこの端末で続ける前に、こちらで動いているタイマーをふつうに止める（記録は確定）
+window.__ttStopRun = function () { if (run.active) resetToIdle(); };
+window.__ttRunActive = function () { return !!(run.active && !run.finished); };
 function stopCountForTimer(why) {
   let r = null;
   try { r = window.__ttCount && window.__ttCount.state().run; } catch (e) {}
@@ -1869,7 +1881,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=28'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=29'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -3185,6 +3197,7 @@ if (!seen) { try { sessionStorage.setItem('tt-stk-seen', '1'); } catch (e) {} ev
 window.__ttSetPlan = function (p) {
 try { if (p) localStorage.setItem('tt-plan', p); else localStorage.removeItem('tt-plan'); } catch (e) {}
 plan = p;
+if (p === 'premium' || p === 'free') setTimeout(function () { showNews(p); }, 2500);
 if (isPremium()) { var b = document.getElementById('tt-promo'); if (b) b.remove(); var ob = document.getElementById('tt-oldrec'); if (ob) ob.remove(); closeCard(); removeSticker(); }
 else { addBanner(); addSticker(); }
 paintHeader();
@@ -3195,6 +3208,57 @@ addSticker();
 paintHeader();
 if (window.__ttOld) addOld(window.__ttOld);
 })();
+/* ---------- 11/24: 新しい有料機能のお知らせ（ログイン中の人に、機能ごとに1回だけ） ----------
+ * 有料機能を足したら NEWS の先頭に1つ足す（料金ページ・比較表の行も一緒に）。
+ * 無料の人には「有料プランを見る」、プレミアムの人には使い方のひとことを出す。1回の表示で1つだけ。
+ * タイマーが動いている間・ほかのお知らせが出ている間は出さない（次に開いたときに出る）。文言は textContent だけ */
+var NEWS = [
+{ id: 'sync1', ja: { h: '新機能：端末間でつなぐ（プレミアム）', p: 'スマホで動かしているタイマーや計測が、PCで開くと上に表示されます。「この端末で続ける」を押すと、残り時間も記録もそのままPCで続きます。計測はPCから止めることもできます。', prem: 'もう使えます。2台目の端末でもログインして、タイマーを開いてみてください。' },
+en: { h: 'New: continue across devices (Premium)', p: 'When a timer or tracking is running on your phone, it shows at the top when you open TimerTrain on your computer. Tap "Continue here" and it carries on there with the same time left and the same record. You can also stop tracking from the other device.', prem: 'It is ready to use. Sign in on a second device and open the timer.' },
+es: { h: 'Nuevo: seguir en otro dispositivo (Premium)', p: 'Si un temporizador o una medición está en marcha en el móvil, aparece arriba al abrir TimerTrain en el ordenador. Pulsa «Seguir aquí» y continúa allí con el mismo tiempo restante y el mismo registro. También puedes detener la medición desde el otro dispositivo.', prem: 'Ya puedes usarlo. Inicia sesión en un segundo dispositivo y abre el temporizador.' } }
+];
+var NEWS_KEY = 'tt-news-seen';
+function showNews(p) {
+var seen = {}; try { seen = JSON.parse(localStorage.getItem(NEWS_KEY) || '{}') || {}; } catch (e) {}
+var it = NEWS.filter(function (n) { return !seen[n.id]; })[0];
+if (!it) return;
+var busy = false; try { busy = window.__ttRunActive && window.__ttRunActive(); } catch (e) {}
+if (busy || document.querySelector('.tt-drop, .tt-news, .ttw-back:not([hidden]), [aria-modal="true"]:not([hidden])') || document.body.classList.contains('focus-mode')) return;
+var M = it[LANG] || it.ja, prem = p === 'premium';
+var A = LANG === 'en' ? { ok: 'OK', see: 'See Premium', close: 'Close', badge: 'New' } : LANG === 'es' ? { ok: 'Entendido', see: 'Ver Premium', close: 'Cerrar', badge: 'Nuevo' } : { ok: 'OK', see: '有料プランを見る', close: '閉じる', badge: 'NEW' };
+var pricing = (LANG === 'en' ? '/en-pricing' : LANG === 'es' ? '/es-pricing' : '/pricing') + '#buy';
+function mark() { seen[it.id] = 1; try { localStorage.setItem(NEWS_KEY, JSON.stringify(seen)); } catch (e) {} }
+var acc = window.DT ? '#C03868' : '#D04A0A';
+var back = document.createElement('div'); back.className = 'tt-news'; back.setAttribute('role', 'dialog'); back.setAttribute('aria-modal', 'true'); back.setAttribute('aria-labelledby', 'tt-news-h');
+back.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.45)';
+var card = document.createElement('div'); card.style.cssText = 'max-width:420px;width:100%;background:var(--card,#fff);color:var(--text,#222);border-radius:18px;padding:22px 20px 18px;box-shadow:0 10px 40px rgba(0,0,0,.25);line-height:1.65';
+var bd = document.createElement('span'); bd.textContent = A.badge; bd.style.cssText = 'display:inline-block;background:' + acc + ';color:#fff;font-weight:800;font-size:.75rem;letter-spacing:.04em;border-radius:999px;padding:2px 10px;margin-bottom:8px';
+var h = document.createElement('h2'); h.id = 'tt-news-h'; h.textContent = M.h; h.style.cssText = 'margin:0 0 8px;font-size:1.15rem';
+var tx = document.createElement('p'); tx.textContent = M.p; tx.style.cssText = 'margin:0 0 10px;font-size:.95rem';
+card.appendChild(bd); card.appendChild(h); card.appendChild(tx);
+if (prem) { var t2 = document.createElement('p'); t2.textContent = M.prem; t2.style.cssText = 'margin:0 0 14px;font-size:.9rem;opacity:.8'; card.appendChild(t2); }
+var row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:6px';
+var btnCss = 'border-radius:999px;padding:10px 20px;font-weight:800;font-size:1rem;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;min-height:44px;font-family:inherit';
+var first;
+if (prem) {
+var ok = document.createElement('button'); ok.type = 'button'; ok.textContent = A.ok; ok.style.cssText = btnCss + ';background:' + acc + ';color:#fff;border:0';
+ok.addEventListener('click', close); row.appendChild(ok); first = ok;
+} else {
+var go = document.createElement('a'); go.href = pricing; go.textContent = A.see; go.style.cssText = btnCss + ';background:' + acc + ';color:#fff;border:0';
+go.addEventListener('click', function () { mark(); if (window.gtag) gtag('event', 'news_click', { id: it.id, to: 'pricing' }); });
+var cl = document.createElement('button'); cl.type = 'button'; cl.textContent = A.close; cl.style.cssText = btnCss + ';background:transparent;color:inherit;border:1.5px solid rgba(127,127,127,.5)';
+cl.addEventListener('click', close); row.appendChild(go); row.appendChild(cl); first = go;
+}
+card.appendChild(row); back.appendChild(card);
+function close() { mark(); back.remove(); document.removeEventListener('keydown', onKey); }
+function onKey(e) { if (e.key === 'Escape') close(); }
+back.addEventListener('click', function (e) { if (e.target === back) close(); });
+document.addEventListener('keydown', onKey);
+document.body.appendChild(back);
+mark(); // 表示したら「見た」にする（閉じずに離れても、もう出さない）
+if (window.gtag) gtag('event', 'news_view', { id: it.id, plan: p });
+try { first.focus(); } catch (e) {}
+}
 
 /* ---------- タイトル（TimerTrain）を押すと、そのページの基本の編成へ（11/13） ---------- */
 (function () {

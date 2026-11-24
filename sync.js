@@ -928,12 +928,17 @@
     if (!cRun) return;
     var L = cLog();
     if (L.secs >= C_MAX) { cStop(true); return; }
-    if (!L.busy && (L.id ? Date.now() - L.saved > 60000 : L.secs >= 15)) persistLog(L, false).then(cSaveRun);
+    if (!L.busy && (L.id ? Date.now() - L.saved > 60000 : L.secs >= 15)) persistLog(L, false).then(function () {
+      cSaveRun();
+      // 11/24: 記録の id ができたら、ほかの端末が同じ記録を続けられるように知らせる
+      if (LV.on && LV.rid.count && cRun && cRun.L === L && L.id && LV.lid !== L.id) { LV.lid = L.id; lvWrite('count', lvCountState(), false); }
+    });
     showStatsNow();
   }
   function cBegin(R) {
     cRun = R; cSaveRun();
     clearInterval(cTick); cTick = setInterval(function () { if (!cConflict()) cStep(); }, 15000);
+    if (LV.on && !LV.noClaim && !LV.resuming) lvCountSave(true); // 11/24: 端末間の同期
   }
   // 11/16: タイマーとカウントが同時に動いていたら（再読み込み・別のタブなど）カウントを止めて記録する
   function cConflict() {
@@ -956,6 +961,7 @@
     if (!cRun) return;
     clearInterval(cTick); cTick = null;
     var R = cRun, L = cLog(); cRun = null; cSaveRun();
+    lvCountSave(); // 11/24: ほかの端末に「止めた」と知らせる
     // 11/20: 「終わった時刻で止める」。始まり〜今の間だけ受け付ける
     if (typeof endMs === 'number' && isFinite(endMs)) {
       var e2 = Math.max(R.start, Math.min(Date.now(), endMs));
@@ -1003,6 +1009,7 @@
     if (!cRun) return;
     if (cRun.L.id || cRun.L.busy) { cStop(false); return; }
     clearInterval(cTick); cTick = null; cRun = null; cSaveRun();
+    lvCountSave();
     ev('count_undo', {});
     showStatsNow();
   }
@@ -1012,7 +1019,7 @@
     var b = cleanBtns([{ id: saved.id, label: saved.label, icon: saved.icon }])[0];
     if (!b) { try { localStorage.removeItem(CR_KEY); } catch (e) {} return; }
     var lid = (typeof saved.lid === 'string' && /^[0-9a-f-]{36}$/i.test(saved.lid)) ? saved.lid : null;
-    cBegin(cMake(b, saved.start, lid));
+    LV.resuming = true; cBegin(cMake(b, saved.start, lid)); LV.resuming = false;
     cStep();
     setTimeout(cConflict, 0);
   }
@@ -1079,6 +1086,363 @@
     document.addEventListener('keydown', onKey);
     document.body.appendChild(back); try { ok.focus(); } catch (x) {}
   }
+  /* ---------- 端末間の同期（プレミアム・11/24） ----------
+   * いま動いているタイマー／1タップ計測を live_runs（1人につき kind ごとに1行）に書き、ほかの端末に見せて、引き継げるようにする。
+   * - 書く: この端末で始めた・一時停止・区切り・編成の変更・止めたとき（app.js の saveRun から）と、動いている間 30秒ごと。
+   *   始めたときは行を自分のものにする（upsert）。それ以外は「行がまだ自分のもの」のときだけ更新する（dev が同じ行だけ）。
+   * - 引き継ぐ: ほかの端末が行を自分のものにして took＝こちらの rid を書く → こちらは記録を確定させずに手放す
+   *   （続きは引き継いだ端末が同じ記録 id で数える）。ほかの端末が自分で新しく始めただけのときは、こちらは止めない。
+   * - 読む: 開いたとき・前に出たとき・見えている間 15秒ごと。
+   * - 読み書きはサーバー側（RLS）でもプレミアムの本人だけ。表示する名前は textContent だけ。
+   */
+  var LT = lang === 'en' ? {
+    on: function (d) { return 'Running on ' + d; }, counting: function (d) { return 'Tracking on ' + d; }, paused: 'Paused',
+    take: 'Continue here', stop: 'Stop', taken: function (d) { return 'Moved to ' + d + '. It continues there.'; },
+    took: 'Continuing here', fail: 'Could not connect. Please try again.', other: 'another device', rest: 'left', done: 'Finished'
+  } : lang === 'es' ? {
+    on: function (d) { return 'En marcha en ' + d; }, counting: function (d) { return 'Midiendo en ' + d; }, paused: 'En pausa',
+    take: 'Seguir aquí', stop: 'Detener', taken: function (d) { return 'Pasó a ' + d + '. Sigue allí.'; },
+    took: 'Sigue en este dispositivo', fail: 'No se pudo conectar. Inténtalo de nuevo.', other: 'otro dispositivo', rest: 'restante', done: 'Terminado'
+  } : {
+    on: function (d) { return d + ' で動いています'; }, counting: function (d) { return d + ' で計測中'; }, paused: '一時停止中',
+    take: 'この端末で続ける', stop: '止める', taken: function (d) { return d + ' に引き継ぎました。続きはそちらで動きます'; },
+    took: 'この端末で続けています', fail: 'つながりませんでした。もう一度お試しください', other: 'ほかの端末', rest: '残り', done: '終わりました'
+  };
+  var LV = { on: false, dev: '', name: '', rid: { timer: null, count: null }, took: { timer: null, count: null }, claim: false,
+    rows: {}, seen: {}, beatT: null, saveT: null, pollT: null, uiT: null, band: null, busy: false, bad: 0 };
+  var LV_RID_T = 'tt-lv-rid', LV_RID_C = 'tt-lv-rid-c', LV_TAKE = 'tt-lv-take';
+  function lvRand() {
+    try { var a = new Uint8Array(10); crypto.getRandomValues(a); return Array.prototype.map.call(a, function (x) { return ('0' + x.toString(16)).slice(-2); }).join(''); }
+    catch (e) { return (Date.now().toString(36) + Math.random().toString(36).slice(2) + '00000000').replace(/[^a-z0-9]/g, '').slice(0, 20); }
+  }
+  function lvDev() {
+    var d = ''; try { d = localStorage.getItem('tt-dev') || ''; } catch (e) {}
+    if (!/^[a-z0-9]{8,40}$/.test(d)) { d = lvRand(); try { localStorage.setItem('tt-dev', d); } catch (e) {} }
+    return d;
+  }
+  function lvName() {
+    var u = navigator.userAgent || '';
+    if (/iPhone/.test(u)) return 'iPhone';
+    if (/iPad/.test(u) || (/Macintosh/.test(u) && navigator.maxTouchPoints > 1)) return 'iPad';
+    if (/Android/.test(u)) return /Mobile/.test(u) ? 'Android' : 'Android tablet';
+    if (/CrOS/.test(u)) return 'Chromebook';
+    if (/Mac/.test(u)) return 'Mac';
+    if (/Windows/.test(u)) return 'Windows';
+    if (/Linux/.test(u)) return 'Linux';
+    return 'PC';
+  }
+  function lvIcon(n) { return /iPhone|Android$/.test(n) ? '📱' : /iPad|tablet/.test(n) ? '📱' : '💻'; }
+  function lvSafeName(n) { n = String(n || '').replace(/[^A-Za-z0-9 ]/g, '').slice(0, 20); return n || LT.other; }
+  // 共有URLの形（?t=色.秒.名前,…&r=回数）から区切りの一覧を作る
+  function lvParse(q) {
+    if (typeof q !== 'string' || !Q_RE.test(q)) return null;
+    var m = q.match(/^\?t=(.*)&r=(inf|\d{1,2})$/); if (!m) return null;
+    var out = [];
+    m[1].split(',').forEach(function (x) {
+      var p = x.match(/^([a-z]+)\.(\d{1,6})\.(.*)$/); if (!p) return;
+      var n = ''; try { n = decodeURIComponent(p[3]); } catch (e) { n = p[3]; }
+      var s = Number(p[2]); if (s > 0) out.push({ c: p[1], s: s, n: n.slice(0, 40) });
+    });
+    return out.length ? { list: out, rep: m[2] === 'inf' ? 0 : Number(m[2]) } : null;
+  }
+  // スナップショットから「いまどの区切りで、あと何ミリ秒か」
+  function lvNow(st) {
+    var P = lvParse(st.q); if (!P) return null;
+    var list = P.list, idx = Math.min(Math.max(0, st.idx | 0), list.length - 1), cyc = Math.max(1, st.cycle | 0), rep = P.rep;
+    if (st.paused) return { n: list[idx].n, c: list[idx].c, ms: Math.max(0, Number(st.remainMs) || 0), paused: true };
+    var now = Date.now(), end = Number(st.endAt) || now, g = 0;
+    while (end <= now && g++ < 5000) {
+      idx++;
+      if (idx >= list.length) { idx = 0; cyc++; if (rep && cyc > rep) return { done: true }; }
+      end += list[idx].s * 1000;
+    }
+    return { n: list[idx].n, c: list[idx].c, ms: end - now };
+  }
+  function lvTimerState() {
+    var on = false; try { on = run.active && !run.finished; } catch (e) {}
+    if (!on) return null;
+    var q = ''; try { q = serialize(); } catch (e) {}
+    if (!Q_RE.test(q)) return null;
+    var L = null;
+    if (log && log.id && log.segs.length <= 400) {
+      step();
+      L = { id: log.id, startedAt: log.startedAt, secs: Math.round(log.secs * 10) / 10, q: log.q, timerId: log.timerId, timerName: log.timerName,
+        segs: log.segs.map(function (g) { return { seq: g.seq, label: g.label, secs: Math.round(g.secs * 10) / 10, startedAt: g.startedAt, sent: g.sent, closed: !!g.closed }; }) };
+    }
+    return { rid: LV.rid.timer, took: LV.took.timer || undefined, name: LV.name, page: location.pathname.slice(0, 100), q: q,
+      paused: !!run.paused, idx: run.idx, cycle: run.cycle, endAt: run.endAt, remainMs: run.paused ? run.remainMs : Math.max(0, run.endAt - Date.now()),
+      extra: run.extra || 0, reminded: !!run.reminded, at: Date.now(), L: L };
+  }
+  function lvCountState() {
+    if (!cRun) return null;
+    return { rid: LV.rid.count, took: LV.took.count || undefined, name: LV.name, id: cRun.id, label: cRun.label, icon: cRun.icon, start: cRun.start,
+      lid: cRun.L.id || null, at: Date.now() };
+  }
+  function lvSaveRid() {
+    try {
+      if (LV.rid.timer) sessionStorage.setItem(LV_RID_T, JSON.stringify({ rid: LV.rid.timer, took: LV.took.timer || null })); else sessionStorage.removeItem(LV_RID_T);
+      if (LV.rid.count) localStorage.setItem(LV_RID_C, JSON.stringify({ rid: LV.rid.count, took: LV.took.count || null })); else localStorage.removeItem(LV_RID_C);
+    } catch (e) {}
+  }
+  function lvOff(e) { if (e && /live_runs|does not exist|schema cache|permission|row-level/i.test(e.message || '')) { if (++LV.bad >= 3) LV.on = false; } }
+  // claim: 行を自分のものにする（始めた・引き継いだとき）。それ以外は自分の行のときだけ更新
+  async function lvWrite(kind, st, claim) {
+    if (!LV.on) return false;
+    try {
+      var r;
+      if (claim) r = await sb.from('live_runs').upsert({ product: PRODUCT, kind: kind, dev: LV.dev, state: st }, { onConflict: 'user_id,product,kind' }).select('kind');
+      else r = await sb.from('live_runs').update({ state: st }).eq('product', PRODUCT).eq('kind', kind).eq('dev', LV.dev).select('kind');
+      if (r.error) { lvOff(r.error); return false; }
+      LV.bad = 0;
+      if (!claim && (!r.data || !r.data.length)) { // ほかの端末の行になっていた → こちらは書くのをやめる（引き継ぎかどうかは読むときに判断）
+        if (st && !st.off) setTimeout(lvPoll, 0);
+        return false;
+      }
+      return true;
+    } catch (e) { return false; }
+  }
+  function lvTimerSave() {
+    if (!LV.on || LV.taking) return;
+    var st = lvTimerState();
+    if (!st) {
+      if (LV.rid.timer) { var off = { rid: LV.rid.timer, took: LV.took.timer || undefined, off: 1, at: Date.now() }; LV.rid.timer = null; LV.took.timer = null; lvSaveRid(); lvWrite('timer', off, false); }
+      return;
+    }
+    if (LV.claim || !LV.rid.timer) { // 新しく始めた
+      LV.claim = false; LV.rid.timer = lvRand(); LV.took.timer = null; lvSaveRid();
+      st.rid = LV.rid.timer; delete st.took;
+      lvWrite('timer', st, true);
+      return;
+    }
+    lvWrite('timer', st, false);
+  }
+  function lvCountSave(fresh) {
+    if (!LV.on || LV.quiet) return;
+    var st = lvCountState();
+    if (!st) {
+      if (LV.rid.count) { var off = { rid: LV.rid.count, took: LV.took.count || undefined, off: 1, at: Date.now() }; LV.rid.count = null; LV.took.count = null; lvSaveRid(); lvWrite('count', off, false); }
+      return;
+    }
+    if (fresh || !LV.rid.count) {
+      LV.rid.count = lvRand(); LV.took.count = null; lvSaveRid();
+      st.rid = LV.rid.count; delete st.took;
+      lvWrite('count', st, true);
+      return;
+    }
+    lvWrite('count', st, false);
+  }
+  // ほかの端末に引き継がれた → この端末は記録を確定させずに手放す
+  function lvRelease(kind, row) {
+    var who = lvSafeName(row.state && row.state.name);
+    if (kind === 'timer') {
+      clearInterval(logTick); logTick = null; log = null; saveTLog();
+      LV.rid.timer = null; LV.took.timer = null; lvSaveRid();
+      if (window.__ttRelease) { try { window.__ttRelease(); } catch (e) {} }
+    } else {
+      clearInterval(cTick); cTick = null; cRun = null; cSaveRun();
+      LV.rid.count = null; LV.took.count = null; lvSaveRid();
+      showStatsNow();
+    }
+    ev('live_released', { kind: kind });
+    if (window.__ttToast) window.__ttToast(LT.taken(who));
+  }
+  async function lvPoll() {
+    if (!LV.on || LV.busy) return;
+    LV.busy = true;
+    try {
+      var r = await sb.from('live_runs').select('kind,dev,state,updated_at').eq('product', PRODUCT);
+      if (r.error) { lvOff(r.error); return; }
+      LV.bad = 0;
+      var rows = {};
+      (r.data || []).forEach(function (x) { if (x && (x.kind === 'timer' || x.kind === 'count')) rows[x.kind] = x; });
+      ['timer', 'count'].forEach(function (k) {
+        var x = rows[k], st = x && x.state && typeof x.state === 'object' ? x.state : null;
+        if (x && x.dev !== LV.dev && st && st.took && LV.rid[k] && st.took === LV.rid[k]) lvRelease(k, x);
+      });
+      LV.rows = rows;
+      lvRender();
+    } catch (e) {} finally { LV.busy = false; }
+  }
+  // 見せる行: ほかの端末のもので、止まっていない・古すぎない・タイマーなら終わっていない
+  function lvShown(k) {
+    var x = LV.rows[k]; if (!x || x.dev === LV.dev) return null;
+    var st = x.state; if (!st || typeof st !== 'object' || st.off) return null;
+    if (k === 'timer') {
+      if (!(Date.now() - Number(st.at) < 12 * 3600e3)) return null;
+      if (LV.rid.timer && st.took === LV.rid.timer) return null;
+      var nw = lvNow(st); if (!nw || nw.done) return null;
+      return { x: x, st: st, nw: nw };
+    }
+    var start = Number(st.start);
+    if (!isFinite(start) || Date.now() - start > C_MAX * 1000 || start > Date.now() + 60000) return null;
+    if (cRun && cRun.start === start) return null; // 同じ計測をもうこの端末でも続けている
+    return { x: x, st: st };
+  }
+  function lvClock(ms) { var s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), ss = s % 60; return (h ? h + ':' + (m < 10 ? '0' : '') : '') + m + ':' + (ss < 10 ? '0' : '') + ss; }
+  function lvRender() {
+    var items = [lvShown('timer'), lvShown('count')];
+    var any = items[0] || items[1];
+    if (!any) { if (LV.band) { LV.band.remove(); LV.band = null; } clearInterval(LV.uiT); LV.uiT = null; return; }
+    if (!document.getElementById('tt-live-css')) { var lk = document.createElement('link'); lk.id = 'tt-live-css'; lk.rel = 'stylesheet'; lk.href = '/live.css?v=1'; document.head.appendChild(lk); }
+    var key = items.map(function (it, i) { return it ? (i + ':' + it.x.dev + ':' + it.st.rid + ':' + (it.st.paused ? 1 : 0) + ':' + it.st.at) : '-'; }).join('|');
+    if (!LV.band) {
+      LV.band = el('div', { cls: 'tt-live' + (window.DT ? ' dt' : ''), role: 'region', 'aria-label': LT.take });
+      var hd = document.querySelector('main .header');
+      if (hd) hd.appendChild(LV.band); else document.body.insertBefore(LV.band, document.body.firstChild); // ヘッダーの中（PCの並びでも全幅の行に入る）
+    }
+    if (LV.band.dataset.k !== key) {
+      LV.band.dataset.k = key; LV.band.textContent = '';
+      items.forEach(function (it, i) {
+        if (!it) return;
+        var k = i ? 'count' : 'timer', st = it.st, who = lvSafeName(st.name);
+        if (!LV.seen[st.rid]) { LV.seen[st.rid] = 1; ev('live_seen', { kind: k }); }
+        var row = el('div', { cls: 'tt-live-row' });
+        var info = el('div', { cls: 'tt-live-info' });
+        info.appendChild(el('span', { cls: 'tt-live-who', text: lvIcon(who) + ' ' + (k === 'timer' ? LT.on(who) : LT.counting(who)) }));
+        var what = el('span', { cls: 'tt-live-what' });
+        var dot = el('span', { cls: 'tt-live-dot' });
+        try { if (k === 'timer' && it.nw && it.nw.c && typeof rowColor === 'function') dot.style.background = rowColor(String(it.nw.c).replace(/[^a-z]/g, '')); } catch (e) {}
+        what.appendChild(dot);
+        what.appendChild(el('span', { cls: 'tt-live-name', text: String(k === 'timer' ? it.nw.n : st.label || '').slice(0, 30) }));
+        what.appendChild(el('span', { cls: 'tt-live-time', 'data-k': k, text: '' }));
+        info.appendChild(what);
+        row.appendChild(info);
+        var acts = el('div', { cls: 'tt-live-acts' });
+        var tb = el('button', { type: 'button', cls: 'tt-live-take', text: LT.take });
+        tb.addEventListener('click', function () { k === 'timer' ? lvTakeTimer(tb) : lvTakeCount(false, tb); });
+        acts.appendChild(tb);
+        if (k === 'count') {
+          var sb2 = el('button', { type: 'button', cls: 'tt-live-stop', text: LT.stop });
+          sb2.addEventListener('click', function () { lvTakeCount(true, sb2); });
+          acts.appendChild(sb2);
+        }
+        row.appendChild(acts);
+        LV.band.appendChild(row);
+      });
+    }
+    lvTickUI();
+    if (!LV.uiT) LV.uiT = setInterval(lvTickUI, 1000);
+  }
+  function lvTickUI() {
+    if (!LV.band) return;
+    var t = lvShown('timer'), c = lvShown('count');
+    if ((!t && LV.band.querySelector('[data-k="timer"]')) || (!c && LV.band.querySelector('[data-k="count"]'))) { LV.band.dataset.k = ''; lvRender(); return; }
+    var te = LV.band.querySelector('[data-k="timer"]');
+    if (te && t) {
+      te.textContent = t.nw.paused ? LT.paused + ' · ' + lvClock(t.nw.ms) : LT.rest + ' ' + lvClock(t.nw.ms);
+      var nm = te.parentNode.querySelector('.tt-live-name'); if (nm && nm.textContent !== String(t.nw.n || '').slice(0, 30)) nm.textContent = String(t.nw.n || '').slice(0, 30);
+    }
+    var ce = LV.band.querySelector('[data-k="count"]');
+    if (ce && c) ce.textContent = lvClock(Date.now() - Number(c.st.start));
+  }
+  // タイマーを引き継ぐ: 行を自分のものにして took を書き、この端末でタイマーと記録の続きを用意してから、そのページを開き直す
+  async function lvTakeTimer(btn) {
+    var it = lvShown('timer'); if (!it) return;
+    var st = it.st;
+    var P = lvParse(st.q), page = String(st.page || '/');
+    if (!P || !/^\/[A-Za-z0-9\-\/._]{0,99}$/.test(page) || /\.\.|\/\//.test(page)) return;
+    btn.disabled = true;
+    // こちらでタイマーが動いていれば、先にふつうに止めて記録を確定する（こちらの行への「止めた」は書かない。すぐ上書きするため）
+    var mine = false; try { mine = window.__ttRunActive && window.__ttRunActive(); } catch (e) {}
+    LV.taking = true; clearTimeout(LV.saveT);
+    if (mine && window.__ttStopRun) { try { window.__ttStopRun(); } catch (e) {} }
+    var rid = lvRand(), now = Date.now();
+    var mineSt = Object.assign({}, st, { rid: rid, took: st.rid, name: LV.name, at: now });
+    var ok = await lvWrite('timer', mineSt, true);
+    if (!ok) { LV.taking = false; btn.disabled = false; if (window.__ttToast) window.__ttToast(LT.fail); return; }
+    ev('live_take', { kind: 'timer' });
+    try {
+      sessionStorage.setItem('tt-run:' + page, JSON.stringify({ q: st.q, paused: !!st.paused, idx: st.idx | 0, cycle: Math.max(1, st.cycle | 0),
+        endAt: Number(st.endAt) || 0, remainMs: Number(st.remainMs) || 0, reminded: !!st.reminded, extra: Number(st.extra) || 0, at: now }));
+      var L = lvCatchUp(st, P);
+      if (L) sessionStorage.setItem(TLOG_KEY, JSON.stringify({ at: now, L: L })); else sessionStorage.removeItem(TLOG_KEY);
+      sessionStorage.setItem(LV_RID_T, JSON.stringify({ rid: rid, took: st.rid }));
+      sessionStorage.setItem(LV_TAKE, '1');
+      window.__ttKeepRun = true; // 閉じるときの saveRun で消さない
+    } catch (e) {}
+    if (mine) await new Promise(function (r) { setTimeout(r, 1200); }); // 止めた記録の保存を待つ
+    location.href = page + st.q;
+  }
+  // 引き継ぐまでに過ぎた時間を、区切りごとに記録へ足す（ほかの端末が裏に回って書けなかった間も数える）
+  function lvCatchUp(st, P) {
+    var L0 = st.L;
+    if (!L0 || typeof L0.id !== 'string' || !/^[0-9a-f-]{36}$/i.test(L0.id) || !Array.isArray(L0.segs) || L0.segs.length > 400) return null;
+    var L = { id: L0.id, startedAt: String(L0.startedAt), secs: Number(L0.secs) || 0, q: L0.q === st.q ? st.q : null, timerId: L0.timerId || null,
+      timerName: L0.timerName ? String(L0.timerName).slice(0, 60) : null,
+      segs: L0.segs.map(function (g) { return { seq: Number(g.seq) || 0, label: String(g.label || '').slice(0, 30), secs: Number(g.secs) || 0, startedAt: String(g.startedAt), sent: Number(g.sent), closed: !!g.closed }; }) };
+    if (!L.q) return null; // 編成が変わっていたら、続きは新しい記録で
+    if (st.paused) return L;
+    var list = P.list, idx = Math.min(Math.max(0, st.idx | 0), list.length - 1), cyc = Math.max(1, st.cycle | 0);
+    var t = Number(st.at), end = Number(st.endAt), now = Date.now(), g = 0;
+    if (!(t > 0 && end > 0) || now - t > 12 * 3600e3) return L;
+    var cur = L.segs[L.segs.length - 1]; if (cur && cur.closed) cur = null;
+    while (t < now && g++ < 3000) {
+      var upto = Math.min(end, now), d = Math.max(0, (upto - t) / 1000);
+      if (!cur) { if (L.segs.length >= 2000) break; cur = { seq: L.segs.length, label: String(list[idx].n || '').slice(0, 30), secs: 0, startedAt: new Date(t).toISOString(), sent: -1, closed: false }; L.segs.push(cur); }
+      cur.secs += d; L.secs += d; t = upto;
+      if (end <= now) {
+        cur.closed = true; cur = null; idx++;
+        if (idx >= list.length) { idx = 0; cyc++; if (P.rep && cyc > P.rep) break; }
+        end += list[idx].s * 1000;
+      }
+    }
+    L.secs = Math.min(L.secs, 356400);
+    return L;
+  }
+  // 1タップの計測を引き継ぐ（stopNow なら、引き継いですぐ止めて記録を確定する）
+  async function lvTakeCount(stopNow, btn) {
+    var it = lvShown('count'); if (!it) return;
+    var st = it.st;
+    var b = cleanBtns([{ id: st.id, label: st.label, icon: st.icon }])[0];
+    var start = Number(st.start);
+    if (!b || !isFinite(start)) return;
+    if (btn) btn.disabled = true;
+    if (cRun) { LV.quiet = true; try { cStop(false); } finally { LV.quiet = false; } } // こちらの計測は先にふつうに止める（行はすぐ上書きする）
+    var rid = lvRand();
+    var mineSt = { rid: rid, took: st.rid, name: LV.name, id: b.id, label: b.label, icon: b.icon, start: start,
+      lid: (typeof st.lid === 'string' && /^[0-9a-f-]{36}$/i.test(st.lid)) ? st.lid : null, at: Date.now() };
+    var ok = await lvWrite('count', mineSt, true);
+    if (!ok) { if (btn) btn.disabled = false; if (window.__ttToast) window.__ttToast(LT.fail); return; }
+    ev('live_take', { kind: 'count', stop: stopNow ? 1 : 0 });
+    LV.rid.count = rid; LV.took.count = st.rid; lvSaveRid();
+    LV.noClaim = true;
+    cBegin(cMake(b, start, mineSt.lid));
+    LV.noClaim = false;
+    if (stopNow) cStop(false); else { cStep(); if (window.__ttToast) window.__ttToast(LT.took); }
+    LV.rows.count = null; lvRender(); showStatsNow();
+  }
+  function lvInit() {
+    if (!PREMIUM || LV.on) return;
+    LV.on = true; LV.dev = lvDev(); LV.name = lvName();
+    try {
+      var t = JSON.parse(sessionStorage.getItem(LV_RID_T) || 'null');
+      if (t && /^[0-9a-f]{20}$/.test(t.rid || '')) { LV.rid.timer = t.rid; LV.took.timer = /^[0-9a-f]{20}$/.test(t.took || '') ? t.took : null; }
+      var c = JSON.parse(localStorage.getItem(LV_RID_C) || 'null');
+      if (c && /^[0-9a-f]{20}$/.test(c.rid || '') && cRun) { LV.rid.count = c.rid; LV.took.count = /^[0-9a-f]{20}$/.test(c.took || '') ? c.took : null; }
+    } catch (e) {}
+    var took = false; try { took = sessionStorage.getItem(LV_TAKE) === '1'; sessionStorage.removeItem(LV_TAKE); } catch (e) {}
+    var prevSave = window.__ttOnRunSave;
+    window.__ttOnRunSave = function () {
+      if (prevSave) { try { prevSave(); } catch (e) {} }
+      clearTimeout(LV.saveT); LV.saveT = setTimeout(lvTimerSave, 400);
+    };
+    var prevStart = window.__ttOnStart;
+    window.__ttOnStart = function () { if (prevStart) { try { prevStart(); } catch (e) {} } LV.claim = true; };
+    // 引き継いで開き直したとき: 行はもう自分のもの（took 付き）。続けて書く
+    var runOn = false; try { runOn = run.active && !run.finished; } catch (e) {}
+    if (runOn && LV.rid.timer) { if (took && window.__ttToast) setTimeout(function () { window.__ttToast(LT.took); }, 600); lvTimerSave(); }
+    else if (!runOn && LV.rid.timer) lvTimerSave(); // 開き直したら止まっていた → 止めたと書く
+    if (cRun && !LV.rid.count) lvCountSave(true);
+    LV.beatT = setInterval(function () {
+      if (document.visibilityState === 'hidden') { var on2 = false; try { on2 = run.active && !run.finished && !run.paused; } catch (e) {} if (!on2 && !cRun) return; }
+      if (LV.rid.timer) lvTimerSave();
+      if (LV.rid.count && cRun) lvWrite('count', lvCountState(), false);
+    }, 30000);
+    LV.pollT = setInterval(function () { if (document.visibilityState === 'visible') lvPoll(); }, 15000);
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') lvPoll(); });
+    window.addEventListener('focus', function () { lvPoll(); });
+    lvPoll();
+  }
   (async function init() {
     var s = await sb.auth.getSession();
     if (!s.data || !s.data.session) {
@@ -1123,6 +1487,7 @@
     loadLabels();
     await load();
     if (window.__ttRestored && isRunning() && !log) resumeLog();
+    lvInit(); // 11/24: 端末間の同期（プレミアムだけ）
     syncSettings().catch(function () {});
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { load(); loadStreak(false); syncSettings().catch(function () {}); } });
   })().catch(function () { setNote(T.err, true); });
