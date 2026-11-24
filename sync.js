@@ -1051,6 +1051,34 @@
     window.__ttOld = { days: o.days, secs: o.secs, first: o.first };
     if (window.__ttOldRecords) { try { window.__ttOldRecords(window.__ttOld); } catch (e) {} }
   }
+  // 11/24: 1人目（11/23 に月250円で申込み → 創設メンバー第1期の月200円へ切り替え）へ一度だけお知らせ。
+  // 第1期の月額で、無料期間が 12/1 より前に終わる人 = その1人だけ。アカウントページで見た・閉じたら出さない
+  function priceDropNote(e) {
+    if (!e || e.price_lookup_key !== 'premium_monthly_t1' || !e.trial_end || !(new Date(e.trial_end).getTime() < Date.UTC(2026, 11, 1))) return;
+    try { if (localStorage.getItem('tt-drop-t1')) return; } catch (x) { return; }
+    var M = lang === 'en' ? {
+      h: 'Good news: your price went down', p: 'You now have the stage 1 founding member price. Your monthly price went down 20%, from ¥250 to ¥200 (charged in your currency), starting with your first payment on November 30. It stays this way for as long as you stay subscribed. Thank you for being our first member!', ok: 'OK', more: 'See my account'
+    } : lang === 'es' ? {
+      h: 'Buenas noticias: tu precio bajó', p: 'Ahora tienes el precio fundador de la etapa 1. Tu plan mensual bajó un 20 %, de ¥250 a ¥200 (se cobra en tu moneda), desde tu primer cobro del 30 de noviembre. Se mantiene así mientras sigas con la suscripción. ¡Gracias por ser la primera persona en suscribirse!', ok: 'Entendido', more: 'Ver mi cuenta'
+    } : {
+      h: 'お知らせ：月額が200円になりました', p: '創設メンバー第1期の価格になり、月額が250円から200円に下がりました。11月30日の初回のお支払いから月200円です。契約が続くかぎり、この料金のままです。最初のメンバーになってくださり、ありがとうございます。', ok: 'OK', more: 'アカウントを見る'
+    };
+    var back = el('div', { cls: 'tt-drop' }); back.setAttribute('role', 'dialog'); back.setAttribute('aria-modal', 'true'); back.setAttribute('aria-labelledby', 'tt-drop-h');
+    back.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.45)';
+    var card = el('div'); card.style.cssText = 'max-width:420px;width:100%;background:var(--card,#fff);color:var(--text,#222);border-radius:16px;padding:22px 20px 18px;box-shadow:0 10px 40px rgba(0,0,0,.25);line-height:1.6';
+    var h = el('h2', { text: M.h }); h.id = 'tt-drop-h'; h.style.cssText = 'margin:0 0 10px;font-size:1.15rem';
+    var p = el('p', { text: M.p }); p.style.cssText = 'margin:0 0 16px;font-size:.95rem';
+    var ok = el('button', { type: 'button', text: M.ok }); ok.style.cssText = 'background:#D04A0A;color:#fff;border:0;border-radius:999px;padding:10px 22px;font-weight:700;font-size:1rem;cursor:pointer';
+    var more = el('a', { href: acctHref, text: M.more }); more.style.cssText = 'margin-left:14px;color:inherit;font-size:.9rem';
+    var row = el('div', {}, [ok, more]); row.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:6px';
+    card.appendChild(h); card.appendChild(p); card.appendChild(row); back.appendChild(card);
+    function close() { try { localStorage.setItem('tt-drop-t1', '1'); } catch (x) {} back.remove(); document.removeEventListener('keydown', onKey); }
+    function onKey(ev) { if (ev.key === 'Escape') close(); }
+    ok.addEventListener('click', close); more.addEventListener('click', function () { try { localStorage.setItem('tt-drop-t1', '1'); } catch (x) {} });
+    back.addEventListener('click', function (ev) { if (ev.target === back) close(); });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(back); try { ok.focus(); } catch (x) {}
+  }
   (async function init() {
     var s = await sb.auth.getSession();
     if (!s.data || !s.data.session) {
@@ -1069,10 +1097,11 @@
     }
     var test = document.getElementById('tt-sync'); if (test) test.remove(); // ログイン中は「準備中」の需要テストを出さない
     try {
-      var en = await sb.from('entitlements').select('plan,status,current_period_end').maybeSingle();
+      var en = await sb.from('entitlements').select('plan,status,current_period_end,trial_end,price_lookup_key').maybeSingle();
       var e = en.data;
       if (e && e.plan === 'premium' && ['active', 'trialing', 'past_due'].indexOf(e.status) >= 0 &&
           (!e.current_period_end || new Date(e.current_period_end).getTime() > Date.now() - 3 * 864e5)) { FREE_MAX = 100; PJ_FREE = 50; PREMIUM = true; }
+      if (PREMIUM) priceDropNote(e);
     } catch (e) {}
     window.__ttSb = sb; window.__ttPremium = PREMIUM;
     if (window.__ttSetPlan) { try { window.__ttSetPlan(PREMIUM ? 'premium' : 'free'); } catch (e) {} }

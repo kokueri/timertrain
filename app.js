@@ -1869,7 +1869,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=27'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=28'; document.body.appendChild(s2); };
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -2889,9 +2889,9 @@ if (!sessionStorage.getItem('tt-visit')) { visits++; localStorage.setItem('tt-vi
 
 var T = {
 ja: {
-label: 'プレミアムのご案内', cta: '7日間無料で試す', k1: ['先着', '100', '名'], k2: '創設メンバー価格', pre: 'ずっと', price: ['月', '250', '円'], brand: 'TimerTrain プレミアム', go: ['', '7日間無料', 'で試す'], fmCard: ['今なら、ずっとこの価格。', '先着100名は、今後値上げしても契約が続くかぎり月250円（年2,000円）のまま。最初の7日間は無料です。', '7日間無料で試す'], close: '閉じる',
+label: 'プレミアムのご案内', cta: '7日間無料で試す', k1: ['第1期 先着', '10', '名'], k2: '創設メンバー価格', pre: 'ずっと', price: ['月', '200', '円'], brand: 'TimerTrain プレミアム', go: ['', '7日間無料', 'で試す'], fmCard: ['今なら、ずっとこの価格。', '第1期（先着10名）は、契約が続くかぎり月200円（年1,500円）のまま。11人目からは10人ごとに上がります。最初の7日間は無料です。', '7日間無料で試す'], close: '閉じる',
 items: [['広告なし'], ['全期間の', '記録グラフ'], ['マイタイマー・', 'マイプロジェクト\u200b無制限'], ['記録を', 'CSVで保存']],
-head: '広告なし・先着100名までずっと月250円', headShort: 'ずっと月250円', headAria: 'プレミアム：広告なし。先着100名まで、ずっと月250円', crown: 'プレミアム',
+head: '広告なし・先着10名はずっと月200円', headShort: 'ずっと月200円', headAria: 'プレミアム：広告なし。第1期の先着10名は、ずっと月200円', crown: 'プレミアム',
 guest: [
 ['このタイマー、保存しておきませんか？', '無料ログインで、次からワンタップで呼び出せます。', '無料でログインして保存'],
 ['スマホでもPCでも、同じタイマーを。', '無料ログインで、作ったタイマーと記録が端末をまたいで同期されます。', '無料でログイン'],
@@ -2902,9 +2902,9 @@ free: [
 ['画面を、もっとすっきり。', 'プレミアムは広告なし。タイマーと記録だけに集中できます。初めての方は最初の7日間無料です。', '7日間無料で試す']]
 },
 en: {
-label: 'About Premium', cta: 'Try 7 days free', k1: ['First ', '100', ''], k2: 'Founding member price', pre: 'For good:', price: ['US$', '1.99', '/mo'], brand: 'TimerTrain Premium', go: ['Try', '7 days free', ''], fmCard: ['Lock in today’s price.', 'The first 100 subscribers keep US$1.99/month (US$15.99/year) for as long as they stay subscribed, even if prices go up. The first 7 days are free.', 'Try 7 days free'], close: 'Close',
+label: 'About Premium', cta: 'Try 7 days free', k1: ['First ', '10', ''], k2: 'Founding member price', pre: 'For good:', price: ['US$', '1.49', '/mo'], brand: 'TimerTrain Premium', go: ['Try', '7 days free', ''], fmCard: ['Lock in today’s price.', 'The first 10 subscribers keep US$1.49/month (US$11.99/year) for as long as they stay subscribed. After that, the price rises every 10 members. The first 7 days are free.', 'Try 7 days free'], close: 'Close',
 items: [['No ads'], ['Full history', '& charts'], ['Unlimited timers', '& projects'], ['Export', 'to CSV']],
-head: 'No ads · first 100 keep US$1.99/mo', headShort: 'US$1.99/mo for good', headAria: 'Premium: no ads. The first 100 subscribers keep US$1.99/month for good', crown: 'Premium',
+head: 'No ads · first 10 keep US$1.49/mo', headShort: 'US$1.49/mo for good', headAria: 'Premium: no ads. The first 10 subscribers keep US$1.49/month for good', crown: 'Premium',
 guest: [
 ['Save this timer?', 'Sign in free and bring it back with one tap next time.', 'Sign in free to save'],
 ['Same timers on phone and computer.', 'Sign in free to sync your timers and history across devices.', 'Sign in free'],
@@ -2915,9 +2915,9 @@ free: [
 ['A cleaner screen.', 'Premium has no ads — just your timer and your records. 7 days free for new subscribers.', 'Try 7 days free']]
 },
 es: {
-label: 'Sobre Premium', cta: 'Prueba 7 días gratis', k1: ['Primeros ', '100', ''], k2: 'Precio fundador', pre: 'Siempre:', price: ['MXN ', '29', '/mes'], brand: 'TimerTrain Premium', go: ['Prueba', '7 días gratis', ''], fmCard: ['Asegura el precio de hoy.', 'Los primeros 100 suscriptores mantienen MXN 29 al mes (MXN 229 al año) mientras sigan suscritos, aunque el precio suba. Los primeros 7 días son gratis.', 'Prueba 7 días gratis'], close: 'Cerrar',
+label: 'Sobre Premium', cta: 'Prueba 7 días gratis', k1: ['Primeros ', '10', ''], k2: 'Precio fundador', pre: 'Siempre:', price: ['MXN ', '22', '/mes'], brand: 'TimerTrain Premium', go: ['Prueba', '7 días gratis', ''], fmCard: ['Asegura el precio de hoy.', 'Las primeras 10 personas mantienen MXN 22 al mes (MXN 179 al año) mientras sigan con la suscripción. Después, el precio sube cada 10 personas. Los primeros 7 días son gratis.', 'Prueba 7 días gratis'], close: 'Cerrar',
 items: [['Sin anuncios'], ['Historial', 'y gráficos'], ['Temporizadores y', 'proyectos ilimitados'], ['Exportar', 'a CSV']],
-head: 'Sin anuncios · primeros 100: MXN 29/mes', headShort: 'MXN 29/mes siempre', headAria: 'Premium: sin anuncios. Los primeros 100 mantienen MXN 29 al mes para siempre', crown: 'Premium',
+head: 'Sin anuncios · primeros 10: MXN 22/mes', headShort: 'MXN 22/mes siempre', headAria: 'Premium: sin anuncios. Las primeras 10 personas mantienen MXN 22 al mes para siempre', crown: 'Premium',
 guest: [
 ['¿Guardar este temporizador?', 'Inicia sesión gratis y recupéralo con un toque la próxima vez.', 'Iniciar sesión y guardar'],
 ['Los mismos temporizadores en el móvil y el ordenador.', 'Inicia sesión gratis para sincronizar tus temporizadores y tu historial.', 'Iniciar sesión gratis'],
