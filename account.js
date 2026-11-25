@@ -616,6 +616,66 @@
     CHECKOUT = null;
   }
 
+  /* ---------- お知らせメール（オプトイン。初期は受け取らない）----------
+   * 読むのは email_prefs（本人の行だけ）、変えるのは set_email_news()（DB 側で同意日時と記録を残す）
+   * メールアドレスはこの表に置かない */
+  var M = {
+    ja: {
+      title: 'お知らせメール', label: '新機能や料金のお知らせを受け取る',
+      note: function (e) { return '新しい機能や料金の変更などを、' + e + ' にお送りします（多くても月に1〜2通）。いつでもここで止められます。'; },
+      must: 'プレミアムをご契約中の方への、料金・規約の大切なお知らせは、この設定に関係なくお送りします。',
+      on: '受け取る設定にしました。', off: '受け取らない設定にしました。',
+      err: '保存できませんでした。時間をおいてもう一度お試しください。'
+    },
+    en: {
+      title: 'Email updates', label: 'Get emails about new features and pricing',
+      note: function (e) { return 'We will email ' + e + ' about new features and pricing changes (one or two a month at most). You can turn this off here at any time.'; },
+      must: 'If you have a Premium subscription, important notices about pricing or terms are sent regardless of this setting.',
+      on: 'You will receive email updates.', off: 'You will not receive email updates.',
+      err: 'Could not save. Please try again later.'
+    },
+    es: {
+      title: 'Correos de novedades', label: 'Recibir correos sobre novedades y precios',
+      note: function (e) { return 'Te escribiremos a ' + e + ' sobre nuevas funciones y cambios de precio (como mucho uno o dos al mes). Puedes desactivarlo aquí cuando quieras.'; },
+      must: 'Si tienes una suscripción Premium, los avisos importantes sobre precios o condiciones se envían sin importar este ajuste.',
+      on: 'Recibirás correos de novedades.', off: 'No recibirás correos de novedades.',
+      err: 'No se pudo guardar. Inténtalo de nuevo más tarde.'
+    }
+  }[lang];
+  function mailBox(user) {
+    var sw = el('input', { type: 'checkbox', cls: 'tt-switch', id: 'acct-news', role: 'switch' });
+    sw.disabled = true;
+    var st = el('p', { cls: 'acct-small', role: 'status' });
+    var row;
+    var box = el('section', { cls: 'acct-usage acct-mail', 'aria-label': M.title }, [
+      el('h2', { text: M.title }),
+      row = el('div', { cls: 'opt-row' }, [
+        el('div', { cls: 'opt-text' }, [el('label', { 'for': 'acct-news', text: M.label })]), sw
+      ]),
+      el('p', { cls: 'acct-small', text: M.note(user.email || '') }),
+      el('p', { cls: 'acct-small', text: M.must }),
+      st
+    ]);
+    row.style.borderTop = '0'; row.style.padding = '0'; // style.css を変えずに済ませる（全ページの ?v= を上げないため）
+    (async function () {
+      var r = await sb.from('email_prefs').select('news').maybeSingle();
+      if (r.error) { st.textContent = M.err; return; } // 表がまだ無いときなど。スイッチは押せないまま
+      sw.checked = !!(r.data && r.data.news);
+      sw.disabled = false;
+    })().catch(function () { st.textContent = M.err; });
+    sw.addEventListener('change', async function () {
+      var want = sw.checked;
+      sw.disabled = true; st.textContent = '';
+      var r;
+      try { r = await sb.rpc('set_email_news', { p_news: want, p_lang: lang, p_source: 'account' }); } catch (e) { r = { error: e }; }
+      sw.disabled = false;
+      if (r.error) { sw.checked = !want; st.textContent = M.err; return; }
+      st.textContent = want ? M.on : M.off;
+      ev(want ? 'news_optin' : 'news_optout', { source: 'account' });
+    });
+    return box;
+  }
+
   function renderSignedIn(user) {
     var meta = user.user_metadata || {};
     var badge = el('p', { cls: 'acct-plan-now', text: P.now });
@@ -679,7 +739,7 @@
     });
     var data = el('section', { cls: 'acct-usage acct-data', 'aria-label': D2.dataTitle }, [el('h2', { text: D2.dataTitle }), el('p', { cls: 'acct-small', text: D2.dataLead }), openData]);
     howBox = el('div', { cls: 'acct-how-box' });
-    show([cols([who, bill, mine, pj, data, planTable(1), howBox, el('div', { cls: 'acct-row' }, [out]), danger], [])]);
+    show([cols([who, bill, mine, pj, data, planTable(1), howBox, mailBox(user), el('div', { cls: 'acct-row' }, [out]), danger], [])]);
     if (location.hash === '#acct-plans') setTimeout(function () { var t = document.getElementById('acct-plans'); if (t) t.scrollIntoView({ block: 'start' }); }, 300);
     startBilling(bill, badge).catch(function () {}).then(function () { loadAll(pj, mine); });
   }
