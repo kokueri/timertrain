@@ -1093,20 +1093,23 @@
    * - 引き継ぐ: ほかの端末が行を自分のものにして took＝こちらの rid を書く → こちらは記録を確定させずに手放す
    *   （続きは引き継いだ端末が同じ記録 id で数える）。ほかの端末が自分で新しく始めただけのときは、こちらは止めない。
    * - 読む: 開いたとき・前に出たとき・見えている間 15秒ごと。
-   * - 読み書きはサーバー側（RLS）でもプレミアムの本人だけ。表示する名前は textContent だけ。
+   * - 読み書きはサーバー側（RLS）で本人だけ（11/25 から無料ログインも。続けるのはプレミアムだけ）。表示する名前は textContent だけ。
    */
   var LT = lang === 'en' ? {
     on: function (d) { return 'Running on ' + d; }, counting: function (d) { return 'Tracking on ' + d; }, paused: 'Paused',
     take: 'Continue here', stop: 'Stop', taken: function (d) { return 'Moved to ' + d + '. It continues there.'; },
-    took: 'Continuing here', fail: 'Could not connect. Please try again.', other: 'another device', rest: 'left', done: 'Finished'
+    took: 'Continuing here', fail: 'Could not connect. Please try again.', other: 'another device', rest: 'left', done: 'Finished',
+    lock: 'With Premium, it continues here with the same time left and the same record.', see: 'See Premium'
   } : lang === 'es' ? {
     on: function (d) { return 'En marcha en ' + d; }, counting: function (d) { return 'Midiendo en ' + d; }, paused: 'En pausa',
     take: 'Seguir aquí', stop: 'Detener', taken: function (d) { return 'Pasó a ' + d + '. Sigue allí.'; },
-    took: 'Sigue en este dispositivo', fail: 'No se pudo conectar. Inténtalo de nuevo.', other: 'otro dispositivo', rest: 'restante', done: 'Terminado'
+    took: 'Sigue en este dispositivo', fail: 'No se pudo conectar. Inténtalo de nuevo.', other: 'otro dispositivo', rest: 'restante', done: 'Terminado',
+    lock: 'Con Premium, continúa aquí con el mismo tiempo restante y el mismo registro.', see: 'Ver Premium'
   } : {
     on: function (d) { return d + ' で動いています'; }, counting: function (d) { return d + ' で計測中'; }, paused: '一時停止中',
     take: 'この端末で続ける', stop: '止める', taken: function (d) { return d + ' に引き継ぎました。続きはそちらで動きます'; },
-    took: 'この端末で続けています', fail: 'つながりませんでした。もう一度お試しください', other: 'ほかの端末', rest: '残り', done: '終わりました'
+    took: 'この端末で続けています', fail: 'つながりませんでした。もう一度お試しください', other: 'ほかの端末', rest: '残り', done: '終わりました',
+    lock: 'プレミアムなら、残り時間も記録もそのまま、この端末で続けられます。', see: '有料プランを見る'
   };
   var LV = { on: false, dev: '', name: '', rid: { timer: null, count: null }, took: { timer: null, count: null }, claim: false,
     rows: {}, seen: {}, beatT: null, saveT: null, pollT: null, uiT: null, band: null, busy: false, bad: 0 };
@@ -1283,7 +1286,7 @@
     var items = [lvShown('timer'), lvShown('count')];
     var any = items[0] || items[1];
     if (!any) { if (LV.band) { LV.band.remove(); LV.band = null; } clearInterval(LV.uiT); LV.uiT = null; return; }
-    if (!document.getElementById('tt-live-css')) { var lk = document.createElement('link'); lk.id = 'tt-live-css'; lk.rel = 'stylesheet'; lk.href = '/live.css?v=1'; document.head.appendChild(lk); }
+    if (!document.getElementById('tt-live-css')) { var lk = document.createElement('link'); lk.id = 'tt-live-css'; lk.rel = 'stylesheet'; lk.href = '/live.css?v=2'; document.head.appendChild(lk); }
     var key = items.map(function (it, i) { return it ? (i + ':' + it.x.dev + ':' + it.st.rid + ':' + (it.st.paused ? 1 : 0) + ':' + it.st.at) : '-'; }).join('|');
     if (!LV.band) {
       LV.band = el('div', { cls: 'tt-live' + (window.DT ? ' dt' : ''), role: 'region', 'aria-label': LT.take });
@@ -1308,8 +1311,12 @@
         info.appendChild(what);
         row.appendChild(info);
         var acts = el('div', { cls: 'tt-live-acts' });
-        var tb = el('button', { type: 'button', cls: 'tt-live-take', text: LT.take });
-        tb.addEventListener('click', function () { k === 'timer' ? lvTakeTimer(tb) : lvTakeCount(false, tb); });
+        // 11/25: 見る・止めるは無料、この端末で続けるはプレミアム（無料の人には🔒と料金ページへの案内）
+        var tb = el('button', { type: 'button', cls: 'tt-live-take' + (PREMIUM ? '' : ' lock'), text: (PREMIUM ? '' : '🔒 ') + LT.take });
+        tb.addEventListener('click', function () {
+          if (!PREMIUM) { lvLockNote(row, k); return; }
+          k === 'timer' ? lvTakeTimer(tb) : lvTakeCount(false, tb);
+        });
         acts.appendChild(tb);
         if (k === 'count') {
           var sb2 = el('button', { type: 'button', cls: 'tt-live-stop', text: LT.stop });
@@ -1322,6 +1329,14 @@
     }
     lvTickUI();
     if (!LV.uiT) LV.uiT = setInterval(lvTickUI, 1000);
+  }
+  function lvLockNote(row, k) {
+    ev('live_lock', { kind: k });
+    if (row.querySelector('.tt-live-note')) return;
+    var p = el('p', { cls: 'tt-live-note', role: 'status' }, [LT.lock + ' ']);
+    var a = el('a', { href: (lang === 'en' ? '/en-pricing' : lang === 'es' ? '/es-pricing' : '/pricing') + '#buy', text: LT.see });
+    a.addEventListener('click', function () { ev('live_lock_click', { kind: k }); });
+    p.appendChild(a); row.appendChild(p);
   }
   function lvTickUI() {
     if (!LV.band) return;
@@ -1337,7 +1352,7 @@
   }
   // タイマーを引き継ぐ: 行を自分のものにして took を書き、この端末でタイマーと記録の続きを用意してから、そのページを開き直す
   async function lvTakeTimer(btn) {
-    var it = lvShown('timer'); if (!it) return;
+    var it = lvShown('timer'); if (!it || !PREMIUM) return;
     var st = it.st;
     var P = lvParse(st.q), page = String(st.page || '/');
     if (!P || !/^\/[A-Za-z0-9\-\/._]{0,99}$/.test(page) || /\.\.|\/\//.test(page)) return;
@@ -1392,6 +1407,7 @@
   // 1タップの計測を引き継ぐ（stopNow なら、引き継いですぐ止めて記録を確定する）
   async function lvTakeCount(stopNow, btn) {
     var it = lvShown('count'); if (!it) return;
+    if (!stopNow && !PREMIUM) return; // 続けるのはプレミアムだけ
     var st = it.st;
     var b = cleanBtns([{ id: st.id, label: st.label, icon: st.icon }])[0];
     var start = Number(st.start);
@@ -1412,7 +1428,7 @@
     LV.rows.count = null; lvRender(); showStatsNow();
   }
   function lvInit() {
-    if (!PREMIUM || LV.on) return;
+    if (LV.on) return; // 11/25: 無料ログインの人も（見る・止めるは無料）
     LV.on = true; LV.dev = lvDev(); LV.name = lvName();
     try {
       var t = JSON.parse(sessionStorage.getItem(LV_RID_T) || 'null');
@@ -1438,7 +1454,8 @@
       if (LV.rid.timer) lvTimerSave();
       if (LV.rid.count && cRun) lvWrite('count', lvCountState(), false);
     }, 30000);
-    LV.pollT = setInterval(function () { if (document.visibilityState === 'visible') lvPoll(); }, 15000);
+    // 見えている間 15秒ごとに読むのはプレミアムだけ（無料は開いた・前に出したときだけ）
+    LV.pollT = setInterval(function () { if (PREMIUM && document.visibilityState === 'visible') lvPoll(); }, 15000);
     document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') lvPoll(); });
     window.addEventListener('focus', function () { lvPoll(); });
     lvPoll();

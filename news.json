@@ -3,9 +3,21 @@
   "items": [
     {
       "id": "sync1",
-      "ja": { "h": "新機能：スマホとPCでつなぐ（プレミアム）", "p": "スマホでもPCでも、動かしているタイマーや計測が、もう一方の端末で開くと上に表示されます。「この端末で続ける」を押すと、残り時間も記録もそのまま続きます。計測はもう一方から止めることもできます。スマホ→PC、PC→スマホのどちらでも使えます。", "prem": "もう使えます。2台目の端末でもログインして、タイマーを開いてみてください。" },
-      "en": { "h": "New: continue between your phone and computer (Premium)", "p": "A timer or tracking running on one device shows at the top when you open TimerTrain on the other. Tap \"Continue here\" and it carries on with the same time left and the same record. You can also stop tracking from the other device. It works both ways: phone to computer and computer to phone.", "prem": "It is ready to use. Sign in on your other device and open the timer." },
-      "es": { "h": "Nuevo: sigue entre el móvil y el ordenador (Premium)", "p": "Si un temporizador o una medición está en marcha en un dispositivo, aparece arriba al abrir TimerTrain en el otro. Pulsa «Seguir aquí» y continúa con el mismo tiempo restante y el mismo registro. También puedes detener la medición desde el otro dispositivo. Funciona en ambos sentidos: del móvil al ordenador y del ordenador al móvil.", "prem": "Ya puedes usarlo. Inicia sesión en tu otro dispositivo y abre el temporizador." }
+      "ja": {
+        "h": "新機能：スマホとPCでつなぐ（プレミアム）",
+        "p": "スマホでもPCでも、動かしているタイマーや計測が、もう一方の端末で開くと上に表示されます。「この端末で続ける」を押すと、残り時間も記録もそのまま続きます。計測はもう一方から止めることもできます。スマホ→PC、PC→スマホのどちらでも使えます。（無料ログインでも、ほかの端末で動いているものの表示と、計測を止めることはできます）",
+        "prem": "もう使えます。2台目の端末でもログインして、タイマーを開いてみてください。"
+      },
+      "en": {
+        "h": "New: continue between your phone and computer (Premium)",
+        "p": "A timer or tracking running on one device shows at the top when you open TimerTrain on the other. Tap \"Continue here\" and it carries on with the same time left and the same record. You can also stop tracking from the other device. It works both ways: phone to computer and computer to phone. (With a free account you can still see what is running on your other device and stop tracking.)",
+        "prem": "It is ready to use. Sign in on your other device and open the timer."
+      },
+      "es": {
+        "h": "Nuevo: sigue entre el móvil y el ordenador (Premium)",
+        "p": "Si un temporizador o una medición está en marcha en un dispositivo, aparece arriba al abrir TimerTrain en el otro. Pulsa «Seguir aquí» y continúa con el mismo tiempo restante y el mismo registro. También puedes detener la medición desde el otro dispositivo. Funciona en ambos sentidos: del móvil al ordenador y del ordenador al móvil. (Con una cuenta gratuita también puedes ver lo que está en marcha en tu otro dispositivo y detener la medición.)",
+        "prem": "Ya puedes usarlo. Inicia sesión en tu otro dispositivo y abre el temporizador."
+      }
     }
   ]
 }

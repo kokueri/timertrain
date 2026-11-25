@@ -235,7 +235,7 @@
         ['利用記録・グラフ（データ）', false, '30日間（記録はずっと保存）', '全期間・月／年のグラフ'],
         ['連続日数', false, true, true],
         ['マイプロジェクト（勉強・仕事などに分けて集計）', false, '1つ', '無制限'],
-        ['端末間でつなぐ（スマホ⇄PC どちら向きでも、動いているタイマー・計測を、もう一方の端末で続ける・止める）', false, false, true],
+        ['端末間でつなぐ（スマホ⇄PC どちら向きでも、動いているタイマー・計測を、もう一方の端末で続ける・止める）', false, '見る・止める', '続ける・見る・止める'],
         ['記録のCSVダウンロード', false, false, true]
       ],
       note: 'プレミアムは月額{m}・年額{y}（税込・創設メンバー価格）。初めての方は最初の7日間が無料で、いつでも解約できます。今あるタイマーの機能は、これからもログインなしで無料で使えます。', more: '料金と詳しい条件', href: '/pricing',
@@ -250,7 +250,7 @@
         ['History and charts', false, '30 days (kept for good)', 'All time + charts'],
         ['Streaks', false, true, true],
         ['Projects (track study, work, etc. separately)', false, '1', 'No limit'],
-        ['Continue across devices (phone ⇄ computer, either way: continue or stop a running timer or tracking on your other device)', false, false, true],
+        ['Continue across devices (phone ⇄ computer, either way: continue or stop a running timer or tracking on your other device)', false, 'View & stop', 'Continue, view & stop'],
         ['Download history as CSV', false, false, true]
       ],
       note: 'Premium is {m}/month or {y}/year (your local currency is shown at checkout). New subscribers get 7 days free, and you can cancel any time. Everything the timer does today stays free without an account.', more: 'Pricing and terms', href: '/en-pricing',
@@ -265,7 +265,7 @@
         ['Historial y gráficos', false, '30 días (se guardan siempre)', 'Todo + gráficos'],
         ['Rachas', false, true, true],
         ['Proyectos (estudio, trabajo, etc. por separado)', false, '1', 'Sin límite'],
-        ['Seguir en otro dispositivo (móvil ⇄ ordenador, en ambos sentidos: continúa o detén lo que está en marcha en tu otro dispositivo)', false, false, true],
+        ['Seguir en otro dispositivo (móvil ⇄ ordenador, en ambos sentidos: continúa o detén lo que está en marcha en tu otro dispositivo)', false, 'Ver y detener', 'Seguir, ver y detener'],
         ['Descargar el historial en CSV', false, false, true]
       ],
       note: 'Premium cuesta {mxnm} o {usdm} al mes (tu moneda se muestra al pagar). Si es tu primera vez, los primeros 7 días son gratis y puedes cancelar cuando quieras. Todo lo que hace el temporizador hoy sigue siendo gratis sin cuenta.', more: 'Precios y condiciones', href: '/es-pricing',
