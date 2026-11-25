@@ -1881,7 +1881,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=30'; document.body.appendChild(s2); };
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=30'; s2.onload = function () { var s3 = document.createElement('script'); s3.src = '/mailask.js?v=1'; document.body.appendChild(s3); }; document.body.appendChild(s2); }; // mailask.js: お知らせメールの確認（11/25）
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -3235,7 +3235,7 @@ var seen = {}; try { seen = JSON.parse(localStorage.getItem(NEWS_KEY) || '{}') |
 var it = NEWS.filter(function (n) { return !seen[n.id]; })[0];
 if (!it) return;
 var busy = false; try { busy = window.__ttRunActive && window.__ttRunActive(); } catch (e) {}
-if (busy || document.querySelector('.tt-drop, .tt-news, .ttw-back:not([hidden]), [aria-modal="true"]:not([hidden])') || document.body.classList.contains('focus-mode')) return;
+if (busy || document.querySelector('.tt-drop, .tt-news, .tt-mailask, .ttw-back:not([hidden]), [aria-modal="true"]:not([hidden])') || document.body.classList.contains('focus-mode')) return;
 var M = it[LANG] || it.ja || it.en, prem = p === 'premium';
 var A = LANG === 'en' ? { ok: 'OK', see: 'See Premium', close: 'Close', badge: 'New' } : LANG === 'es' ? { ok: 'Entendido', see: 'Ver Premium', close: 'Cerrar', badge: 'Nuevo' } : { ok: 'OK', see: '有料プランを見る', close: '閉じる', badge: 'NEW' };
 var pricing = (LANG === 'en' ? '/en-pricing' : LANG === 'es' ? '/es-pricing' : '/pricing') + '#buy';
