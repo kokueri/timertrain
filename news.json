@@ -2,6 +2,24 @@
   "note": "新しい有料機能のお知らせ（app.js の showNews が読む）。有料機能を足したら items の先頭に1つ足す。ログイン中の人に、id ごとに1回だけ出る。料金ページ・比較表の行も一緒に足すこと",
   "items": [
     {
+      "id": "look1",
+      "ja": {
+        "h": "新機能：背景とBGM（プレミアム）",
+        "p": "共有リンクの下の「🎨 背景・BGM」から、タイマーの後ろに動く背景と、タイマー中に流れる音楽を選べます。メロンクリームソーダ・ピーチソーダや、12月までの雪とサンタのそり、クリスマスカフェの曲など。（無料でも、クリーム微炭酸とカフェジャズはずっと使えて、ほかも60秒ためせます）",
+        "prem": "もう使えます。共有リンクの下の「🎨 背景・BGM」から選んでください。"
+      },
+      "en": {
+        "h": "New: backgrounds & music (Premium)",
+        "p": "Tap \"🎨 Background & music\" under the share link to pick a moving background behind the timer and music that plays while it runs: melon cream soda, peach soda, snow & sleigh until December, Christmas café songs and more. (Free accounts keep cream soda and café jazz for good, and can try the rest for 60 seconds.)",
+        "prem": "It is ready to use. Tap \"🎨 Background & music\" under the share link."
+      },
+      "es": {
+        "h": "Nuevo: fondos y música (Premium)",
+        "p": "Toca «🎨 Fondo y música» debajo del enlace para compartir y elige un fondo animado detrás del temporizador y música mientras corre: soda de melón, soda de durazno, nieve y trineo hasta diciembre, canciones de café navideño y más. (Con una cuenta gratuita, la soda de crema y el jazz de café son siempre tuyos, y puedes probar los demás 60 segundos.)",
+        "prem": "Ya puedes usarlo. Toca «🎨 Fondo y música» debajo del enlace para compartir."
+      }
+    },
+    {
       "id": "sync1",
       "ja": {
         "h": "新機能：スマホとPCでつなぐ（プレミアム）",

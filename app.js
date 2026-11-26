@@ -1102,6 +1102,7 @@ try { resetToIdle(); } finally { window.__ttOnStop = onStop; window.__ttOnRunSav
 // ほかの端末のタイマーをこの端末で続ける前に、こちらで動いているタイマーをふつうに止める（記録は確定）
 window.__ttStopRun = function () { if (run.active) resetToIdle(); };
 window.__ttRunActive = function () { return !!(run.active && !run.finished); };
+window.__ttRunPlaying = function () { return !!(run.active && !run.paused && !run.finished); }; // 11/25: BGM（theme.js）が見る
 function stopCountForTimer(why) {
   let r = null;
   try { r = window.__ttCount && window.__ttCount.state().run; } catch (e) {}
@@ -1874,6 +1875,11 @@ sb.insertAdjacentElement('afterend', wb); if (sb.parentNode) sb.parentNode.style
 }
 if (viaHash) setTimeout(function () { openWrap('hash'); }, 300);
 })();
+/* 11/25: 背景とBGM（theme.js）。タイマーのページだけ。入口は共有リンクの下 */
+if (document.getElementById('share-btn') && !document.getElementById('tt-look-js')) {
+var lkc = document.createElement('link'); lkc.rel = 'stylesheet'; lkc.href = '/theme.css?v=1'; document.head.appendChild(lkc);
+var lks = document.createElement('script'); lks.id = 'tt-look-js'; lks.src = '/theme.js?v=1'; document.body.appendChild(lks);
+}
 // マイページの「データを見る」から来たとき
 try { if (sessionStorage.getItem('tt-open-data') && document.getElementById('setup')) { sessionStorage.removeItem('tt-open-data'); setTimeout(function () { openData('account'); }, 200); } } catch (e) {}
 // ログイン中は、説明文の「無料ログインでできること」を出さない
@@ -3198,6 +3204,7 @@ window.__ttSetPlan = function (p) {
 try { if (p) localStorage.setItem('tt-plan', p); else localStorage.removeItem('tt-plan'); } catch (e) {}
 plan = p;
 if (p === 'premium' || p === 'free') setTimeout(function () { showNews(p); }, 2500);
+if (window.__ttLook) { try { window.__ttLook.plan(p); } catch (e) {} }
 if (isPremium()) { var b = document.getElementById('tt-promo'); if (b) b.remove(); var ob = document.getElementById('tt-oldrec'); if (ob) ob.remove(); closeCard(); removeSticker(); }
 else { addBanner(); addSticker(); }
 paintHeader();
