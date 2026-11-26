@@ -1877,8 +1877,8 @@ if (viaHash) setTimeout(function () { openWrap('hash'); }, 300);
 })();
 /* 11/25: 背景とBGM（theme.js）。タイマーのページだけ。入口は共有リンクの下 */
 if (document.getElementById('share-btn') && !document.getElementById('tt-look-js')) {
-var lkc = document.createElement('link'); lkc.rel = 'stylesheet'; lkc.href = '/theme.css?v=1'; document.head.appendChild(lkc);
-var lks = document.createElement('script'); lks.id = 'tt-look-js'; lks.src = '/theme.js?v=1'; document.body.appendChild(lks);
+var lkc = document.createElement('link'); lkc.rel = 'stylesheet'; lkc.href = '/theme.css?v=2'; document.head.appendChild(lkc);
+var lks = document.createElement('script'); lks.id = 'tt-look-js'; lks.src = '/theme.js?v=2'; document.body.appendChild(lks);
 }
 // マイページの「データを見る」から来たとき
 try { if (sessionStorage.getItem('tt-open-data') && document.getElementById('setup')) { sessionStorage.removeItem('tt-open-data'); setTimeout(function () { openData('account'); }, 200); } } catch (e) {}

@@ -1,7 +1,8 @@
 /* 11/25: 背景とBGM（TimerTrain・ドーナツタイマー共通）
  * 無料: 背景「クリーム微炭酸」・BGM「カフェジャズ」。ほかはプレミアム。
  * 無料・ログイン前の人は、プレミアムのものを60秒ためせる（終わると元に戻して案内を出す）。
- * 選んだものは localStorage 'tt-look' に保存（{bg, bgm, vol}）。BGM はタイマーが動いている間だけ流す。
+ * 選んだものは localStorage 'tt-look' に保存（{bg, bgm, vol}）。
+ * BGM: 選ぶと流れ始め、画面を閉じても流れ続ける。止めるのは入口の横の ⏸ か「なし」。タイマーの ▶ でも流れ始める（11/26 えりなさん）
  * 素材は /media/bg/・/media/bgm/（Service Worker では扱わない。Range 読み込みのため）
  * 文言は textContent だけ。外から来る値は id の一覧と照らし合わせてから使う */
 (function () {
@@ -15,19 +16,19 @@
 
   var T = {
     ja: { btn: '🎨 背景・BGM', title: '背景とBGM', bg: '背景', bgm: 'BGM', vol: '音量', none: 'なし', close: '閉じる',
-      bgmNote: 'BGM はタイマーが動いている間に流れます', iosVol: '音量は端末の音量ボタンで調整してください',
+      bgmNote: '選ぶと流れ始めます。止めるときは「🎨 背景・BGM」の横の ⏸ を押してください。タイマーの ▶ でも流れ始めます', play: 'BGMを流す', pause: 'BGMを止める', iosVol: '音量は端末の音量ボタンで調整してください',
       lockNote: '🔒 はプレミアムの機能です。押すと60秒ためせます', see: '有料プランを見る',
       trial: function (s) { return 'お試し中（あと' + s + '秒）'; },
       trialEnd: 'お試しが終わりました。プレミアムなら、いつでも使えます', season: '12月まで',
       songs: function (n) { return n + '曲'; } },
     en: { btn: '🎨 Background & music', title: 'Background & music', bg: 'Background', bgm: 'Music', vol: 'Volume', none: 'None', close: 'Close',
-      bgmNote: 'Music plays while a timer is running', iosVol: 'Use your device volume buttons to adjust the volume',
+      bgmNote: 'Music starts when you pick it and keeps playing. Use ⏸ next to "🎨 Background & music" to stop it. Starting a timer also starts the music', play: 'Play music', pause: 'Pause music', iosVol: 'Use your device volume buttons to adjust the volume',
       lockNote: '🔒 is Premium. Tap to try it for 60 seconds', see: 'See Premium',
       trial: function (s) { return 'Trying it (' + s + 's left)'; },
       trialEnd: 'Your trial has ended. With Premium you can use it any time', season: 'Until Dec',
       songs: function (n) { return n + ' songs'; } },
     es: { btn: '🎨 Fondo y música', title: 'Fondo y música', bg: 'Fondo', bgm: 'Música', vol: 'Volumen', none: 'Ninguno', close: 'Cerrar',
-      bgmNote: 'La música suena mientras el temporizador está en marcha', iosVol: 'Ajusta el volumen con los botones del dispositivo',
+      bgmNote: 'La música empieza al elegirla y sigue sonando. Para pararla, usa ⏸ junto a «🎨 Fondo y música». Al iniciar el temporizador también empieza', play: 'Poner música', pause: 'Pausar música', iosVol: 'Ajusta el volumen con los botones del dispositivo',
       lockNote: '🔒 es Premium. Tócalo para probarlo 60 segundos', see: 'Ver Premium',
       trial: function (s) { return 'Probando (quedan ' + s + ' s)'; },
       trialEnd: 'Terminó la prueba. Con Premium puedes usarlo siempre', season: 'Hasta dic.',
@@ -119,11 +120,13 @@
   });
 
   /* ---------- BGM ---------- */
-  var au = null, list = [], idx = 0, unlocked = false, previewing = false;
+  var au = null, list = [], idx = 0, unlocked = false;
+  var on = false, userOff = false, wasPlaying = false; // on: 流したい / userOff: このタイマーの間は ⏸ で止められた
   var volFixed = null; // iOS など、音量を変えられないブラウザ
   function audio() {
     if (au) return au;
     au = new Audio(); au.preload = 'none';
+    au.addEventListener('play', paintToggle); au.addEventListener('pause', paintToggle);
     au.addEventListener('ended', function () { if (!list.length) return; idx = (idx + 1) % list.length; au.src = '/media/bgm/' + list[idx] + '.m4a'; tick(); });
     setVol();
     return au;
@@ -144,11 +147,22 @@
     tick();
   }
   function playing() { try { return !!(window.__ttRunPlaying && window.__ttRunPlaying()); } catch (e) { return false; } }
+  function runActive() { try { return !!(window.__ttRunActive && window.__ttRunActive()); } catch (e) { return false; } }
   function tick() {
-    if (!au || !list.length) return;
-    var want = (playing() || previewing);
-    if (want && au.paused) { var p = au.play(); if (p && p.catch) p.catch(function () {}); }
-    else if (!want && !au.paused) { try { au.pause(); } catch (e) {} }
+    var pl = playing();
+    if (pl && !wasPlaying && !userOff) on = true; // タイマーの ▶ で流し始める
+    wasPlaying = pl;
+    if (!runActive()) userOff = false;
+    if (!au || !list.length) { paintToggle(); return; }
+    if (on && au.paused) { var p = au.play(); if (p && p.catch) p.catch(function () { on = false; paintToggle(); }); }
+    else if (!on && !au.paused) { try { au.pause(); } catch (e) {} }
+    paintToggle();
+  }
+  function setOn(v, byUser) {
+    on = !!v && cur.bgm !== 'none';
+    if (byUser && !v && runActive()) userOff = true;
+    if (byUser && v) userOff = false;
+    tick();
   }
   setInterval(tick, 1000);
   // iOS: 最初に押されたときに音を出せる状態にしておく（タイマーの ▶ から1秒後に流すため）
@@ -157,7 +171,7 @@
     unlocked = true;
     var a = audio(), p;
     try { p = a.play(); } catch (e) {}
-    if (p && p.then) p.then(function () { setTimeout(function () { if (!playing() && !previewing) { try { a.pause(); } catch (e) {} } }, 60); }).catch(function () { unlocked = false; });
+    if (p && p.then) p.then(function () { setTimeout(function () { if (!on && !playing()) { try { a.pause(); } catch (e) {} } }, 60); }).catch(function () { unlocked = false; });
   }, true);
 
   /* ---------- お試し ---------- */
@@ -213,7 +227,7 @@
       ev('theme_pick', { kind: kind, id: item.id, trial: 1, member: member() });
     }
     if (kind === 'bg') applyBg();
-    else { previewing = cur.bgm !== 'none'; applyBgm(); }
+    else { on = cur.bgm !== 'none'; userOff = false; applyBgm(); }
     paintSheet();
   }
   function paintSheet() {
@@ -301,17 +315,36 @@
   function closeSheet() {
     if (!back) return;
     back.remove(); back = null; sheet = null; trialEl = null;
-    previewing = false; tick();
+    tick();
     if (lastFocus && lastFocus.focus) { try { lastFocus.focus(); } catch (e) {} }
   }
 
   /* ---------- 入口（共有リンクの下） ---------- */
+  var tg = null;
+  function paintToggle() {
+    if (!tg) return;
+    var show = cur.bgm !== 'none';
+    tg.hidden = !show;
+    var playingNow = !!(au && !au.paused && list.length);
+    tg.textContent = playingNow ? '⏸' : '▶';
+    tg.setAttribute('aria-label', playingNow ? T.pause : T.play);
+    tg.title = playingNow ? T.pause : T.play;
+    tg.setAttribute('aria-pressed', playingNow ? 'true' : 'false');
+  }
   function addEntry() {
     var sb = document.getElementById('share-btn');
     if (!sb || document.getElementById('tt-look-btn')) return;
+    var w = el('div', 'tt-look-wrap');
     var b = el('button', 'tt-look-btn' + (DT ? ' dt' : ''), T.btn); b.type = 'button'; b.id = 'tt-look-btn';
     b.addEventListener('click', openSheet);
-    sb.insertAdjacentElement('afterend', b);
+    tg = el('button', 'tt-look-tg' + (DT ? ' dt' : '')); tg.type = 'button'; tg.id = 'tt-look-tg'; tg.hidden = true;
+    tg.addEventListener('click', function () {
+      var playingNow = !!(au && !au.paused);
+      setOn(!playingNow, true);
+      ev('theme_bgm_toggle', { on: playingNow ? 0 : 1, id: cur.bgm, member: member() });
+    });
+    w.appendChild(b); w.appendChild(tg);
+    sb.insertAdjacentElement('afterend', w);
     if (sb.parentNode) sb.parentNode.style.flexWrap = 'wrap';
   }
 

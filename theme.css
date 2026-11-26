@@ -6,11 +6,17 @@ html.tt-look-on body { background: transparent; }
 :root[data-theme="dark"] #tt-look-bg .tt-look-dim { opacity: .8; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) #tt-look-bg .tt-look-dim { opacity: .8; } }
 
-.tt-look-btn { flex: 1 1 100%; display: flex; align-items: center; justify-content: center; width: 100%; margin-top: 8px; min-height: 44px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font-weight: 700; font-size: 15px; }
+.tt-look-wrap { flex: 1 1 100%; display: flex; gap: 8px; width: 100%; margin-top: 8px; }
+.tt-look-btn { flex: 1 1 auto; display: flex; align-items: center; justify-content: center; min-height: 44px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font-weight: 700; font-size: 15px; }
 .tt-look-btn:hover { border-color: var(--text2); }
 .tt-look-btn:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.tt-look-tg { flex: 0 0 44px; width: 44px; min-height: 44px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font-size: 16px; line-height: 1; }
+.tt-look-tg[hidden] { display: none; }
+.tt-look-tg:hover { border-color: var(--text2); }
+.tt-look-tg:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 #setup.collapsed .tt-look-btn { min-height: 40px; font-size: 14px; }
-body.focus-mode .tt-look-btn { display: none; }
+#setup.collapsed .tt-look-tg { min-height: 40px; flex-basis: 40px; width: 40px; }
+body.focus-mode .tt-look-wrap { display: none; }
 
 .tt-look-back { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.35); display: flex; align-items: flex-end; justify-content: center; }
 @media (min-width: 640px) { .tt-look-back { align-items: center; } }
