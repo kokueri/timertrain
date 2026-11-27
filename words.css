@@ -37,3 +37,62 @@
 .tt-words-go:disabled { opacity: .35; cursor: default; }
 .tt-words-go:focus-visible, .tt-words-chip:focus-visible, .tt-words-x:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .tt-words-note { margin-top: 8px; font-size: 12px; color: var(--text2); line-height: 1.6; }
+/* 11/27: 入口を「タイマー設定」のボタンの中の右に */
+.tt-words-btn.in-head { position: absolute; right: 46px; transform: translateY(-50%); margin: 0 !important; z-index: 2; border: 1.5px solid var(--line); background: var(--bg); padding: 5px 11px; font-size: 13px; white-space: nowrap; }
+.tt-words-btn.in-head:hover { border-color: var(--text2); }
+body.focus-mode .tt-words-btn { display: none !important; }
+/* 🎤 音声入力 */
+.tt-words-row { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; }
+.tt-words-row .tt-words-in { margin-top: 0; flex: 1 1 auto; min-width: 0; }
+.tt-words-mic { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--bg); font-size: 18px; line-height: 1; }
+.tt-words-mic:hover { border-color: var(--text2); }
+.tt-words-mic.on { border-color: #D04A0A; background: #FFE9DF; animation: ttMic 1.2s ease-in-out infinite; }
+@keyframes ttMic { 50% { box-shadow: 0 0 0 6px rgba(208, 74, 10, .18); } }
+@media (prefers-reduced-motion: reduce) { .tt-words-mic.on { animation: none; } }
+.tt-words-mic:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+/* ---------- 11/27: 1日の目標（app.js renderGoal）---------- */
+.tt-goal { margin-top: 10px; }
+.tt-goal-row { display: flex; align-items: center; gap: 10px; min-height: 36px; }
+.tt-goal-ring { --p: 0; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 50%; background: conic-gradient(var(--gc, #D04A0A) calc(var(--p) * 1%), var(--line) 0); -webkit-mask: radial-gradient(farthest-side, transparent 62%, #000 64%); mask: radial-gradient(farthest-side, transparent 62%, #000 64%); }
+.tt-goal-ring.ok { background: conic-gradient(#34C759 100%, #34C759 0); }
+.tt-goal-t { flex: 1 1 auto; min-width: 0; font-size: 13.5px; line-height: 1.4; }
+.tt-goal-t strong { font-weight: 800; }
+.tt-goal-left { color: var(--text2); font-variant-numeric: tabular-nums; }
+.tt-goal-set { padding: 7px 12px; border-radius: 999px; border: 1.5px dashed var(--text2); color: var(--text2); font-size: 13.5px; font-weight: 700; }
+.tt-goal-set:hover { color: var(--text); border-color: var(--text); }
+.tt-goal-edit { flex: 0 0 36px; width: 36px; height: 36px; border-radius: 50%; color: var(--text2); font-size: 16px; }
+.tt-goal-edit:hover { background: var(--line); color: var(--text); }
+.tt-goal-labs { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; }
+.tt-goal-l { display: grid; grid-template-columns: 10px minmax(3em, auto) 1fr auto; align-items: center; gap: 8px; font-size: 12.5px; }
+.tt-goal-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.tt-goal-ln { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tt-goal-bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.tt-goal-bar > span { display: block; height: 100%; border-radius: 999px; }
+.tt-goal-lv { color: var(--text2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tt-goal-l.ok .tt-goal-lv { color: #1E7E34; font-weight: 700; }
+:root[data-theme="dark"] .tt-goal-l.ok .tt-goal-lv { color: #7EE29A; }
+.tt-goal-sample { margin: 8px 0 2px; pointer-events: none; }
+.tt-goal-ed { margin-top: 10px; padding: 12px; border-radius: 14px; border: 1.5px solid var(--line); background: var(--bg); display: flex; flex-direction: column; gap: 8px; }
+.tt-goal-h { font-size: 14px; }
+.tt-goal-h2 { font-size: 13.5px; margin-top: 6px; }
+.tt-goal-sub { font-size: 12px; color: var(--text2); }
+.tt-goal-chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.tt-goal-chip { padding: 6px 11px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font-size: 13px; font-weight: 700; }
+.tt-goal-chip[aria-pressed="true"] { border-color: var(--text); background: var(--text); color: var(--card); }
+.tt-goal-num { width: 8.5em; padding: 6px 8px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font: inherit; font-size: 14px; }
+.tt-goal-lab { flex: 1 1 8em; min-width: 0; padding: 6px 8px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--card); color: var(--text); font: inherit; font-size: 14px; }
+.tt-goal-llist { display: flex; flex-direction: column; gap: 6px; }
+.tt-goal-li, .tt-goal-add { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.tt-goal-li .tt-goal-ln { flex: 1 1 auto; }
+.tt-goal-li .tt-goal-num, .tt-goal-add .tt-goal-num { width: 5.5em; }
+.tt-goal-u { font-size: 12.5px; color: var(--text2); }
+.tt-goal-x { width: 32px; height: 32px; border-radius: 50%; color: var(--text2); font-size: 18px; }
+.tt-goal-x:hover { background: var(--line); }
+.tt-goal-lock { font-size: 12.5px; line-height: 1.6; }
+.tt-goal-lock a { font-weight: 800; color: inherit; }
+.tt-goal-btns { display: flex; gap: 8px; margin-top: 4px; }
+.tt-goal-save { flex: 1; min-height: 40px; border-radius: 999px; background: var(--text); color: var(--card); font-weight: 800; }
+.tt-goal-cancel { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--line); color: var(--text2); font-weight: 700; }
+.tt-goal-set:focus-visible, .tt-goal-edit:focus-visible, .tt-goal-chip:focus-visible, .tt-goal-save:focus-visible, .tt-goal-cancel:focus-visible, .tt-goal-x:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.tt-today-open > .tt-goal-sample { display: flex !important; }
+.tt-goal-ring { display: block; }

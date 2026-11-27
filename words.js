@@ -23,9 +23,22 @@
   var RE_JUNK = /^(?:まず|最初に|はじめに|次に|つぎに|そのあと|それから|最後に|さいごに|first|then|next|finally|and|primero|luego|después|al final|y)\s*/i;
   var RE_TAIL = /\s*(?:を|で|の|と|から|して|する|やる|and|y|de)\s*$/i;
 
+  // 漢数字（音声入力で「二十五分」「三回」となることがある）→ 数字
+  var KD = { '〇': 0, '零': 0, '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9 };
+  function kan(k) {
+    var n = 0, cur = 0;
+    for (var i = 0; i < k.length; i++) {
+      var c = k.charAt(i);
+      if (c in KD) cur = cur * 10 + KD[c];
+      else if (c === '十') { n += (cur || 1) * 10; cur = 0; }
+      else if (c === '百') { n += (cur || 1) * 100; cur = 0; }
+    }
+    return n + cur;
+  }
   function norm(s) {
     s = String(s || '');
     try { s = s.normalize('NFKC'); } catch (e) {}
+    s = s.replace(/[〇零一二三四五六七八九十百]+(?=\s*(?:時間|分|秒|回|セット|周))/g, function (k) { return String(kan(k)); });
     return s.replace(/[＿_]/g, ' ').slice(0, 300);
   }
   function grab(seg, re, mult, out) {
@@ -104,17 +117,17 @@
       ex: ['英単語25分、休憩5分を3回、最後に復習10分', 'プランク30秒、休憩10秒を8回', '作業50分、休憩10分 ×2'], exL: '例を入れる',
       note: '「名前＋時間」を「、」で区切って書きます。「を3回」「×3」でくり返し。入力はこの端末の中だけで読み取ります', rep: function (n) { return n === Infinity ? 'ずっとくり返し' : n > 1 ? n + '回くり返し' : ''; },
       err: { empty: '', notime: '時間が見つかりませんでした。「休憩5分」のように、名前と時間を書いてください', many: 'タイマーが多すぎます（40個まで）' },
-      running: 'タイマーを止めてから使えます', done: function (n) { return n + '個のタイマーにしました'; }, total: '合計' },
+      running: 'タイマーを止めてから使えます', done: function (n) { return n + '個のタイマーにしました'; }, total: '合計', mic: '声で入力', micOn: '聞いています…（もう一度押すと止まります）', micErr: '音声入力が使えませんでした。マイクの許可を確かめてください', micNote: '🎤 の音声入力は、お使いのブラウザの機能を使います（Chrome では Google のサーバーで文字にされます）' },
     en: { btn: '✍️ Type it in', title: 'Build a timer from words', ph: 'e.g. Vocab 25 min, break 5 min x 3, review 10 min', apply: 'Use this', close: 'Close',
       ex: ['Vocab 25 min, break 5 min x 3, review 10 min', 'Plank 30 sec, rest 10 sec, 8 rounds', 'Work 50 min, break 10 min x 2'], exL: 'Try an example',
       note: 'Write "name + time", separated by commas. Use "x 3" or "3 rounds" to repeat. It is read on this device only', rep: function (n) { return n === Infinity ? 'repeats forever' : n > 1 ? 'repeats ' + n + ' times' : ''; },
       err: { empty: '', notime: 'No time found. Write a name and a time, like "break 5 min"', many: 'Too many timers (up to 40)' },
-      running: 'Stop the timer first', done: function (n) { return 'Set up ' + n + ' timers'; }, total: 'Total' },
+      running: 'Stop the timer first', done: function (n) { return 'Set up ' + n + ' timers'; }, total: 'Total', mic: 'Speak', micOn: 'Listening… (tap again to stop)', micErr: 'Voice input did not work. Check the microphone permission', micNote: '🎤 voice input uses your browser\'s own speech feature (in Chrome, Google\'s servers turn speech into text)' },
     es: { btn: '✍️ Escríbelo', title: 'Crear un temporizador con palabras', ph: 'p. ej. Vocabulario 25 min, descanso 5 min x 3, repaso 10 min', apply: 'Usar esto', close: 'Cerrar',
       ex: ['Vocabulario 25 min, descanso 5 min x 3, repaso 10 min', 'Plancha 30 s, descanso 10 s, 8 rondas', 'Trabajo 50 min, descanso 10 min x 2'], exL: 'Probar un ejemplo',
       note: 'Escribe «nombre + tiempo», separados por comas. Usa «x 3» o «3 rondas» para repetir. Se lee solo en este dispositivo', rep: function (n) { return n === Infinity ? 'se repite siempre' : n > 1 ? 'se repite ' + n + ' veces' : ''; },
       err: { empty: '', notime: 'No se encontró ningún tiempo. Escribe un nombre y un tiempo, como «descanso 5 min»', many: 'Demasiados temporizadores (hasta 40)' },
-      running: 'Detén el temporizador primero', done: function (n) { return n + ' temporizadores listos'; }, total: 'Total' }
+      running: 'Detén el temporizador primero', done: function (n) { return n + ' temporizadores listos'; }, total: 'Total', mic: 'Hablar', micOn: 'Escuchando… (toca otra vez para parar)', micErr: 'No funcionó la entrada de voz. Revisa el permiso del micrófono', micNote: '🎤 la entrada de voz usa la función de tu navegador (en Chrome, los servidores de Google convierten la voz en texto)' }
   }[lang];
   var defName = lang === 'en' ? 'Timer' : lang === 'es' ? 'Temporizador' : 'タイマー';
   function ev(n, p) { try { if (window.gtag) window.gtag('event', n, p || {}); } catch (e) {} }
@@ -128,7 +141,7 @@
   function preview() {
     var r = parse(inp.value, defName);
     last = r.error ? null : r;
-    prev.textContent = ''; msg.textContent = '';
+    prev.textContent = ''; if (!(typeof rec !== 'undefined' && rec)) msg.textContent = '';
     go.disabled = !last;
     if (r.error) { msg.textContent = T.err[r.error] || ''; return; }
     var ol = el('ol', 'tt-words-list');
@@ -171,7 +184,30 @@
   inp = el('textarea', 'tt-words-in'); inp.rows = 2; inp.maxLength = 300; inp.placeholder = T.ph; inp.setAttribute('aria-label', T.title);
   inp.addEventListener('input', function () { clearTimeout(inp._t); inp._t = setTimeout(preview, 200); });
   inp.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); preview(); apply(); } if (e.key === 'Escape') { toggle(false); btn.focus(); } });
-  box.appendChild(inp);
+  // 🎤 音声入力（Web Speech API があるブラウザだけ）
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, micB = null, micNote = null;
+  if (SR) {
+    var row = el('div', 'tt-words-row'); box.insertBefore(row, null); row.appendChild(inp);
+    micB = el('button', 'tt-words-mic', '🎤'); micB.type = 'button'; micB.setAttribute('aria-label', T.mic); micB.title = T.mic; micB.setAttribute('aria-pressed', 'false');
+    row.appendChild(micB);
+    micB.addEventListener('click', function () {
+      if (rec) { try { rec.stop(); } catch (e) {} return; }
+      try {
+        rec = new SR(); rec.lang = lang === 'en' ? 'en-US' : lang === 'es' ? 'es-ES' : 'ja-JP';
+        rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+        var base = inp.value ? inp.value.replace(/\s*$/, '') + (lang === 'ja' ? '、' : ', ') : '';
+        rec.onresult = function (e) {
+          var t = ''; for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+          inp.value = (base + t).slice(0, 300); preview();
+        };
+        rec.onerror = function () { msg.textContent = T.micErr; };
+        rec.onend = function () { rec = null; micB.setAttribute('aria-pressed', 'false'); micB.classList.remove('on'); if (msg.textContent === T.micOn) msg.textContent = ''; preview(); };
+        rec.start();
+        micB.setAttribute('aria-pressed', 'true'); micB.classList.add('on'); msg.textContent = T.micOn;
+        ev('words_mic', {});
+      } catch (e) { rec = null; msg.textContent = T.micErr; }
+    });
+  } else box.appendChild(inp);
   var exs = el('div', 'tt-words-ex'); exs.appendChild(el('span', 'tt-words-exl', T.exL));
   T.ex.forEach(function (s) { var c = el('button', 'tt-words-chip', s); c.type = 'button'; c.addEventListener('click', function () { inp.value = s; preview(); ev('words_example', {}); }); exs.appendChild(c); });
   box.appendChild(exs);
@@ -179,7 +215,29 @@
   msg = el('p', 'tt-words-msg'); msg.setAttribute('role', 'status'); box.appendChild(msg);
   go = el('button', 'tt-words-go', T.apply); go.type = 'button'; go.disabled = true; go.addEventListener('click', apply); box.appendChild(go);
   box.appendChild(el('p', 'tt-words-note', T.note));
+  if (SR) box.appendChild(el('p', 'tt-words-note', T.micNote));
   btn.addEventListener('click', function () { toggle(!opened); });
-  add.insertAdjacentElement('afterend', btn);
-  btn.insertAdjacentElement('afterend', box);
+  add.insertAdjacentElement('afterend', box);
+  // 入口は「タイマー設定」のボタンの中の右（11/27 えりなさん）。幅が狭いとき・見出しが無いページは「＋ タイマーを追加」の下
+  var setup = document.getElementById('setup');
+  function place() {
+    var tgl = document.getElementById('setup-toggle');
+    if (!tgl || !setup || tgl.offsetWidth < 280) {
+      btn.classList.remove('in-head'); if (tgl) { var tx0 = tgl.querySelector('.st-txt'); if (tx0) tx0.style.marginRight = ''; }
+      if (btn.previousElementSibling !== add) add.insertAdjacentElement('afterend', btn);
+      btn.style.top = ''; return;
+    }
+    if (btn.parentNode !== setup || btn.previousElementSibling !== tgl) tgl.insertAdjacentElement('afterend', btn);
+    if (getComputedStyle(setup).position === 'static') setup.style.position = 'relative';
+    btn.classList.add('in-head');
+    btn.style.top = (tgl.offsetTop + tgl.offsetHeight / 2) + 'px';
+    var tx = tgl.querySelector('.st-txt'); if (tx) tx.style.marginRight = (btn.offsetWidth + 8) + 'px';
+  }
+  place();
+  setTimeout(place, 300);
+  window.addEventListener('resize', function () { clearTimeout(place._t); place._t = setTimeout(place, 150); });
+  if (window.ResizeObserver) { var tglEl = document.getElementById('setup-toggle'); if (tglEl) new ResizeObserver(function () { place(); }).observe(tglEl); }
+  // 見出しの中から押したときは、開いたあと入力欄まで見えるように
+  var oldToggle = toggle;
+  toggle = function (on) { oldToggle(on); if (on) setTimeout(function () { try { box.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {} }, 60); };
 })();
