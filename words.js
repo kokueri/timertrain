@@ -1,7 +1,7 @@
 /* 11/27: ことばでタイマーを作る（TimerTrain・ドーナツタイマー共通）
  * 「英単語25分、休憩5分を3回、最後に復習10分」→ タイマーの並びとくり返し回数にする。
  * AI は使わず、この端末の中だけで読み取る（入力はどこにも送らない）。
- * 入口は「＋ タイマーを追加」の下。入れる前に中身を見せて、入れたあとは「元に戻す」ができる。 */
+ * 入口は「タイマー設定」のボタンの中の右（入りきらないときは🎤だけ）。入れる前に中身を見せて、入れたあとは「元に戻す」ができる。 */
 (function () {
   'use strict';
   var MAX_ITEMS = 40, MAX_SECS = 99 * 3600;
@@ -9,9 +9,9 @@
   var COLORS = ['red', 'teal', 'orange', 'purple', 'blue', 'pink', 'yellow'];
   var NUM = '(\\d+(?:\\.\\d+)?)';
   var NB = '(?![a-zà-ÿ])'; // 単位のあとに英字が続かない（"min" が "mint" に当たらないように）
-  var RE_H = new RegExp(NUM + '\\s*(?:時間|hours?|hrs?|horas?|h' + NB + ')(半)?', 'gi');
-  var RE_M = new RegExp(NUM + '\\s*(?:分|minutes?|mins?|minutos?|m' + NB + ')(半)?', 'gi');
-  var RE_S = new RegExp(NUM + '\\s*(?:秒|seconds?|secs?|segundos?|s' + NB + ')', 'gi');
+  var RE_H = new RegExp(NUM + '\\s*(?:時間|hours?|hrs?|horas?|h)' + NB + '(半)?', 'gi');
+  var RE_M = new RegExp(NUM + '\\s*(?:分|minutes?|mins?|minutos?|m)' + NB + '(半)?', 'gi');
+  var RE_S = new RegExp(NUM + '\\s*(?:秒|seconds?|secs?|segundos?|s)' + NB, 'gi');
   var RE_CLOCK = /(\d{1,2}):(\d{2})(?::(\d{2}))?/g;
   var RE_REP = [
     /(?:を|×|x|\*)\s*(\d{1,2})\s*(?:回|セット|周|sets?|rounds?|times|veces|rondas|series)?/i,
@@ -20,8 +20,8 @@
     /(\d{1,2})\s*(?:rounds?|sets?|times|veces|rondas|series)/i
   ];
   var RE_INF = /(ずっと|エンドレス|無限|∞|forever|endless|infinite|sin fin|infinito)/i;
-  var RE_JUNK = /^(?:まず|最初に|はじめに|次に|つぎに|そのあと|それから|最後に|さいごに|first|then|next|finally|and|primero|luego|después|al final|y)\s*/i;
-  var RE_TAIL = /\s*(?:を|で|の|と|から|して|する|やる|and|y|de)\s*$/i;
+  var RE_JUNK = /^(?:間|ずつ|まず|最初に|はじめに|次に|つぎに|そのあと|それから|最後に|さいごに|first|then|next|finally|and|primero|luego|después|al final|y)\s*/i;
+  var RE_TAIL = /(?:\s*(?:を|で|の|と|から|して|する|やる)|\s+(?:and|y|de))\s*$/i;
 
   // 漢数字（音声入力で「二十五分」「三回」となることがある）→ 数字
   var KD = { '〇': 0, '零': 0, '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9 };
@@ -38,7 +38,8 @@
   function norm(s) {
     s = String(s || '');
     try { s = s.normalize('NFKC'); } catch (e) {}
-    s = s.replace(/[〇零一二三四五六七八九十百]+(?=\s*(?:時間|分|秒|回|セット|周))/g, function (k) { return String(kan(k)); });
+    s = s.replace(/(?:かける|掛ける|かけ|✕|✖)\s*(?=[〇零一二三四五六七八九十百\d])/g, '×');
+    s = s.replace(/[〇零一二三四五六七八九十百]+(?=\s*(?:時間|分|秒|回|セット|周))|(?<=×\s*)[〇零一二三四五六七八九十百]+/g, function (k) { return String(kan(k)); });
     return s.replace(/[＿_]/g, ' ').slice(0, 300);
   }
   function grab(seg, re, mult, out) {
@@ -53,9 +54,14 @@
     seg = grab(seg, RE_H, 3600, o);
     seg = grab(seg, RE_M, 60, o);
     seg = grab(seg, RE_S, 1, o);
-    for (var i = 0; i < RE_REP.length; i++) {
-      var m = seg.match(RE_REP[i]);
-      if (m) { var n = parseInt(m[1], 10); if (n >= 1 && n <= 99) { o.rep = n; seg = seg.replace(m[0], ' '); break; } }
+    // くり返し（「3回かける2」「×3 ×2」のように重なったら掛け算）
+    for (var g = 0; g < 4; g++) {
+      var found = false;
+      for (var i = 0; i < RE_REP.length; i++) {
+        var m = seg.match(RE_REP[i]);
+        if (m) { var n = parseInt(m[1], 10); if (n >= 1 && n <= 99) { o.rep = Math.min(99, (o.rep || 1) * n); seg = seg.replace(m[0], ' '); found = true; break; } }
+      }
+      if (!found) break;
     }
     var name = seg.replace(/[()（）「」『』【】\[\]"“”'。.!！?？:：・]/g, ' ').replace(/\s+/g, ' ').trim();
     for (var k = 0; k < 3; k++) name = name.replace(RE_JUNK, '').replace(RE_TAIL, '').trim();
@@ -69,6 +75,12 @@
     if (!s.trim()) return { error: 'empty' };
     // 「腹筋40秒と休憩20秒」の「と」も区切りにする（時間のすぐあとの と・and・y だけ）
     s = s.replace(/(分|秒|時間|半|\d\s*(?:min|mins|minutes?|sec|secs|seconds?|s|m|h|minutos?|segundos?))\s*(?:と|and|y)\s+/gi, '$1、').replace(/(分|秒|時間|半)\s*と/g, '$1、');
+    // 音声入力は「、」が入らない（「英単語25分休憩5分を3回」）。時間のすぐあとに次の名前が来たら区切る
+    if (/^\s*\d/.test(s)) {
+      // 「25分勉強5分休憩」のように時間が先の書き方は、次の時間の前で区切る（「1時間30分」は区切らない）
+      s = s.replace(/([^\s\d、,，;；\n→>＞を×x*.:間分秒半])\s*(?=\d+(?:\.\d+)?\s*(?:時間|分|秒)|\d{1,2}:\d{2})/g, '$1、');
+    } else s = s.replace(/(\d\s*(?:時間|分|秒)半?)(?=\s*[^\s\d、,，;；\n→>＞をでのとずく繰リ回セ周半×x*間ほくぐ程])/g, '$1、')
+      .replace(/(\d\s*(?:minutes?|mins?|seconds?|secs?|hours?|hrs?|minutos?|segundos?|horas?))\s+(?!(?:x|times|sets?|rounds?|and|y|veces|rondas|series|repeat|repetir|de|of|each)\b)(?=[a-zà-ÿ])/gi, '$1、');
     // 「そのあと」「最後に」などは、くり返しの範囲の切れ目（§）。「まず」「最初に」はその1つだけで区切る（¶）
     s = s.replace(/そのあと|それから|のあと|次に|つぎに|最後に|さいごに|\bthen\b|\bnext\b|\bfinally\b|\by luego\b|\bluego\b|\bdespués\b|\bal final\b/gi, '、§')
       .replace(/まず|最初に|はじめに|\bfirst\b|\bprimero\b/gi, '、¶');
@@ -83,6 +95,8 @@
       solo = mark === '¶'; mark = '';
       var o = readSeg(seg);
       if (o.hit && o.secs >= 1) cur.push({ name: o.name, secs: Math.min(o.secs, MAX_SECS) });
+      // 「1時間30分 勉強」のように時間のあとに名前だけが来たら、その前のタイマーの名前にする
+      else if (!o.hit && o.name && cur.length && !cur[cur.length - 1].name) cur[cur.length - 1].name = o.name;
       if (solo && !o.rep && !o.inf && cur.length) { groups.push({ items: cur, n: 1 }); cur = []; }
       if (o.inf) inf = true;
       if (o.rep || o.inf) { if (cur.length) { groups.push({ items: cur, n: o.inf ? Infinity : o.rep }); cur = []; } else if (groups.length) { groups[groups.length - 1].n = o.inf ? Infinity : o.rep; } }
@@ -113,17 +127,17 @@
   /* ---------- 画面 ---------- */
   var lang = document.documentElement.lang === 'en' ? 'en' : document.documentElement.lang === 'es' ? 'es' : 'ja';
   var T = {
-    ja: { btn: '✍️ ことばで作る', title: 'ことばでタイマーを作る', ph: '例: 英単語25分、休憩5分を3回、最後に復習10分', apply: 'この並びにする', close: '閉じる',
+    ja: { btn: '🎤 ことばで作る', title: 'ことばでタイマーを作る', ph: '例: 英単語25分、休憩5分を3回、最後に復習10分', apply: 'この並びにする', close: '閉じる',
       ex: ['英単語25分、休憩5分を3回、最後に復習10分', 'プランク30秒、休憩10秒を8回', '作業50分、休憩10分 ×2'], exL: '例を入れる',
       note: '「名前＋時間」を「、」で区切って書きます。「を3回」「×3」でくり返し。入力はこの端末の中だけで読み取ります', rep: function (n) { return n === Infinity ? 'ずっとくり返し' : n > 1 ? n + '回くり返し' : ''; },
       err: { empty: '', notime: '時間が見つかりませんでした。「休憩5分」のように、名前と時間を書いてください', many: 'タイマーが多すぎます（40個まで）' },
       running: 'タイマーを止めてから使えます', done: function (n) { return n + '個のタイマーにしました'; }, total: '合計', mic: '声で入力', micOn: '聞いています…（もう一度押すと止まります）', micErr: '音声入力が使えませんでした。マイクの許可を確かめてください', micNote: '🎤 の音声入力は、お使いのブラウザの機能を使います（Chrome では Google のサーバーで文字にされます）' },
-    en: { btn: '✍️ Type it in', title: 'Build a timer from words', ph: 'e.g. Vocab 25 min, break 5 min x 3, review 10 min', apply: 'Use this', close: 'Close',
+    en: { btn: '🎤 Say or type it', title: 'Build a timer from words', ph: 'e.g. Vocab 25 min, break 5 min x 3, review 10 min', apply: 'Use this', close: 'Close',
       ex: ['Vocab 25 min, break 5 min x 3, review 10 min', 'Plank 30 sec, rest 10 sec, 8 rounds', 'Work 50 min, break 10 min x 2'], exL: 'Try an example',
       note: 'Write "name + time", separated by commas. Use "x 3" or "3 rounds" to repeat. It is read on this device only', rep: function (n) { return n === Infinity ? 'repeats forever' : n > 1 ? 'repeats ' + n + ' times' : ''; },
       err: { empty: '', notime: 'No time found. Write a name and a time, like "break 5 min"', many: 'Too many timers (up to 40)' },
       running: 'Stop the timer first', done: function (n) { return 'Set up ' + n + ' timers'; }, total: 'Total', mic: 'Speak', micOn: 'Listening… (tap again to stop)', micErr: 'Voice input did not work. Check the microphone permission', micNote: '🎤 voice input uses your browser\'s own speech feature (in Chrome, Google\'s servers turn speech into text)' },
-    es: { btn: '✍️ Escríbelo', title: 'Crear un temporizador con palabras', ph: 'p. ej. Vocabulario 25 min, descanso 5 min x 3, repaso 10 min', apply: 'Usar esto', close: 'Cerrar',
+    es: { btn: '🎤 Dilo o escríbelo', title: 'Crear un temporizador con palabras', ph: 'p. ej. Vocabulario 25 min, descanso 5 min x 3, repaso 10 min', apply: 'Usar esto', close: 'Cerrar',
       ex: ['Vocabulario 25 min, descanso 5 min x 3, repaso 10 min', 'Plancha 30 s, descanso 10 s, 8 rondas', 'Trabajo 50 min, descanso 10 min x 2'], exL: 'Probar un ejemplo',
       note: 'Escribe «nombre + tiempo», separados por comas. Usa «x 3» o «3 rondas» para repetir. Se lee solo en este dispositivo', rep: function (n) { return n === Infinity ? 'se repite siempre' : n > 1 ? 'se repite ' + n + ' veces' : ''; },
       err: { empty: '', notime: 'No se encontró ningún tiempo. Escribe un nombre y un tiempo, como «descanso 5 min»', many: 'Demasiados temporizadores (hasta 40)' },
@@ -222,7 +236,7 @@
   var setup = document.getElementById('setup');
   function place() {
     var tgl = document.getElementById('setup-toggle');
-    if (!tgl || !setup || tgl.offsetWidth < 280) {
+    if (!tgl || !setup || !tgl.offsetWidth) {
       btn.classList.remove('in-head'); if (tgl) { var tx0 = tgl.querySelector('.st-txt'); if (tx0) tx0.style.marginRight = ''; }
       if (btn.previousElementSibling !== add) add.insertAdjacentElement('afterend', btn);
       btn.style.top = ''; return;
@@ -230,8 +244,17 @@
     if (btn.parentNode !== setup || btn.previousElementSibling !== tgl) tgl.insertAdjacentElement('afterend', btn);
     if (getComputedStyle(setup).position === 'static') setup.style.position = 'relative';
     btn.classList.add('in-head');
+    var tx = tgl.querySelector('.st-txt');
+    // 入りきらないとき（設定を閉じたPCの細い列など）はマイクだけ
+    btn.classList.remove('compact'); btn.textContent = T.btn; btn.removeAttribute('aria-label'); btn.title = '';
+    if (tx) tx.style.marginRight = '';
+    var tr = tgl.getBoundingClientRect(), txEnd = tr.left + 80;
+    // 見出しの1行目（「タイマー設定」「設定」）の幅で決める。下の行（中身のまとめ）は折り返してよい
+    var ttl = [].filter.call(tgl.querySelectorAll('.st-title, .st-short'), function (e) { return e.offsetWidth > 0; })[0] || tx;
+    if (ttl) { try { var rg = document.createRange(); rg.selectNodeContents(ttl); txEnd = rg.getBoundingClientRect().right; } catch (e) {} }
+    if (tr.right - txEnd - 46 - 16 < btn.offsetWidth) { btn.classList.add('compact'); btn.textContent = '🎤'; btn.setAttribute('aria-label', T.btn.replace(/^\S+\s*/, '')); btn.title = T.btn.replace(/^\S+\s*/, ''); }
     btn.style.top = (tgl.offsetTop + tgl.offsetHeight / 2) + 'px';
-    var tx = tgl.querySelector('.st-txt'); if (tx) tx.style.marginRight = (btn.offsetWidth + 8) + 'px';
+    if (tx) tx.style.marginRight = (btn.offsetWidth + 8) + 'px';
   }
   place();
   setTimeout(place, 300);

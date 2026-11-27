@@ -96,3 +96,4 @@ body.focus-mode .tt-words-btn { display: none !important; }
 .tt-goal-set:focus-visible, .tt-goal-edit:focus-visible, .tt-goal-chip:focus-visible, .tt-goal-save:focus-visible, .tt-goal-cancel:focus-visible, .tt-goal-x:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .tt-today-open > .tt-goal-sample { display: flex !important; }
 .tt-goal-ring { display: block; }
+.tt-words-btn.in-head.compact { padding: 4px 8px; font-size: 15px; line-height: 1; }
