@@ -377,12 +377,13 @@ const soundTick = () => SOUNDS[sound.s].tick();
 
 /* その他の設定（自動で次へ・終了前のお知らせ・ブラウザ通知。端末に保存） */
 const OPT_KEY = 'tt-opts';
-let opts = { auto: true, remind: 0, notify: true, silent: false, keep: true };
+// 11/27: 終わる前のお知らせは初期値を1分前に（r1 がない古い保存の「しない」は、前の初期値なので1分前にする）
+let opts = { auto: true, remind: 1, notify: true, silent: false, keep: true, r1: 1 };
 try {
 const ov = JSON.parse(localStorage.getItem(OPT_KEY) || 'null');
 if (ov) {
 if (typeof ov.auto === 'boolean') opts.auto = ov.auto;
-if ([0, 1, 2, 5].includes(ov.remind)) opts.remind = ov.remind;
+if ([0, 1, 2, 5].includes(ov.remind) && (ov.r1 || ov.remind !== 0)) opts.remind = ov.remind;
 if (typeof ov.notify === 'boolean') opts.notify = ov.notify;
 if (typeof ov.silent === 'boolean') opts.silent = ov.silent;
 if (typeof ov.keep === 'boolean') opts.keep = ov.keep;
@@ -1468,6 +1469,19 @@ toastId = setTimeout(() => el.classList.remove('show'), 1800);
 }
 window.__ttToast = toast;
 
+// 11/27: ことばでタイマーを作る（words.js）から編成を入れ替える。戻すための前の編成を返す。動いている間は入れ替えない
+window.__ttApplyConfig = function (cfg) {
+if (run.active && !run.finished) return 'running';
+if (!cfg || !Array.isArray(cfg.timers) || !cfg.timers.length) return null;
+const prev = { timers: state.timers.map(x => ({ name: x.name, secs: x.secs, color: x.color })), repeat: state.repeat };
+const timers = cfg.timers.slice(0, 40).map(x => ({ id: uid(), name: String(x.name || STR.defName).slice(0, 30), secs: Math.min(Math.max(1, Math.round(+x.secs) || 60), MAX_SECS), color: PALETTE.some(c => c.id === x.color) ? x.color : 'blue' }));
+const rep = cfg.repeat === Infinity ? Infinity : Math.min(Math.max(1, parseInt(cfg.repeat, 10) || 1), 99);
+if (run.active) resetToIdle();
+state = { timers, repeat: rep };
+persist(); renderList();
+return prev;
+};
+window.__ttUndoToast = function (msg, fn) { undoToast(msg, fn); };
 $('add-btn').addEventListener('click', () => {
 const last = state.timers[state.timers.length - 1];
 state.timers.push({ id: uid(), name: STR.defName, secs: 300, color: nextColor(last ? last.color : 'gray') });
@@ -1944,6 +1958,11 @@ sb.insertAdjacentElement('afterend', wb); if (sb.parentNode) sb.parentNode.style
 }
 if (viaHash) setTimeout(function () { openWrap('hash'); }, 300);
 })();
+/* 11/27: ことばでタイマーを作る（words.js）。入口は「＋ タイマーを追加」の下 */
+if (document.getElementById('add-btn') && !document.getElementById('tt-words-js')) {
+var wdc = document.createElement('link'); wdc.rel = 'stylesheet'; wdc.href = '/words.css?v=1'; document.head.appendChild(wdc);
+var wds = document.createElement('script'); wds.id = 'tt-words-js'; wds.src = '/words.js?v=1'; document.body.appendChild(wds);
+}
 /* 11/25: 背景とBGM（theme.js）。タイマーのページだけ。入口は共有リンクの下 */
 if (document.getElementById('share-btn') && !document.getElementById('tt-look-js')) {
 var lkc = document.createElement('link'); lkc.rel = 'stylesheet'; lkc.href = '/theme.css?v=2'; document.head.appendChild(lkc);
