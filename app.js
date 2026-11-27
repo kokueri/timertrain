@@ -390,13 +390,18 @@ if (typeof ov.keep === 'boolean') opts.keep = ov.keep;
 } catch (e) {}
 function saveOpts() { try { localStorage.setItem(OPT_KEY, JSON.stringify(opts)); } catch (e) {} }
 const canNotify = () => 'Notification' in window;
-function notify(body, sticky) {
+function notify(body, sticky, kind) {
 if (!opts.notify || !canNotify() || Notification.permission !== 'granted') return;
 // 画面を見ているとき（表示中かつ操作中のウィンドウ）は音と表示だけ。裏の別ウィンドウ・最小化・別タブでは通知
 if (document.visibilityState === 'visible' && document.hasFocus()) return;
 const title = typeof BRAND === 'string' ? BRAND : 'TimerTrain';
 const o = { body: String(body), tag: 'timertrain', renotify: true, icon: DT ? '/donut/icon-192.png' : '/icon-192.png',
-requireInteraction: !!sticky, data: { url: location.pathname + location.search } };
+requireInteraction: !!sticky, data: { url: location.pathname + location.search, kind: kind || '' } };
+// 11/27: 終わる前・終わったときの通知に「+1分」「+5分」（対応しているブラウザだけ表示される）
+if ((kind === 'remind' || kind === 'done') && navigator.serviceWorker && navigator.serviceWorker.controller) {
+const m = typeof ADJ_L === 'object' ? ADJ_L.m : '分';
+o.actions = [{ action: 'ext60', title: '+1' + m }, { action: 'ext300', title: '+5' + m }];
+}
 try {
 if (navigator.serviceWorker && navigator.serviceWorker.controller) {
 navigator.serviceWorker.ready.then(r => r.showNotification(title, o)).catch(() => {});
@@ -1034,7 +1039,11 @@ function curRemain() { return run.paused ? run.remainMs : Math.max(0, run.endAt 
 const ADJ_L = LANG === 'en' ? { m: 'm', s: 's', more: (t) => 'Add ' + t, less: (t) => 'Take off ' + t, g: 'Adjust time left' }
   : LANG === 'es' ? { m: ' min', s: ' s', more: (t) => 'Sumar ' + t, less: (t) => 'Quitar ' + t, g: 'Ajustar el tiempo restante' }
   : { m: '分', s: '秒', more: (t) => t + '足す', less: (t) => t + '減らす', g: '残り時間を調整' };
-let adjRow = null;
+// 11/27: 終わったあと・終わる前のお知らせからの延長
+const EXT_L = LANG === 'en' ? { g: 'Extend', lead: 'Need more time?', more: (m) => 'Extend by ' + m + ' min', done: (m) => 'Extended by ' + m + ' min' }
+  : LANG === 'es' ? { g: 'Ampliar', lead: '¿Necesitas más tiempo?', more: (m) => 'Ampliar ' + m + ' min', done: (m) => 'Ampliado ' + m + ' min' }
+  : { g: '延長', lead: 'もう少し続ける？', more: (m) => m + '分延長', done: (m) => m + '分延長しました' };
+let adjRow = null, extRow = null;
 function buildAdj() {
   const rc = document.querySelector('.run-controls');
   if (!rc || adjRow) return;
@@ -1050,10 +1059,63 @@ function buildAdj() {
     adjRow.appendChild(b);
   });
   rc.parentNode.insertBefore(adjRow, rc);
+  extRow = document.createElement('div'); extRow.className = 'tt-adj tt-ext'; extRow.hidden = true;
+  extRow.setAttribute('role', 'group'); extRow.setAttribute('aria-label', EXT_L.g);
+  const lead = document.createElement('span'); lead.className = 'tt-ext-l'; lead.textContent = EXT_L.lead; lead.style.cssText = 'font-size:12.5px;font-weight:700;color:var(--text2);margin-right:2px'; extRow.appendChild(lead);
+  [1, 5, 10].forEach(m => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'tt-adj-b plus';
+    b.textContent = '+' + m + ADJ_L.m; b.setAttribute('aria-label', EXT_L.more(m));
+    b.addEventListener('click', () => extendFinished(m * 60, 'finish'));
+    extRow.appendChild(b);
+  });
+  rc.parentNode.insertBefore(extRow, rc);
 }
 function syncAdj() {
   if (!adjRow) buildAdj();
   if (adjRow) adjRow.hidden = !(run.active && !run.finished);
+  if (extRow) extRow.hidden = !(run.active && run.finished);
+}
+// 終わったあとに延長: 最後のタイマーをもう少し続ける（記録は新しい1回として残す）
+function extendFinished(sec, from) {
+  if (!run.active || !run.finished || !state.timers[run.idx]) return;
+  stopCountForTimer();
+  applySilentMode(true);
+  unlockAudio();
+  if (window.__ttOnStart) { try { window.__ttOnStart(); } catch (e) {} }
+  run.finished = false; run.paused = false;
+  run.extra = sec * 1000 - state.timers[run.idx].secs * 1000;
+  run.endAt = Date.now() + sec * 1000; run.remainMs = 0; run.lastSec = -1;
+  run.reminded = !(opts.remind && sec > opts.remind * 60 + 5);
+  acquireWakeLock();
+  pauseBtn.innerHTML = ICONS.pause;
+  runTime.classList.remove('finished');
+  hideUndo();
+  updateHighlight();
+  updateRunView();
+  updateEta();
+  syncAdj();
+  clearInterval(tickId); tickId = setInterval(tick, 200);
+  scheduleAhead();
+  keepAlive(true);
+  saveRun();
+  toast(EXT_L.done(sec / 60));
+  if (window.gtag) gtag('event', 'time_extend', { sec: sec, from: from });
+}
+// 動いている途中の延長（終わる前のお知らせ・通知から）
+function extendRunning(sec, from) {
+  if (!run.active) return;
+  if (run.finished) { extendFinished(sec, from); return; }
+  addTime(sec);
+  toast(EXT_L.done(sec / 60));
+  if (window.gtag) gtag('event', 'time_extend', { sec: sec, from: from });
+}
+// 通知のボタン（+1分・+5分）から: Service Worker 経由で知らせが来る
+if (navigator.serviceWorker) {
+  navigator.serviceWorker.addEventListener('message', e => {
+    const d = e.data;
+    if (!d || d.tt !== 'extend' || ![60, 300].includes(d.sec)) return;
+    extendRunning(d.sec, d.kind === 'done' ? 'notify_done' : 'notify_remind');
+  });
 }
 function addTime(sec) {
   if (!run.active || run.finished) return;
@@ -1075,7 +1137,7 @@ const ONE_L = LANG === 'en' ? { both: 'The timer was also running. ', short: (l)
   : LANG === 'es' ? { both: 'El temporizador también estaba en marcha. ', short: (l) => 'Se detuvo «' + l + '» (menos de 15 s, no se guardó).', stopped: (l, m) => 'Se detuvo «' + l + '» y se guardó (' + m + ' min).', paused: (l) => 'Se pausó el temporizador y empezó «' + l + '».', undo: 'Deshacer' }
   : { both: 'タイマーと同時に動いていたので、', short: (l) => '「' + l + '」を止めました（15秒未満なので記録なし）', stopped: (l, m) => '「' + l + '」を止めて記録しました（' + m + '分）', paused: (l) => 'タイマーを一時停止して「' + l + '」を計り始めました', undo: '元に戻す' };
 let undoEl = null, undoTimer = 0;
-function undoToast(msg, onUndo) {
+function undoToast(msg, onUndo, acts) {
   if (!undoEl) {
     undoEl = document.createElement('div'); undoEl.className = 'tt-undo'; undoEl.setAttribute('role', 'status'); undoEl.setAttribute('aria-live', 'polite');
     document.body.appendChild(undoEl);
@@ -1087,8 +1149,14 @@ function undoToast(msg, onUndo) {
     b.addEventListener('click', () => { hideUndo(); try { onUndo(); } catch (e) {} if (window.gtag) gtag('event', 'one_undo', {}); });
     undoEl.appendChild(b);
   }
+  (acts || []).forEach(a => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'tt-undo-b'; b.textContent = a.t;
+    if (a.label) b.setAttribute('aria-label', a.label);
+    b.addEventListener('click', () => { hideUndo(); try { a.fn(); } catch (e) {} });
+    undoEl.appendChild(b);
+  });
   undoEl.classList.add('show');
-  clearTimeout(undoTimer); undoTimer = setTimeout(hideUndo, onUndo ? 6000 : 3500);
+  clearTimeout(undoTimer); undoTimer = setTimeout(hideUndo, acts && acts.length ? 15000 : onUndo ? 6000 : 3500);
 }
 function hideUndo() { clearTimeout(undoTimer); if (undoEl) undoEl.classList.remove('show'); }
 window.__ttTimerRunning = function () { return !!(run.active && !run.paused && !run.finished); };
@@ -1180,7 +1248,7 @@ if (DT) { DT.done(); DT.fit(runTime); } else setRing(1, '#34C759');
 document.title = STR.doneTitle;
 updateEta();
 saveRun();
-if (!lateAdvance) notify(STR.nDone, true);
+if (!lateAdvance) notify(STR.nDone, true, 'done');
 setTimeout(() => { if (run.finished) applySilentMode(false); }, 4000);
 if (window.__ttOnFinish) { try { window.__ttOnFinish(); } catch (e) {} }
 if (window.__ttPromoFinish) setTimeout(function () { if (run.finished) { try { window.__ttPromoFinish(); } catch (e) {} } }, 800);
@@ -1209,7 +1277,8 @@ const t = state.timers[run.idx];
 if (opts.remind && !run.reminded && t.secs > opts.remind * 60 + 5 && sec <= opts.remind * 60 && sec > 3) {
 run.reminded = true;
 if (!bgSched) { soundTick(); setTimeout(soundTick, 250); }
-notify(STR.nSoon(t.name || STR.defName, opts.remind));
+notify(STR.nSoon(t.name || STR.defName, opts.remind), false, 'remind');
+undoToast(STR.nSoon(t.name || STR.defName, opts.remind), null, [1, 5].map(m => ({ t: '+' + m + ADJ_L.m, label: EXT_L.more(m), fn: () => extendRunning(m * 60, 'remind') })));
 }
 }
 updateRunView();

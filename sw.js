@@ -2,8 +2,8 @@
 - HTML: network-first （常に最新のページを配信し、オフライン時のみキャッシュ）
 - 静的アセット: cache-first（style.css / app.js は ?v= 付きなので更新は自動で反映）
 */
-const V = 'tt-v91';
-const PRECACHE = ['/style.css?v=65', '/app.js?v=80', '/icon-192.png', '/icon-512.png'];
+const V = 'tt-v92';
+const PRECACHE = ['/style.css?v=65', '/app.js?v=81', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', e => {
 e.waitUntil(caches.open(V).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting()).catch(() => self.skipWaiting()));
@@ -51,6 +51,18 @@ return res;
 // 通知をタップしたら、開いているタイマーのタブに戻る（なければトップを開く）
 self.addEventListener('notificationclick', e => {
 e.notification.close();
+// 11/27: 通知の「+1分」「+5分」→ そのタイマーのタブに知らせる（タブは前に出さない）
+if (e.action === 'ext60' || e.action === 'ext300') {
+const sec = e.action === 'ext60' ? 60 : 300;
+const d = e.notification.data || {};
+const path = (typeof d.url === 'string' && d.url.startsWith('/') ? d.url : '/').split('?')[0];
+const kind = d.kind === 'done' ? 'done' : 'remind';
+e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+const same = list.filter(c => { try { return new URL(c.url).pathname === path; } catch (x) { return false; } });
+(same.length ? same : list.filter(c => c.url.startsWith(self.location.origin))).slice(0, 1).forEach(c => c.postMessage({ tt: 'extend', sec: sec, kind: kind }));
+}));
+return;
+}
 e.waitUntil(
 self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
 const want = (e.notification.data && typeof e.notification.data.url === 'string' && e.notification.data.url.startsWith('/')) ? e.notification.data.url : '/';
