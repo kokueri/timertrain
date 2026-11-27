@@ -839,11 +839,25 @@
     var r = await sb.from('settings').upsert({ product: PRODUCT, data: full }, { onConflict: 'user_id,product' });
     if (!r.error) remoteData = data;
   }
+  // 11/27: 1日の目標を保存（ほかの項目は残して goal だけ入れ替える）
+  window.__ttSaveGoal = async function (g) {
+    if (!sb) return;
+    try {
+      var cur = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
+      if (cur.error) return;
+      var base = (cur.data && cur.data.data && typeof cur.data.data === 'object') ? cur.data.data : {};
+      var data = Object.assign({}, base, { goal: g });
+      if (JSON.stringify(data).length > 15000) return;
+      await sb.from('settings').upsert({ product: PRODUCT, data: data }, { onConflict: 'user_id,product' });
+    } catch (e) {}
+  };
   async function syncSettings() {
     var r = await sb.from('settings').select('data').eq('product', PRODUCT).maybeSingle();
     if (r.error) return;
     var remote = (r.data && r.data.data) || {};
     var rmap = cleanMap(remote.labelMap), rhide = cleanHide(remote.labelHide), rcol = cleanCol(remote.labelColor);
+    // 11/27: 1日の目標（ほかの端末で変えたものを反映）
+    if (remote.goal && typeof remote.goal === 'object' && window.__ttGoalRemote) { try { window.__ttGoalRemote(remote.goal); } catch (e) {} }
     LPJ = cleanPj(remote.labelProject);
     if (JSON.stringify(rmap) !== JSON.stringify(LMAP) || JSON.stringify(Object.keys(rhide)) !== JSON.stringify(Object.keys(LHIDE))) {
       setLabelMeta(rmap, rhide, rcol); loadLabels(); loadStreak(true);

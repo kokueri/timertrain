@@ -2,6 +2,24 @@
   "note": "新しい有料機能のお知らせ（app.js の showNews が読む）。有料機能を足したら items の先頭に1つ足す。ログイン中の人に、id ごとに1回だけ出る。料金ページ・比較表の行も一緒に足すこと",
   "items": [
     {
+      "id": "goal1",
+      "ja": {
+        "h": "新機能：1日の目標",
+        "p": "今日のログに「🎯 1日の目標を決める」ができました。目標まであとどれくらいか、リングで見えます（休憩はのぞく）。プレミアムなら「勉強1時間・運動30分」のように、ラベルごとの目標も決められます。",
+        "prem": "プレミアムでは、ラベルごとの目標も決められます。今日のログの「🎯 1日の目標を決める」（または ✎）からどうぞ。"
+      },
+      "en": {
+        "h": "New: daily goal",
+        "p": "Today's log now has \"🎯 Set a daily goal\". A ring shows how close you are (breaks are not counted). With Premium you can also set goals by label, like \"Study 1 h, Exercise 30 min\".",
+        "prem": "With Premium you can set goals by label too. Tap \"🎯 Set a daily goal\" (or ✎) in today's log."
+      },
+      "es": {
+        "h": "Nuevo: meta diaria",
+        "p": "El registro de hoy ahora tiene «🎯 Poner una meta diaria». Un anillo muestra cuánto te falta (sin contar descansos). Con Premium también puedes poner metas por etiqueta, como «Estudio 1 h, Ejercicio 30 min».",
+        "prem": "Con Premium también puedes poner metas por etiqueta. Toca «🎯 Poner una meta diaria» (o ✎) en el registro de hoy."
+      }
+    },
+    {
       "id": "look1",
       "ja": {
         "h": "新機能：背景とBGM（プレミアム）",

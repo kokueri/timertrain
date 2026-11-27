@@ -1960,8 +1960,8 @@ if (viaHash) setTimeout(function () { openWrap('hash'); }, 300);
 })();
 /* 11/27: ことばでタイマーを作る（words.js）。入口は「＋ タイマーを追加」の下 */
 if (document.getElementById('add-btn') && !document.getElementById('tt-words-js')) {
-var wdc = document.createElement('link'); wdc.rel = 'stylesheet'; wdc.href = '/words.css?v=1'; document.head.appendChild(wdc);
-var wds = document.createElement('script'); wds.id = 'tt-words-js'; wds.src = '/words.js?v=1'; document.body.appendChild(wds);
+var wdc = document.createElement('link'); wdc.rel = 'stylesheet'; wdc.href = '/words.css?v=2'; document.head.appendChild(wdc);
+var wds = document.createElement('script'); wds.id = 'tt-words-js'; wds.src = '/words.js?v=2'; document.body.appendChild(wds);
 }
 /* 11/25: 背景とBGM（theme.js）。タイマーのページだけ。入口は共有リンクの下 */
 if (document.getElementById('share-btn') && !document.getElementById('tt-look-js')) {
@@ -1975,7 +1975,7 @@ if (signed) { var perks = document.getElementById('tt-perks'); if (perks) perks.
 // ログイン中だけ、同期用のライブラリとマイタイマーを読み込む（未ログインの人には何も増えない）
 if (signed && document.getElementById('setup')) {
 var s1 = document.createElement('script'); s1.src = '/vendor/supabase-2.116.0.js';
-s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=30'; s2.onload = function () { var s3 = document.createElement('script'); s3.src = '/mailask.js?v=1'; document.body.appendChild(s3); }; document.body.appendChild(s2); }; // mailask.js: お知らせメールの確認（11/25）
+s1.onload = function () { var s2 = document.createElement('script'); s2.src = '/sync.js?v=31'; s2.onload = function () { var s3 = document.createElement('script'); s3.src = '/mailask.js?v=1'; document.body.appendChild(s3); }; document.body.appendChild(s2); }; // mailask.js: お知らせメールの確認（11/25）
 document.body.appendChild(s1);
 }
 /* ログイン中のホーム（11/13 v2）: 説明文と用途別リンクの代わりに「マイタイマー＋すぐ始める」を1行で。
@@ -2207,7 +2207,160 @@ if (col) { (function (r) { if (r && r.parentNode === col) col.insertBefore(card,
 else ctr.insertAdjacentElement('afterend', card);
 }
 renderTodayOpen(card.querySelector('.tt-today-open'), st);
+renderGoal(card, st);
 renderCount(card.querySelector('.tt-count'), st.count);
+}
+/* ---------- 11/27: 1日の目標（全体の目標は無料ログイン、ラベルごとの目標はプレミアム）----------
+ * 保存: 端末 localStorage 'tt-goal' ＋ ログイン中は settings.data.goal（sync.js の __ttSaveGoal）。{ all: 分, labels: { ラベル: 分 } }
+ * 休憩は数えない。達成したらその場で1回だけお知らせ（ページを開いた時点ですでに達成していたら出さない） */
+var GOAL_KEY = 'tt-goal';
+var GL = lang === 'en' ? { set: '🎯 Set a daily goal', goal: function (d) { return 'Goal ' + d; }, left: function (d) { return d + ' to go'; }, done: '🎉 Goal reached!', edit: 'Change goal', title: 'Daily goal', allL: 'Total for the day (breaks not counted)', none: 'None', min: 'min', custom: 'Other (min)', labT: 'Goals by label', labNote: 'e.g. Study 1 h, Exercise 30 min', add: 'Add', labPh: 'Label', save: 'Save', close: 'Close', lock: '🔒 Goals by label are a Premium feature.', see: 'See Premium', hit: function (l) { return '🎉 You reached your goal' + (l ? ' for ' + l : ' for today') + '!'; }, rm: function (l) { return 'Remove ' + l; }, ring: function (p) { return p + '% of today\'s goal'; }, sample: 'Goal 4h · 40m to go' }
+: lang === 'es' ? { set: '🎯 Poner una meta diaria', goal: function (d) { return 'Meta ' + d; }, left: function (d) { return 'faltan ' + d; }, done: '🎉 ¡Meta cumplida!', edit: 'Cambiar meta', title: 'Meta diaria', allL: 'Total del día (sin descansos)', none: 'Ninguna', min: 'min', custom: 'Otra (min)', labT: 'Metas por etiqueta', labNote: 'p. ej. Estudio 1 h, Ejercicio 30 min', add: 'Añadir', labPh: 'Etiqueta', save: 'Guardar', close: 'Cerrar', lock: '🔒 Las metas por etiqueta son de Premium.', see: 'Ver Premium', hit: function (l) { return '🎉 ¡Cumpliste tu meta' + (l ? ' de ' + l : ' de hoy') + '!'; }, rm: function (l) { return 'Quitar ' + l; }, ring: function (p) { return p + '% de la meta de hoy'; }, sample: 'Meta 4 h · faltan 40 min' }
+: { set: '🎯 1日の目標を決める', goal: function (d) { return '目標 ' + d; }, left: function (d) { return 'あと' + d; }, done: '🎉 目標達成！', edit: '目標を変える', title: '1日の目標', allL: '1日の合計（休憩はのぞく）', none: 'なし', min: '分', custom: 'そのほか（分）', labT: 'ラベルごとの目標', labNote: '例: 勉強 1時間、運動 30分', add: '追加', labPh: 'ラベル', save: '保存', close: '閉じる', lock: '🔒 ラベルごとの目標はプレミアムの機能です。', see: '有料プランを見る', hit: function (l) { return '🎉 ' + (l ? l + 'の' : '今日の') + '目標を達成しました！'; }, rm: function (l) { return l + 'を外す'; }, ring: function (p) { return '今日の目標の' + p + '%'; }, sample: '目標 4時間 · あと40分' };
+function cleanGoal(g) {
+var o = { all: 0, labels: {} };
+if (g && typeof g === 'object') {
+var a = parseInt(g.all, 10); if (a >= 0 && a <= 1440) o.all = a;
+if (g.labels && typeof g.labels === 'object') Object.keys(g.labels).slice(0, 20).forEach(function (k) { var v = parseInt(g.labels[k], 10), kk = String(k).trim().slice(0, 30); if (kk && v > 0 && v <= 1440) o.labels[kk] = v; });
+}
+return o;
+}
+function readGoal() { try { return cleanGoal(JSON.parse(localStorage.getItem(GOAL_KEY) || 'null')); } catch (e) { return cleanGoal(null); } }
+function goalPrem() { try { return !!localStorage.getItem('sb-arsfocfjfwtlykfdkiea-auth-token') && localStorage.getItem('tt-plan') === 'premium'; } catch (e) { return false; } }
+function rerenderGoal() { var c = document.getElementById('tt-today'); if (c && lastTodaySt && !c.classList.contains('sample')) renderGoal(c, lastTodaySt); }
+// ほかの端末で変えた目標（sync.js が設定を読んだとき）
+window.__ttGoalRemote = function (g) { var c = cleanGoal(g), cur = readGoal(); if (JSON.stringify(c) === JSON.stringify(cur)) return; try { localStorage.setItem(GOAL_KEY, JSON.stringify(c)); } catch (e) {} rerenderGoal(); };
+window.__ttGoalRefresh = rerenderGoal;
+var goalPrev = null, goalPrevL = {}, goalDay = '', goalEdOpen = false;
+function goalEv(n, p) { if (window.gtag) gtag('event', n, p || {}); }
+function ringEl(p) { var r = mk('span', 'tt-goal-ring'); r.style.setProperty('--p', Math.min(100, p)); if (DT) r.style.setProperty('--gc', '#C03868'); r.setAttribute('aria-hidden', 'true'); if (p >= 100) r.classList.add('ok'); return r; }
+function renderGoal(card, st) {
+if (!card || card.classList.contains('sample')) return;
+var g = readGoal(), prem = goalPrem();
+var day0 = new Date(); day0.setHours(0, 0, 0, 0); var dk = day0.toDateString();
+if (dk !== goalDay) { goalDay = dk; goalPrev = null; goalPrevL = {}; }
+var t0 = day0.getTime(), t1 = t0 + 86400000, per = {};
+(st.blocks || []).forEach(function (b) { if (b && !b.brk && b.s >= t0 && b.s < t1 && b.secs >= 1) per[b.label] = (per[b.label] || 0) + b.secs; });
+var todaySec = st.today || 0;
+// 達成のお知らせ（このページを開いている間に越えたときだけ）
+if (g.all > 0) {
+var gs = g.all * 60;
+if (goalPrev !== null && goalPrev < gs && todaySec >= gs) { if (typeof toast === 'function') toast(GL.hit('')); goalEv('goal_hit', { min: g.all, kind: 'all' }); }
+goalPrev = todaySec;
+}
+if (prem) Object.keys(g.labels).forEach(function (l) {
+var ls = g.labels[l] * 60, v = per[l] || 0;
+if (goalPrevL[l] != null && goalPrevL[l] < ls && v >= ls) { if (typeof toast === 'function') toast(GL.hit(l)); goalEv('goal_hit', { min: g.labels[l], kind: 'label' }); }
+goalPrevL[l] = v;
+});
+var box = card.querySelector('.tt-goal');
+if (!box) { box = mk('div', 'tt-goal'); var cnt = card.querySelector('.tt-count'); if (cnt) card.insertBefore(box, cnt); else card.appendChild(box); }
+if (goalEdOpen && box.querySelector('.tt-goal-ed')) { paintGoalRow(box, g, prem, todaySec, per); return; }
+box.textContent = '';
+box.appendChild(mk('div', 'tt-goal-row'));
+paintGoalRow(box, g, prem, todaySec, per);
+}
+function paintGoalRow(box, g, prem, todaySec, per) {
+var row = box.querySelector('.tt-goal-row'); row.textContent = '';
+if (!(g.all > 0) && !(prem && Object.keys(g.labels).length)) {
+var sb = mk('button', 'tt-goal-set', GL.set); sb.type = 'button'; sb.addEventListener('click', function () { openGoalEd(box); }); row.appendChild(sb);
+} else {
+if (g.all > 0) {
+var p = Math.floor(todaySec / (g.all * 60) * 100);
+var r = ringEl(p); row.appendChild(r);
+var tx = mk('span', 'tt-goal-t');
+tx.appendChild(mk('strong', null, p >= 100 ? GL.done : GL.goal(fmtDur(g.all * 60))));
+if (p < 100) tx.appendChild(mk('span', 'tt-goal-left', ' · ' + GL.left(fmtDur(Math.max(60, g.all * 60 - todaySec)))));
+else tx.appendChild(mk('span', 'tt-goal-left', ' · ' + fmtDur(todaySec) + ' / ' + fmtDur(g.all * 60)));
+tx.setAttribute('aria-label', GL.ring(Math.min(999, p)));
+row.appendChild(tx);
+} else row.appendChild(mk('span', 'tt-goal-t'));
+var eb = mk('button', 'tt-goal-edit', '✎'); eb.type = 'button'; eb.setAttribute('aria-label', GL.edit); eb.title = GL.edit; eb.addEventListener('click', function () { openGoalEd(box); }); row.appendChild(eb);
+}
+var old = box.querySelector('.tt-goal-labs'); if (old) old.remove();
+var ls = prem ? Object.keys(g.labels) : [];
+if (ls.length) {
+var ul = mk('div', 'tt-goal-labs');
+ls.forEach(function (l) {
+var v = per[l] || 0, gs = g.labels[l] * 60, pp = Math.min(100, Math.floor(v / gs * 100));
+var it = mk('div', 'tt-goal-l' + (pp >= 100 ? ' ok' : ''));
+var dot = mk('span', 'tt-goal-dot'); dot.style.background = labelColor(l); it.appendChild(dot);
+it.appendChild(mk('span', 'tt-goal-ln', l));
+var bar = mk('span', 'tt-goal-bar'); var fill = mk('span'); fill.style.width = pp + '%'; fill.style.background = labelColor(l); bar.appendChild(fill); it.appendChild(bar);
+it.appendChild(mk('span', 'tt-goal-lv', (pp >= 100 ? '✓ ' : '') + fmtDur(v) + ' / ' + fmtDur(gs)));
+ul.appendChild(it);
+});
+var ed = box.querySelector('.tt-goal-ed'); if (ed) box.insertBefore(ul, ed); else box.appendChild(ul);
+}
+}
+function openGoalEd(box) {
+if (box.querySelector('.tt-goal-ed')) return;
+goalEdOpen = true;
+var g = readGoal(), prem = goalPrem(), draft = { all: g.all, labels: Object.assign({}, g.labels) };
+goalEv('goal_open', { member: prem ? 'premium' : 'free' });
+var ed = mk('div', 'tt-goal-ed'); ed.setAttribute('role', 'group'); ed.setAttribute('aria-label', GL.title);
+ed.appendChild(mk('strong', 'tt-goal-h', GL.title));
+ed.appendChild(mk('span', 'tt-goal-sub', GL.allL));
+var chips = mk('div', 'tt-goal-chips');
+var cust = document.createElement('input'); cust.type = 'number'; cust.min = '1'; cust.max = '1440'; cust.step = '5'; cust.inputMode = 'numeric'; cust.className = 'tt-goal-num'; cust.placeholder = GL.custom; cust.setAttribute('aria-label', GL.custom);
+function paintChips() { [].forEach.call(chips.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-m') === draft.all)); }); }
+[0, 30, 60, 120, 180, 240, 360].forEach(function (m) {
+var b = mk('button', 'tt-goal-chip', m ? fmtDur(m * 60) : GL.none); b.type = 'button'; b.setAttribute('data-m', m);
+b.addEventListener('click', function () { draft.all = m; cust.value = ''; paintChips(); });
+chips.appendChild(b);
+});
+if (draft.all && [0, 30, 60, 120, 180, 240, 360].indexOf(draft.all) < 0) cust.value = draft.all;
+cust.addEventListener('input', function () { var v = parseInt(cust.value, 10); if (v > 0 && v <= 1440) { draft.all = v; paintChips(); } });
+chips.appendChild(cust);
+ed.appendChild(chips); paintChips();
+// ラベルごと
+ed.appendChild(mk('strong', 'tt-goal-h2', GL.labT));
+if (prem) {
+var list = mk('div', 'tt-goal-llist');
+function paintL() {
+list.textContent = '';
+Object.keys(draft.labels).forEach(function (l) {
+var it = mk('div', 'tt-goal-li');
+var dot = mk('span', 'tt-goal-dot'); dot.style.background = labelColor(l); it.appendChild(dot);
+it.appendChild(mk('span', 'tt-goal-ln', l));
+var n = document.createElement('input'); n.type = 'number'; n.min = '1'; n.max = '1440'; n.step = '5'; n.inputMode = 'numeric'; n.className = 'tt-goal-num'; n.value = draft.labels[l]; n.setAttribute('aria-label', l + ' (' + GL.min + ')');
+n.addEventListener('input', function () { var v = parseInt(n.value, 10); if (v > 0 && v <= 1440) draft.labels[l] = v; });
+it.appendChild(n); it.appendChild(mk('span', 'tt-goal-u', GL.min));
+var x = mk('button', 'tt-goal-x', '×'); x.type = 'button'; x.setAttribute('aria-label', GL.rm(l)); x.addEventListener('click', function () { delete draft.labels[l]; paintL(); });
+it.appendChild(x);
+list.appendChild(it);
+});
+}
+paintL(); ed.appendChild(list);
+var addRow = mk('div', 'tt-goal-add');
+var li = document.createElement('input'); li.type = 'text'; li.maxLength = 30; li.className = 'tt-goal-lab'; li.placeholder = GL.labPh; li.setAttribute('aria-label', GL.labPh); li.setAttribute('list', 'tt-labels');
+var ln = document.createElement('input'); ln.type = 'number'; ln.min = '1'; ln.max = '1440'; ln.step = '5'; ln.value = '60'; ln.inputMode = 'numeric'; ln.className = 'tt-goal-num'; ln.setAttribute('aria-label', GL.min);
+var ab = mk('button', 'tt-goal-chip', GL.add); ab.type = 'button';
+ab.addEventListener('click', function () { var l = li.value.trim().slice(0, 30), v = parseInt(ln.value, 10); if (!l || !(v > 0 && v <= 1440) || Object.keys(draft.labels).length >= 20) return; draft.labels[l] = v; li.value = ''; paintL(); });
+addRow.appendChild(li); addRow.appendChild(ln); addRow.appendChild(mk('span', 'tt-goal-u', GL.min)); addRow.appendChild(ab);
+ed.appendChild(addRow);
+ed.appendChild(mk('span', 'tt-goal-sub', GL.labNote));
+} else {
+var lk = mk('p', 'tt-goal-lock'); lk.appendChild(mk('span', null, GL.lock + ' ' + GL.labNote + ' '));
+var a = document.createElement('a'); a.href = PRICING_URL + '#buy'; a.textContent = GL.see; a.addEventListener('click', function () { goalEv('goal_cta', {}); });
+lk.appendChild(a); ed.appendChild(lk);
+}
+var bt = mk('div', 'tt-goal-btns');
+var sv = mk('button', 'tt-goal-save', GL.save); sv.type = 'button';
+var cl = mk('button', 'tt-goal-cancel', GL.close); cl.type = 'button';
+sv.addEventListener('click', function () {
+var ng = cleanGoal(prem ? draft : { all: draft.all, labels: g.labels });
+try { localStorage.setItem(GOAL_KEY, JSON.stringify(ng)); } catch (e) {}
+if (window.__ttSaveGoal) { try { window.__ttSaveGoal(ng); } catch (e) {} }
+goalEv('goal_set', { min: ng.all, labels: Object.keys(ng.labels).length });
+goalPrev = null; goalPrevL = {};
+closeEd();
+});
+cl.addEventListener('click', closeEd);
+function closeEd() { goalEdOpen = false; ed.remove(); rerenderGoal(); }
+bt.appendChild(sv); bt.appendChild(cl); ed.appendChild(bt);
+box.appendChild(ed);
+var first = chips.querySelector('[aria-pressed="true"]') || chips.querySelector('button'); if (first) first.focus();
 }
 function openData() { if (window.__ttOpenData) window.__ttOpenData('today'); }
 // 11/18: ログイン前は、ログのカードの「見本」を出す（押すとログインへ）。名前・時刻は固定の例で、記録は何も読まない
@@ -2231,6 +2384,9 @@ open.setAttribute('aria-label', SAMPLE_L.aria);
 var hd = open.querySelector('.tt-today-head'); if (hd) hd.insertBefore(mk('span', 'tt-today-tag', SAMPLE_L.tag), hd.querySelector('.tt-today-sum'));
 var nw = open.querySelector('.tt-today-now'); if (nw) nw.remove();
 var cta = mk('span', 'tt-today-cta', SAMPLE_L.cta + ' →'); open.appendChild(cta);
+// 11/27: 見本にも目標のリング（ログインすると自分の目標を決められる）
+var sg = mk('span', 'tt-goal-row tt-goal-sample'); sg.setAttribute('aria-hidden', 'true'); sg.appendChild(ringEl(83)); sg.appendChild(mk('span', 'tt-goal-t', GL.sample));
+open.insertBefore(sg, cta);
 var col = document.getElementById('tt-logcol');
 if (!col) { col = document.createElement('section'); col.id = 'tt-logcol'; col.className = 'tt-logcol'; col.setAttribute('aria-label', TL.title); runSec.insertAdjacentElement('afterend', col); }
 (function (r) { if (r && r.parentNode === col) col.insertBefore(card, r); else col.appendChild(card); })(document.getElementById('tt-stk')); document.documentElement.classList.add('tt-has-log');
@@ -3293,6 +3449,7 @@ try { if (p) localStorage.setItem('tt-plan', p); else localStorage.removeItem('t
 plan = p;
 if (p === 'premium' || p === 'free') setTimeout(function () { showNews(p); }, 2500);
 if (window.__ttLook) { try { window.__ttLook.plan(p); } catch (e) {} }
+if (window.__ttGoalRefresh) { try { window.__ttGoalRefresh(); } catch (e) {} }
 if (isPremium()) { var b = document.getElementById('tt-promo'); if (b) b.remove(); var ob = document.getElementById('tt-oldrec'); if (ob) ob.remove(); closeCard(); removeSticker(); }
 else { addBanner(); addSticker(); }
 paintHeader();
