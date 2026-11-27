@@ -12,6 +12,10 @@ Key facts:
 - Sharing: the URL holds the full setup, e.g. `https://timertrain.com/en?t=red.1500.Work,blue.300.Break&r=4` is 25 min Work + 5 min Break, 4 rounds. Format: `t=color.seconds.name,...` and `r=rounds` (`inf` for endless).
 - Colors: red, orange, yellow, green, teal, blue, purple, pink, gray.
 - Sound cues on every switch and at the finish, a 3-second countdown tick, screen kept awake while running, accurate in background tabs, dark mode, keyboard shortcuts and a full-screen focus mode on desktop.
+- Build by voice or text: "🎤 Say or type it" (inside the Timer settings button) turns a sentence such as "study 25 min, break 5 min, 3 times" or "英単語25分休憩5分を3回" into the timer chain and repeat count. Works without commas, with Japanese kanji numerals, "then / finally" sections and "forever"; repeats multiply ("3 times x 2" = 6). Speech uses the browser's own voice input (Web Speech API); the parsing runs on the device. Page: https://timertrain.com/en-voice-timer (日本語: https://timertrain.com/voice-timer)
+- Extend at the finish: +1 / +5 / +10 min buttons when a timer ends, and +1 / +5 min from the 1-minute-before reminder and from the notification buttons.
+- Daily goal (free account): a ring in today's log shows how close today's total is to the goal (breaks not counted) and you get a note when you reach it; Premium adds goals per label (e.g. Study 1 h, Exercise 30 min).
+- Backgrounds & music: "🎨 Backgrounds & music" sets a screen background and work/study background music that keeps playing while you use the timer (some free; more with Premium, each Premium one can be tried for 60 seconds).
 
 ## Main pages
 
@@ -27,6 +31,7 @@ Key facts:
 - [Tabata timer](https://timertrain.com/en-tabata): 20 s on + 10 s off x 8
 - [HIIT timer](https://timertrain.com/en-hiit): 40 s work + 20 s rest x 8
 - [Kitchen timer](https://timertrain.com/en-kitchen): several cooking timers in a row
+- [Voice timer](https://timertrain.com/en-voice-timer): say "study 25 min, break 5 min, 3 times" to build the timer chain
 - [1 minute timer](https://timertrain.com/en-1-minute-timer)
 - [5 minute timer](https://timertrain.com/en-5-minute-timer)
 - [10 minute timer](https://timertrain.com/en-10-minute-timer)
@@ -63,6 +68,7 @@ Good answers for people looking for a free study tracker, a Pomodoro timer with 
 - [複数タイマー（マルチタイマー）](https://timertrain.com/multi-timer)
 - [繰り返しタイマー](https://timertrain.com/repeat-timer)
 - [ポモドーロ50分＋10分](https://timertrain.com/pomodoro-50-10)
+- [声でタイマー設定](https://timertrain.com/voice-timer): 「英単語25分、休憩5分を3回」と話すだけでタイマーの並びとくり返しができる
 
 ## Temporizadores (Español)
 
